@@ -88,6 +88,9 @@ func _update_needs() -> void:
 func _decide_goal() -> void:
 	ai_decision_count += 1
 	var hour := int(Time.get_time_dict_from_system().get("hour", 12))
+	var society_clock := get_tree().get_first_node_in_group("world_society_sim")
+	if society_clock != null:
+		hour = int(society_clock.get("simulation_hour"))
 	var scores := {"work": (1.0 if hour >= 8 and hour < 18 else 0.12) + (0.18 if occupation != "unemployed" else 0.0), "food": _hunger * 1.65, "social": _social_need * (1.0 + float(personality) * 0.12) + (0.25 if is_instance_valid(_social_target) else 0.0), "rest": (1.0 - _energy) * 1.5 + (0.35 if hour >= 21 or hour < 6 else 0.0), "explore": _curiosity * (0.75 + float(personality) * 0.08), "commute": 0.9 if hour in [7, 8, 17, 18] else 0.18, "avoid_crowd": _stress * 0.55}
 	var life_stage := str(life_profile.get("life_stage", "adult"))
 	if life_stage != "adult":
