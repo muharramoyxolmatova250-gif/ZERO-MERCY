@@ -17,7 +17,8 @@ def main()->int:
  a=p.parse_args()
  west,south,east,north=a.bbox
  if not(-180<=west<east<=180 and -90<=south<north<=90): p.error("Invalid bbox.")
- if not(0.001<=a.tile_deg<=1.0) or a.tile_size_m<100: p.error("Invalid tile size.")
+ if not (0.001 <= a.tile_deg <= 1.0): p.error("Invalid --tile-deg; expected 0.001..1.0.")
+ if a.tile_size_m is not None and a.tile_size_m < 100: p.error("Invalid --tile-size-m; expected >=100 metres.")
  anchor_lon,anchor_lat=a.anchor
  # Pick a square runtime grid cell smaller than the narrowest east-west tile spacing.
  tile_size_m = a.tile_size_m if a.tile_size_m is not None else min(4000.0, a.tile_deg * 111320.0 * math.cos(math.radians(anchor_lat)) * 0.82)
