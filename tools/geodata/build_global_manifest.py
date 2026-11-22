@@ -44,34 +44,57 @@ def safe_id(value: str) -> str:
     return re.sub(r"[^a-zA-Z0-9._-]+", "_", value).strip("_")
 
 
-def _geometry_bboxes(geometry: dict) -> list[list[float]]:
-    points: list[tuple[float, float]] = []
-    def visit(value):
-        if isinstance(value, (list, tuple)):
-            if len(value) >= 2 and isinstance(value[0], (int, float)) and isinstance(value[1], (int, float)):
-                points.append((float(value[0]), float(value[1])))
-            else:
-                for child in value:
-                    visit(child)
-    visit((geometry or {}).get("coordinates", []))
+def _ring_bboxes(ring: list) -> list[list[float]]:
+    points = [(float(point[0]), float(point[1])) for point in ring
+              if isinstance(point, (list, tuple)) and len(point) >= 2
+              and isinstance(point[0], (int, float)) and isinstance(point[1], (int, float))]
     if not points:
         return []
     longitudes = sorted({((lon + 180.0) % 360.0) - 180.0 for lon, _ in points})
     south = min(lat for _, lat in points)
     north = max(lat for _, lat in points)
     if len(longitudes) == 1:
-        return [[longitudes[0], south, longitudes[0] + 0.000001, north]]
+        lon = longitudes[0]
+        east = min(180.0, lon + 0.000001)
+        return [[lon, south, east, north]] if east > lon else [[-180.0, south, -179.999999, north]]
     gaps = []
     for i, lon in enumerate(longitudes):
         nxt = longitudes[(i + 1) % len(longitudes)] + (360.0 if i == len(longitudes) - 1 else 0.0)
         gaps.append((nxt - lon, i))
     _, gap_index = max(gaps)
-    west = longitudes[(gap_index + 1) % len(longitudes)]
-    east = longitudes[gap_index]
+    west, east = longitudes[(gap_index + 1) % len(longitudes)], longitudes[gap_index]
     if west <= east:
         return [[west, south, east, north]]
     return [[west, south, 180.0, north], [-180.0, south, east, north]]
 
+
+def _geometry_bboxes(geometry: dict) -> list[list[float]]:
+    if not geometry:
+        return []
+    kind = geometry.get("type")
+    coordinates = geometry.get("coordinates")
+    polygons = []
+    if kind == "Polygon":
+        polygons = [coordinates or []]
+    elif kind == "MultiPolygon":
+        polygons = coordinates or []
+    elif kind == "GeometryCollection":
+        result = []
+        for child in geometry.get("geometries", []):
+            result.extend(_geometry_bboxes(child))
+        return result
+    else:
+        return []
+    result, seen = [], set()
+    for polygon in polygons:
+        if not polygon:
+            continue
+        for bbox in _ring_bboxes(polygon[0]):
+            key = tuple(round(value, 7) for value in bbox)
+            if key not in seen:
+                result.append(bbox)
+                seen.add(key)
+    return result
 
 def build_catalog(index: dict) -> dict:
     features = index.get("features", [])
