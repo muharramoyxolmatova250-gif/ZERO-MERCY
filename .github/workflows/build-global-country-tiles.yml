@@ -12,6 +12,7 @@ on:
       - "tools/geodata/validate_osm_tile_batch.py"
       - "tools/geodata/select_global_country_batch.py"
       - "tools/geodata/advance_global_country_batch.py"
+      - "tools/geodata/rebuild_global_runtime_index.py"
       - "scripts/world/region_streamer.gd"
       - "scripts/world/osm_region.gd"
   workflow_dispatch:
@@ -123,6 +124,7 @@ jobs:
               cmd += ["--bbox",*map(str,bbox)]
           subprocess.run(cmd,check=True)
           PY
+          python tools/geodata/rebuild_global_runtime_index.py
       - name: Process bounded tile batch
         if: steps.select.outputs.has_work == 'true'
         env:
