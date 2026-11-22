@@ -59,13 +59,56 @@ func _block(center: Vector3) -> void:
 
 func _building(base: Vector3, size: Vector3) -> void:
 	var body_color: Color = mats[rng.randi_range(0, mats.size() - 1)].albedo_color
-	_box(base + Vector3(0, size.y * 0.5, 0), size, body_color, false, generate_collision)
+	# Keep the visual tower shell, but build collision as separate wall segments so the lobby entrance is traversable.
+	_box(base + Vector3(0, size.y * 0.5, 0), size, body_color, false, false)
+	if generate_collision:
+		_building_collision_shell(base, size)
+	_building_lobby(base, size, _window_materials[rng.randi_range(0, 1)].albedo_color)
 	var accent_index := rng.randi_range(0, 1)
 	var accent: Color = _window_materials[accent_index].albedo_color
 	_box(base + Vector3(0, size.y + 0.12, 0), Vector3(size.x + 0.4, 0.24, size.z + 0.4), accent, true, false)
 	_facade_windows_instanced(base, size, accent_index)
 	_ground_floor_frontage(base, size, accent)
 	_roof_detail(base, size, accent)
+
+
+func _building_collision_shell(base: Vector3, size: Vector3) -> void:
+	var wall := 0.45
+	var door_width := minf(2.2, size.x * 0.24)
+	var front_z := base.z - size.z * 0.5
+	# Left and right front wall segments leave a real doorway in the centre.
+	var side_width := maxf(0.5, (size.x - door_width) * 0.5)
+	_box(Vector3(base.x - (door_width + side_width) * 0.5, size.y * 0.5, front_z), Vector3(side_width, size.y, wall), Color.BLACK, false, true)
+	_box(Vector3(base.x + (door_width + side_width) * 0.5, size.y * 0.5, front_z), Vector3(side_width, size.y, wall), Color.BLACK, false, true)
+	_box(Vector3(base.x, size.y - 1.5, front_z), Vector3(door_width, 3.0, wall), Color.BLACK, false, true)
+	_box(Vector3(base.x, size.y * 0.5, base.z + size.z * 0.5), Vector3(size.x, size.y, wall), Color.BLACK, false, true)
+	_box(Vector3(base.x - size.x * 0.5, size.y * 0.5, base.z), Vector3(wall, size.y, size.z), Color.BLACK, false, true)
+	_box(Vector3(base.x + size.x * 0.5, size.y * 0.5, base.z), Vector3(wall, size.y, size.z), Color.BLACK, false, true)
+	_box(Vector3(base.x, -0.12, base.z), Vector3(size.x, 0.24, size.z), Color.BLACK, false, true)
+
+
+func _building_lobby(base: Vector3, size: Vector3, accent: Color) -> void:
+	var room_depth := minf(size.z * 0.72, 8.0)
+	var room_width := minf(size.x * 0.72, 9.0)
+	var lobby_center := Vector3(base.x, 0.0, base.z - size.z * 0.5 + room_depth * 0.5 + 0.55)
+	_box(lobby_center + Vector3(0.0, 0.035, 0.0), Vector3(room_width, 0.07, room_depth), Color(0.018, 0.035, 0.055), false, false)
+	_box(lobby_center + Vector3(0.0, 1.35, room_depth * 0.5 - 0.35), Vector3(room_width * 0.72, 2.5, 0.16), Color(0.025, 0.055, 0.085), false, false)
+	_box(lobby_center + Vector3(0.0, 1.55, room_depth * 0.5 - 0.23), Vector3(room_width * 0.58, 0.12, 0.12), accent, true, false)
+	# Reception counter, interactive-looking holographic directory and seating.
+	_box(lobby_center + Vector3(0.0, 0.62, -room_depth * 0.08), Vector3(room_width * 0.42, 1.15, 0.72), Color(0.025, 0.04, 0.07), false, false)
+	_box(lobby_center + Vector3(0.0, 1.25, -room_depth * 0.08), Vector3(room_width * 0.44, 0.08, 0.78), accent, true, false)
+	_box(lobby_center + Vector3(-room_width * 0.27, 1.45, room_depth * 0.12), Vector3(0.08, 1.6, 0.08), accent, true, false)
+	_box(lobby_center + Vector3(-room_width * 0.27, 2.15, room_depth * 0.12), Vector3(1.4, 0.8, 0.06), Color(0.0, 0.18, 0.25), true, false)
+	for seat_x in [-1.0, 1.0]:
+		_box(lobby_center + Vector3(seat_x * room_width * 0.27, 0.42, -room_depth * 0.25), Vector3(1.0, 0.35, 0.75), Color(0.04, 0.055, 0.08), false, false)
+	var lobby_light := OmniLight3D.new()
+	lobby_light.name = "LobbyNeonLight"
+	lobby_light.position = lobby_center + Vector3(0.0, 2.8, 0.0)
+	lobby_light.light_color = accent
+	lobby_light.light_energy = 1.1
+	lobby_light.omni_range = 10.0
+	lobby_light.shadow_enabled = false
+	add_child(lobby_light)
 
 func _facade_windows_instanced(base: Vector3, size: Vector3, accent_index: int) -> void:
 	var columns := maxi(2, int(size.x / 2.8))
