@@ -3,8 +3,7 @@ extends Node3D
 ## Export GeoJSON from a regional PBF with:
 ## osmium export region.osm.pbf -o region.geojson
 ##
-## This is a first-pass local tangent/equirectangular preview, not a global projection.
-## Keep each region small (e.g. a few kilometres across) to limit distortion.
+## Uses a WGS84 local tangent approximation; keep tiles small to limit distortion.
 
 @export_file("*.geojson") var geojson_path := "res://data/osm/region.geojson"
 @export var region_center_lat := 40.78
@@ -12,7 +11,9 @@ extends Node3D
 @export var metres_per_unit := 1.0
 @export var road_width_default := 5.0
 @export var building_height_default := 8.0
+@export_range(100.0, 50000.0, 100.0) var region_size_m := 4000.0
 @export var max_features := 100000
+var feature_stats: Dictionary = {}
 
 var _road_material: StandardMaterial3D
 var _building_material: StandardMaterial3D
@@ -59,7 +60,7 @@ func _material(base: Color, glow: Color, energy: float) -> StandardMaterial3D:
 
 func _add_ground() -> void:
 	var plane := PlaneMesh.new()
-	plane.size = Vector2(12000.0, 12000.0)
+	plane.size = Vector2(region_size_m * metres_per_unit, region_size_m * metres_per_unit)
 	var ground := MeshInstance3D.new()
 	ground.name = "RegionGround"
 	ground.mesh = plane
@@ -99,7 +100,10 @@ func _load_features(path: String) -> void:
 			counts.waterways += 1
 		else:
 			counts.skipped += 1
-	print("ZERO MERCY OSM region: ", counts, " / ", features.size(), " input features.")
+	feature_stats = counts.duplicate(true)
+	feature_stats["processed"] = limit
+	feature_stats["total"] = features.size()
+	print("ZERO MERCY OSM region: ", feature_stats, " / ", features.size(), " input features.")
 
 
 func _add_road_geometry(kind: String, coords: Variant, tags: Dictionary) -> void:
@@ -240,10 +244,9 @@ func _add_quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3) 
 
 
 func _coordinate_to_local(coord: Array) -> Vector3:
-	var lon := float(coord[0])
-	var lat := float(coord[1])
-	var metres_per_degree_lat := 111320.0
-	var metres_per_degree_lon := 111320.0 * cos(deg_to_rad(region_center_lat))
-	var x := (lon - region_center_lon) * metres_per_degree_lon * metres_per_unit
-	var z := -(lat - region_center_lat) * metres_per_degree_lat * metres_per_unit
-	return Vector3(x, 0.0, z)
+	if coord.size() < 2:
+		return Vector3.ZERO
+	var local := EarthCoordinates.lat_lon_to_local(
+		float(coord[1]), float(coord[0]), region_center_lat, region_center_lon
+	)
+	return Vector3(local.x * metres_per_unit, 0.0, local.y * metres_per_unit)
