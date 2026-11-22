@@ -3,6 +3,7 @@ extends Node3D
 const PLAYER_SCENE := preload("res://scenes/player.tscn")
 const HUD_SCENE := preload("res://scenes/ui/mission_hud.tscn")
 const BEACON_SCENE := preload("res://scenes/world/mission_beacon.tscn")
+const RESCUE_SCENE := preload("res://scenes/world/rescue_zone.tscn")
 
 var rng := RandomNumberGenerator.new()
 
@@ -18,6 +19,9 @@ func _ready() -> void:
 	var beacon := BEACON_SCENE.instantiate()
 	beacon.position = Vector3(0, 0, -8)
 	add_child(beacon)
+	var rescue_zone := RESCUE_SCENE.instantiate()
+	rescue_zone.position = Vector3(15, 0, -25)
+	add_child(rescue_zone)
 
 func _build_environment() -> void:
 	var world_env := WorldEnvironment.new()
