@@ -4,6 +4,7 @@ extends Node3D
 @export_file("*.json") var tile_index_path := "res://data/world/region_tiles.json"
 @export var region_scene: PackedScene
 @export var terrain_scene: PackedScene = preload("res://scenes/world/dem_terrain_tile.tscn")
+@export var cyberpunk_district_scene: PackedScene = preload("res://scenes/world/cyberpunk_district.tscn")
 @export_range(100.0,100000.0,100.0) var tile_size_m := 11132.0
 @export_range(0,8,1) var load_radius := 1
 @export_range(1,12,1) var unload_radius := 2
@@ -14,6 +15,7 @@ var _tiles: Dictionary = {}
 var _loaded: Dictionary = {}
 var _anchor_lon := 72.3
 var _anchor_lat := 40.7
+var _settlement_catalog_cache: Dictionary = {}
 var _queue: Array[Vector2i] = []
 var _last := Vector2i(2147483647, 2147483647)
 var indexed_tile_count := 0
@@ -127,20 +129,93 @@ func _load_queue() -> void:
                 float(entry.get("origin_z", coord.y * tile_size_m))
             )
             nodes.append(instance)
+        var terrain_for_cell: Node3D = null
         var dem_metadata := str(entry.get("dem_metadata_path", ""))
         var dem_height := str(entry.get("dem_height_path", ""))
         if terrain_scene != null and not dem_metadata.is_empty() and not dem_height.is_empty():
             if FileAccess.file_exists(dem_metadata) and FileAccess.file_exists(dem_height):
-                var terrain := terrain_scene.instantiate() as Node3D
-                terrain.set("metadata_path", dem_metadata)
-                terrain.set("height_path", dem_height)
-                _root.add_child(terrain)
-                nodes.append(terrain)
-                _place_target_on_terrain(terrain)
+                terrain_for_cell = terrain_scene.instantiate() as Node3D
+                terrain_for_cell.set("metadata_path", dem_metadata)
+                terrain_for_cell.set("height_path", dem_height)
+                _root.add_child(terrain_for_cell)
+                nodes.append(terrain_for_cell)
+                _place_target_on_terrain(terrain_for_cell)
+        _load_cyberpunk_districts(entry, nodes, terrain_for_cell)
         if not nodes.is_empty():
             _loaded[key] = {"coord": coord, "nodes": nodes}
             done += 1
 
+
+
+func _load_cyberpunk_districts(entry: Dictionary, nodes: Array[Node3D], terrain: Node3D) -> void:
+    if cyberpunk_district_scene == null:
+        return
+    var tile_id := str(entry.get("tile_id", ""))
+    if tile_id.is_empty():
+        return
+    var spawned_in_cell: Dictionary = {}
+    var source_regions: Array = entry.get("source_regions", [])
+    for source_region in source_regions:
+        var catalog := _get_settlement_catalog(str(source_region))
+        for settlement in catalog.get("settlements", []):
+            if typeof(settlement) != TYPE_DICTIONARY:
+                continue
+            var settlement_id := str(settlement.get("id", ""))
+            if settlement_id.is_empty() or spawned_in_cell.has(settlement_id):
+                continue
+            if str(settlement.get("home_tile_id", "")) != tile_id:
+                continue
+            var place := str(settlement.get("place", ""))
+            var population := int(settlement.get("population", 0))
+            if place != "city" and not (place == "town" and population >= 50000):
+                continue
+            var latitude := float(settlement.get("lat", 0.0))
+            var longitude := float(settlement.get("lon", 0.0))
+            var elevation := 0.0
+            if terrain != null and terrain.has_method("sample_elevation"):
+                var sampled := float(terrain.call("sample_elevation", latitude, longitude))
+                if is_finite(sampled):
+                    elevation = sampled
+            var district := cyberpunk_district_scene.instantiate() as Node3D
+            if place == "city":
+                district.set("blocks_per_side", 7 if population >= 1000000 else 5)
+                district.set("block_spacing", 68.0 if population >= 1000000 else 58.0)
+                district.set("min_building_height", 32.0 if population >= 1000000 else 22.0)
+                district.set("max_building_height", 210.0 if population >= 1000000 else 150.0)
+            else:
+                district.set("blocks_per_side", 3)
+                district.set("block_spacing", 44.0)
+                district.set("min_building_height", 10.0)
+                district.set("max_building_height", 70.0)
+            district.set("seed_value", int(abs(hash(settlement_id))))
+            district.name = ("Cyberpunk_" + str(settlement.get("name", place))).validate_node_name()
+            district.position = Vector3(
+                (longitude - _anchor_lon) * 111320.0,
+                elevation,
+                -(latitude - _anchor_lat) * 111320.0
+            )
+            _root.add_child(district)
+            nodes.append(district)
+            spawned_in_cell[settlement_id] = true
+
+
+func _get_settlement_catalog(region_id: String) -> Dictionary:
+    if _settlement_catalog_cache.has(region_id):
+        return _settlement_catalog_cache[region_id]
+    var path := "res://data/world/tile_jobs/urban_bboxes/" + region_id + ".json"
+    if not FileAccess.file_exists(path):
+        _settlement_catalog_cache[region_id] = {}
+        return {}
+    var file := FileAccess.open(path, FileAccess.READ)
+    if file == null:
+        _settlement_catalog_cache[region_id] = {}
+        return {}
+    var parsed: Variant = JSON.parse_string(file.get_as_text())
+    if typeof(parsed) != TYPE_DICTIONARY:
+        _settlement_catalog_cache[region_id] = {}
+        return {}
+    _settlement_catalog_cache[region_id] = parsed
+    return parsed
 
 func _place_target_on_terrain(terrain: Node3D) -> void:
     if _target == null or not terrain.has_method("sample_elevation"):
