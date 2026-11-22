@@ -36,10 +36,10 @@ def main()->int:
         pbf.parent.mkdir(parents=True,exist_ok=True); geo.parent.mkdir(parents=True,exist_ok=True)
         if geo.exists() and geo.stat().st_size>100 and not a.force:
             print(f"Skip existing {geo}"); completed+=1; continue
-        temp=pbf.with_suffix(pbf.suffix+".part")
+        temp=pbf.with_name(pbf.stem+".part.osm.pbf")
         run(["osmium","extract","-b",f"{west},{south},{east},{north}",str(a.source),"-o",str(temp),"--overwrite"])
         temp.replace(pbf)
-        geo_tmp=geo.with_suffix(geo.suffix+".part")
+        geo_tmp=geo.with_name(geo.stem+".part.geojson")
         run(["osmium","export",str(pbf),"-o",str(geo_tmp),"--overwrite"])
         if geo_tmp.stat().st_size<2: raise RuntimeError(f"Empty GeoJSON export: {geo_tmp}")
         geo_tmp.replace(geo)
