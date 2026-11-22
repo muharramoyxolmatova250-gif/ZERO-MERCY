@@ -40,6 +40,15 @@ func _run() -> void:
 		_fail("Cyberpunk street lighting missing: " + str(street_lights))
 		return
 	print("PASS Stage 3: ", street_lights, " street lights generated at district junctions.")
+	var storefronts := _count_named_nodes(city, "OSM_Building")
+	if storefronts > 0:
+		_fail("Unexpected OSM building nodes in procedural city fixture.")
+		return
+	var city_doors := _count_nodes_of_type(city, StaticBody3D)
+	if city_doors < 20:
+		_fail("Procedural city building collision/frontage count too low: " + str(city_doors))
+		return
+	print("PASS Stage 3: building entrances and illuminated street-level frontage generated.")
 	var overview := load("res://scenes/world/earth_overview.tscn")
 	if overview == null:
 		_fail("Earth overview scene failed to load.")
