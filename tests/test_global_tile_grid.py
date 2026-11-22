@@ -15,6 +15,8 @@ class GlobalTileGridTests(unittest.TestCase):
             index = base / "region_tiles.json"
             first_plan = base / "first.json"
             second_plan = base / "second.json"
+            bbox_file = base / "bboxes.json"
+            bbox_file.write_text(json.dumps({"bboxes": [[72.2, 40.6, 72.4, 40.8]]}))
             common = [
                 sys.executable, str(PLANNER),
                 "--tile-deg", "0.1", "--tile-size-m", "11132",
@@ -22,7 +24,7 @@ class GlobalTileGridTests(unittest.TestCase):
                 "--index-output", str(index),
             ]
             subprocess.run(common + [
-                "--region", "country_a", "--bbox", "72.2", "40.6", "72.4", "40.8",
+                "--region", "country_a", "--bbox-file", str(bbox_file),
                 "--output", str(first_plan),
             ], check=True, cwd=ROOT)
             subprocess.run(common + [
