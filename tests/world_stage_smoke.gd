@@ -88,6 +88,37 @@ func _run() -> void:
 		_fail("OSM feature accounting did not process all fixture features.")
 		return
 	print("PASS Stage 2: WGS84 OSM roads, building footprints and waterways imported.")
+	# Runtime test for loading an indexed regional OSM tile.
+	var stream_index := "user://zero_mercy_stream_smoke.json"
+	var stream_file := FileAccess.open(stream_index, FileAccess.WRITE)
+	if stream_file == null:
+		_fail("Could not create region streamer smoke index.")
+		return
+	var stream_data := {"_tile_size_m": 1000.0, "0,0": {"geojson_path": "res://tests/fixtures/osm_region_smoke.geojson", "center_lat": 41.0, "center_lon": 69.0, "origin_x": 0.0, "origin_z": 0.0}}
+	stream_file.store_string(JSON.stringify(stream_data))
+	stream_file.close()
+	var stream_root := Node3D.new()
+	root.add_child(stream_root)
+	var stream_target := Node3D.new()
+	stream_target.name = "StreamTarget"
+	stream_root.add_child(stream_target)
+	var streamer := Node3D.new()
+	streamer.set_script(load("res://scripts/world/region_streamer.gd"))
+	streamer.set("target_path", NodePath("../StreamTarget"))
+	streamer.set("tile_index_path", stream_index)
+	streamer.set("region_scene", load("res://scenes/world/osm_region.tscn"))
+	streamer.set("load_radius", 0)
+	streamer.set("unload_radius", 1)
+	streamer.set("max_operations_per_frame", 2)
+	stream_root.add_child(streamer)
+	await process_frame
+	await process_frame
+	if int(streamer.get("indexed_tile_count")) != 1 or int(streamer.get("loaded_tile_count")) != 1:
+		_fail("Region streamer did not load indexed tile.")
+		return
+	print("PASS Stage 2: regional tile streamer loads indexed map data.")
+	stream_root.queue_free()
+
 
 	var main_scene: PackedScene = load("res://scenes/main.tscn")
 	if main_scene == null:
