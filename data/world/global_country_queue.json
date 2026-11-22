@@ -1,11 +1,30 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "source_catalogue": "/home/runner/work/ZERO-MERCY/ZERO-MERCY/data/world/global_regions.json",
-  "selection": "Country extracts plus continent PBF fallbacks clipped to uncovered country boundaries",
+  "selection": "Priority country extracts plus continent PBF fallbacks clipped to uncovered country boundaries",
   "extract_count": 195,
   "covered_iso3166_1_count": 204,
   "supplemental_parent_extract_count": 5,
   "countries": [
+    {
+      "id": "uzbekistan",
+      "name": "Uzbekistan",
+      "iso3166_1": [
+        "UZ"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/uzbekistan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          55.97708,
+          37.16636,
+          73.17463,
+          45.61884
+        ]
+      ],
+      "extract_kind": "country"
+    },
     {
       "id": "afghanistan",
       "name": "Afghanistan",
@@ -21,6 +40,164 @@
           29.36856,
           74.90017,
           38.50674
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "us",
+      "name": "United States of America",
+      "iso3166_1": [
+        "US"
+      ],
+      "parent": "north-america",
+      "pbf_url": "https://download.geofabrik.de/north-america/us/us-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -180.0,
+          15.92097,
+          -66.87576000000001,
+          72.98845
+        ],
+        [
+          170.9033,
+          50.02187,
+          180.0,
+          56.3099
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "china",
+      "name": "China",
+      "iso3166_1": [
+        "CN"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/china/china-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          73.41788,
+          14.27437,
+          134.8036,
+          53.65559
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "japan",
+      "name": "Japan",
+      "iso3166_1": [
+        "JP"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/japan/japan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          122.5607,
+          20.08228,
+          154.4709,
+          45.8154
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "india",
+      "name": "India",
+      "iso3166_1": [
+        "IN"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/india/india-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          67.67457,
+          5.896067,
+          97.41989,
+          35.73091
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "south-korea",
+      "name": "South Korea",
+      "iso3166_1": [
+        "KR"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/south-korea/south-korea-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          124.3188,
+          32.36076,
+          132.3386,
+          38.64966
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "united-kingdom",
+      "name": "United Kingdom",
+      "iso3166_1": [
+        "GB"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/united-kingdom/united-kingdom-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -14.858499999999992,
+          49.4192,
+          2.641786,
+          61.13564
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "germany",
+      "name": "Germany",
+      "iso3166_1": [
+        "DE"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/germany/germany-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          5.864417,
+          47.26543,
+          15.05078,
+          55.14777
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "france",
+      "name": "France",
+      "iso3166_1": [
+        "FR"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/france/france-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -6.937207000000001,
+          41.23866,
+          9.9,
+          51.4288
         ]
       ],
       "extract_kind": "country"
@@ -621,25 +798,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "china",
-      "name": "China",
-      "iso3166_1": [
-        "CN"
-      ],
-      "parent": "asia",
-      "pbf_url": "https://download.geofabrik.de/asia/china/china-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          73.41788,
-          14.27437,
-          134.8036,
-          53.65559
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "colombia",
       "name": "Colombia",
       "iso3166_1": [
@@ -1070,25 +1228,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "france",
-      "name": "France",
-      "iso3166_1": [
-        "FR"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/france/france-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          -6.937207000000001,
-          41.23866,
-          9.9,
-          51.4288
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "gabon",
       "name": "Gabon",
       "iso3166_1": [
@@ -1145,25 +1284,6 @@
           41.05117,
           46.73959,
           43.5899
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "germany",
-      "name": "Germany",
-      "iso3166_1": [
-        "DE"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/germany/germany-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          5.864417,
-          47.26543,
-          15.05078,
-          55.14777
         ]
       ],
       "extract_kind": "country"
@@ -1398,25 +1518,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "india",
-      "name": "India",
-      "iso3166_1": [
-        "IN"
-      ],
-      "parent": "asia",
-      "pbf_url": "https://download.geofabrik.de/asia/india/india-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          67.67457,
-          5.896067,
-          97.41989,
-          35.73091
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "indonesia",
       "name": "Indonesia (with East Timor)",
       "iso3166_1": [
@@ -1565,25 +1666,6 @@
           16.35,
           -75.50999999999999,
           19.16
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "japan",
-      "name": "Japan",
-      "iso3166_1": [
-        "JP"
-      ],
-      "parent": "asia",
-      "pbf_url": "https://download.geofabrik.de/asia/japan/japan-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          122.5607,
-          20.08228,
-          154.4709,
-          45.8154
         ]
       ],
       "extract_kind": "country"
@@ -2990,25 +3072,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "south-korea",
-      "name": "South Korea",
-      "iso3166_1": [
-        "KR"
-      ],
-      "parent": "asia",
-      "pbf_url": "https://download.geofabrik.de/asia/south-korea/south-korea-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          124.3188,
-          32.36076,
-          132.3386,
-          38.64966
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "south-sudan",
       "name": "South Sudan",
       "iso3166_1": [
@@ -3433,50 +3496,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "united-kingdom",
-      "name": "United Kingdom",
-      "iso3166_1": [
-        "GB"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/united-kingdom/united-kingdom-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          -14.858499999999992,
-          49.4192,
-          2.641786,
-          61.13564
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "us",
-      "name": "United States of America",
-      "iso3166_1": [
-        "US"
-      ],
-      "parent": "north-america",
-      "pbf_url": "https://download.geofabrik.de/north-america/us/us-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          -180.0,
-          15.92097,
-          -66.87576000000001,
-          72.98845
-        ],
-        [
-          170.9033,
-          50.02187,
-          180.0,
-          56.3099
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "uruguay",
       "name": "Uruguay",
       "iso3166_1": [
@@ -3491,25 +3510,6 @@
           -36.2487,
           -52.77229999999997,
           -30.07355
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "uzbekistan",
-      "name": "Uzbekistan",
-      "iso3166_1": [
-        "UZ"
-      ],
-      "parent": "asia",
-      "pbf_url": "https://download.geofabrik.de/asia/uzbekistan-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          55.97708,
-          37.16636,
-          73.17463,
-          45.61884
         ]
       ],
       "extract_kind": "country"
