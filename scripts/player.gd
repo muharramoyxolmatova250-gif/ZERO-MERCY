@@ -155,52 +155,61 @@ func _reload_weapon() -> void:
 	ammo_changed.emit(ammo_in_magazine, reserve_ammo)
 
 func _interact_with_world() -> void:
- if is_instance_valid(_held_item):
-  _drop_held_item()
-  return
- var origin := camera.global_position
- var end := origin + (-camera.global_transform.basis.z * 3.5)
- var query := PhysicsRayQueryParameters3D.create(origin, end)
- query.exclude = [get_rid()]
- query.collide_with_areas = false
- var hit := get_world_3d().direct_space_state.intersect_ray(query)
- if hit.is_empty(): return
- var collider: Object = hit.get("collider")
- if collider is StaticBody3D and collider.is_in_group("world_pickup"):
-  _pick_up_item(collider as Node3D)
+	if is_instance_valid(_held_item):
+		_drop_held_item()
+		return
+	var origin := camera.global_position
+	var end := origin + (-camera.global_transform.basis.z * 3.5)
+	var query := PhysicsRayQueryParameters3D.create(origin, end)
+	query.exclude = [get_rid()]
+	query.collide_with_areas = false
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return
+	var collider: Object = hit.get("collider")
+	if collider is StaticBody3D and collider.is_in_group("world_pickup"):
+		_pick_up_item(collider as Node3D)
+
 
 func _pick_up_item(item: Node3D) -> void:
- if not is_instance_valid(item) or _held_item != null: return
- _held_item = item
- item.set_meta("original_collision_layer", item.collision_layer if item is CollisionObject3D else 1)
- if item is CollisionObject3D:
-  item.collision_layer = 0
-  item.collision_mask = 0
- item.reparent(_hand_anchor, true)
- var tween := create_tween()
- tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
- tween.tween_property(item, "position", Vector3.ZERO, 0.28)
- tween.parallel().tween_property(item, "rotation", Vector3.ZERO, 0.28)
- if item.has_method("set_being_held"): item.call("set_being_held", true)
+	if not is_instance_valid(item) or _held_item != null:
+		return
+	_held_item = item
+	item.set_meta("original_collision_layer", item.collision_layer if item is CollisionObject3D else 1)
+	if item is CollisionObject3D:
+		item.collision_layer = 0
+		item.collision_mask = 0
+	item.reparent(_hand_anchor, true)
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(item, "position", Vector3.ZERO, 0.28)
+	tween.parallel().tween_property(item, "rotation", Vector3.ZERO, 0.28)
+	if item.has_method("set_being_held"):
+		item.call("set_being_held", true)
+
 
 func _drop_held_item() -> void:
- if not is_instance_valid(_held_item): _held_item = null; return
- var item := _held_item
- _held_item = null
- var origin := camera.global_position
- var end := origin + (-camera.global_transform.basis.z * 2.2)
- var query := PhysicsRayQueryParameters3D.create(origin, end)
- query.exclude = [get_rid()]
- query.collide_with_areas = false
- var hit := get_world_3d().direct_space_state.intersect_ray(query)
- var destination := end
- if not hit.is_empty(): destination = (hit.position as Vector3) + Vector3.UP * 0.45
- var world_parent := get_tree().current_scene
- item.reparent(world_parent, true)
- if item is CollisionObject3D:
-  item.collision_layer = int(item.get_meta("original_collision_layer", 1))
-  item.collision_mask = 1
- var tween := create_tween()
- tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
- tween.tween_property(item, "global_position", destination, 0.32)
- if item.has_method("set_being_held"): item.call("set_being_held", false)
+	if not is_instance_valid(_held_item):
+		_held_item = null
+		return
+	var item := _held_item
+	_held_item = null
+	var origin := camera.global_position
+	var end := origin + (-camera.global_transform.basis.z * 2.2)
+	var query := PhysicsRayQueryParameters3D.create(origin, end)
+	query.exclude = [get_rid()]
+	query.collide_with_areas = false
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	var destination := end
+	if not hit.is_empty():
+		destination = hit.position + Vector3.UP * 0.45
+	var world_parent := get_tree().current_scene
+	item.reparent(world_parent, true)
+	if item is CollisionObject3D:
+		item.collision_layer = int(item.get_meta("original_collision_layer", 1))
+		item.collision_mask = 1
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(item, "global_position", destination, 0.32)
+	if item.has_method("set_being_held"):
+		item.call("set_being_held", false)
