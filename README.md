@@ -6,9 +6,9 @@ ZERO MERCY is planned as a planet-scale open-world game set on a cyberpunk versi
 
 ## Current development stage
 
-Stage 1 — Core Game Foundation has been implemented in the repository. It includes a third-person controller, player health and stamina, a basic hitscan weapon, a live HUD, a data-driven prologue objective chain, a local save manager and a procedural cyberpunk blockout city.
+Stage 1 — Core Game Foundation implementation is complete in the repository. It includes a third-person controller, player health and stamina, a basic hitscan weapon, a live HUD, a data-driven prologue objective chain, a local save manager and a procedural cyberpunk blockout city.
 
-**Important:** Stage 1 still requires a Godot 4.3+ editor/runtime validation pass. The protagonist is currently a capsule blockout, not the final character model. See [docs/STAGE_1_CORE_FOUNDATION.md](docs/STAGE_1_CORE_FOUNDATION.md) for the acceptance checklist and known limitations.
+**Verification note:** Stage 1 implementation is complete; automated Godot 4.3 headless validation and an end-to-end playtest are still required before runtime correctness is certified. The protagonist is currently a capsule blockout, not the final character model. See [docs/STAGE_1_CORE_FOUNDATION.md](docs/STAGE_1_CORE_FOUNDATION.md) for the acceptance checklist and known limitations.
 
 ## Run it
 
