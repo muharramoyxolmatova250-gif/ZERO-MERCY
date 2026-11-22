@@ -13,7 +13,7 @@ def initial_state() -> dict:
             "next_tile_by_region": {}, "completed_regions": []}
 
 def select_batch(queue: dict, state: dict, region_id: str = "",
-                 tile_start: str = "", tile_count: int = 32) -> dict:
+                 tile_start: str = "", tile_count: int = 8) -> dict:
     countries = queue.get("countries", [])
     by_id = {item["id"]: item for item in countries}
     offsets = state.get("next_tile_by_region", {})
@@ -42,7 +42,7 @@ def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--region-id", default="")
     p.add_argument("--tile-start", default="")
-    p.add_argument("--tile-count", type=int, default=32)
+    p.add_argument("--tile-count", type=int, default=8)
     p.add_argument("--queue", type=Path, default=QUEUE)
     p.add_argument("--state", type=Path, default=STATE)
     p.add_argument("--output", type=Path, required=True)
