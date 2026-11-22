@@ -168,7 +168,16 @@ func _run() -> void:
 	if int(advanced_snapshot.get("simulation_day", 0)) < 31:
 		_fail("NPC life simulation did not advance its world calendar.")
 		return
-	print("PASS Stage 5: persistent NPC profiles, ages, school/work stages and monthly life simulation.")
+	var phone := main.get_node_or_null("DaraPhone")
+	if phone == null:
+		_fail("Dara smartphone UI was not added to the main scene.")
+		return
+	phone.call("set_phone_open", true)
+	if not bool(phone.call("is_phone_open")):
+		_fail("Dara smartphone did not open.")
+		return
+	phone.call("set_phone_open", false)
+	print("PASS Stage 5: persistent NPC profiles, life simulation and live Dara smartphone.")
 	main.call("_unhandled_input", _map_key_event())
 	await process_frame
 	if main.get_node_or_null("EarthMapOverview") == null:
