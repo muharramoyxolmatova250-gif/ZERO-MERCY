@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "world_name": "ZERO MERCY Earth",
+  "coordinate_system": "WGS84 (EPSG:4326) source; convert to a documented local/projected system per tile",
+  "tile_scheme": {
+    "type": "latitude_longitude_grid",
+    "latitude_step_degrees": 1.0,
+    "longitude_step_degrees": 1.0,
+    "note": "Initial planning grid only; production tile size must be benchmarked and may vary by latitude and data density."
+  },
+  "regions": [],
+  "layers": [
+    {"id": "country_boundaries", "status": "planned", "source": "Natural Earth"},
+    {"id": "coastlines", "status": "planned", "source": "Natural Earth"},
+    {"id": "elevation", "status": "planned", "source": "Copernicus DEM / NASA SRTM where suitable"},
+    {"id": "roads_buildings_places", "status": "planned", "source": "OpenStreetMap"},
+    {"id": "hydrography", "status": "planned", "source": "OpenStreetMap / licensed public datasets"},
+    {"id": "land_cover", "status": "planned", "source": "To be selected after license review"}
+  ]
+}
