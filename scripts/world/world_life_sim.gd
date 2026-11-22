@@ -4,6 +4,8 @@ extends Node
 @export_range(1000, 100000, 1000) var max_saved_profiles := 50000
 const SAVE_PATH := "user://zero_mercy_life_state.json"
 const JOBS := ["engineer", "doctor", "teacher", "pilot", "police", "mechanic", "designer", "courier", "scientist", "merchant", "artist", "security"]
+const FIRST_NAMES := ["Amina", "Aziz", "Laylo", "Jasur", "Malika", "Sardor", "Madina", "Bekzod", "Yelena", "Denni", "Kamila", "Timur", "Nodira", "Akmal", "Sofia", "Maksim"]
+const LAST_NAMES := ["Karimov", "Saidova", "Rahimov", "Ismoilova", "Tursunov", "Nazarova", "Aliyev", "Yusupova", "Mirzaev", "Qodirova", "Petrov", "Sultonova"]
 const SCHOOLS := ["Neo Primary School", "Cybernetics Academy", "District Technical School", "Global Science Institute"]
 const START_HUBS := ["Neo-Tashkent", "Neo-Tokyo", "Neo-Seoul", "Neo-Shanghai", "Neo-Singapore", "Neo-Dubai", "Neo-Istanbul", "Neo-London", "Neo-Paris", "Neo-New York", "Neo-Los Angeles", "Neo-Sao Paulo", "Neo-Sydney", "Neo-Cairo", "Neo-Mumbai", "Neo-Mexico City", "Neo-Johannesburg", "Neo-Toronto"]
 var simulation_day := 1
@@ -70,7 +72,8 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         job = JOBS[local_rng.randi_range(0, JOBS.size() - 1)]
     var married := age >= 22 and age <= 62 and local_rng.randf() < 0.48
     var profile := {
-        "id": citizen_id, "city": city_id, "sex": sex,
+        "id": citizen_id, "name": FIRST_NAMES[local_rng.randi_range(0, FIRST_NAMES.size() - 1)] + " " + LAST_NAMES[local_rng.randi_range(0, LAST_NAMES.size() - 1)],
+        "city": city_id, "sex": sex,
         "age_days": age * 365 + local_rng.randi_range(0, 364), "age_years": age,
         "life_stage": stage, "occupation": job,
         "education": _education_for_age(age, local_rng),
@@ -209,8 +212,9 @@ func _create_child_profile(parent: Dictionary) -> void:
         return
     var city_id := str(parent.get("city", ""))
     resident_profiles[child_id] = {
-        "id": child_id, "city": city_id,
-        "sex": "female" if _rng.randf() < 0.5 else "male",
+        "id": child_id,
+        "name": FIRST_NAMES[_rng.randi_range(0, FIRST_NAMES.size() - 1)] + " " + LAST_NAMES[_rng.randi_range(0, LAST_NAMES.size() - 1)],
+        "city": city_id, "sex": "female" if _rng.randf() < 0.5 else "male",
         "age_days": 0, "age_years": 0, "life_stage": "child",
         "occupation": "child", "education": "early_childhood", "school": "",
         "marital_status": "single", "partner_id": "",
