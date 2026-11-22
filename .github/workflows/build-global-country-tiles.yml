@@ -10,7 +10,7 @@ on:
       tile_degrees:
         description: Geographic tile width in degrees
         required: true
-        default: "0.025"
+        default: "0.05"
         type: string
       tile_start:
         description: First tile job index
@@ -64,13 +64,12 @@ jobs:
           if len(bbox)!=4 or bbox[0]>=bbox[2] or bbox[1]>=bbox[3]:
               raise SystemExit("Country extract has invalid geographic bounds")
           with open(os.environ["GITHUB_ENV"],"a",encoding="utf-8") as env:
-              env.write("COUNTRY_BBOX="+",".join(map(str,bbox))+"\\n")
+              env.write("COUNTRY_BBOX="+",".join(map(str,bbox))+"\n")
           subprocess.run(["python","tools/geodata/build_global_manifest.py","--region",item["id"],"--download"],check=True)
           PY
       - name: Plan country tiles in the shared world coordinate frame
         env:
           REGION_ID: ${{ inputs.region_id }}
-          COUNTRY_BBOX: ${{ env.COUNTRY_BBOX }}
           TILE_DEGREES: ${{ inputs.tile_degrees }}
         run: |
           SAFE_REGION=$(printf '%s' "$REGION_ID" | tr '/' '_')
