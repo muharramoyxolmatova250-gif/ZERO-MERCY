@@ -59,8 +59,8 @@ func _block(center: Vector3) -> void:
 
 func _building(base: Vector3, size: Vector3) -> void:
 	var body_color: Color = mats[rng.randi_range(0, mats.size() - 1)].albedo_color
-	# Keep the visual tower shell, but build collision as separate wall segments so the lobby entrance is traversable.
-	_box(base + Vector3(0, size.y * 0.5, 0), size, body_color, false, false)
+	# Hollow visual shell: the front doorway remains physically and visually open.
+	_building_visual_shell(base, size, body_color)
 	if generate_collision:
 		_building_collision_shell(base, size)
 	_building_lobby(base, size, _window_materials[rng.randi_range(0, 1)].albedo_color)
@@ -70,6 +70,27 @@ func _building(base: Vector3, size: Vector3) -> void:
 	_facade_windows_instanced(base, size, accent_index)
 	_ground_floor_frontage(base, size, accent)
 	_roof_detail(base, size, accent)
+
+
+
+func _building_visual_shell(base: Vector3, size: Vector3, wall_color: Color) -> void:
+	var wall := 0.45
+	var door_width := minf(2.2, size.x * 0.24)
+	var front_z := base.z - size.z * 0.5
+	var side_width := maxf(0.5, (size.x - door_width) * 0.5)
+	var pieces := [
+		[Vector3(base.x - (door_width + side_width) * 0.5, size.y * 0.5, front_z), Vector3(side_width, size.y, wall)],
+		[Vector3(base.x + (door_width + side_width) * 0.5, size.y * 0.5, front_z), Vector3(side_width, size.y, wall)],
+		[Vector3(base.x, size.y - 1.5, front_z), Vector3(door_width, 3.0, wall)],
+		[Vector3(base.x, size.y * 0.5, base.z + size.z * 0.5), Vector3(size.x, size.y, wall)],
+		[Vector3(base.x - size.x * 0.5, size.y * 0.5, base.z), Vector3(wall, size.y, size.z)],
+		[Vector3(base.x + size.x * 0.5, size.y * 0.5, base.z), Vector3(wall, size.y, size.z)]
+	]
+	for piece in pieces:
+		var wall_mesh := _box(piece[0], piece[1], wall_color, false, false)
+		wall_mesh.add_to_group("building_shell_visual")
+	var roof_mesh := _box(base + Vector3(0.0, size.y, 0.0), Vector3(size.x, wall, size.z), wall_color, false, false)
+	roof_mesh.add_to_group("building_shell_visual")
 
 
 func _building_collision_shell(base: Vector3, size: Vector3) -> void:
@@ -168,7 +189,7 @@ func _roof_detail(base: Vector3, size: Vector3, accent: Color) -> void:
 	if rng.randf() > 0.5:
 		_box(base + Vector3(size.x * 0.3, roof_y + 0.35, 0), Vector3(1.4, 0.6, 1.4), Color(0.07, 0.09, 0.12), false, false)
 
-func _box(pos: Vector3, size: Vector3, color: Color, glow: bool, collision: bool) -> void:
+func _box(pos: Vector3, size: Vector3, color: Color, glow: bool, collision: bool) -> MeshInstance3D:
 	var mesh := BoxMesh.new()
 	mesh.size = size
 	var instance := MeshInstance3D.new()
@@ -194,6 +215,7 @@ func _box(pos: Vector3, size: Vector3, color: Color, glow: bool, collision: bool
 		shape.shape = box_shape
 		body.add_child(shape)
 		add_child(body)
+	return instance
 
 
 func _spawn_street_furniture() -> void:
