@@ -17,6 +17,7 @@ func _ready() -> void:
 	rng.seed = seed_value
 	_materials()
 	_roads_and_blocks()
+	_spawn_city_life()
 
 func _materials() -> void:
 	for c in [Color(0.018, 0.028, 0.05), Color(0.035, 0.025, 0.065), Color(0.045, 0.055, 0.075), Color(0.065, 0.025, 0.055)]:
@@ -129,3 +130,38 @@ func _box(pos: Vector3, size: Vector3, color: Color, glow: bool, collision: bool
 		shape.shape = box_shape
 		body.add_child(shape)
 		add_child(body)
+
+func _spawn_city_life() -> void:
+	var citizen_script := load("res://scripts/world/city_citizen.gd")
+	var traffic_script := load("res://scripts/world/city_traffic.gd")
+	var half := blocks_per_side * block_spacing * 0.5
+	var inset := road_width * 0.5 + 2.0
+	for i in range(mini(12, blocks_per_side * 2)):
+		var citizen := Node3D.new()
+		citizen.set_script(citizen_script)
+		var lane := (float(i % blocks_per_side) - float(blocks_per_side - 1) * 0.5) * block_spacing
+		var side := -1.0 if i % 2 == 0 else 1.0
+		citizen.set("route", PackedVector3Array([
+			Vector3(lane - 8.0, 0, side * (half - inset)),
+			Vector3(lane + 8.0, 0, side * (half - inset)),
+			Vector3(lane + 8.0, 0, side * (half - inset - 10.0)),
+			Vector3(lane - 8.0, 0, side * (half - inset - 10.0))
+		]))
+		citizen.set("walk_speed", rng.randf_range(0.8, 1.6))
+		citizen.position = Vector3(lane - 8.0, 0, side * (half - inset))
+		add_child(citizen)
+	for i in range(4):
+		var car := Node3D.new()
+		car.set_script(traffic_script)
+		var offset := (float(i) - 1.5) * 3.2
+		var route := PackedVector3Array([
+			Vector3(-half, 0, offset),
+			Vector3(half, 0, offset),
+			Vector3(half, 0, offset + 5.0),
+			Vector3(-half, 0, offset + 5.0)
+		])
+		car.set("route", route)
+		car.set("speed", rng.randf_range(7.0, 12.0))
+		car.set("vehicle_color", [Color(0.02,0.12,0.2), Color(0.12,0.025,0.09), Color(0.08,0.1,0.14), Color(0.16,0.09,0.025)][i])
+		car.position = route[0]
+		add_child(car)
