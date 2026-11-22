@@ -50,7 +50,7 @@ func _run() -> void:
 		_fail("Procedural city building collision/frontage count too low: " + str(city_doors))
 		return
 	print("PASS Stage 3: building entrances and illuminated street-level frontage generated.")
-	var lobby_lights := _count_named_nodes(city, "LobbyNeonLight")
+	var lobby_lights := city.get_tree().get_nodes_in_group("building_lobby_light").size()
 	if lobby_lights < 10:
 		_fail("Enterable building lobbies are missing: " + str(lobby_lights))
 		return
