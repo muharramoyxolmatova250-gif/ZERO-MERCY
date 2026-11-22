@@ -24,6 +24,20 @@ func _on_objective_updated(_mission_id: String, objective_id: String, current: i
         _target.call("set_progress", current, total)
 
 func _on_objective_completed(_mission_id: String, _objective_id: String) -> void:
+    var completed_objective: Dictionary = MissionManager.get_current_objective()
+    var event_id := str(completed_objective.get("event", ""))
+    var dialogue_routes := {
+        "meet_unknown_contact": ["intro", "res://data/story/dialogue_intro.json"],
+        "confront_denni": ["denni_betrayal", "res://data/story/dialogue_denni_betrayal.json"],
+        "recover_yelena_message": ["yelena_last_light", "res://data/story/dialogue_yelena_last_light.json"],
+        "confront_biological_father": ["father_reveal", "res://data/story/dialogue_father_reveal.json"],
+        "make_throne_decision": ["throne_offer", "res://data/story/dialogue_throne_offer.json"],
+        "choose_network_fate": ["final_choice", "res://data/story/dialogue_final_choice.json"],
+        "watch_unknown_transmission": ["golden_finger", "res://data/story/dialogue_golden_finger.json"]
+    }
+    if dialogue_routes.has(event_id) and DialogueManager.dialogue_id == "":
+        var route: Array = dialogue_routes[event_id]
+        DialogueManager.start_dialogue(str(route[0]), str(route[1]))
     if is_instance_valid(_target):
         _target.queue_free()
     _target = null
