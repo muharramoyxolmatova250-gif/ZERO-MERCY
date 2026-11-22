@@ -10,6 +10,7 @@ const STREAMER_SCRIPT := preload("res://scripts/world/region_streamer.gd")
 const LIFE_SIM_SCRIPT := preload("res://scripts/world/world_life_sim.gd")
 const PHONE_UI_SCRIPT := preload("res://scripts/ui/phone_ui.gd")
 const MISSION_DIRECTOR_SCRIPT := preload("res://scripts/story/mission_objective_director.gd")
+const DIALOGUE_UI_SCRIPT := preload("res://scripts/ui/dialogue_ui.gd")
 const EARTH_OVERVIEW_SCENE := preload("res://scenes/world/earth_overview.tscn")
 var _earth_overview: Node3D
 var _player: CharacterBody3D
@@ -29,6 +30,7 @@ func _ready() -> void:
  _start_global_world_simulation()
  _start_society_simulation()
  _start_phone_ui()
+ _start_dialogue_ui()
  _start_mission_objective_director()
  add_child(HUD_SCENE.instantiate())
  var beacon := BEACON_SCENE.instantiate()
@@ -43,6 +45,13 @@ func _ready() -> void:
 
 
 
+
+
+func _start_dialogue_ui() -> void:
+ var dialogue_ui := CanvasLayer.new()
+ dialogue_ui.name = "DialogueUI"
+ dialogue_ui.set_script(DIALOGUE_UI_SCRIPT)
+ add_child(dialogue_ui)
 
 func _start_mission_objective_director() -> void:
  var director := Node3D.new()
