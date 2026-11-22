@@ -24,6 +24,10 @@ FILES = {
     "110m": "ne_110m_admin_0_countries.geojson",
     "50m": "ne_50m_admin_0_countries.geojson",
 }
+HYDROGRAPHY = {
+    "rivers": ("ne_110m_rivers_lake_centerlines.geojson", {"LineString", "MultiLineString"}),
+    "lakes": ("ne_110m_lakes.geojson", {"Polygon", "MultiPolygon"}),
+}
 
 
 def download(scale: str, reuse_existing: bool = False, attempts: int = 5) -> None:
@@ -69,14 +73,57 @@ def download(scale: str, reuse_existing: bool = False, attempts: int = 5) -> Non
     raise RuntimeError(f"Could not download {scale} country boundaries after {attempts} attempts: {last_error}")
 
 
+
+
+def download_hydrography(reuse_existing: bool = False, attempts: int = 5) -> None:
+    for layer, (filename, allowed_geometry) in HYDROGRAPHY.items():
+        url = f"${BASE}/{filename}"
+        target = OUT / f"world-110m-{layer}.geojson"
+        def validate(raw: bytes) -> tuple[int, int]:
+            parsed = json.loads(raw)
+            features = parsed.get("features", [])
+            if parsed.get("type") != "FeatureCollection" or not features:
+                raise RuntimeError(f"Invalid hydrography FeatureCollection from {url}")
+            invalid = [i for i, feature in enumerate(features)
+                       if (feature.get("geometry") or {}).get("type") not in allowed_geometry]
+            if invalid:
+                raise RuntimeError(f"{layer}: invalid geometries at feature indexes {invalid[:10]}")
+            return len(features), len(raw)
+        if reuse_existing and target.is_file():
+            count, size = validate(target.read_bytes())
+            print(f"Reusing validated {target.relative_to(ROOT)} ({count} features, {size:,} bytes)")
+            continue
+        request = urllib.request.Request(url, headers={"User-Agent": "ZERO-MERCY-geodata/1.0"})
+        last_error = None
+        for attempt in range(attempts):
+            try:
+                print(f"Downloading Natural Earth {layer} (attempt {attempt + 1}/{attempts})...")
+                with urllib.request.urlopen(request, timeout=90) as response:
+                    raw = response.read()
+                count, size = validate(raw)
+                target.write_bytes(raw)
+                print(f"Saved {target.relative_to(ROOT)} ({count} features, {size:,} bytes)")
+                break
+            except Exception as exc:
+                last_error = exc
+                if attempt + 1 < attempts:
+                    delay = min(30, 3 * (2 ** attempt))
+                    print(f"{layer} download failed ({exc}); retrying in {delay}s...")
+                    time.sleep(delay)
+        else:
+            raise RuntimeError(f"Could not download {layer} after {attempts} attempts: {last_error}")
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scale", choices=["110m", "50m", "all"], default="110m")
     parser.add_argument("--reuse-existing", action="store_true", help="Validate and reuse existing boundary files.")
+    parser.add_argument("--hydrography", action="store_true", help="Also download global rivers and lakes.")
     args = parser.parse_args()
     scales = FILES if args.scale == "all" else [args.scale]
     for scale in scales:
         download(scale, reuse_existing=args.reuse_existing)
+    if args.hydrography:
+        download_hydrography(reuse_existing=args.reuse_existing)
     print("Done. Open scenes/world/earth_globe.tscn in Godot 4.3+ to view the globe.")
 
 
