@@ -88,3 +88,11 @@ GitHub Actions now runs `tests/world_stage_smoke.gd`, which creates a fixture-ba
 - The globe prefers the 50m dataset for greater geographic detail and falls back to 110m if the detailed file is absent.
 - Natural Earth country boundaries are public-domain data; OpenStreetMap road/building extracts remain separately sourced and subject to ODbL attribution and share-alike obligations.
 - This is global country-boundary coverage, not a complete global terrain/road/building database. Regional OSM PBFs must still be selected and processed into runtime tiles.
+
+
+## Inland-water polygon rendering and CI verification
+
+- Country polygon interior rings are now converted to ocean-coloured inland-water surfaces instead of being silently ignored.
+- The Earth globe smoke fixture includes a polygon with an interior ring, and the smoke test asserts that an inland-water surface is created.
+- GitHub Actions validation passed on commit `27f761f5771197c6477708da57c2fb5aea637fd5`: project import, geography planner, Earth globe (5 fixture meshes including 1 inland-water surface), DEM mesh/collision, city generation, and main-scene launch all completed successfully.
+- This is a fixture-based code validation only. It does not mean global OSM roads/buildings or worldwide DEM terrain have been downloaded.
