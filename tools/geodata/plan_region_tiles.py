@@ -14,6 +14,7 @@ def main()->int:
  p.add_argument("--tile-size-m",type=float,default=None)
  p.add_argument("--output",type=Path)
  p.add_argument("--index-output",type=Path,default=ROOT/"data"/"world"/"region_tiles.json")
+ p.add_argument("--merge-index",action="store_true",help="Merge this region into the existing runtime index.")
  a=p.parse_args()
  west,south,east,north=a.bbox
  if not(-180<=west<east<=180 and -90<=south<north<=90): p.error("Invalid bbox.")
@@ -52,7 +53,17 @@ def main()->int:
  output.parent.mkdir(parents=True,exist_ok=True)
  output.write_text(json.dumps(plan,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
  runtime={"_comment":f"Generated for {a.region}; coordinates use this shared local anchor.",
-  "_tile_size_m":tile_size_m,"_anchor_lon":anchor_lon,"_anchor_lat":anchor_lat,**index}
+  "_tile_size_m":tile_size_m,"_anchor_lon":anchor_lon,"_anchor_lat":anchor_lat}
+ if a.merge_index and a.index_output.is_file():
+  previous=json.loads(a.index_output.read_text(encoding="utf-8"))
+  if not isinstance(previous,dict): p.error("Existing runtime index must be a JSON object.")
+  if abs(float(previous.get("_tile_size_m",tile_size_m))-tile_size_m)>0.001 or abs(float(previous.get("_anchor_lon",anchor_lon))-anchor_lon)>1e-8 or abs(float(previous.get("_anchor_lat",anchor_lat))-anchor_lat)>1e-8:
+   p.error("Cannot merge indexes with different tile size or geographic anchor.")
+  runtime.update({k:v for k,v in previous.items() if not str(k).startswith("_")})
+ for key,entry in index.items():
+  if key in runtime and runtime[key].get("geojson_path") != entry.get("geojson_path"):
+   p.error(f"Global grid collision at {key}; use smaller aligned tiles.")
+  runtime[key]=entry
  a.index_output.parent.mkdir(parents=True,exist_ok=True)
  a.index_output.write_text(json.dumps(runtime,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
  print(f"Created {len(tiles)} jobs and Godot runtime index: {a.index_output}")
