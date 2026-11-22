@@ -41,6 +41,8 @@ def rebuild(plan_dir: Path) -> dict:
                     "center_lon": float(tile["center_lon"]), "origin_x": ox, "origin_z": oz,
                     "region_size_m": float(tile["region_size_m"]), "tile_id": str(tile["id"]),
                     "region": region, "projection": "global_equirectangular",
+                    "dem_height_path": str(tile.get("godot_dem_height_path", "")),
+                    "dem_metadata_path": str(tile.get("godot_dem_metadata_path", "")),
                 }
                 continue
             if (abs(entry["center_lat"] - float(tile["center_lat"])) > 1e-6
@@ -50,6 +52,13 @@ def rebuild(plan_dir: Path) -> dict:
                 entry["geojson_paths"].append(source_path)
             if region not in entry["source_regions"]:
                 entry["source_regions"].append(region)
+            for field, plan_field in (("dem_height_path", "godot_dem_height_path"),
+                                      ("dem_metadata_path", "godot_dem_metadata_path")):
+                candidate = str(tile.get(plan_field, ""))
+                if candidate and entry.get(field) not in ("", candidate):
+                    raise ValueError(f"{path}: conflicting DEM path for global cell {key}")
+                if candidate:
+                    entry[field] = candidate
             entry["region_size_m"] = max(entry["region_size_m"], float(tile["region_size_m"]))
     if runtime is None:
         raise ValueError(f"No global equirectangular tile plans found in {plan_dir}")
