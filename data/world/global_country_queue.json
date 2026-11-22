@@ -2,7 +2,7 @@
   "schema_version": 2,
   "source_catalogue": "/home/runner/work/ZERO-MERCY/ZERO-MERCY/data/world/global_regions.json",
   "selection": "Geofabrik country-level extracts carrying ISO-3166-1 codes; combined extracts retain all codes",
-  "country_extract_count": 185,
+  "country_extract_count": 190,
   "countries": [
     {
       "id": "afghanistan",
@@ -1037,6 +1037,28 @@
       ]
     },
     {
+      "id": "gcc-states",
+      "name": "GCC States",
+      "iso3166_1": [
+        "AE",
+        "BH",
+        "KW",
+        "OM",
+        "QA"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/gcc-states/gcc-states-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          34.434889999999996,
+          15.24752,
+          60.947479999999985,
+          32.19653
+        ]
+      ]
+    },
+    {
       "id": "georgia",
       "name": "Georgia",
       "iso3166_1": [
@@ -1217,6 +1239,25 @@
       ]
     },
     {
+      "id": "haiti-and-domrep",
+      "name": "Haiti and Dominican Republic",
+      "iso3166_1": [
+        "DO",
+        "HT"
+      ],
+      "parent": "central-america",
+      "pbf_url": "https://download.geofabrik.de/central-america/haiti-and-domrep/haiti-and-domrep-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -74.82529,
+          16.99901,
+          -68.05482,
+          21.45307
+        ]
+      ]
+    },
+    {
       "id": "honduras",
       "name": "Honduras",
       "iso3166_1": [
@@ -1357,6 +1398,25 @@
           49.60002,
           -5.059265000000011,
           56.86553
+        ]
+      ]
+    },
+    {
+      "id": "israel-and-palestine",
+      "name": "Israel and Palestine",
+      "iso3166_1": [
+        "IL",
+        "PS"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/israel-and-palestine/israel-and-palestine-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          33.99994000000001,
+          29.4396,
+          35.915310000000005,
+          33.45436
         ]
       ]
     },
@@ -1741,6 +1801,26 @@
           -17.13324,
           35.92940999999999,
           -9.362691
+        ]
+      ]
+    },
+    {
+      "id": "malaysia-singapore-brunei",
+      "name": "Malaysia, Singapore, and Brunei",
+      "iso3166_1": [
+        "BN",
+        "MY",
+        "SG"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/malaysia-singapore-brunei/malaysia-singapore-brunei-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          99.25611000000004,
+          0.830813,
+          119.66829999999999,
+          7.736849
         ]
       ]
     },
@@ -2563,6 +2643,25 @@
           -0.525565,
           8.366995000000003,
           2.440286
+        ]
+      ]
+    },
+    {
+      "id": "senegal-and-gambia",
+      "name": "Senegal and Gambia",
+      "iso3166_1": [
+        "GM",
+        "SN"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/senegal-and-gambia/senegal-and-gambia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -19.85623000000001,
+          12.01511,
+          -11.335949999999997,
+          16.70088
         ]
       ]
     },
