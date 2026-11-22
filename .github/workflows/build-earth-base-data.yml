@@ -44,7 +44,7 @@ jobs:
           python-version: "3.12"
       - name: Download and validate global country geometry
         run: |
-          python tools/geodata/download_natural_earth.py --scale "${{ inputs.detail || '110m' }}" --reuse-existing
+          python tools/geodata/download_natural_earth.py --scale "${{ inputs.detail || '110m' }}" --reuse-existing --hydrography
           python - <<'PY'
           import json
           from pathlib import Path
