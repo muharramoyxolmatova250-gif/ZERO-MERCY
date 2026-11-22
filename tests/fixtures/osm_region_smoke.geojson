@@ -1,0 +1,8 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {"type":"Feature","properties":{"tags":{"highway":"primary","name":"Smoke Avenue"}},"geometry":{"type":"LineString","coordinates":[[69.0,41.0],[69.001,41.001],[69.002,41.0]]}},
+    {"type":"Feature","properties":{"tags":{"building":"yes","height":"12"}},"geometry":{"type":"Polygon","coordinates":[[[69.0002,41.0002],[69.0005,41.0002],[69.0005,41.0005],[69.0002,41.0005],[69.0002,41.0002]]]}},
+    {"type":"Feature","properties":{"tags":{"waterway":"stream"}},"geometry":{"type":"LineString","coordinates":[[69.0001,41.0008],[69.001,41.0009]]}}
+  ]
+}
