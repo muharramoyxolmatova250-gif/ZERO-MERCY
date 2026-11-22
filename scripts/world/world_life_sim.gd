@@ -79,9 +79,23 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         "last_activity": "commute", "life_events": ["registered_in_world"]
     }
     resident_profiles[citizen_id] = profile
-    _sync_hub_demographics(city_id)
     _prune_profiles_if_needed()
     return profile
+
+func claim_resident_id(city_id: String) -> String:
+    var candidates: Array[String] = []
+    for citizen_id in resident_profiles.keys():
+        var profile: Dictionary = resident_profiles[citizen_id]
+        if str(profile.get("city", "")) == city_id and not bool(profile.get("active", false)) and str(profile.get("life_stage", "")) != "deceased":
+            candidates.append(str(citizen_id))
+    if candidates.is_empty():
+        return ""
+    var selected_id := candidates[_rng.randi_range(0, candidates.size() - 1)]
+    var selected: Dictionary = resident_profiles[selected_id]
+    selected["active"] = true
+    selected["last_seen_day"] = simulation_day
+    resident_profiles[selected_id] = selected
+    return selected_id
 
 func unregister_citizen(citizen_id: String) -> void:
     if not resident_profiles.has(citizen_id):
@@ -156,6 +170,7 @@ func advance_month() -> void:
             profile["children_count"] = int(profile.get("children_count", 0)) + 1
             births_total += 1
             _append_event(profile, "new_child_born")
+            _create_child_profile(profile)
         if new_age >= 82 and _rng.randf() < 0.006:
             profile["life_stage"] = "deceased"
             profile["active"] = false
@@ -168,6 +183,26 @@ func advance_month() -> void:
     print("ZERO MERCY life month ", simulation_year, "-", simulation_month,
         ": births=", births_total, " deaths=", deaths_total, " marriages=", marriages_total,
         " residents=", resident_profiles.size())
+
+
+func _create_child_profile(parent: Dictionary) -> void:
+    var parent_id := str(parent.get("id", "parent"))
+    var child_number := int(parent.get("children_count", 1))
+    var child_id := "birth_" + str(abs(hash(parent_id + ":" + str(simulation_day) + ":" + str(child_number))))
+    if resident_profiles.has(child_id):
+        return
+    resident_profiles[child_id] = {
+        "id": child_id, "city": str(parent.get("city", "")),
+        "sex": "female" if _rng.randf() < 0.5 else "male",
+        "age_days": 0, "age_years": 0, "life_stage": "child",
+        "occupation": "child", "education": "early_childhood", "school": "",
+        "marital_status": "single", "partner_id": "",
+        "children_count": 0, "family_id": str(parent.get("family_id", "")),
+        "parent_id": parent_id, "money": 0, "health": 0.98,
+        "happiness": 0.8, "active": false, "born_day": simulation_day,
+        "last_seen_day": simulation_day, "last_activity": "sleep",
+        "life_events": [{"day": simulation_day, "event": "born"}]
+    }
 
 func _stage_for_age(age: int) -> String:
     if age < 6: return "child"
