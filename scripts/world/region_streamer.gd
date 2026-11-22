@@ -3,6 +3,7 @@ extends Node3D
 @export var target_path: NodePath
 @export_file("*.json") var tile_index_path := "res://data/world/region_tiles.json"
 @export var region_scene: PackedScene
+@export var terrain_scene: PackedScene = preload("res://scenes/world/dem_terrain_tile.tscn")
 @export_range(100.0,100000.0,100.0) var tile_size_m := 11132.0
 @export_range(0,8,1) var load_radius := 1
 @export_range(1,12,1) var unload_radius := 2
@@ -11,6 +12,8 @@ var _target: Node3D
 var _root: Node3D
 var _tiles: Dictionary = {}
 var _loaded: Dictionary = {}
+var _anchor_lon := 72.3
+var _anchor_lat := 40.7
 var _queue: Array[Vector2i] = []
 var _last := Vector2i(2147483647, 2147483647)
 var indexed_tile_count := 0
