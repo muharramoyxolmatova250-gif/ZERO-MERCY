@@ -216,6 +216,10 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changed tile outputs in this batch."
           else
+            # Catalogue files are refreshed locally but owned and committed by the base workflow.
+            git restore data/world/global_regions.json data/world/global_country_queue.json
+            # Remove untracked extraction scratch; staged game tiles remain staged.
+            git clean -fd
             git commit -m "Build verified global OSM tiles for $SAFE_REGION"
             git pull --rebase origin "${GITHUB_REF_NAME:-main}"
             git push origin "HEAD:${GITHUB_REF_NAME:-main}"
