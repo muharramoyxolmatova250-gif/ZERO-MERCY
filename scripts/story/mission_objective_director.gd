@@ -72,7 +72,7 @@ func _spawn_current_objective() -> void:
     marker.set("event_id", str(objective.get("event", "")))
     marker.set("display_title", str(objective.get("title", "MISSION OBJECTIVE")))
     marker.set("current", int(objective.get("current", 0)))
-    marker.set("target", int(objective.get("target", 1))
+    marker.set("target", int(objective.get("target", 1)))
     add_child(marker)
     marker.global_position = player.global_position + forward * distance + right * side_offset + Vector3.UP * 0.4
     _target = marker
