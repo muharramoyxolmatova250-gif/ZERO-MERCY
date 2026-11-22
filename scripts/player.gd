@@ -167,6 +167,9 @@ func _interact_with_world() -> void:
 	if hit.is_empty():
 		return
 	var collider: Object = hit.get("collider")
+	if collider is StaticBody3D and collider.is_in_group("mission_objective") and collider.has_method("interact"):
+		collider.call("interact")
+		return
 	if collider is StaticBody3D and collider.is_in_group("world_pickup"):
 		_pick_up_item(collider as Node3D)
 
