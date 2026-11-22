@@ -284,6 +284,6 @@ func _spawn_city_life() -> void:
 		])
 		car.set("route", route)
 		car.set("speed", rng.randf_range(7.0, 12.0))
-		car.set("vehicle_color", [Color(0.02,0.12,0.2), Color(0.12,0.025,0.09), Color(0.08,0.1,0.14), Color(0.16,0.09,0.025)][i])
+		car.set("vehicle_color", [Color(0.02,0.12,0.2), Color(0.12,0.025,0.09), Color(0.08,0.1,0.14), Color(0.16,0.09,0.025)][i % 4])
 		car.position = route[0]
 		add_child(car)
