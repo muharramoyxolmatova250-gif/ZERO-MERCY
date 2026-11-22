@@ -133,7 +133,7 @@ def build_offline_catalog(existing_path: Path) -> dict:
         boxes = []
         codes = region.get("iso3166_1") or []
         if isinstance(codes, str):
-            codes = [codes]
+            codes = [code.strip() for code in codes.split(",")]
         for code in codes:
             boxes.extend(bounds_by_code.get(str(code).upper(), []))
         if boxes:
