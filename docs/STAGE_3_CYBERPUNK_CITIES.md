@@ -18,3 +18,13 @@ This is a procedural cyberpunk district generator, not a replica of every real-w
 ## Automated acceptance smoke test
 
 GitHub Actions runs the district scene headlessly and checks that procedural geometry is generated. Facade window instances use MultiMesh. This is a structural smoke test, not a performance benchmark or a visual acceptance test on target PCs. Real mapped city coverage, interiors, traffic, NPCs, advanced LOD and production art remain outside this stage foundation.
+
+
+## Enterable lobby shell update
+
+- Tower shells are assembled from separate wall panels instead of a single opaque solid box.
+- The front opening remains clear at pedestrian height; side walls, rear wall and roof retain the building silhouette.
+- Lobby floors, reception counters, holographic directories and neon lights are generated inside the shell.
+- Automated smoke tests count the hollow shell panels alongside lobby lights.
+
+This creates accessible ground-floor lobby space in the procedural district. It does not yet provide unique furnished interiors on every upper floor or elevators.
