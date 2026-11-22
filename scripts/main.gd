@@ -129,11 +129,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _start_global_world_simulation() -> void:
-	var population := Node3D.new()
-	population.name = "GlobalPopulationSimulation"
-	population.set_script(load("res://scripts/world/global_population_sim.gd"))
-	add_child(population)
-	var air_traffic := Node3D.new()
-	air_traffic.name = "GlobalAirTraffic"
-	air_traffic.set_script(load("res://scripts/world/global_air_traffic.gd"))
-	add_child(air_traffic)
+ var population := Node3D.new()
+ population.name = "GlobalPopulationSimulation"
+ population.set_script(load("res://scripts/world/global_population_sim.gd"))
+ add_child(population)
+ var air_traffic := Node3D.new()
+ air_traffic.name = "GlobalAirTraffic"
+ air_traffic.set_script(load("res://scripts/world/global_air_traffic.gd"))
+ add_child(air_traffic)
