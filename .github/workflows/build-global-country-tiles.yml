@@ -39,6 +39,9 @@ on:
         type: string
   schedule:
     - cron: "17 */6 * * *"
+  workflow_run:
+    workflows: ["Build ZERO MERCY Earth base data"]
+    types: [completed]
 
 permissions:
   contents: write
@@ -49,6 +52,7 @@ concurrency:
 
 jobs:
   build-country-batch:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
