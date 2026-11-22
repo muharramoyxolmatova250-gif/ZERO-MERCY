@@ -23,6 +23,7 @@ func _ready() -> void:
  add_child(player)
  _start_region_streaming()
  _start_global_world_simulation()
+ _start_society_simulation()
  add_child(HUD_SCENE.instantiate())
  var beacon := BEACON_SCENE.instantiate()
  beacon.position = Vector3(0, 0, -8)
@@ -138,3 +139,9 @@ func _start_global_world_simulation() -> void:
  air_traffic.name = "GlobalAirTraffic"
  air_traffic.set_script(load("res://scripts/world/global_air_traffic.gd"))
  add_child(air_traffic)
+
+func _start_society_simulation() -> void:
+ var society := Node.new()
+ society.name = "WorldSocietySimulation"
+ society.set_script(load("res://scripts/world/world_society_sim.gd"))
+ add_child(society)
