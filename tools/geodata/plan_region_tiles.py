@@ -11,7 +11,9 @@ def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--region", required=True)
     p.add_argument("--bbox", action="append", nargs=4, type=float,
-                   required=True, metavar=("WEST", "SOUTH", "EAST", "NORTH"))
+                   metavar=("WEST", "SOUTH", "EAST", "NORTH"))
+    p.add_argument("--bbox-file", type=Path,
+                   help="JSON file containing a bboxes array of WGS84 rectangles.")
     p.add_argument("--tile-deg", type=float, default=0.05)
     p.add_argument("--anchor", nargs=2, type=float, default=[64.0, 41.0], metavar=("LON", "LAT"))
     p.add_argument("--tile-size-m", type=float, default=None)
@@ -21,9 +23,15 @@ def main() -> int:
     p.add_argument("--index-output", type=Path, default=ROOT / "data/world/region_tiles.json")
     p.add_argument("--merge-index", action="store_true")
     a = p.parse_args()
+    bboxes = list(a.bbox or [])
+    if a.bbox_file:
+        bbox_data = json.loads(a.bbox_file.read_text(encoding="utf-8"))
+        bboxes.extend(bbox_data.get("bboxes", []))
+    if not bboxes:
+        p.error("Provide at least one --bbox or a --bbox-file with bboxes.")
     if not (0.001 <= a.tile_deg <= 1.0):
         p.error("--tile-deg must be between 0.001 and 1.0.")
-    for west, south, east, north in a.bbox:
+    for west, south, east, north in bboxes:
         if not (-180 <= west < east <= 180 and -90 <= south < north <= 90):
             p.error(f"Invalid bbox: {[west, south, east, north]}")
     anchor_lon, anchor_lat = a.anchor
