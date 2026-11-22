@@ -15,6 +15,12 @@ extends Node3D
 @export var max_features := 100000
 var feature_stats: Dictionary = {}
 var global_equirectangular := false
+var dem_metadata_path := ""
+var dem_height_path := ""
+var _dem_metadata: Dictionary = {}
+var _dem_samples: PackedFloat32Array = PackedFloat32Array()
+var _dem_width := 0
+var _dem_height := 0
 
 var _road_material: StandardMaterial3D
 var _building_material: StandardMaterial3D
@@ -25,15 +31,19 @@ var _neon_magenta: StandardMaterial3D
 
 
 
-func configure_region(path: String, center_lat: float, center_lon: float, use_global_equirectangular: bool = false) -> void:
+func configure_region(path: String, center_lat: float, center_lon: float, use_global_equirectangular: bool = false, dem_meta_path: String = "", dem_samples_path: String = "") -> void:
 	geojson_path = path
 	region_center_lat = center_lat
 	region_center_lon = center_lon
 	global_equirectangular = use_global_equirectangular
+	dem_metadata_path = dem_meta_path
+	dem_height_path = dem_samples_path
 
 func _ready() -> void:
 	_setup_materials()
-	_add_ground()
+	_load_dem_samples()
+	if _dem_samples.is_empty():
+		_add_ground()
 	if not FileAccess.file_exists(geojson_path):
 		push_warning("OSM GeoJSON not found. Export a regional PBF with osmium export first.")
 		return
@@ -199,19 +209,85 @@ func _ring_to_local(ring: Array) -> PackedVector2Array:
 	return points
 
 
+
+func _ring_to_heights(ring: Array) -> PackedFloat32Array:
+	var heights := PackedFloat32Array()
+	for coord in ring:
+		if coord is Array and coord.size() >= 2:
+			heights.append(_sample_elevation(float(coord[1]), float(coord[0])) * metres_per_unit)
+	if heights.size() > 2 and is_equal_approx(heights[0], heights[heights.size() - 1]):
+		heights.remove_at(heights.size() - 1)
+	return heights
+
+
+func _load_dem_samples() -> void:
+	if dem_metadata_path.is_empty() or dem_height_path.is_empty():
+		return
+	if not FileAccess.file_exists(dem_metadata_path) or not FileAccess.file_exists(dem_height_path):
+		return
+	var meta_file := FileAccess.open(dem_metadata_path, FileAccess.READ)
+	var data_file := FileAccess.open(dem_height_path, FileAccess.READ)
+	if meta_file == null or data_file == null:
+		return
+	var parsed: Variant = JSON.parse_string(meta_file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	_dem_metadata = parsed
+	_dem_width = int(_dem_metadata.get("width", 0))
+	_dem_height = int(_dem_metadata.get("height", 0))
+	if _dem_width < 3 or _dem_height < 3:
+		_dem_metadata.clear()
+		return
+	var bytes := data_file.get_buffer(data_file.get_length())
+	if bytes.size() != _dem_width * _dem_height * 4:
+		_dem_metadata.clear()
+		return
+	_dem_samples.resize(_dem_width * _dem_height)
+	for i in range(_dem_samples.size()):
+		_dem_samples[i] = bytes.decode_float(i * 4)
+	print("ZERO MERCY OSM region: loaded ", _dem_width, "x", _dem_height, " terrain samples.")
+
+
+func _sample_elevation(latitude: float, longitude: float) -> float:
+	if _dem_samples.is_empty():
+		return 0.0
+	var west := float(_dem_metadata.get("west", 0.0))
+	var east := float(_dem_metadata.get("east", 0.0))
+	var south := float(_dem_metadata.get("south", 0.0))
+	var north := float(_dem_metadata.get("north", 0.0))
+	if east <= west or north <= south:
+		return 0.0
+	if longitude < west - 0.000001 or longitude > east + 0.000001:
+		return 0.0
+	if latitude < south - 0.000001 or latitude > north + 0.000001:
+		return 0.0
+	var fx := clampf((longitude - west) / (east - west), 0.0, 1.0) * float(_dem_width - 1)
+	var fy := clampf((north - latitude) / (north - south), 0.0, 1.0) * float(_dem_height - 1)
+	var x0 := floori(fx)
+	var y0 := floori(fy)
+	var x1 := mini(x0 + 1, _dem_width - 1)
+	var y1 := mini(y0 + 1, _dem_height - 1)
+	var tx := fx - float(x0)
+	var ty := fy - float(y0)
+	var top := lerpf(_dem_samples[y0 * _dem_width + x0], _dem_samples[y0 * _dem_width + x1], tx)
+	var bottom := lerpf(_dem_samples[y1 * _dem_width + x0], _dem_samples[y1 * _dem_width + x1], tx)
+	return lerpf(top, bottom, ty)
+
 func _add_extruded_polygon(rings: Array, height: float) -> void:
 	if rings.is_empty():
 		return
 	var outer := _ring_to_local(rings[0])
-	if outer.size() < 3:
+	var outer_heights := _ring_to_heights(rings[0])
+	if outer.size() < 3 or outer_heights.size() != outer.size():
 		return
-	var holes: Array[PackedVector2Array] = []
 	var all_rings: Array[PackedVector2Array] = [outer]
+	var all_heights: Array[PackedFloat32Array] = [outer_heights]
 	for ring_index in range(1, rings.size()):
 		var hole := _ring_to_local(rings[ring_index])
-		if hole.size() >= 3:
-			holes.append(hole)
+		var hole_heights := _ring_to_heights(rings[ring_index])
+		if hole.size() >= 3 and hole_heights.size() == hole.size():
 			all_rings.append(hole)
+			all_heights.append(hole_heights)
 	var indices := Geometry2D.triangulate_polygon(outer)
 	if indices.is_empty():
 		push_warning("OSM building polygon could not be triangulated; skipped invalid footprint.")
@@ -219,17 +295,22 @@ func _add_extruded_polygon(rings: Array, height: float) -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for i in range(0, indices.size(), 3):
-		var a := Vector3(outer[indices[i]].x, height, outer[indices[i]].y)
-		var b := Vector3(outer[indices[i + 1]].x, height, outer[indices[i + 1]].y)
-		var c := Vector3(outer[indices[i + 2]].x, height, outer[indices[i + 2]].y)
+		var ia := indices[i]
+		var ib := indices[i + 1]
+		var ic := indices[i + 2]
+		var a := Vector3(outer[ia].x, outer_heights[ia] + height, outer[ia].y)
+		var b := Vector3(outer[ib].x, outer_heights[ib] + height, outer[ib].y)
+		var c := Vector3(outer[ic].x, outer_heights[ic] + height, outer[ic].y)
 		_add_triangle(st, a, b, c)
-	for ring in all_rings:
+	for ring_index in range(all_rings.size()):
+		var ring := all_rings[ring_index]
+		var elevations := all_heights[ring_index]
 		for i in range(ring.size()):
 			var j := (i + 1) % ring.size()
-			var a := Vector3(ring[i].x, 0.0, ring[i].y)
-			var b := Vector3(ring[j].x, 0.0, ring[j].y)
-			var c := Vector3(ring[j].x, height, ring[j].y)
-			var d := Vector3(ring[i].x, height, ring[i].y)
+			var a := Vector3(ring[i].x, elevations[i], ring[i].y)
+			var b := Vector3(ring[j].x, elevations[j], ring[j].y)
+			var c := Vector3(ring[j].x, elevations[j] + height, ring[j].y)
+			var d := Vector3(ring[i].x, elevations[i] + height, ring[i].y)
 			_add_quad(st, a, b, c, d)
 	var mesh := st.commit()
 	if mesh == null:
@@ -272,8 +353,10 @@ func _coordinate_to_local(coord: Array) -> Vector3:
 			longitude += 360.0
 		var x := (longitude - region_center_lon) * 111320.0
 		var z := -(float(coord[1]) - region_center_lat) * 111320.0
-		return Vector3(x * metres_per_unit, 0.0, z * metres_per_unit)
+		var elevation := _sample_elevation(float(coord[1]), longitude)
+		return Vector3(x * metres_per_unit, elevation * metres_per_unit, z * metres_per_unit)
 	var local := EarthCoordinates.lat_lon_to_local(
 		float(coord[1]), float(coord[0]), region_center_lat, region_center_lon
 	)
-	return Vector3(local.x * metres_per_unit, 0.0, local.y * metres_per_unit)
+	var elevation := _sample_elevation(float(coord[1]), float(coord[0]))
+	return Vector3(local.x * metres_per_unit, elevation * metres_per_unit, local.y * metres_per_unit)
