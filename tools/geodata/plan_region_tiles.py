@@ -71,6 +71,10 @@ def main() -> int:
                     "pbf_output": f"data/osm/tmp/{a.region}/{tile_id}.osm.pbf",
                     "geojson_output": f"data/osm/tiles/{a.region}/{tile_id}.geojson",
                     "godot_geojson_path": f"res://data/osm/tiles/{a.region}/{tile_id}.geojson",
+                    "dem_height_path": f"data/terrain/tiles/global/{tile_id}.f32" if a.global_grid else "",
+                    "dem_metadata_path": f"data/terrain/tiles/global/{tile_id}.json" if a.global_grid else "",
+                    "godot_dem_height_path": f"res://data/terrain/tiles/global/{tile_id}.f32" if a.global_grid else "",
+                    "godot_dem_metadata_path": f"res://data/terrain/tiles/global/{tile_id}.json" if a.global_grid else "",
                     "region_size_m": round(max(region_width, (n - s) * 111320.0) * 1.08, 3),
                 }
                 tiles.append(entry)
@@ -83,6 +87,8 @@ def main() -> int:
                     "region_size_m": entry["region_size_m"],
                     "tile_id": tile_id, "region": a.region,
                     "projection": "global_equirectangular" if a.global_grid else "local_tangent",
+                    "dem_height_path": entry["godot_dem_height_path"],
+                    "dem_metadata_path": entry["godot_dem_metadata_path"],
                 }
                 if key in index:
                     p.error(f"Tile grid collision inside {a.region} at {key}; reduce tile-deg.")
