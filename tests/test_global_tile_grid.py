@@ -31,7 +31,9 @@ class GlobalTileGridTests(unittest.TestCase):
             ], check=True, cwd=ROOT)
             a = json.loads(first_plan.read_text())
             b = json.loads(second_plan.read_text())
-            runtime = json.loads(index.read_text())
+            rebuilt = base / "rebuilt.json"
+            subprocess.run([sys.executable, str(ROOT / "tools/geodata/rebuild_global_runtime_index.py"), "--plans", str(base), "--output", str(rebuilt)], check=True, cwd=ROOT)
+            runtime = json.loads(rebuilt.read_text())
             self.assertEqual(a["tile_count"], 4)
             self.assertEqual(b["tile_count"], 4)
             shared = [entry for key, entry in runtime.items()
