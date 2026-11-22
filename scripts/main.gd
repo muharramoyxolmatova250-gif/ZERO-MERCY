@@ -22,6 +22,7 @@ func _ready() -> void:
  _player = player
  add_child(player)
  _start_region_streaming()
+ _start_global_world_simulation()
  add_child(HUD_SCENE.instantiate())
  var beacon := BEACON_SCENE.instantiate()
  beacon.position = Vector3(0, 0, -8)
