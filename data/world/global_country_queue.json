@@ -1,0 +1,3374 @@
+{
+  "schema_version": 2,
+  "source_catalogue": "/home/runner/work/ZERO-MERCY/ZERO-MERCY/data/world/global_regions.json",
+  "selection": "Geofabrik country-level extracts carrying ISO-3166-1 codes; combined extracts retain all codes",
+  "country_extract_count": 185,
+  "countries": [
+    {
+      "id": "afghanistan",
+      "name": "Afghanistan",
+      "iso3166_1": [
+        "AF"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/afghanistan/afghanistan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          60.48760999999999,
+          29.36856,
+          74.90017,
+          38.50674
+        ]
+      ]
+    },
+    {
+      "id": "albania",
+      "name": "Albania",
+      "iso3166_1": [
+        "AL"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/albania/albania-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          18.896479999999997,
+          39.62738,
+          21.062849999999997,
+          42.66313
+        ]
+      ]
+    },
+    {
+      "id": "algeria",
+      "name": "Algeria",
+      "iso3166_1": [
+        "DZ"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/algeria/algeria-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -8.704894999999993,
+          18.92874,
+          12.035979999999995,
+          37.77284
+        ]
+      ]
+    },
+    {
+      "id": "andorra",
+      "name": "Andorra",
+      "iso3166_1": [
+        "AD"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/andorra/andorra-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          1.4123679999999865,
+          42.4276,
+          1.7874810000000139,
+          42.65717
+        ]
+      ]
+    },
+    {
+      "id": "angola",
+      "name": "Angola",
+      "iso3166_1": [
+        "AO"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/angola/angola-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          10.538479999999993,
+          -18.06508,
+          24.10297,
+          -4.327925
+        ]
+      ]
+    },
+    {
+      "id": "antarctica",
+      "name": "Antarctica",
+      "iso3166_1": [
+        "AQ"
+      ],
+      "parent": null,
+      "pbf_url": "https://download.geofabrik.de/antarctica/antarctica-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -180.0,
+          -90.0,
+          -179.999999,
+          -60.0
+        ]
+      ]
+    },
+    {
+      "id": "argentina",
+      "name": "Argentina",
+      "iso3166_1": [
+        "AR"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/argentina/argentina-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -73.61453,
+          -55.68296,
+          -53.63534,
+          -21.72575
+        ]
+      ]
+    },
+    {
+      "id": "armenia",
+      "name": "Armenia",
+      "iso3166_1": [
+        "AM"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/armenia/armenia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          43.43821,
+          38.83743,
+          46.642619999999994,
+          41.31029
+        ]
+      ]
+    },
+    {
+      "id": "australia",
+      "name": "Australia",
+      "iso3166_1": [
+        "AU"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/australia/australia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          68.13342,
+          -57.07106,
+          169.0016,
+          -8.809565
+        ]
+      ]
+    },
+    {
+      "id": "austria",
+      "name": "Austria",
+      "iso3166_1": [
+        "AT"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/austria/austria-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          9.526780000000002,
+          46.36979,
+          17.164080000000013,
+          49.02403
+        ]
+      ]
+    },
+    {
+      "id": "azerbaijan",
+      "name": "Azerbaijan",
+      "iso3166_1": [
+        "AZ"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/azerbaijan/azerbaijan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          44.75005999999999,
+          38.24727,
+          51.72309999999999,
+          42.67437
+        ]
+      ]
+    },
+    {
+      "id": "bahamas",
+      "name": "Bahamas",
+      "iso3166_1": [
+        "BS"
+      ],
+      "parent": "central-america",
+      "pbf_url": "https://download.geofabrik.de/central-america/bahamas/bahamas-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -81.51857,
+          20.27251,
+          -71.86673,
+          27.97497
+        ]
+      ]
+    },
+    {
+      "id": "bangladesh",
+      "name": "Bangladesh",
+      "iso3166_1": [
+        "BD"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/bangladesh/bangladesh-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          87.99765000000002,
+          18.58403,
+          92.69713999999999,
+          26.64677
+        ]
+      ]
+    },
+    {
+      "id": "belarus",
+      "name": "Belarus",
+      "iso3166_1": [
+        "BY"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/belarus/belarus-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          23.174800000000005,
+          51.23441,
+          32.76947000000001,
+          56.17385
+        ]
+      ]
+    },
+    {
+      "id": "belgium",
+      "name": "Belgium",
+      "iso3166_1": [
+        "BE"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/belgium/belgium-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          2.340724999999992,
+          49.49489,
+          6.41026500000001,
+          51.59839
+        ]
+      ]
+    },
+    {
+      "id": "belize",
+      "name": "Belize",
+      "iso3166_1": [
+        "BZ"
+      ],
+      "parent": "central-america",
+      "pbf_url": "https://download.geofabrik.de/central-america/belize/belize-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -89.22892,
+          15.88308,
+          -86.85983,
+          18.4984
+        ]
+      ]
+    },
+    {
+      "id": "benin",
+      "name": "Benin",
+      "iso3166_1": [
+        "BJ"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/benin/benin-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          0.7614890000000116,
+          5.984817,
+          3.861694,
+          12.43658
+        ]
+      ]
+    },
+    {
+      "id": "bhutan",
+      "name": "Bhutan",
+      "iso3166_1": [
+        "BT"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/bhutan/bhutan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          88.73917,
+          26.6948,
+          92.13159000000002,
+          28.25372
+        ]
+      ]
+    },
+    {
+      "id": "bolivia",
+      "name": "Bolivia",
+      "iso3166_1": [
+        "BO"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/bolivia/bolivia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -69.65675,
+          -22.92551,
+          -57.43481,
+          -9.63866
+        ]
+      ]
+    },
+    {
+      "id": "bosnia-herzegovina",
+      "name": "Bosnia-Herzegovina",
+      "iso3166_1": [
+        "BA"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/bosnia-herzegovina/bosnia-herzegovina-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          15.715599999999995,
+          42.55239,
+          19.626390000000015,
+          45.27803
+        ]
+      ]
+    },
+    {
+      "id": "botswana",
+      "name": "Botswana",
+      "iso3166_1": [
+        "BW"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/botswana/botswana-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          19.987449999999995,
+          -26.91539,
+          29.385490000000004,
+          -17.77403
+        ]
+      ]
+    },
+    {
+      "id": "brazil",
+      "name": "Brazil",
+      "iso3166_1": [
+        "BR"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/brazil/brazil-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -74.02313,
+          -35.46552,
+          -27.67249000000001,
+          5.522895
+        ]
+      ]
+    },
+    {
+      "id": "bulgaria",
+      "name": "Bulgaria",
+      "iso3166_1": [
+        "BG"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/bulgaria/bulgaria-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          22.348749999999995,
+          41.22681,
+          29.18818999999999,
+          44.21777
+        ]
+      ]
+    },
+    {
+      "id": "burkina-faso",
+      "name": "Burkina Faso",
+      "iso3166_1": [
+        "BF"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/burkina-faso/burkina-faso-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -5.527409000000006,
+          9.384107,
+          2.4125290000000064,
+          15.09271
+        ]
+      ]
+    },
+    {
+      "id": "burundi",
+      "name": "Burundi",
+      "iso3166_1": [
+        "BI"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/burundi/burundi-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          29.00018,
+          -4.481328,
+          30.85114999999999,
+          -2.307893
+        ]
+      ]
+    },
+    {
+      "id": "cambodia",
+      "name": "Cambodia",
+      "iso3166_1": [
+        "KH"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/cambodia/cambodia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          101.85219999999998,
+          8.858092,
+          107.6397,
+          14.71875
+        ]
+      ]
+    },
+    {
+      "id": "cameroon",
+      "name": "Cameroon",
+      "iso3166_1": [
+        "CM"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/cameroon/cameroon-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          8.330000000000013,
+          1.645663,
+          16.203120000000013,
+          13.09278
+        ]
+      ]
+    },
+    {
+      "id": "canada",
+      "name": "Canada",
+      "iso3166_1": [
+        "CA"
+      ],
+      "parent": "north-america",
+      "pbf_url": "https://download.geofabrik.de/north-america/canada/canada-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -141.7761,
+          41.66009,
+          -44.17684,
+          85.04032
+        ]
+      ]
+    },
+    {
+      "id": "cape-verde",
+      "name": "Cape Verde",
+      "iso3166_1": [
+        "CV"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/cape-verde/cape-verde-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -26.323790000000002,
+          14.00485,
+          -21.390960000000007,
+          18.005
+        ]
+      ]
+    },
+    {
+      "id": "central-african-republic",
+      "name": "Central African Republic",
+      "iso3166_1": [
+        "CF"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/central-african-republic/central-african-republic-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          14.409079999999989,
+          2.208735,
+          27.475779999999986,
+          11.03264
+        ]
+      ]
+    },
+    {
+      "id": "chad",
+      "name": "Chad",
+      "iso3166_1": [
+        "TD"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/chad/chad-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          13.401289999999989,
+          7.428518,
+          24.025270000000006,
+          23.53793
+        ]
+      ]
+    },
+    {
+      "id": "chile",
+      "name": "Chile",
+      "iso3166_1": [
+        "CL"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/chile/chile-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -113.2233,
+          -58.45195,
+          -65.5141,
+          -17.45743
+        ]
+      ]
+    },
+    {
+      "id": "china",
+      "name": "China",
+      "iso3166_1": [
+        "CN"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/china/china-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          73.41788,
+          14.27437,
+          134.80359999999996,
+          53.65559
+        ]
+      ]
+    },
+    {
+      "id": "colombia",
+      "name": "Colombia",
+      "iso3166_1": [
+        "CO"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/colombia/colombia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -83.23104,
+          -4.25732,
+          -66.81472,
+          16.41924
+        ]
+      ]
+    },
+    {
+      "id": "congo-democratic-republic",
+      "name": "Congo (Democratic Republic/Kinshasa)",
+      "iso3166_1": [
+        "CD"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/congo-democratic-republic/congo-democratic-republic-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          11.883430000000004,
+          -13.5006,
+          31.33569,
+          5.401396
+        ]
+      ]
+    },
+    {
+      "id": "congo-brazzaville",
+      "name": "Congo (Republic/Brazzaville)",
+      "iso3166_1": [
+        "CG"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/congo-brazzaville/congo-brazzaville-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          10.944169999999986,
+          -5.195885,
+          18.66783000000001,
+          3.740932
+        ]
+      ]
+    },
+    {
+      "id": "cook-islands",
+      "name": "Cook Islands",
+      "iso3166_1": [
+        "CK"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/cook-islands/cook-islands-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -168.4661,
+          -25.28867,
+          -154.8056,
+          -5.800506
+        ]
+      ]
+    },
+    {
+      "id": "costa-rica",
+      "name": "Costa Rica",
+      "iso3166_1": [
+        "CR"
+      ],
+      "parent": "central-america",
+      "pbf_url": "https://download.geofabrik.de/central-america/costa-rica/costa-rica-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -87.82473,
+          4.937746,
+          -82.34952,
+          11.2237
+        ]
+      ]
+    },
+    {
+      "id": "croatia",
+      "name": "Croatia",
+      "iso3166_1": [
+        "HR"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/croatia/croatia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          13.089159999999993,
+          42.16483,
+          19.45997,
+          46.55756
+        ]
+      ]
+    },
+    {
+      "id": "cuba",
+      "name": "Cuba",
+      "iso3166_1": [
+        "CU"
+      ],
+      "parent": "central-america",
+      "pbf_url": "https://download.geofabrik.de/central-america/cuba/cuba-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -85.4242,
+          19.2533,
+          -73.70831,
+          23.60427
+        ]
+      ]
+    },
+    {
+      "id": "cyprus",
+      "name": "Cyprus",
+      "iso3166_1": [
+        "CY"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/cyprus/cyprus-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          31.952439999999996,
+          34.23374,
+          34.96146999999999,
+          36.00323
+        ]
+      ]
+    },
+    {
+      "id": "czech-republic",
+      "name": "Czech Republic",
+      "iso3166_1": [
+        "CZ"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/czech-republic/czech-republic-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          12.084769999999992,
+          48.54292,
+          18.86321000000001,
+          51.06426
+        ]
+      ]
+    },
+    {
+      "id": "denmark",
+      "name": "Denmark",
+      "iso3166_1": [
+        "DK"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/denmark/denmark-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          7.701099999999997,
+          54.44065,
+          15.65449000000001,
+          58.06239
+        ]
+      ]
+    },
+    {
+      "id": "djibouti",
+      "name": "Djibouti",
+      "iso3166_1": [
+        "DJ"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/djibouti/djibouti-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          41.76177000000001,
+          10.88824,
+          43.84568999999999,
+          12.82615
+        ]
+      ]
+    },
+    {
+      "id": "east-timor",
+      "name": "East Timor",
+      "iso3166_1": [
+        "TL"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/east-timor/east-timor-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          123.7912,
+          -9.690103,
+          127.59109999999998,
+          -8.057869
+        ]
+      ]
+    },
+    {
+      "id": "ecuador",
+      "name": "Ecuador",
+      "iso3166_1": [
+        "EC"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/ecuador/ecuador-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -93.56487,
+          -5.024173,
+          -75.16149,
+          2.843487
+        ]
+      ]
+    },
+    {
+      "id": "egypt",
+      "name": "Egypt",
+      "iso3166_1": [
+        "EG"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/egypt/egypt-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          24.62628000000001,
+          21.9838,
+          37.16263000000001,
+          32.52518
+        ]
+      ]
+    },
+    {
+      "id": "el-salvador",
+      "name": "El Salvador",
+      "iso3166_1": [
+        "SV"
+      ],
+      "parent": "central-america",
+      "pbf_url": "https://download.geofabrik.de/central-america/el-salvador/el-salvador-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -90.50091,
+          12.03598,
+          -87.58438,
+          14.45762
+        ]
+      ]
+    },
+    {
+      "id": "equatorial-guinea",
+      "name": "Equatorial Guinea",
+      "iso3166_1": [
+        "GQ"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/equatorial-guinea/equatorial-guinea-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          5.1656309999999905,
+          -1.792669,
+          11.423380000000009,
+          4.147134
+        ]
+      ]
+    },
+    {
+      "id": "eritrea",
+      "name": "Eritrea",
+      "iso3166_1": [
+        "ER"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/eritrea/eritrea-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          36.42070000000001,
+          12.34385,
+          43.33233000000001,
+          18.32962
+        ]
+      ]
+    },
+    {
+      "id": "estonia",
+      "name": "Estonia",
+      "iso3166_1": [
+        "EE"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/estonia/estonia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          20.85166000000001,
+          57.49764,
+          28.214259999999996,
+          59.99705
+        ]
+      ]
+    },
+    {
+      "id": "ethiopia",
+      "name": "Ethiopia",
+      "iso3166_1": [
+        "ET"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/ethiopia/ethiopia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          32.96722,
+          3.389192,
+          48.005449999999996,
+          14.91626
+        ]
+      ]
+    },
+    {
+      "id": "faroe-islands",
+      "name": "Faroe Islands",
+      "iso3166_1": [
+        "FO"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/faroe-islands/faroe-islands-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -8.690197000000012,
+          60.86632,
+          -5.515148000000011,
+          62.90523
+        ]
+      ]
+    },
+    {
+      "id": "fiji",
+      "name": "Fiji",
+      "iso3166_1": [
+        "FJ"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/fiji/fiji-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          172.7647,
+          -25.08127,
+          180.0,
+          -9.783321
+        ],
+        [
+          -180.0,
+          -25.08127,
+          -176.2675,
+          -9.783321
+        ]
+      ]
+    },
+    {
+      "id": "finland",
+      "name": "Finland",
+      "iso3166_1": [
+        "FI"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/finland/finland-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          19.02427,
+          59.28783,
+          31.61590000000001,
+          70.09959
+        ]
+      ]
+    },
+    {
+      "id": "france",
+      "name": "France",
+      "iso3166_1": [
+        "FR"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/france/france-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -6.937207000000001,
+          41.23866,
+          9.900000000000006,
+          51.4288
+        ]
+      ]
+    },
+    {
+      "id": "gabon",
+      "name": "Gabon",
+      "iso3166_1": [
+        "GA"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/gabon/gabon-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          7.3897269999999935,
+          -5.995799,
+          14.551389999999998,
+          2.325716
+        ]
+      ]
+    },
+    {
+      "id": "georgia",
+      "name": "Georgia",
+      "iso3166_1": [
+        "GE"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/georgia/georgia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          39.880930000000006,
+          41.05117,
+          46.73958999999999,
+          43.5899
+        ]
+      ]
+    },
+    {
+      "id": "germany",
+      "name": "Germany",
+      "iso3166_1": [
+        "DE"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/germany/germany-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          5.864417000000003,
+          47.26543,
+          15.050780000000003,
+          55.14777
+        ]
+      ]
+    },
+    {
+      "id": "ghana",
+      "name": "Ghana",
+      "iso3166_1": [
+        "GH"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/ghana/ghana-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -3.8073990000000038,
+          3.704056,
+          1.3940379999999948,
+          11.17772
+        ]
+      ]
+    },
+    {
+      "id": "greece",
+      "name": "Greece",
+      "iso3166_1": [
+        "GR"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/greece/greece-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          18.970640000000003,
+          34.59111,
+          29.656830000000014,
+          41.74954
+        ]
+      ]
+    },
+    {
+      "id": "greenland",
+      "name": "Greenland",
+      "iso3166_1": [
+        "GL"
+      ],
+      "parent": "north-america",
+      "pbf_url": "https://download.geofabrik.de/north-america/greenland/greenland-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -75.3894,
+          58.67169,
+          -9.454384000000005,
+          84.44358
+        ]
+      ]
+    },
+    {
+      "id": "guatemala",
+      "name": "Guatemala",
+      "iso3166_1": [
+        "GT"
+      ],
+      "parent": "central-america",
+      "pbf_url": "https://download.geofabrik.de/central-america/guatemala/guatemala-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -92.73303,
+          12.74168,
+          -87.95177,
+          17.83533
+        ]
+      ]
+    },
+    {
+      "id": "guinea",
+      "name": "Guinea",
+      "iso3166_1": [
+        "GN"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/guinea/guinea-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -16.857079999999996,
+          7.183332,
+          -7.627259000000009,
+          12.68322
+        ]
+      ]
+    },
+    {
+      "id": "guinea-bissau",
+      "name": "Guinea-Bissau",
+      "iso3166_1": [
+        "GW"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/guinea-bissau/guinea-bissau-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -16.96427,
+          10.14494,
+          -13.629230000000007,
+          12.6936
+        ]
+      ]
+    },
+    {
+      "id": "guyana",
+      "name": "Guyana",
+      "iso3166_1": [
+        "GY"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/guyana/guyana-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -61.421009999999995,
+          1.149369,
+          -56.42321,
+          9.182536
+        ]
+      ]
+    },
+    {
+      "id": "guyane",
+      "name": "Guyane",
+      "iso3166_1": [
+        "GF"
+      ],
+      "parent": "france",
+      "pbf_url": "https://download.geofabrik.de/europe/france/guyane/guyane-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -54.62299,
+          2.093117,
+          -50.86670000000001,
+          6.370288
+        ]
+      ]
+    },
+    {
+      "id": "honduras",
+      "name": "Honduras",
+      "iso3166_1": [
+        "HN"
+      ],
+      "parent": "central-america",
+      "pbf_url": "https://download.geofabrik.de/central-america/honduras/honduras-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -89.36005,
+          12.96943,
+          -81.66138,
+          17.93171
+        ]
+      ]
+    },
+    {
+      "id": "hungary",
+      "name": "Hungary",
+      "iso3166_1": [
+        "HU"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/hungary/hungary-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          16.108450000000005,
+          45.73207,
+          22.90648999999999,
+          48.58921
+        ]
+      ]
+    },
+    {
+      "id": "iceland",
+      "name": "Iceland",
+      "iso3166_1": [
+        "IS"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/iceland/iceland-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -25.69999999999999,
+          62.84553,
+          -12.417079999999999,
+          67.50085
+        ]
+      ]
+    },
+    {
+      "id": "india",
+      "name": "India",
+      "iso3166_1": [
+        "IN"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/india/india-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          67.67457000000002,
+          5.896067,
+          97.41989000000001,
+          35.73091
+        ]
+      ]
+    },
+    {
+      "id": "indonesia",
+      "name": "Indonesia (with East Timor)",
+      "iso3166_1": [
+        "ID"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/indonesia/indonesia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          92.76481000000001,
+          -11.60655,
+          141.0217,
+          6.99933
+        ]
+      ]
+    },
+    {
+      "id": "iran",
+      "name": "Iran",
+      "iso3166_1": [
+        "IR"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/iran/iran-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          44.023030000000006,
+          24.03947,
+          63.35413,
+          39.79045
+        ]
+      ]
+    },
+    {
+      "id": "iraq",
+      "name": "Iraq",
+      "iso3166_1": [
+        "IQ"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/iraq/iraq-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          38.78399999999999,
+          29.01775,
+          49.55108000000001,
+          37.39063
+        ]
+      ]
+    },
+    {
+      "id": "ireland-and-northern-ireland",
+      "name": "Ireland and Northern Ireland",
+      "iso3166_1": [
+        "IE"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/ireland-and-northern-ireland/ireland-and-northern-ireland-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -14.402240000000006,
+          49.60002,
+          -5.059265000000011,
+          56.86553
+        ]
+      ]
+    },
+    {
+      "id": "italy",
+      "name": "Italy",
+      "iso3166_1": [
+        "IT"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/italy/italy-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          6.602696000000009,
+          35.07638,
+          19.124989999999997,
+          47.10005
+        ]
+      ]
+    },
+    {
+      "id": "ivory-coast",
+      "name": "Ivory Coast",
+      "iso3166_1": [
+        "CI"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/ivory-coast/ivory-coast-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -8.633881000000002,
+          4.141916,
+          -2.4762149999999963,
+          10.75034
+        ]
+      ]
+    },
+    {
+      "id": "jamaica",
+      "name": "Jamaica",
+      "iso3166_1": [
+        "JM"
+      ],
+      "parent": "central-america",
+      "pbf_url": "https://download.geofabrik.de/central-america/jamaica/jamaica-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -78.85,
+          16.35,
+          -75.51,
+          19.16
+        ]
+      ]
+    },
+    {
+      "id": "japan",
+      "name": "Japan",
+      "iso3166_1": [
+        "JP"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/japan/japan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          122.5607,
+          20.08228,
+          154.47090000000003,
+          45.8154
+        ]
+      ]
+    },
+    {
+      "id": "jordan",
+      "name": "Jordan",
+      "iso3166_1": [
+        "JO"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/jordan/jordan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          34.868859999999984,
+          29.18213,
+          39.310220000000015,
+          33.37922
+        ]
+      ]
+    },
+    {
+      "id": "kazakhstan",
+      "name": "Kazakhstan",
+      "iso3166_1": [
+        "KZ"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/kazakhstan/kazakhstan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          46.423040000000015,
+          40.55346,
+          87.35359,
+          55.50799
+        ]
+      ]
+    },
+    {
+      "id": "kenya",
+      "name": "Kenya",
+      "iso3166_1": [
+        "KE"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/kenya/kenya-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          33.86789999999999,
+          -4.816276,
+          41.97685000000001,
+          4.629931
+        ]
+      ]
+    },
+    {
+      "id": "kiribati",
+      "name": "Kiribati",
+      "iso3166_1": [
+        "KI"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/kiribati/kiribati-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          167.8684,
+          -13.83833,
+          180.0,
+          6.472283
+        ],
+        [
+          -180.0,
+          -13.83833,
+          -147.0336,
+          6.472283
+        ]
+      ]
+    },
+    {
+      "id": "kyrgyzstan",
+      "name": "Kyrgyzstan",
+      "iso3166_1": [
+        "KG"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/kyrgyzstan/kyrgyzstan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          69.25506999999999,
+          39.15136,
+          80.27710000000002,
+          43.2812
+        ]
+      ]
+    },
+    {
+      "id": "laos",
+      "name": "Laos",
+      "iso3166_1": [
+        "LA"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/laos/laos-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          100.08280000000002,
+          13.90159,
+          107.65030000000002,
+          22.52825
+        ]
+      ]
+    },
+    {
+      "id": "latvia",
+      "name": "Latvia",
+      "iso3166_1": [
+        "LV"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/latvia/latvia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          19.733479999999986,
+          55.66109,
+          28.25501,
+          58.0947
+        ]
+      ]
+    },
+    {
+      "id": "lebanon",
+      "name": "Lebanon",
+      "iso3166_1": [
+        "LB"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/lebanon/lebanon-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          34.76799,
+          33.05299,
+          36.636660000000006,
+          34.80253
+        ]
+      ]
+    },
+    {
+      "id": "lesotho",
+      "name": "Lesotho",
+      "iso3166_1": [
+        "LS"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/lesotho/lesotho-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          27.009199999999993,
+          -30.68472,
+          29.463930000000005,
+          -28.56734
+        ]
+      ]
+    },
+    {
+      "id": "liberia",
+      "name": "Liberia",
+      "iso3166_1": [
+        "LR"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/liberia/liberia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -14.954540000000009,
+          -0.681003,
+          -7.245720000000006,
+          8.570158
+        ]
+      ]
+    },
+    {
+      "id": "libya",
+      "name": "Libya",
+      "iso3166_1": [
+        "LY"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/libya/libya-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          9.374404999999996,
+          19.45087,
+          25.407260000000008,
+          33.57972
+        ]
+      ]
+    },
+    {
+      "id": "liechtenstein",
+      "name": "Liechtenstein",
+      "iso3166_1": [
+        "LI"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/liechtenstein/liechtenstein-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          9.471078000000006,
+          47.04774,
+          9.636216999999988,
+          47.27128
+        ]
+      ]
+    },
+    {
+      "id": "lithuania",
+      "name": "Lithuania",
+      "iso3166_1": [
+        "LT"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/lithuania/lithuania-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          20.61859000000001,
+          53.89221,
+          26.838729999999998,
+          56.45329
+        ]
+      ]
+    },
+    {
+      "id": "luxembourg",
+      "name": "Luxembourg",
+      "iso3166_1": [
+        "LU"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/luxembourg/luxembourg-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          5.733033000000006,
+          49.44553,
+          6.532249000000007,
+          50.18496
+        ]
+      ]
+    },
+    {
+      "id": "macedonia",
+      "name": "Macedonia",
+      "iso3166_1": [
+        "MK"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/macedonia/macedonia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          20.446709999999996,
+          40.84759,
+          23.04012,
+          42.37969
+        ]
+      ]
+    },
+    {
+      "id": "madagascar",
+      "name": "Madagascar",
+      "iso3166_1": [
+        "MG"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/madagascar/madagascar-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          42.30124000000001,
+          -26.5823,
+          51.14842999999999,
+          -11.02746
+        ]
+      ]
+    },
+    {
+      "id": "malawi",
+      "name": "Malawi",
+      "iso3166_1": [
+        "MW"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/malawi/malawi-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          32.664410000000004,
+          -17.13324,
+          35.92940999999999,
+          -9.362691
+        ]
+      ]
+    },
+    {
+      "id": "maldives",
+      "name": "Maldives",
+      "iso3166_1": [
+        "MV"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/maldives/maldives-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          71.69999999999999,
+          -1.36,
+          74.5,
+          7.69
+        ]
+      ]
+    },
+    {
+      "id": "mali",
+      "name": "Mali",
+      "iso3166_1": [
+        "ML"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/mali/mali-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -12.247009999999989,
+          10.1176,
+          4.330256999999989,
+          25.09499
+        ]
+      ]
+    },
+    {
+      "id": "malta",
+      "name": "Malta",
+      "iso3166_1": [
+        "MT"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/malta/malta-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          14.0,
+          35.51985,
+          14.856099999999998,
+          36.33296
+        ]
+      ]
+    },
+    {
+      "id": "marshall-islands",
+      "name": "Marshall Islands",
+      "iso3166_1": [
+        "MH"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/marshall-islands/marshall-islands-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          156.8453,
+          1.777314,
+          175.5118,
+          17.94606
+        ]
+      ]
+    },
+    {
+      "id": "mauritania",
+      "name": "Mauritania",
+      "iso3166_1": [
+        "MR"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/mauritania/mauritania-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -17.35015999999999,
+          14.71578,
+          -4.816056000000003,
+          27.33613
+        ]
+      ]
+    },
+    {
+      "id": "mauritius",
+      "name": "Mauritius",
+      "iso3166_1": [
+        "MU"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/mauritius/mauritius-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          53.54727,
+          -22.2411,
+          64.66991000000002,
+          -9.183617
+        ]
+      ]
+    },
+    {
+      "id": "mexico",
+      "name": "Mexico",
+      "iso3166_1": [
+        "MX"
+      ],
+      "parent": "north-america",
+      "pbf_url": "https://download.geofabrik.de/north-america/mexico/mexico-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -132.4952,
+          9.456709,
+          -85.49087,
+          32.72067
+        ]
+      ]
+    },
+    {
+      "id": "micronesia",
+      "name": "Micronesia",
+      "iso3166_1": [
+        "FM"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/micronesia/micronesia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          135.31240000000003,
+          -1.147444,
+          165.6345,
+          13.21917
+        ]
+      ]
+    },
+    {
+      "id": "moldova",
+      "name": "Moldova",
+      "iso3166_1": [
+        "MD"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/moldova/moldova-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          26.61232000000001,
+          45.46164,
+          30.192489999999992,
+          48.49397
+        ]
+      ]
+    },
+    {
+      "id": "monaco",
+      "name": "Monaco",
+      "iso3166_1": [
+        "MC"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/monaco/monaco-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          7.408582999999993,
+          43.48382,
+          7.59567100000001,
+          43.75293
+        ]
+      ]
+    },
+    {
+      "id": "mongolia",
+      "name": "Mongolia",
+      "iso3166_1": [
+        "MN"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/mongolia/mongolia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          87.70254999999997,
+          41.50035,
+          120.02010000000001,
+          52.19582
+        ]
+      ]
+    },
+    {
+      "id": "montenegro",
+      "name": "Montenegro",
+      "iso3166_1": [
+        "ME"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/montenegro/montenegro-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          18.17282,
+          41.61621,
+          20.35883000000001,
+          43.56217
+        ]
+      ]
+    },
+    {
+      "id": "morocco",
+      "name": "Morocco",
+      "iso3166_1": [
+        "MA"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/morocco/morocco-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -18.18350000000001,
+          20.40373,
+          -0.9935759999999902,
+          36.06077
+        ]
+      ]
+    },
+    {
+      "id": "mozambique",
+      "name": "Mozambique",
+      "iso3166_1": [
+        "MZ"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/mozambique/mozambique-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          30.207420000000013,
+          -26.93837,
+          42.53488999999999,
+          -9.986206
+        ]
+      ]
+    },
+    {
+      "id": "myanmar",
+      "name": "Myanmar (a.k.a. Burma)",
+      "iso3166_1": [
+        "MM"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/myanmar/myanmar-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          90.65133000000003,
+          9.510211,
+          101.19709999999998,
+          28.57476
+        ]
+      ]
+    },
+    {
+      "id": "namibia",
+      "name": "Namibia",
+      "iso3166_1": [
+        "NA"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/namibia/namibia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          9.784615000000002,
+          -30.20686,
+          25.265890000000013,
+          -16.91682
+        ]
+      ]
+    },
+    {
+      "id": "nauru",
+      "name": "Nauru",
+      "iso3166_1": [
+        "NR"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/nauru/nauru-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          163.7052,
+          -3.771196,
+          168.55989999999997,
+          2.693851
+        ]
+      ]
+    },
+    {
+      "id": "nepal",
+      "name": "Nepal",
+      "iso3166_1": [
+        "NP"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/nepal/nepal-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          80.04912999999999,
+          26.3445,
+          88.22212999999999,
+          30.47822
+        ]
+      ]
+    },
+    {
+      "id": "netherlands",
+      "name": "Netherlands",
+      "iso3166_1": [
+        "NL"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/netherlands/netherlands-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          2.9360949999999946,
+          50.74753,
+          7.230455000000006,
+          54.01786
+        ]
+      ]
+    },
+    {
+      "id": "new-caledonia",
+      "name": "New Caledonia",
+      "iso3166_1": [
+        "NC"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/new-caledonia/new-caledonia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          157.89999999999998,
+          -25.0,
+          174.10000000000002,
+          -16.9
+        ]
+      ]
+    },
+    {
+      "id": "new-zealand",
+      "name": "New Zealand",
+      "iso3166_1": [
+        "NZ"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/new-zealand/new-zealand-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          162.096,
+          -56.75268,
+          180.0,
+          -28.488
+        ],
+        [
+          -180.0,
+          -56.75268,
+          -173.5849,
+          -28.488
+        ]
+      ]
+    },
+    {
+      "id": "nicaragua",
+      "name": "Nicaragua",
+      "iso3166_1": [
+        "NI"
+      ],
+      "parent": "central-america",
+      "pbf_url": "https://download.geofabrik.de/central-america/nicaragua/nicaragua-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -87.9774,
+          10.70177,
+          -82.37865,
+          15.1119
+        ]
+      ]
+    },
+    {
+      "id": "niger",
+      "name": "Niger",
+      "iso3166_1": [
+        "NE"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/niger/niger-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          0.11972099999999841,
+          11.68684,
+          16.05605,
+          23.56864
+        ]
+      ]
+    },
+    {
+      "id": "nigeria",
+      "name": "Nigeria",
+      "iso3166_1": [
+        "NG"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/nigeria/nigeria-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          2.66452799999999,
+          2.674022,
+          14.680569999999989,
+          13.89874
+        ]
+      ]
+    },
+    {
+      "id": "niue",
+      "name": "Niue",
+      "iso3166_1": [
+        "NU"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/niue/niue-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -172.027,
+          -22.47347,
+          -166.2989,
+          -16.63667
+        ]
+      ]
+    },
+    {
+      "id": "north-korea",
+      "name": "North Korea",
+      "iso3166_1": [
+        "KP"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/north-korea/north-korea-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          123.697,
+          37.61103,
+          131.6447,
+          43.02043
+        ]
+      ]
+    },
+    {
+      "id": "norway",
+      "name": "Norway",
+      "iso3166_1": [
+        "NO"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/norway/norway-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -11.368009999999998,
+          57.55323,
+          35.52710999999999,
+          81.05195
+        ]
+      ]
+    },
+    {
+      "id": "pakistan",
+      "name": "Pakistan",
+      "iso3166_1": [
+        "PK"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/pakistan/pakistan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          60.821680000000015,
+          23.3763,
+          77.22426999999999,
+          37.10667
+        ]
+      ]
+    },
+    {
+      "id": "palau",
+      "name": "Palau",
+      "iso3166_1": [
+        "PW"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/palau/palau-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          130.10339999999997,
+          1.621407,
+          136.95410000000004,
+          11.48818
+        ]
+      ]
+    },
+    {
+      "id": "panama",
+      "name": "Panama",
+      "iso3166_1": [
+        "PA"
+      ],
+      "parent": "central-america",
+      "pbf_url": "https://download.geofabrik.de/central-america/panama/panama-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -83.46462,
+          6.644027,
+          -77.08126,
+          11.20708
+        ]
+      ]
+    },
+    {
+      "id": "papua-new-guinea",
+      "name": "Papua New Guinea",
+      "iso3166_1": [
+        "PG"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/papua-new-guinea/papua-new-guinea-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          139.20140000000004,
+          -14.74845,
+          162.8034,
+          2.587814
+        ]
+      ]
+    },
+    {
+      "id": "paraguay",
+      "name": "Paraguay",
+      "iso3166_1": [
+        "PY"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/paraguay/paraguay-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -62.69475,
+          -27.65675,
+          -54.20176000000001,
+          -19.24012
+        ]
+      ]
+    },
+    {
+      "id": "peru",
+      "name": "Peru",
+      "iso3166_1": [
+        "PE"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/peru/peru-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -86.02509,
+          -20.30552,
+          -68.55439,
+          0.060049
+        ]
+      ]
+    },
+    {
+      "id": "philippines",
+      "name": "Philippines",
+      "iso3166_1": [
+        "PH"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/philippines/philippines-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          112.16610000000003,
+          4.382696,
+          127.07420000000002,
+          21.53021
+        ]
+      ]
+    },
+    {
+      "id": "pitcairn-islands",
+      "name": "Pitcairn Islands",
+      "iso3166_1": [
+        "PN"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/pitcairn-islands/pitcairn-islands-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -133.0664,
+          -27.66403,
+          -118.3448,
+          -21.59613
+        ]
+      ]
+    },
+    {
+      "id": "poland",
+      "name": "Poland",
+      "iso3166_1": [
+        "PL"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/poland/poland-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          13.990219999999994,
+          48.98642,
+          24.161020000000008,
+          55.22826
+        ]
+      ]
+    },
+    {
+      "id": "polynesie-francaise",
+      "name": "Polynésie française (French Polynesia)",
+      "iso3166_1": [
+        "PF"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/polynesie-francaise/polynesie-francaise-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -158.5547,
+          -31.54105,
+          -132.5391,
+          -4.915789
+        ]
+      ]
+    },
+    {
+      "id": "portugal",
+      "name": "Portugal",
+      "iso3166_1": [
+        "PT"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/portugal/portugal-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -31.599999999999994,
+          29.7,
+          -6.179512999999986,
+          42.1639
+        ]
+      ]
+    },
+    {
+      "id": "us/puerto-rico",
+      "name": "Puerto Rico",
+      "iso3166_1": [
+        "PR"
+      ],
+      "parent": "us",
+      "pbf_url": "https://download.geofabrik.de/north-america/us/puerto-rico/puerto-rico-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -68.31024,
+          17.51573,
+          -65.09262,
+          18.81272
+        ]
+      ]
+    },
+    {
+      "id": "romania",
+      "name": "Romania",
+      "iso3166_1": [
+        "RO"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/romania/romania-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          20.241809999999987,
+          43.61247,
+          30.278960000000012,
+          48.26948
+        ]
+      ]
+    },
+    {
+      "id": "russia",
+      "name": "Russian Federation",
+      "iso3166_1": [
+        "RU"
+      ],
+      "parent": null,
+      "pbf_url": "https://download.geofabrik.de/russia/russia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          19.40836999999999,
+          35.61404,
+          180.0,
+          83.83133
+        ],
+        [
+          -180.0,
+          35.61404,
+          -168.684085,
+          83.83133
+        ]
+      ]
+    },
+    {
+      "id": "rwanda",
+      "name": "Rwanda",
+      "iso3166_1": [
+        "RW"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/rwanda/rwanda-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          28.85929999999999,
+          -2.848747,
+          30.90863999999999,
+          -1.03831
+        ]
+      ]
+    },
+    {
+      "id": "saint-helena-ascension-and-tristan-da-cunha",
+      "name": "Saint Helena, Ascension, and Tristan da Cunha",
+      "iso3166_1": [
+        "SH"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/saint-helena-ascension-and-tristan-da-cunha/saint-helena-ascension-and-tristan-da-cunha-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -15.57025999999999,
+          -43.83245,
+          -2.781277999999986,
+          -4.591221
+        ]
+      ]
+    },
+    {
+      "id": "samoa",
+      "name": "Samoa",
+      "iso3166_1": [
+        "WS"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/samoa/samoa-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -174.5114,
+          -15.87838,
+          -170.5427,
+          -10.96083
+        ]
+      ]
+    },
+    {
+      "id": "sao-tome-and-principe",
+      "name": "Sao Tome and Principe",
+      "iso3166_1": [
+        "ST"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/sao-tome-and-principe/sao-tome-and-principe-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          5.273915999999986,
+          -0.525565,
+          8.366995000000003,
+          2.440286
+        ]
+      ]
+    },
+    {
+      "id": "serbia",
+      "name": "Serbia",
+      "iso3166_1": [
+        "RS"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/serbia/serbia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          18.808940000000007,
+          42.22979,
+          23.01034999999999,
+          46.19207
+        ]
+      ]
+    },
+    {
+      "id": "seychelles",
+      "name": "Seychelles",
+      "iso3166_1": [
+        "SC"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/seychelles/seychelles-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          45.684950000000015,
+          -12.55844,
+          57.57433,
+          -3.17239
+        ]
+      ]
+    },
+    {
+      "id": "sierra-leone",
+      "name": "Sierra Leone",
+      "iso3166_1": [
+        "SL"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/sierra-leone/sierra-leone-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -14.764510000000001,
+          5.391619,
+          -10.255799999999994,
+          10.00571
+        ]
+      ]
+    },
+    {
+      "id": "slovakia",
+      "name": "Slovakia",
+      "iso3166_1": [
+        "SK"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/slovakia/slovakia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          16.83071000000001,
+          47.72646,
+          22.570510000000013,
+          49.6186
+        ]
+      ]
+    },
+    {
+      "id": "slovenia",
+      "name": "Slovenia",
+      "iso3166_1": [
+        "SI"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/slovenia/slovenia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          13.305090000000007,
+          45.42081,
+          16.60033999999999,
+          46.87956
+        ]
+      ]
+    },
+    {
+      "id": "solomon-islands",
+      "name": "Solomon Islands",
+      "iso3166_1": [
+        "SB"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/solomon-islands/solomon-islands-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          154.5856,
+          -16.12694,
+          173.59339999999997,
+          -4.139945
+        ]
+      ]
+    },
+    {
+      "id": "somalia",
+      "name": "Somalia",
+      "iso3166_1": [
+        "SO"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/somalia/somalia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          40.974890000000016,
+          -1.816753,
+          52.448710000000005,
+          12.51177
+        ]
+      ]
+    },
+    {
+      "id": "south-africa",
+      "name": "South Africa",
+      "iso3166_1": [
+        "ZA"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/south-africa/south-africa-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          15.99606,
+          -47.58493,
+          39.24259000000001,
+          -22.11736
+        ]
+      ]
+    },
+    {
+      "id": "south-korea",
+      "name": "South Korea",
+      "iso3166_1": [
+        "KR"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/south-korea/south-korea-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          124.31880000000001,
+          32.36076,
+          132.33860000000004,
+          38.64966
+        ]
+      ]
+    },
+    {
+      "id": "south-sudan",
+      "name": "South Sudan",
+      "iso3166_1": [
+        "SS"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/south-sudan/south-sudan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          23.42491000000001,
+          3.461547,
+          35.962980000000016,
+          12.23937
+        ]
+      ]
+    },
+    {
+      "id": "spain",
+      "name": "Spain",
+      "iso3166_1": [
+        "ES"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/spain/spain-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -9.77901399999999,
+          35.26393,
+          5.098524999999995,
+          44.14855
+        ]
+      ]
+    },
+    {
+      "id": "sri-lanka",
+      "name": "Sri Lanka",
+      "iso3166_1": [
+        "LK"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/sri-lanka/sri-lanka-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          79.16415999999998,
+          5.621275,
+          82.64612,
+          10.07153
+        ]
+      ]
+    },
+    {
+      "id": "sudan",
+      "name": "Sudan",
+      "iso3166_1": [
+        "SD"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/sudan/sudan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          21.781000000000006,
+          8.653747,
+          39.62781000000001,
+          22.34706
+        ]
+      ]
+    },
+    {
+      "id": "suriname",
+      "name": "Suriname",
+      "iso3166_1": [
+        "SR"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/suriname/suriname-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -58.08461,
+          1.816773,
+          -53.328190000000006,
+          7.761698
+        ]
+      ]
+    },
+    {
+      "id": "swaziland",
+      "name": "Swaziland",
+      "iso3166_1": [
+        "SZ"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/swaziland/swaziland-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          30.785750000000007,
+          -27.31826,
+          32.136979999999994,
+          -25.71781
+        ]
+      ]
+    },
+    {
+      "id": "sweden",
+      "name": "Sweden",
+      "iso3166_1": [
+        "SE"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/sweden/sweden-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          10.541380000000004,
+          55.02652,
+          24.22471999999999,
+          69.06643
+        ]
+      ]
+    },
+    {
+      "id": "switzerland",
+      "name": "Switzerland",
+      "iso3166_1": [
+        "CH"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/switzerland/switzerland-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          5.954418000000004,
+          45.81642,
+          10.495839999999987,
+          47.81126
+        ]
+      ]
+    },
+    {
+      "id": "syria",
+      "name": "Syria",
+      "iso3166_1": [
+        "SY"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/syria/syria-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          35.28548000000001,
+          32.3066,
+          42.38382999999999,
+          37.32239
+        ]
+      ]
+    },
+    {
+      "id": "taiwan",
+      "name": "Taiwan",
+      "iso3166_1": [
+        "TW"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/taiwan/taiwan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          118.10360000000003,
+          20.72799,
+          122.93119999999999,
+          26.60305
+        ]
+      ]
+    },
+    {
+      "id": "tajikistan",
+      "name": "Tajikistan",
+      "iso3166_1": [
+        "TJ"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/tajikistan/tajikistan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          67.3201,
+          36.66374,
+          75.16570999999999,
+          41.05502
+        ]
+      ]
+    },
+    {
+      "id": "tanzania",
+      "name": "Tanzania",
+      "iso3166_1": [
+        "TZ"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/tanzania/tanzania-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          29.243950000000012,
+          -11.77595,
+          40.69487000000001,
+          -0.974988
+        ]
+      ]
+    },
+    {
+      "id": "thailand",
+      "name": "Thailand",
+      "iso3166_1": [
+        "TH"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/thailand/thailand-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          97.13562000000002,
+          5.597877,
+          105.63920000000002,
+          20.46875
+        ]
+      ]
+    },
+    {
+      "id": "togo",
+      "name": "Togo",
+      "iso3166_1": [
+        "TG"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/togo/togo-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -0.14833799999999542,
+          5.892541,
+          1.8109420000000114,
+          11.14395
+        ]
+      ]
+    },
+    {
+      "id": "tokelau",
+      "name": "Tokelau",
+      "iso3166_1": [
+        "TK"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/tokelau/tokelau-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -176.8579,
+          -11.08137,
+          -167.4097,
+          -6.664586
+        ]
+      ]
+    },
+    {
+      "id": "tonga",
+      "name": "Tonga",
+      "iso3166_1": [
+        "TO"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/tonga/tonga-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -178.6487,
+          -25.68413,
+          -171.3053,
+          -14.15464
+        ]
+      ]
+    },
+    {
+      "id": "tunisia",
+      "name": "Tunisia",
+      "iso3166_1": [
+        "TN"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/tunisia/tunisia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          7.513960999999995,
+          30.20864,
+          12.068000000000012,
+          37.77474
+        ]
+      ]
+    },
+    {
+      "id": "turkey",
+      "name": "Turkey",
+      "iso3166_1": [
+        "TR"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/turkey/turkey-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          25.523979999999995,
+          35.717,
+          44.85991999999999,
+          43.07481
+        ]
+      ]
+    },
+    {
+      "id": "turkmenistan",
+      "name": "Turkmenistan",
+      "iso3166_1": [
+        "TM"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/turkmenistan/turkmenistan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          51.83270999999999,
+          35.12355,
+          66.72271999999998,
+          42.81253
+        ]
+      ]
+    },
+    {
+      "id": "tuvalu",
+      "name": "Tuvalu",
+      "iso3166_1": [
+        "TV"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/tuvalu/tuvalu-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          172.9953,
+          -13.24039,
+          180.0,
+          -4.061646
+        ],
+        [
+          -180.0,
+          -13.24039,
+          -176.757,
+          -4.061646
+        ]
+      ]
+    },
+    {
+      "id": "uganda",
+      "name": "Uganda",
+      "iso3166_1": [
+        "UG"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/uganda/uganda-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          29.57056,
+          -1.487315,
+          35.010310000000004,
+          4.250552
+        ]
+      ]
+    },
+    {
+      "id": "ukraine",
+      "name": "Ukraine",
+      "iso3166_1": [
+        "UA"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/ukraine/ukraine-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          22.13264000000001,
+          44.00862,
+          40.238110000000006,
+          52.3865
+        ]
+      ]
+    },
+    {
+      "id": "united-kingdom",
+      "name": "United Kingdom",
+      "iso3166_1": [
+        "GB"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/united-kingdom/united-kingdom-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -14.858499999999992,
+          49.4192,
+          2.641785999999996,
+          61.13564
+        ]
+      ]
+    },
+    {
+      "id": "us",
+      "name": "United States of America",
+      "iso3166_1": [
+        "US"
+      ],
+      "parent": "north-america",
+      "pbf_url": "https://download.geofabrik.de/north-america/us/us-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          170.9033,
+          15.92097,
+          180.0,
+          72.98845
+        ],
+        [
+          -180.0,
+          15.92097,
+          -66.87576,
+          72.98845
+        ]
+      ]
+    },
+    {
+      "id": "uruguay",
+      "name": "Uruguay",
+      "iso3166_1": [
+        "UY"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/uruguay/uruguay-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -58.525890000000004,
+          -36.2487,
+          -52.7723,
+          -30.07355
+        ]
+      ]
+    },
+    {
+      "id": "uzbekistan",
+      "name": "Uzbekistan",
+      "iso3166_1": [
+        "UZ"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/uzbekistan-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          55.97708,
+          37.16636,
+          73.17462999999998,
+          45.61884
+        ]
+      ]
+    },
+    {
+      "id": "vanuatu",
+      "name": "Vanuatu",
+      "iso3166_1": [
+        "VU"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/vanuatu/vanuatu-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          163.3086,
+          -21.64288,
+          173.6089,
+          -12.29626
+        ]
+      ]
+    },
+    {
+      "id": "venezuela",
+      "name": "Venezuela",
+      "iso3166_1": [
+        "VE"
+      ],
+      "parent": "south-america",
+      "pbf_url": "https://download.geofabrik.de/south-america/venezuela/venezuela-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -73.38098,
+          0.621727,
+          -59.51474,
+          15.96134
+        ]
+      ]
+    },
+    {
+      "id": "vietnam",
+      "name": "Vietnam",
+      "iso3166_1": [
+        "VN"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/vietnam/vietnam-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          102.09590000000003,
+          7.382239,
+          114.64229999999998,
+          23.40214
+        ]
+      ]
+    },
+    {
+      "id": "us/us-virgin-islands",
+      "name": "Virgin Islands",
+      "iso3166_1": [
+        "VI"
+      ],
+      "parent": "us",
+      "pbf_url": "https://download.geofabrik.de/north-america/us/us-virgin-islands/us-virgin-islands-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -65.17502,
+          17.28246,
+          -63.95554,
+          18.48596
+        ]
+      ]
+    },
+    {
+      "id": "wallis-et-futuna",
+      "name": "Wallis et Futuna",
+      "iso3166_1": [
+        "WF"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/wallis-et-futuna/wallis-et-futuna-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -179.978,
+          -16.25685,
+          -174.1553,
+          -9.05868
+        ]
+      ]
+    },
+    {
+      "id": "yemen",
+      "name": "Yemen",
+      "iso3166_1": [
+        "YE"
+      ],
+      "parent": "asia",
+      "pbf_url": "https://download.geofabrik.de/asia/yemen/yemen-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          41.06894,
+          11.36768,
+          55.51167000000001,
+          19.03189
+        ]
+      ]
+    },
+    {
+      "id": "zambia",
+      "name": "Zambia",
+      "iso3166_1": [
+        "ZM"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/zambia/zambia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          21.98982000000001,
+          -18.08777,
+          33.71773000000002,
+          -8.239483
+        ]
+      ]
+    },
+    {
+      "id": "zimbabwe",
+      "name": "Zimbabwe",
+      "iso3166_1": [
+        "ZW"
+      ],
+      "parent": "africa",
+      "pbf_url": "https://download.geofabrik.de/africa/zimbabwe/zimbabwe-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          25.22290000000001,
+          -22.44725,
+          33.085409999999996,
+          -15.58707
+        ]
+      ]
+    },
+    {
+      "id": "ile-de-clipperton",
+      "name": "Île de Clipperton",
+      "iso3166_1": [
+        "PF"
+      ],
+      "parent": "australia-oceania",
+      "pbf_url": "https://download.geofabrik.de/australia-oceania/ile-de-clipperton/ile-de-clipperton-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -110.1215,
+          9.595339,
+          -108.3746,
+          11.15685
+        ]
+      ]
+    }
+  ]
+}
