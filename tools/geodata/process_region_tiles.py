@@ -55,7 +55,7 @@ def main() -> int:
         config_path.write_text(json.dumps(config, indent=2), encoding="utf-8")
         try:
             # Osmium reads the source once per strategy pass, not once per tile.
-            run(["osmium", "extract", "--config", str(config_path), str(a.source), "--overwrite"])
+            run(["osmium", "extract", "--config", str(config_path), "--strategy", "complete_ways", "--verbose", str(a.source), "--overwrite"])
         finally:
             config_path.unlink(missing_ok=True)
 
