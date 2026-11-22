@@ -41,7 +41,7 @@ def download(west: float, south: float, east: float, north: float,
                 raise RuntimeError("ETOPO tile is unexpectedly small.")
             with temporary.open("rb") as source:
                 signature = source.read(4)
-            if signature not in (b"II*\\x00", b"MM\\x00*"):
+            if signature not in (b"II*\x00", b"MM\x00*"):
                 raise RuntimeError("Downloaded file is not a TIFF.")
             temporary.replace(target)
             print(f"Saved {target} ({target.stat().st_size:,} bytes)")
