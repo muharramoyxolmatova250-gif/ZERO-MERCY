@@ -28,6 +28,8 @@ func _ready()->void:
  if typeof(data)!=TYPE_DICTIONARY:
   push_error("Region index must be a JSON object.")
   return
+ if data.has("_tile_size_m"):
+  tile_size_m = maxf(100.0, float(data["_tile_size_m"]))
  for key in data:
   if str(key).begins_with("_"): continue
   var parts:=str(key).split(",")
