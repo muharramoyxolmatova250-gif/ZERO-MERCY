@@ -2,7 +2,7 @@ extends Node3D
 ## Builds a lightweight 3D globe from Natural Earth country GeoJSON.
 ## Download data first with: python tools/geodata/download_natural_earth.py --scale 110m
 
-@export_file("*.geojson") var geojson_path: String = "res://data/geodata/world-110m.geojson"
+@export_file("*.geojson") var geojson_path: String = "res://data/geodata/world-50m.geojson"
 @export_range(10.0, 1000.0, 1.0) var globe_radius: float = 100.0
 @export var draw_country_borders: bool = true
 
@@ -17,8 +17,12 @@ func _ready() -> void:
 	_setup_materials()
 	_add_ocean()
 	if not FileAccess.file_exists(geojson_path):
-		push_warning("Earth GeoJSON missing. Run tools/geodata/download_natural_earth.py first.")
-		return
+		var fallback := "res://data/geodata/world-110m.geojson"
+		if FileAccess.file_exists(fallback):
+			geojson_path = fallback
+		else:
+			push_warning("Earth GeoJSON missing. Run tools/geodata/download_natural_earth.py --scale all first.")
+			return
 	_load_geojson(geojson_path)
 
 
