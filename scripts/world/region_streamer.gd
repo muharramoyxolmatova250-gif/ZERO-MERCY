@@ -87,6 +87,8 @@ func _load_queue()->void:
 		var instance:=scene.instantiate()
 		if instance is Node3D and instance.has_method("configure_region"):
 			instance.configure_region(str(e.get("geojson_path","")),float(e.get("center_lat",0.0)),float(e.get("center_lon",0.0)))
+			if e.has("region_size_m") and "region_size_m" in instance:
+				instance.set("region_size_m", float(e["region_size_m"]))
 		_root.add_child(instance)
 		if instance is Node3D:
 			instance.position=Vector3(float(e.get("origin_x",c.x*tile_size_m)),0.0,float(e.get("origin_z",c.y*tile_size_m)))
