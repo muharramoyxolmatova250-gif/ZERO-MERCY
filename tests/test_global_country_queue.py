@@ -9,7 +9,7 @@ class GlobalCountryQueueTests(unittest.TestCase):
         catalog = {"regions": [
             {"id": "germany", "name": "Germany", "iso3166_1": "DE", "bboxes": [[5,47,15,55]]},
             {"id": "israel-and-palestine", "name": "Israel and Palestine",
-             "iso3166_1": ["PS","IL"], "bboxes": [[34,29,36,34]]},
+             "iso3166_1": "PS,IL", "bboxes": [[34,29,36,34]]},
             {"id": "california", "name": "California", "iso3166_1": [],
              "iso3166_2": ["US-CA"], "bboxes": [[-125,32,-114,42]]},
             {"id": "missing-bounds", "name": "No bounds", "iso3166_1": ["XX"]},
