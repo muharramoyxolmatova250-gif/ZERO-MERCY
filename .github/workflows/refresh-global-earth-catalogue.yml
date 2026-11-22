@@ -31,6 +31,26 @@ jobs:
         run: python tools/geodata/build_global_manifest.py --output data/world/global_regions.json
       - name: Download public-domain world country boundaries (110m and 50m)
         run: python tools/geodata/download_natural_earth.py --scale all
+      - name: Install OSM processing tools
+        run: sudo apt-get update && sudo apt-get install -y osmium-tool
+      - name: Download and process real Andijan OSM extract
+        run: |
+          python tools/geodata/build_global_manifest.py --output data/world/global_regions.json --region uzbekistan --download
+          python tools/geodata/prepare_osm_region.py data/osm/pbf/uzbekistan.osm.pbf --bbox 72.325 40.765 72.355 40.795 --tile 0,0 --anchor 72.34 40.78
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("data/world/region_tiles.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          tile = data.get("0,0")
+          if not tile or not Path("data/osm/tiles/tile_0_0.geojson").is_file():
+              raise SystemExit("Andijan OSM tile generation failed.")
+          path.write_text(json.dumps({"0,0": tile}, indent=2) + "\\n", encoding="utf-8")
+          geo = json.loads(Path("data/osm/tiles/tile_0_0.geojson").read_text(encoding="utf-8"))
+          if geo.get("type") != "FeatureCollection" or not geo.get("features"):
+              raise SystemExit("Andijan GeoJSON tile is empty or invalid.")
+          print(f"Andijan tile ready: {len(geo['features'])} OSM features.")
+          PY
       - name: Validate global boundary GeoJSON
         run: |
           python - <<'PY'
@@ -46,7 +66,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/world/global_regions.json data/geodata/world-110m.geojson data/geodata/world-50m.geojson
+          git add data/world/global_regions.json data/geodata/world-110m.geojson data/geodata/world-50m.geojson data/world/region_tiles.json data/osm/tiles/tile_0_0.geojson
           if git diff --cached --quiet; then
             echo "Global region catalogue is already current."
           else
