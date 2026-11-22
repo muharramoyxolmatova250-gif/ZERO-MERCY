@@ -31,6 +31,22 @@ def main() -> int:
             west, south, east, north = tile["bbox"]
             assert west < east and south < north
             assert tile["godot_geojson_path"].startswith("res://")
+            assert tile["region_size_m"] >= 100.0
+        andijan_plan = root / "andijan-plan.json"
+        andijan_index = root / "andijan-index.json"
+        subprocess.run([
+            sys.executable, str(PLANNER), "--region", "andijan",
+            "--bbox", "72.2", "40.6", "72.4", "40.8",
+            "--tile-deg", "0.1", "--tile-size-m", "8000",
+            "--anchor", "72.3", "40.7",
+            "--output", str(andijan_plan), "--index-output", str(andijan_index),
+        ], check=True)
+        andijan = json.loads(andijan_plan.read_text(encoding="utf-8"))
+        andijan_runtime = json.loads(andijan_index.read_text(encoding="utf-8"))
+        assert andijan["tile_count"] == 4
+        assert len([key for key in andijan_runtime if not key.startswith("_")]) == 4
+        assert all(tile["region_size_m"] > 10000 for tile in andijan["tiles"])
+        print("PASS: planner creates valid Andijan/Asaka tiles with collision-free 8 km runtime keys.")
         print("PASS: planner creates 4 valid geographic jobs and 4 runtime index entries.")
     catalogue = build_catalog({
         "features": [{
