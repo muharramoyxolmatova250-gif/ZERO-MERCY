@@ -155,6 +155,8 @@ func _run() -> void:
 		return
 	var globe := globe_scene.instantiate()
 	globe.set("geojson_path", "res://tests/fixtures/earth_smoke.geojson")
+	globe.set("rivers_geojson_path", "res://tests/fixtures/rivers_smoke.geojson")
+	globe.set("lakes_geojson_path", "res://tests/fixtures/lakes_smoke.geojson")
 	root.add_child(globe)
 	await process_frame
 	var globe_meshes := _count_meshes(globe)
@@ -162,10 +164,14 @@ func _run() -> void:
 		_fail("Earth globe did not render ocean, land, inland water and borders: " + str(globe_meshes))
 		return
 	var inland_water_count := globe.get_tree().get_nodes_in_group("earth_inland_water").size()
-	if inland_water_count < 1:
-		_fail("Earth globe did not render the polygon interior ring as inland water.")
+	if inland_water_count < 2:
+		_fail("Earth globe did not render polygon holes and lake surfaces as inland water.")
 		return
-	print("PASS Stage 2: Earth globe generated ", globe_meshes, " meshes including ", inland_water_count, " inland-water surfaces.")
+	var river_count := globe.get_tree().get_nodes_in_group("earth_river").size()
+	if river_count < 1:
+		_fail("Earth globe did not render global river line geometry.")
+		return
+	print("PASS Stage 2: Earth globe generated ", globe_meshes, " meshes including ", inland_water_count, " lake/water surfaces and ", river_count, " river lines.")
 
 	var metadata_path := "user://zero_mercy_dem_smoke.json"
 	var heights_path := "user://zero_mercy_dem_smoke.f32"
