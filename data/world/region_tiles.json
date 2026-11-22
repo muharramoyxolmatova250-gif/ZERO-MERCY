@@ -1,0 +1,24 @@
+{
+  "_comment": "Example local tile index. Coordinates are tile-grid x,z indices, not latitude/longitude. Replace paths and origins with processed region outputs.",
+  "0,0": {
+    "geojson_path": "res://data/osm/tiles/0_0.geojson",
+    "center_lat": 40.78,
+    "center_lon": 72.34,
+    "origin_x": 0,
+    "origin_z": 0
+  },
+  "1,0": {
+    "geojson_path": "res://data/osm/tiles/1_0.geojson",
+    "center_lat": 40.78,
+    "center_lon": 72.36,
+    "origin_x": 2000,
+    "origin_z": 0
+  },
+  "0,1": {
+    "geojson_path": "res://data/osm/tiles/0_1.geojson",
+    "center_lat": 40.76,
+    "center_lon": 72.34,
+    "origin_x": 0,
+    "origin_z": 2000
+  }
+}
