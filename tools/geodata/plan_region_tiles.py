@@ -99,7 +99,9 @@ def main() -> int:
                     "dem_metadata_path": entry["godot_dem_metadata_path"],
                 }
                 if key in index:
-                    p.error(f"Tile grid collision inside {a.region} at {key}; reduce tile-deg.")
+                    if index[key]["tile_id"] == tile_id:
+                        continue
+                    p.error(f"Tile grid collision inside {a.region} at {key}; check global anchor and tile size.")
                 index[key] = indexed
 
     plan = {
