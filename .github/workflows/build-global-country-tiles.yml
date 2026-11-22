@@ -52,7 +52,7 @@ jobs:
           python tools/geodata/build_global_country_queue.py
       - name: Resolve country bounds and download extract
         env:
-          REGION_ID: \${{ inputs.region_id }}
+          REGION_ID: ${{ inputs.region_id }}
         run: |
           python - <<'PY'
           import json, os, subprocess
@@ -69,8 +69,8 @@ jobs:
           PY
       - name: Plan country tiles in the shared global grid
         env:
-          REGION_ID: \${{ inputs.region_id }}
-          TILE_DEGREES: \${{ inputs.tile_degrees }}
+          REGION_ID: ${{ inputs.region_id }}
+          TILE_DEGREES: ${{ inputs.tile_degrees }}
         run: |
           python - <<'PY'
           import json, os, subprocess
