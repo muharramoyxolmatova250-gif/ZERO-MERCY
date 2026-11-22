@@ -1,24 +1,26 @@
 {
   "prologue_signal": {
-    "title": "01 — Lost Signal",
-    "chapter": "Prologue",
-    "description": "Neo-City markazidagi buzilgan signal manbasini top.",
+    "id": "prologue_signal",
+    "title": "01 — Yo‘qolgan signal",
+    "chapter": "Prologue — Uzilgan signal",
+    "description": "Neo-City eski bozoridagi signal manbasini top va tinch oilani qutqar.",
+    "estimated_minutes": 60,
     "objectives": [
       {
-        "id": "reach_market",
-        "title": "Eski bozorga yetib bor",
+        "id": "obj_1",
+        "title": "Hududni tekshir",
         "event": "enter_old_market",
         "target": 1
       },
       {
-        "id": "inspect_beacon",
-        "title": "Signal qurilmasini tekshir",
+        "id": "obj_2",
+        "title": "Qurilmani top",
         "event": "interact_beacon",
         "target": 1
       },
       {
-        "id": "protect_family",
-        "title": "Oilani xavfsiz joyga olib bor",
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
         "event": "escort_family_safe",
         "target": 1
       }
@@ -26,6 +28,1897 @@
     "reward": {
       "credits": 250,
       "story_flag": "family_saved"
+    }
+  },
+  "prologue_aftershock": {
+    "id": "prologue_aftershock",
+    "title": "02 — Qora yomg‘ir",
+    "chapter": "Prologue — Uzilgan signal",
+    "description": "Qutqaruvdan keyin xavfsizlik dronlaridan qochib, yashirin boshpanaga yet.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "reach_safehouse",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "disable_pursuit_drone",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "meet_unknown_contact",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 275,
+      "story_flag": "safehouse_found"
+    }
+  },
+  "prologue_ghost_chip": {
+    "id": "prologue_ghost_chip",
+    "title": "03 — Chipdagi arvoh",
+    "chapter": "Prologue — Uzilgan signal",
+    "description": "Dara chipidagi nosozlikni tekshir va o‘chirilgan xotira bo‘lagini tikla.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "scan_chip",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "recover_memory_fragment",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "decode_signal",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 300,
+      "story_flag": "chip_fragment_found"
+    }
+  },
+  "quiet_district": {
+    "id": "quiet_district",
+    "title": "04 — Jim ko‘chalar",
+    "chapter": "I bob — Sukunat tumani",
+    "description": "Yo‘qolgan aholi izlarini tekshir va kuzatuv tarmog‘ini top.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "search_residential_block",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "question_three_residents",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "find_surveillance_hub",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 325,
+      "story_flag": "surveillance_found"
+    }
+  },
+  "underground_archive": {
+    "id": "underground_archive",
+    "title": "05 — Yerosti arxivi",
+    "chapter": "I bob — Sukunat tumani",
+    "description": "Yopiq arxivga kirib, noqonuniy xotira yozuvlarini qo‘lga kirit.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "find_archive_entrance",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "bypass_archive_lock",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "download_archive",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 350,
+      "story_flag": "archive_downloaded"
+    }
+  },
+  "first_witness": {
+    "id": "first_witness",
+    "title": "06 — Birinchi guvoh",
+    "chapter": "I bob — Sukunat tumani",
+    "description": "Tirik qolgan guvohni himoya qil va uning ko‘rsatmasini yozib ol.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "locate_witness",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "defeat_hunters",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "secure_witness_testimony",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 375,
+      "story_flag": "witness_secured"
+    }
+  },
+  "ghost_protocol": {
+    "id": "ghost_protocol",
+    "title": "07 — Arvoh protokoli",
+    "chapter": "II bob — Ghost Protocol",
+    "description": "Chip signalining manbasini uchta server tugunidan kuzat.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "trace_node_alpha",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "trace_node_beta",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "trace_node_gamma",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 400,
+      "story_flag": "ghost_protocol_open"
+    }
+  },
+  "memory_fragment": {
+    "id": "memory_fragment",
+    "title": "08 — Xotira parchalari",
+    "chapter": "II bob — Ghost Protocol",
+    "description": "Daraning o‘tmishidan o‘chirilgan uchta xotira parchasini tikla.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "recover_memory_one",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "recover_memory_two",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "recover_memory_three",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 425,
+      "story_flag": "memories_restored"
+    }
+  },
+  "signal_hunt": {
+    "id": "signal_hunt",
+    "title": "09 — Ovoz ortidagi ovoz",
+    "chapter": "II bob — Ghost Protocol",
+    "description": "Signal ortidagi noma’lum operatorni top va uzatmani tingla.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "reach_relay_tower",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "defend_relay",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "decode_operator_voice",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 450,
+      "story_flag": "operator_identified"
+    }
+  },
+  "denni_contact": {
+    "id": "denni_contact",
+    "title": "10 — Eski sherik",
+    "chapter": "III bob — Denni soyasi",
+    "description": "Denni bilan uchrash va uning maxfiy ma’lumotini tekshir.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "reach_meeting_point",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "scan_denni_data",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "accept_or_refuse_deal",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 475,
+      "story_flag": "denni_contacted"
+    }
+  },
+  "false_route": {
+    "id": "false_route",
+    "title": "11 — Soxta yo‘l",
+    "chapter": "III bob — Denni soyasi",
+    "description": "Denni bergan koordinatalarni tekshir va pistirmani aniqlagin.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "follow_coordinates",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "detect_ambush",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "escape_trap",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 500,
+      "story_flag": "ambush_survived"
+    }
+  },
+  "denni_betrayal": {
+    "id": "denni_betrayal",
+    "title": "12 — Xiyonat",
+    "chapter": "III bob — Denni soyasi",
+    "description": "Denni xiyonatini fosh qil va uning qo‘l ostidagi guruhdan chiqib ket.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "confront_denni",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "disable_control_room",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "escape_denni_compound",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 525,
+      "story_flag": "denni_betrayed"
+    }
+  },
+  "yelena_rescue": {
+    "id": "yelena_rescue",
+    "title": "13 — Qutqaruv yo‘lagi",
+    "chapter": "IV bob — Yelenaning so‘nggi nuri",
+    "description": "Yelenani karantin sektoridan olib chiqish uchun uchta himoya qatlamini buz.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "reach_quarantine",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "disable_security_grid",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "find_yelena",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 550,
+      "story_flag": "yelena_found"
+    }
+  },
+  "last_transmission": {
+    "id": "last_transmission",
+    "title": "14 — So‘nggi uzatma",
+    "chapter": "IV bob — Yelenaning so‘nggi nuri",
+    "description": "Yelena bilan birga global uzatmani yubor va dushman to‘lqinini ushla.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "restore_transmitter",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "hold_transmitter_position",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "send_global_message",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 575,
+      "story_flag": "global_message_sent"
+    }
+  },
+  "yelena_fall": {
+    "id": "yelena_fall",
+    "title": "15 — So‘nggi yorug‘lik",
+    "chapter": "IV bob — Yelenaning so‘nggi nuri",
+    "description": "Yelenani qutqarishga urin va uning so‘nggi xabarini saqla.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "reach_yelena",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "defeat_execution_unit",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "recover_yelena_message",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 600,
+      "story_flag": "yelena_fell"
+    }
+  },
+  "airport_escape": {
+    "id": "airport_escape",
+    "title": "16 — Osmondagi yo‘l",
+    "chapter": "V bob — Chegarasiz dunyo",
+    "description": "Xalqaro aeroportga yetib bor va kuzatuv ro‘yxatidan chiq.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "reach_airport",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "secure_flight_identity",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "board_aircraft",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 625,
+      "story_flag": "flight_secured"
+    }
+  },
+  "border_crossing": {
+    "id": "border_crossing",
+    "title": "17 — Chegara ortida",
+    "chapter": "V bob — Chegarasiz dunyo",
+    "description": "Boshqa davlatdagi ma’lumot markaziga yashirin kir.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "arrive_foreign_city",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "find_data_broker",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "obtain_access_key",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 650,
+      "story_flag": "foreign_access"
+    }
+  },
+  "black_market_network": {
+    "id": "black_market_network",
+    "title": "18 — Qora bozor tarmog‘i",
+    "chapter": "V bob — Chegarasiz dunyo",
+    "description": "Uch mamlakatdagi noqonuniy texnologiya savdosini kuzat.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "trace_market_one",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "trace_market_two",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "trace_market_three",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 675,
+      "story_flag": "black_market_mapped"
+    }
+  },
+  "father_clue": {
+    "id": "father_clue",
+    "title": "19 — Noma’lum familiya",
+    "chapter": "VI bob — Qon izi",
+    "description": "Daraning biologik otasiga olib boruvchi hujjatlarni top.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "search_birth_record",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "decode_family_archive",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "identify_family_symbol",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 700,
+      "story_flag": "father_clue_found"
+    }
+  },
+  "genetic_archive": {
+    "id": "genetic_archive",
+    "title": "20 — Genetik arxiv",
+    "chapter": "VI bob — Qon izi",
+    "description": "Genetik bazadan Daraning haqiqiy nasabini tasdiqla.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "enter_gene_lab",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "retrieve_dna_record",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "verify_parentage",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 725,
+      "story_flag": "parentage_verified"
+    }
+  },
+  "bloodline_reveal": {
+    "id": "bloodline_reveal",
+    "title": "21 — Qon haqiqatı",
+    "chapter": "VI bob — Qon izi",
+    "description": "Biologik otang Neo-City rahbari ekanini aniqlagin.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "follow_final_coordinate",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "open_private_vault",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "learn_father_identity",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 750,
+      "story_flag": "father_identity_known"
+    }
+  },
+  "neo_city_infiltration": {
+    "id": "neo_city_infiltration",
+    "title": "22 — Hukmdor shahri",
+    "chapter": "VII bob — Sovereign City",
+    "description": "Neo-City markaziga kir va boshqaruv minorasiga yo‘l och.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "cross_outer_wall",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "disable_city_scanners",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "enter_government_sector",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 775,
+      "story_flag": "sovereign_city_entered"
+    }
+  },
+  "council_chamber": {
+    "id": "council_chamber",
+    "title": "23 — Kengash zali",
+    "chapter": "VII bob — Sovereign City",
+    "description": "Kengash a’zolarining yashirin kelishuvini ochib ber.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "collect_council_evidence",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "expose_three_delegates",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "reach_council_chamber",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 800,
+      "story_flag": "council_exposed"
+    }
+  },
+  "father_confrontation": {
+    "id": "father_confrontation",
+    "title": "24 — Ota va qiz",
+    "chapter": "VII bob — Sovereign City",
+    "description": "Biologik otang bilan yuzma-yuz kel va uning rejasini eshit.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "reach_private_elevator",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "survive_guardian_boss",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "confront_biological_father",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 825,
+      "story_flag": "father_confronted"
+    }
+  },
+  "sovereign_truth": {
+    "id": "sovereign_truth",
+    "title": "25 — Taxt ortidagi sir",
+    "chapter": "VII bob — Sovereign City",
+    "description": "Butun dunyoni nazorat qiluvchi tizimning asl maqsadini och.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "enter_core_archive",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "decrypt_global_protocol",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "broadcast_truth",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 850,
+      "story_flag": "global_protocol_revealed"
+    }
+  },
+  "power_vacuum": {
+    "id": "power_vacuum",
+    "title": "26 — Hokimiyatsiz shahar",
+    "chapter": "VIII bob — Shisha taxt",
+    "description": "Rahbar yo‘qligida uch fraksiya o‘rtasidagi urushni to‘xtat.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "reach_neutral_zone",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "negotiate_with_faction_one",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "negotiate_with_faction_two",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 875,
+      "story_flag": "factions_contacted"
+    }
+  },
+  "faction_choice": {
+    "id": "faction_choice",
+    "title": "27 — Kimning tomoni?",
+    "chapter": "VIII bob — Shisha taxt",
+    "description": "Fuqarolar, isyonchilar yoki tizim tarafdorlari bilan kelishuv tanla.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "hear_civilian_demands",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "hear_rebel_demands",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "make_faction_choice",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 900,
+      "story_flag": "faction_choice_made"
+    }
+  },
+  "throne_offer": {
+    "id": "throne_offer",
+    "title": "28 — Taklif",
+    "chapter": "VIII bob — Shisha taxt",
+    "description": "Otangning o‘rnini egallash taklifini qabul qil yoki rad et.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "enter_throne_room",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "hear_final_offer",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "make_throne_decision",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 925,
+      "story_flag": "throne_decision_made"
+    }
+  },
+  "network_shutdown": {
+    "id": "network_shutdown",
+    "title": "29 — Global uzilish",
+    "chapter": "IX bob — Dunyo qulashi",
+    "description": "Global tarmoqning uchta tayanchini o‘chirib, odamlarni nazoratdan ozod qil.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "disable_network_hub_one",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "disable_network_hub_two",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "disable_network_hub_three",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 950,
+      "story_flag": "network_weakened"
+    }
+  },
+  "city_war": {
+    "id": "city_war",
+    "title": "30 — Shaharlar urushi",
+    "chapter": "IX bob — Dunyo qulashi",
+    "description": "Fuqarolarni evakuatsiya qil va uch shahardagi hujumni to‘xtat.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "evacuate_city_one",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "defend_city_two",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "secure_city_three",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 975,
+      "story_flag": "cities_defended"
+    }
+  },
+  "core_overload": {
+    "id": "core_overload",
+    "title": "31 — Yadro haddidan oshdi",
+    "chapter": "IX bob — Dunyo qulashi",
+    "description": "Markaziy yadroga yetib bor va portlash zanjirini to‘xtat.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "reach_reactor_core",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "disable_cooling_locks",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "stabilize_reactor",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 1000,
+      "story_flag": "reactor_stabilized"
+    }
+  },
+  "worldwide_blackout": {
+    "id": "worldwide_blackout",
+    "title": "32 — Qorong‘u Yer",
+    "chapter": "IX bob — Dunyo qulashi",
+    "description": "Yer bo‘ylab uzilgan aloqani tiklash yoki butunlay o‘chirish yo‘lini tanla.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "restore_emergency_power",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "choose_network_fate",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "activate_world_protocol",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 1025,
+      "story_flag": "world_protocol_activated"
+    }
+  },
+  "last_defense": {
+    "id": "last_defense",
+    "title": "33 — Oxirgi mudofaa",
+    "chapter": "X bob — Tojsiz",
+    "description": "Oxirgi qarshilik guruhini himoya qil va boshqaruv minorasiga yo‘l och.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "rally_resistance",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "defend_last_shelter",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "reach_control_tower",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 1050,
+      "story_flag": "resistance_saved"
+    }
+  },
+  "destroy_control": {
+    "id": "destroy_control",
+    "title": "34 — Nazoratni yo‘q qil",
+    "chapter": "X bob — Tojsiz",
+    "description": "Odamlarning irodasini boshqaruvchi asosiy tizimni yo‘q qil.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "disable_security_core",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "plant_core_charges",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "escape_core_chamber",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 1075,
+      "story_flag": "control_system_destroyed"
+    }
+  },
+  "reject_throne": {
+    "id": "reject_throne",
+    "title": "35 — Toj kerak emas",
+    "chapter": "X bob — Tojsiz",
+    "description": "Otangning taxtini rad et va hokimiyatni odamlarga qaytar.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "return_to_throne_room",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "reject_throne",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "broadcast_final_choice",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 1100,
+      "story_flag": "throne_rejected"
+    }
+  },
+  "aftershock": {
+    "id": "aftershock",
+    "title": "36 — Kuldan keyin",
+    "chapter": "XI bob — Oltin barmoq",
+    "description": "Yakuniy jangdan keyin omon qolganlarni top va shahar holatini bahola.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "search_ruined_district",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "rescue_survivors",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "visit_memorial",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 1125,
+      "story_flag": "aftershock_complete"
+    }
+  },
+  "ghost_signal_epilogue": {
+    "id": "ghost_signal_epilogue",
+    "title": "37 — Oxirgi signal",
+    "chapter": "XI bob — Oltin barmoq",
+    "description": "O‘chirilgan deb hisoblangan signal yana paydo bo‘lganini tekshir.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "trace_new_signal",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "open_unknown_packet",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "follow_golden_trace",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 1150,
+      "story_flag": "golden_trace_found"
+    }
+  },
+  "golden_finger": {
+    "id": "golden_finger",
+    "title": "38 — Oltin barmoq",
+    "chapter": "XI bob — Oltin barmoq",
+    "description": "Post-kredit voqeasida noma’lum shaxsning izini top.",
+    "estimated_minutes": 60,
+    "objectives": [
+      {
+        "id": "obj_1",
+        "title": "Hududni tekshir",
+        "event": "enter_abandoned_lab",
+        "target": 1
+      },
+      {
+        "id": "obj_2",
+        "title": "Qurilmani top",
+        "event": "inspect_golden_fingerprint",
+        "target": 1
+      },
+      {
+        "id": "obj_3",
+        "title": "Vazifani yakunla",
+        "event": "watch_unknown_transmission",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 1175,
+      "story_flag": "golden_finger_seen"
+    }
+  },
+  "side_missing_child": {
+    "id": "side_missing_child",
+    "title": "Yon topshiriq — Yo‘qolgan bola",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Turar-joy sektorida yo‘qolgan bolani top.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "find_child_clue",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "track_child_signal",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "return_child",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 150
+    }
+  },
+  "side_blackout": {
+    "id": "side_blackout",
+    "title": "Yon topshiriq — Elektr uzilishi",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Tuman elektr tarmog‘ini qayta ishga tushir.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "reach_power_station",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "replace_power_cell",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "restore_power",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 170
+    }
+  },
+  "side_medical_run": {
+    "id": "side_medical_run",
+    "title": "Yon topshiriq — Tibbiy yuk",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Kasalxonaga zarur dori vositalarini yetkaz.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "collect_medical_case",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "cross_quarantine",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "deliver_medical_case",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 190
+    }
+  },
+  "side_data_leak": {
+    "id": "side_data_leak",
+    "title": "Yon topshiriq — Ma’lumot sizishi",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Fuqarolarning shaxsiy ma’lumotlari sotilishini to‘xtat.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "find_data_vendor",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "erase_private_records",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "expose_data_vendor",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 210
+    }
+  },
+  "side_rooftop_race": {
+    "id": "side_rooftop_race",
+    "title": "Yon topshiriq — Tomlar poygasi",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Neon tomlar bo‘ylab noqonuniy poygada qatnash.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "reach_race_start",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "pass_race_checkpoints",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "finish_rooftop_race",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 230
+    }
+  },
+  "side_drone_rescue": {
+    "id": "side_drone_rescue",
+    "title": "Yon topshiriq — Dron qutqaruvi",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Boshqaruvdan chiqqan transport dronini to‘xtat.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "locate_runaway_drone",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "disable_drone_weapons",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "land_drone_safely",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 250
+    }
+  },
+  "side_old_soldier": {
+    "id": "side_old_soldier",
+    "title": "Yon topshiriq — Eski askar",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Sobiq askarning yo‘qolgan xotira modulini top.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "find_old_soldier",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "search_battle_site",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "return_memory_module",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 270
+    }
+  },
+  "side_night_market": {
+    "id": "side_night_market",
+    "title": "Yon topshiriq — Tungi bozor",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Tungi bozordagi noqonuniy qurol savdosini fosh et.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "enter_night_market",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "photograph_weapon_trade",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "report_weapon_trade",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 290
+    }
+  },
+  "side_water_crisis": {
+    "id": "side_water_crisis",
+    "title": "Yon topshiriq — Suv inqirozi",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Mahalliy suv tozalash tizimini sabotajdan qutqar.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "reach_water_plant",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "remove_contamination",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "restart_water_plant",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 310
+    }
+  },
+  "side_school_network": {
+    "id": "side_school_network",
+    "title": "Yon topshiriq — Maktab tarmog‘i",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "O‘quvchilar ma’lumotlarini o‘g‘irlayotgan tizimni o‘chir.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "enter_school_server",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "trace_student_database",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "secure_school_network",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 330
+    }
+  },
+  "side_lost_android": {
+    "id": "side_lost_android",
+    "title": "Yon topshiriq — Yo‘qolgan android",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "O‘z xotirasini qidirayotgan androidga yordam ber.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "find_android",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "recover_android_memory",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "choose_android_fate",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 350
+    }
+  },
+  "side_street_art": {
+    "id": "side_street_art",
+    "title": "Yon topshiriq — Devorlardagi haqiqat",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Taqiqlangan devoriy suratlar ortidagi xabarni top.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "scan_mural",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "decode_hidden_message",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "share_mural_truth",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 370
+    }
+  },
+  "side_airport_smuggling": {
+    "id": "side_airport_smuggling",
+    "title": "Yon topshiriq — Aeroportdagi kontrabanda",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Aeroport yuk terminalidagi kontrabanda yo‘lini to‘xtat.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "inspect_cargo_manifest",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "follow_cargo_drone",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "stop_smuggling",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 390
+    }
+  },
+  "side_train_ghost": {
+    "id": "side_train_ghost",
+    "title": "Yon topshiriq — Arvoh poyezd",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Avtomatik boshqaruvdagi poyezdni to‘xtat.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "reach_rail_control",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "override_train_ai",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "stop_ghost_train",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 410
+    }
+  },
+  "side_family_debt": {
+    "id": "side_family_debt",
+    "title": "Yon topshiriq — Oilaviy qarz",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Qarz tizimi tahdid qilayotgan oilani himoya qil.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "meet_family",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "find_debt_contract",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "cancel_debt_contract",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 430
+    }
+  },
+  "side_cyberclinic": {
+    "id": "side_cyberclinic",
+    "title": "Yon topshiriq — Kiberklinika",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Noqonuniy implant klinikasidagi bemorlarni qutqar.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "enter_cyberclinic",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "disable_implant_lock",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "evacuate_patients",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 450
+    }
+  },
+  "side_signal_hunter": {
+    "id": "side_signal_hunter",
+    "title": "Yon topshiriq — Signal ovchisi",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Noma’lum radio signallar manbasini aniqlagin.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "scan_radio_band",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "triangulate_signal",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "recover_signal_device",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 470
+    }
+  },
+  "side_flooded_tunnel": {
+    "id": "side_flooded_tunnel",
+    "title": "Yon topshiriq — Suv bosgan tunnel",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Yerosti tunnelida qolgan ishchilarni qutqar.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "enter_flooded_tunnel",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "restore_tunnel_lights",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "escort_tunnel_workers",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 490
+    }
+  },
+  "side_rebel_supply": {
+    "id": "side_rebel_supply",
+    "title": "Yon topshiriq — Isyonchilar ta’minoti",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Gumanitar yukni jang hududidan olib o‘t.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "collect_relief_supplies",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "cross_checkpoint",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "deliver_relief_supplies",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 510
+    }
+  },
+  "side_corporate_witness": {
+    "id": "side_corporate_witness",
+    "title": "Yon topshiriq — Korporativ guvoh",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Korporatsiyadan qochgan muhandisni xavfsiz joyga yetkaz.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "locate_engineer",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "protect_engineer",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "reach_safe_zone",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 530
+    }
+  },
+  "side_memory_market": {
+    "id": "side_memory_market",
+    "title": "Yon topshiriq — Xotira bozori",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Odamlarning xotirasini sotayotgan savdogarni fosh et.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "find_memory_broker",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "recover_stolen_memories",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "expose_memory_market",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 550
+    }
+  },
+  "side_satellite_fall": {
+    "id": "side_satellite_fall",
+    "title": "Yon topshiriq — Yiqilgan sun’iy yo‘ldosh",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Yiqilgan sun’iy yo‘ldosh modulini xavfsizlantir.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "reach_crash_site",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "secure_satellite_core",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "send_recovery_beacon",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 570
+    }
+  },
+  "side_yelena_echo": {
+    "id": "side_yelena_echo",
+    "title": "Yon topshiriq — Yelena aks-sadosi",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Yelenaning yashirin qoldirgan xabarlarini top.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "find_yelena_cache_one",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "find_yelena_cache_two",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "decode_yelena_final_note",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 590
+    }
+  },
+  "side_denni_debt": {
+    "id": "side_denni_debt",
+    "title": "Yon topshiriq — Denni qarzi",
+    "chapter": "Dunyo faoliyatlari",
+    "description": "Denni bilan bog‘liq eski qarzlar zanjirini yakunla.",
+    "estimated_minutes": 35,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "side_obj_1",
+        "title": "Manbani top",
+        "event": "find_denni_ledger",
+        "target": 1
+      },
+      {
+        "id": "side_obj_2",
+        "title": "To‘siqni bartaraf et",
+        "event": "confront_debt_collector",
+        "target": 1
+      },
+      {
+        "id": "side_obj_3",
+        "title": "Vazifani yakunla",
+        "event": "close_denni_ledger",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 610
     }
   }
 }
