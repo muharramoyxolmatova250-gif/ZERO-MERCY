@@ -23,6 +23,11 @@ func _run() -> void:
 		_fail("City life missing: citizens=" + str(citizens) + ", traffic=" + str(traffic))
 		return
 	print("PASS Stage 3: ", citizens, " pedestrians and ", traffic, " electric vehicles spawned.")
+	var citizen_phones := _count_named_nodes(city, "Phone")
+	if citizen_phones < citizens:
+		_fail("City citizens are missing personal phones: " + str(citizen_phones))
+		return
+	print("PASS Stage 3: every spawned citizen has a personal cyberpunk phone prop.")
 	var first_citizen := city.get_tree().get_first_node_in_group("city_citizen") as Node3D
 	var first_car := city.get_tree().get_first_node_in_group("city_traffic") as Node3D
 	var citizen_start := first_citizen.position
