@@ -290,17 +290,17 @@ func _spawn_city_life() -> void:
 		add_child(car)
 
 func _spawn_interactive_props() -> void:
- var prop_script := load("res://scripts/world/world_pickup.gd")
- var props := [
-  [Vector3(-9.0,0.65,-18.0),"Neon energy drink",Color(0.0,0.75,1.0)],
-  [Vector3(8.0,0.55,-24.0),"Holo data tablet",Color(1.0,0.12,0.42)],
-  [Vector3(14.0,0.45,12.0),"Cybernetic component",Color(0.95,0.58,0.2)],
-  [Vector3(-16.0,0.5,9.0),"Smart device",Color(0.25,0.95,0.72)]
- ]
- for entry in props:
-  var item := StaticBody3D.new()
-  item.set_script(prop_script)
-  item.set("display_name",entry[1])
-  item.set("glow_color",entry[2])
-  item.position = entry[0]
-  add_child(item)
+	var prop_script := load("res://scripts/world/world_pickup.gd")
+	var props := [
+		[Vector3(-9.0, 0.65, -18.0), "Neon energy drink", Color(0.0, 0.75, 1.0)],
+		[Vector3(8.0, 0.55, -24.0), "Holo data tablet", Color(1.0, 0.12, 0.42)],
+		[Vector3(14.0, 0.45, 12.0), "Cybernetic component", Color(0.95, 0.58, 0.2)],
+		[Vector3(-16.0, 0.5, 9.0), "Smart device", Color(0.25, 0.95, 0.72)]
+	]
+	for entry in props:
+		var item := StaticBody3D.new()
+		item.set_script(prop_script)
+		item.set("display_name", entry[1])
+		item.set("glow_color", entry[2])
+		item.position = entry[0]
+		add_child(item)
