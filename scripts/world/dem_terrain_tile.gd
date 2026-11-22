@@ -6,6 +6,8 @@ extends Node3D
 @export var vertical_offset := 0.0
 @export var terrain_material: Material
 @export var create_collision := true
+var _samples: PackedFloat32Array = PackedFloat32Array()
+var _metadata: Dictionary = {}
 
 func _ready() -> void:
 	build_from_files()
@@ -48,7 +50,6 @@ func build_from_files() -> void:
 	var uvs := PackedVector2Array()
 	for z in range(h):
 		for x in range(w):
-			var index := (z * w + x) * 4
 			var elevation := _samples[z * w + x] / metres_per_unit * vertical_scale + vertical_offset
 			vertices.append(Vector3((float(x) / float(w - 1) - 0.5) * width_m, elevation,
 				(float(z) / float(h - 1) - 0.5) * depth_m))
