@@ -90,7 +90,7 @@ func _build_phone() -> void:
     var tabs := HBoxContainer.new()
     tabs.add_theme_constant_override("separation", 4)
     outer.add_child(tabs)
-    for tab in ["feed", "news", "contacts", "life", "map"]:
+    for tab in ["feed", "news", "contacts", "life", "missions", "map"]:
         var button := Button.new()
         button.text = tab.to_upper()
         button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -136,6 +136,8 @@ func _refresh_content() -> void:
             _build_contacts()
         "life":
             _build_life()
+        "missions":
+            _build_missions()
         "map":
             _build_map()
 
@@ -217,6 +219,55 @@ func _build_life() -> void:
     _add_stat("DEATHS", _format_number(int(data.get("deaths_total", 0))))
     _add_stat("MARRIAGES", _format_number(int(data.get("marriages_total", 0))))
     _add_stat("GRADUATIONS", _format_number(int(data.get("graduations_total", 0))))
+
+
+func _build_missions() -> void:
+    _add_section_title("CAMPAIGN CONTROL")
+    var campaign_data: Dictionary = MissionManager.get_campaign_snapshot()
+    _add_stat("MAIN STORY", str(campaign_data.get("main_completed", 0)) + " / " + str(campaign_data.get("main_total", 0)))
+    _add_stat("SIDE MISSIONS", str(campaign_data.get("side_completed", 0)) + " / " + str(campaign_data.get("side_total", 0)))
+    _add_stat("CREDITS", _format_number(int(campaign_data.get("credits", 0))))
+    if MissionManager.active_mission_id != "":
+        var mission: Dictionary = MissionManager.get_current_mission_data()
+        var objective: Dictionary = MissionManager.get_current_objective()
+        _add_body("ACTIVE: " + str(mission.get("title", MissionManager.active_mission_id)))
+        _add_body("OBJECTIVE: " + str(objective.get("title", "In progress")))
+        _add_body("PROGRESS: " + str(objective.get("current", 0)) + " / " + str(objective.get("target", 1)))
+    else:
+        _add_body("Main story continues from the mission HUD. Press ENTER after a completed mission.")
+    _add_section_title("AVAILABLE SIDE OPERATIONS")
+    var available: Array[Dictionary] = MissionManager.get_available_side_missions()
+    if available.is_empty():
+        _add_body("No side operations available.")
+        return
+    for item in available.slice(0, 10):
+        var card := PanelContainer.new()
+        var style := StyleBoxFlat.new()
+        style.bg_color = Color(0.025, 0.045, 0.07, 0.98)
+        style.border_color = Color(0.0, 0.48, 0.62, 0.45)
+        style.set_border_width_all(1)
+        style.set_corner_radius_all(7)
+        card.add_theme_stylebox_override("panel", style)
+        _content.add_child(card)
+        var body := VBoxContainer.new()
+        card.add_child(body)
+        var title := Label.new()
+        title.text = str(item.get("title", "Side mission"))
+        title.add_theme_color_override("font_color", Color(0.15, 0.88, 1.0))
+        body.add_child(title)
+        var description := Label.new()
+        description.text = str(item.get("description", ""))
+        description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        body.add_child(description)
+        var launch := Button.new()
+        launch.text = "START OPERATION"
+        launch.disabled = MissionManager.active_mission_id != ""
+        launch.pressed.connect(_start_side_mission.bind(str(item.get("id", ""))))
+        body.add_child(launch)
+
+func _start_side_mission(mission_id: String) -> void:
+    MissionManager.start_side_mission(mission_id)
+    _refresh_content()
 
 func _build_map() -> void:
     _add_section_title("EARTH NAVIGATION")
