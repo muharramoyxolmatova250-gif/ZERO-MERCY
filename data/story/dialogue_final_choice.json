@@ -1,0 +1,70 @@
+{
+  "start": "final_protocol",
+  "nodes": {
+    "final_protocol": {
+      "speaker": "Yelena yozuvi",
+      "text": "Dara, yadroga yetding. Tizimni yo‘q qilishing yoki uning boshqaruvini qayta taqsimlashing mumkin. Har bir tanlovning narxi bor.",
+      "choices": [
+        {
+          "text": "Markaziy nazoratni butunlay yo‘q qilaman.",
+          "next": "destroy",
+          "choice_id": "world_fate",
+          "value": "destroy",
+          "flag": "control_system_destroyed",
+          "flag_value": true
+        },
+        {
+          "text": "Nazoratni barcha hududlarga taqsimlayman.",
+          "next": "distribute",
+          "choice_id": "world_fate",
+          "value": "distribute",
+          "flag": "distributed_control",
+          "flag_value": true
+        },
+        {
+          "text": "Yangi tizimni o‘zim boshqaraman.",
+          "next": "take_control",
+          "choice_id": "world_fate",
+          "value": "take_control",
+          "flag": "throne_rejected",
+          "flag_value": false
+        }
+      ]
+    },
+    "destroy": {
+      "speaker": "Dara",
+      "text": "Hech kim boshqa birovning ongini boshqara olmaydi.",
+      "choices": [
+        {
+          "text": "Yakuniy buyruqni berish.",
+          "next": "end"
+        }
+      ]
+    },
+    "distribute": {
+      "speaker": "Dara",
+      "text": "Har bir shahar o‘z kelajagini o‘zi belgilaydi.",
+      "choices": [
+        {
+          "text": "Yakuniy buyruqni berish.",
+          "next": "end"
+        }
+      ]
+    },
+    "take_control": {
+      "speaker": "Dara",
+      "text": "Men bu kuchni boshqalardan himoya qilaman. Hatto buning uchun o‘zim hukmdor bo‘lsam ham.",
+      "choices": [
+        {
+          "text": "Yakuniy buyruqni berish.",
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "Tizim",
+      "text": "GLOBAL PROTOKOL TANLOVI QABUL QILINDI.",
+      "choices": []
+    }
+  }
+}
