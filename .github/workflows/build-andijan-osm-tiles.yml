@@ -1,0 +1,87 @@
+name: Build playable Andijan OSM tiles
+
+on:
+  push:
+    paths:
+      - ".github/workflows/build-andijan-osm-tiles.yml"
+      - "tools/geodata/build_global_manifest.py"
+      - "tools/geodata/plan_region_tiles.py"
+      - "tools/geodata/process_region_tiles.py"
+      - "scripts/world/region_streamer.gd"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: zero-mercy-andijan-osm-tiles
+  cancel-in-progress: false
+
+jobs:
+  build-andijan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout ZERO MERCY
+        uses: actions/checkout@v4
+      - name: Install Osmium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y osmium-tool
+          osmium --version
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download current Uzbekistan OSM source
+        run: python tools/geodata/build_global_manifest.py --region uzbekistan --download
+      - name: Plan four adjacent Andijan and Asaka tiles
+        run: |
+          python tools/geodata/plan_region_tiles.py \
+            --region andijan \
+            --bbox 72.2 40.6 72.4 40.8 \
+            --tile-deg 0.1 \
+            --tile-size-m 10000 \
+            --anchor 72.3 40.7 \
+            --index-output data/world/region_tiles.json
+      - name: Clip and export real OSM streets, buildings and waterways
+        run: |
+          python tools/geodata/process_region_tiles.py \
+            data/osm/pbf/uzbekistan.osm.pbf \
+            data/world/tile_jobs/andijan.json \
+            --start 0 --count 4
+      - name: Validate generated Andijan GeoJSON tiles
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          paths = sorted(Path("data/osm/tiles/andijan").glob("*.geojson"))
+          assert len(paths) == 4, f"Expected 4 tiles, found {len(paths)}"
+          totals = {"features": 0, "roads": 0, "buildings": 0, "waterways": 0}
+          for path in paths:
+              data = json.loads(path.read_text(encoding="utf-8"))
+              assert data.get("type") == "FeatureCollection", path
+              features = data.get("features", [])
+              assert features, f"Empty tile: {path}"
+              totals["features"] += len(features)
+              for feature in features:
+                  tags = feature.get("properties", {}).get("tags", feature.get("properties", {}))
+                  totals["roads"] += int("highway" in tags)
+                  totals["buildings"] += int("building" in tags)
+                  totals["waterways"] += int("waterway" in tags)
+              print(f"{path}: {len(features)} OSM features, {path.stat().st_size:,} bytes")
+          assert totals["roads"] > 0, "No real road features were exported."
+          assert totals["buildings"] > 0, "No real building footprints were exported."
+          print("Validated OSM totals:", totals)
+          PY
+      - name: Commit playable Andijan tiles and index
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/world/region_tiles.json data/world/tile_jobs/andijan.json data/osm/tiles/andijan/*.geojson
+          if git diff --cached --quiet; then
+            echo "Andijan OSM tiles are already current."
+          else
+            git commit -m "Build real Andijan OSM world tiles"
+            git push
+          fi
