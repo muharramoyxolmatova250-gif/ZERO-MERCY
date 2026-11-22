@@ -157,6 +157,12 @@ func _run() -> void:
 	if not citizen_snapshot.has("age_years") or not citizen_snapshot.has("life_stage"):
 		_fail("NPC does not expose persistent life-cycle data.")
 		return
+	life_sim.call("register_citizen", "smoke_resident", "SmokeCity", "resident")
+	life_sim.call("unregister_citizen", "smoke_resident")
+	var reclaimed_id := str(life_sim.call("claim_resident_id", "SmokeCity"))
+	if reclaimed_id != "smoke_resident":
+		_fail("Persistent resident profile was not reclaimed after streaming unload.")
+		return
 	life_sim.call("advance_month")
 	var advanced_snapshot: Dictionary = life_sim.call("get_world_life_snapshot")
 	if int(advanced_snapshot.get("simulation_day", 0)) < 31:
