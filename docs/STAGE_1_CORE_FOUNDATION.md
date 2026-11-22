@@ -1,6 +1,6 @@
 # ZERO MERCY — Stage 1: Core Game Foundation
 
-Status: implementation committed; Godot editor/runtime verification is still required.
+Status: **Stage 1 implementation complete.** Automated Godot 4.3 validation has been added in `.github/workflows/godot-core-validation.yml`; its result must be green before runtime correctness is certified.
 
 ## Included
 - Godot 4 project settings and the main gameplay scene.
@@ -28,9 +28,14 @@ Status: implementation committed; Godot editor/runtime verification is still req
 - [x] HUD binds to player signals and mission-manager signals.
 - [x] Mission progression is data-driven and completion writes a local save.
 - [x] Core controls and actions are documented.
-- [ ] Open in Godot 4.3+ and confirm there are no parser/import errors.
+- [ ] GitHub Actions Godot 4.3 headless import and launch workflow passes.
 - [ ] Run the prologue end-to-end and confirm beacon/rescue collision areas trigger in the expected order.
 - [ ] Confirm mouse capture, movement, sprint, jump, firing, reload and save/load on target hardware.
 
 ## Honest scope boundary
 This is a playable-foundation implementation, not a finished AAA character or full game. Dara is still represented by a capsule blockout; there is no final rig, animation set, audio, respawn flow, accessibility menu or remappable-controls screen. The editor/runtime acceptance checks above must be performed before this stage can be called fully verified. No claim of 9K rendering or final-art quality is made.
+
+
+## Stage 1 completion decision
+
+The agreed Stage 1 feature scope is implemented and committed: core project setup, player controller, camera, health/stamina, basic weapon, HUD, prologue objective flow, interaction/rescue triggers, local save manager and cyberpunk blockout. This closes the **implementation** portion of Stage 1. It does not certify a fully playtested build: the headless Godot workflow and a human end-to-end playtest remain explicit verification gates. Dara's final character art and animation are intentionally deferred to later production work.
