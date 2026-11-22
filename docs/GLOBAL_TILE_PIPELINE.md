@@ -1,26 +1,22 @@
 # ZERO MERCY — Global Earth data pipeline
 
-## Country-level worldwide queue
-
-Refresh the official Geofabrik extract catalogue and derive one non-overlapping country-level extract per ISO-3166-1 code:
+The global queue is generated from Geofabrik's official worldwide extract index:
 
 ```bash
 python tools/geodata/build_global_manifest.py
 python tools/geodata/build_global_country_queue.py
 ```
 
-The queue is written to `data/world/global_country_queue.json`. It chooses the shallowest downloadable extract for each country code to avoid downloading a country and all nested subdivisions redundantly.
+The queue retains one shallowest downloadable extract per ISO-3166-1 country code and includes the catalogue's geographic bounding box. Aggregate continent extracts and nested regional duplicates are excluded.
 
-## Process country data in bounded batches
+## Country batch workflow
 
-GitHub Actions workflow `.github/workflows/build-global-country-tiles.yml` is the global production entry point. Run it with a country `region_id` from the queue, geographic bounds (`west,south,east,north`), tile width and a bounded tile range. Each run downloads only that country's PBF, plans geographic tiles, processes the requested batch, validates the GeoJSON and runtime index, then commits verified output.
+Use `.github/workflows/build-global-country-tiles.yml`. Supply a country extract ID from `data/world/global_country_queue.json`, tile width, and a bounded tile range. The workflow resolves that country's bounds automatically, downloads only its PBF, plans tiles in a shared world coordinate frame, merges the runtime tile index, processes the requested batch, validates outputs and commits verified data.
 
-Use small geographic bounds and repeat the workflow with successive `tile_start` values. Large countries require many batches. The older Andijan workflow remains a small smoke-test fixture, not the global data pipeline.
+Run successive batches by increasing `tile_start`. Large countries require many runs; the PBF itself may exceed GitHub runner disk or time limits. The old Andijan workflow is only a small smoke test.
 
-## Current technical boundaries
+## Remaining world-scale engineering
 
-This workflow builds real OSM vector tiles (roads, building footprints and waterways) for the selected bounds. It does not by itself create a complete Earth game. Global elevation/terrain, coastlines and landcover, antimeridian-safe globe rendering, per-layer LOD, robust cross-region streaming, authored interiors, cyberpunk city dressing and performance qualification remain separate engineering work. A successful regional batch is not proof of global coverage.
+This pipeline is for real OSM roads, building footprints and waterways. It is not a finished planet: spherical globe streaming, elevation/terrain coverage, coastlines, landcover, rivers/lakes, global LOD, detailed interiors and performance qualification still require implementation. The current regional streamer uses a flat shared coordinate grid; a globe-native tile selector is required before using it for seamless travel across the entire spherical Earth.
 
-## Licensing
-
-Geofabrik extracts derive from OpenStreetMap. Display **© OpenStreetMap contributors** and link to https://www.openstreetmap.org/copyright. Review ODbL 1.0 attribution and share-alike obligations before distributing derived databases.
+OpenStreetMap-derived data requires attribution **© OpenStreetMap contributors** and compliance with ODbL 1.0: https://www.openstreetmap.org/copyright.
