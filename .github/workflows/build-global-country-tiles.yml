@@ -10,7 +10,7 @@ on:
       tile_degrees:
         description: Geographic tile width in degrees
         required: true
-        default: "0.05"
+        default: "0.1"
         type: string
       tile_start:
         description: First tile job index
@@ -27,7 +27,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: zero-mercy-global-osm-${{ inputs.region_id }}
+  group: zero-mercy-repository-data-build
   cancel-in-progress: false
 
 jobs:
@@ -52,7 +52,7 @@ jobs:
           python tools/geodata/build_global_country_queue.py
       - name: Resolve country bounds and download extract
         env:
-          REGION_ID: ${{ inputs.region_id }}
+          REGION_ID: \${{ inputs.region_id }}
         run: |
           python - <<'PY'
           import json, os, subprocess
@@ -60,25 +60,33 @@ jobs:
           item=next((x for x in queue["countries"] if x["id"]==os.environ["REGION_ID"]), None)
           if item is None:
               raise SystemExit("Unknown country-level extract ID")
-          bbox=item["bbox"]
-          if len(bbox)!=4 or bbox[0]>=bbox[2] or bbox[1]>=bbox[3]:
-              raise SystemExit("Country extract has invalid geographic bounds")
+          bboxes=item["bboxes"]
+          if not bboxes:
+              raise SystemExit("Country extract has no valid geographic bounds")
           with open(os.environ["GITHUB_ENV"],"a",encoding="utf-8") as env:
-              env.write("COUNTRY_BBOX="+",".join(map(str,bbox))+"\n")
+              env.write("COUNTRY_BBOXES_JSON="+json.dumps(bboxes,separators=(",",":"))+"\n")
           subprocess.run(["python","tools/geodata/build_global_manifest.py","--region",item["id"],"--download"],check=True)
           PY
-      - name: Plan country tiles in the shared world coordinate frame
+      - name: Plan country tiles in the shared global grid
         env:
-          REGION_ID: ${{ inputs.region_id }}
-          TILE_DEGREES: ${{ inputs.tile_degrees }}
+          REGION_ID: \${{ inputs.region_id }}
+          TILE_DEGREES: \${{ inputs.tile_degrees }}
         run: |
-          SAFE_REGION=$(printf '%s' "$REGION_ID" | tr '/' '_')
-          IFS=',' read -r WEST SOUTH EAST NORTH <<< "$COUNTRY_BBOX"
-          python tools/geodata/plan_region_tiles.py --region "$SAFE_REGION" \
-            --bbox "$WEST" "$SOUTH" "$EAST" "$NORTH" --tile-deg "$TILE_DEGREES" \
-            --anchor 0 0 --tile-size-m 4000 --merge-index \
-            --output "data/world/tile_jobs/$SAFE_REGION.json" \
-            --index-output data/world/region_tiles.json
+          python - <<'PY'
+          import json, os, subprocess
+          bboxes=json.loads(os.environ["COUNTRY_BBOXES_JSON"])
+          tile_deg=float(os.environ["TILE_DEGREES"])
+          tile_size=tile_deg*111320.0
+          region=os.environ["REGION_ID"].replace("/","_")
+          cmd=["python","tools/geodata/plan_region_tiles.py","--region",region,
+               "--tile-deg",str(tile_deg),"--tile-size-m",str(tile_size),
+               "--anchor","72.3","40.7","--global-grid","--merge-index",
+               "--output",f"data/world/tile_jobs/{region}.json",
+               "--index-output","data/world/region_tiles.json"]
+          for bbox in bboxes:
+              cmd += ["--bbox",*map(str,bbox)]
+          subprocess.run(cmd,check=True)
+          PY
       - name: Process and validate bounded tile batch
         env:
           REGION_ID: ${{ inputs.region_id }}
