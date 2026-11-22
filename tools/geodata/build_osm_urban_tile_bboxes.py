@@ -81,8 +81,8 @@ def build_bboxes(features: list, region_bboxes: list[list[float]]) -> tuple[list
         # expanding every empty square of a continent into millions of tile jobs.
         for west, south, east, north in region_bboxes:
             cx, cy = (west + east) * 0.5, (south + north) * 0.5
-            radius_x = min(0.05, (east - west) * 0.25)
-            radius_y = min(0.05, (north - south) * 0.25)
+            radius_x = min(0.04, (east - west) * 0.25)
+            radius_y = min(0.04, (north - south) * 0.25)
             if radius_x > 0 and radius_y > 0:
                 result.append([cx - radius_x, cy - radius_y, cx + radius_x, cy + radius_y])
         counts["fallback"] = len(result)
