@@ -47,7 +47,10 @@ class UrbanTileBboxTests(unittest.TestCase):
              "geometry": {"type": "Point", "coordinates": [72.32, 40.65]}},
         ]
         boxes, counts, settlements = build_bboxes(features, [[0.0, 0.0, 100.0, 90.0]])
-        self.assertEqual(boxes[0], [72.3, 40.6, 72.39999999999999, 40.7])
+        self.assertAlmostEqual(boxes[0][0], 72.3, places=6)
+        self.assertAlmostEqual(boxes[0][1], 40.6, places=6)
+        self.assertAlmostEqual(boxes[0][2], 72.4, places=6)
+        self.assertAlmostEqual(boxes[0][3], 40.7, places=6)
 
     def test_empty_region_gets_small_fallback_sample(self):
         boxes, counts, settlements = build_bboxes([], [[10.0, 20.0, 10.4, 20.4]])
