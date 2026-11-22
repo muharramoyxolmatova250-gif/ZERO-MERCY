@@ -22,5 +22,7 @@ jobs:
         run: python tools/geodata/test_geodata_pipeline.py
       - name: Import and parse project
         run: godot --headless --editor --path . --quit
+      - name: Smoke-test Earth globe, DEM terrain and cyberpunk city
+        run: godot --headless --path . --script res://tests/world_stage_smoke.gd
       - name: Launch main scene smoke test
         run: godot --headless --path . --quit-after 8
