@@ -164,7 +164,7 @@ func _scan_social_context() -> void:
 			_social_target = candidate
 
 func get_ai_snapshot() -> Dictionary:
-	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"memories":_memory.size(),"decisions":ai_decision_count,"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
+	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"memories":_memory.size(),"decisions":ai_decision_count,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
 
 func remember_event(event_name: String) -> void:
 	_memory.append(event_name)
