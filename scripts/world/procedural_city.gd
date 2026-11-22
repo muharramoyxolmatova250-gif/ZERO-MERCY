@@ -139,6 +139,7 @@ func _spawn_city_life() -> void:
 	for i in range(mini(12, blocks_per_side * 2)):
 		var citizen := Node3D.new()
 		citizen.set_script(citizen_script)
+		citizen.add_to_group("city_citizen")
 		var lane := (float(i % blocks_per_side) - float(blocks_per_side - 1) * 0.5) * block_spacing
 		var side := -1.0 if i % 2 == 0 else 1.0
 		citizen.set("route", PackedVector3Array([
@@ -153,6 +154,7 @@ func _spawn_city_life() -> void:
 	for i in range(4):
 		var car := Node3D.new()
 		car.set_script(traffic_script)
+		car.add_to_group("city_traffic")
 		var offset := (float(i) - 1.5) * 3.2
 		var route := PackedVector3Array([
 			Vector3(-half, 0, offset),
