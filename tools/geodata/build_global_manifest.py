@@ -50,23 +50,28 @@ def _ring_bboxes(ring: list) -> list[list[float]]:
               and isinstance(point[0], (int, float)) and isinstance(point[1], (int, float))]
     if not points:
         return []
-    longitudes = sorted({((lon + 180.0) % 360.0) - 180.0 for lon, _ in points})
+    longitudes = sorted({lon % 360.0 for lon, _ in points})
     south = min(lat for _, lat in points)
     north = max(lat for _, lat in points)
     if len(longitudes) == 1:
         lon = longitudes[0]
-        east = min(180.0, lon + 0.000001)
-        return [[lon, south, east, north]] if east > lon else [[-180.0, south, -179.999999, north]]
+        signed = lon if lon <= 180.0 else lon - 360.0
+        if signed >= 180.0:
+            return [[-180.0, south, -179.999999, north]]
+        return [[signed, south, min(180.0, signed + 0.000001), north]]
     gaps = []
     for i, lon in enumerate(longitudes):
         nxt = longitudes[(i + 1) % len(longitudes)] + (360.0 if i == len(longitudes) - 1 else 0.0)
         gaps.append((nxt - lon, i))
     _, gap_index = max(gaps)
-    west, east = longitudes[(gap_index + 1) % len(longitudes)], longitudes[gap_index]
+    west360, east360 = longitudes[(gap_index + 1) % len(longitudes)], longitudes[gap_index]
+    west = west360 if west360 <= 180.0 else west360 - 360.0
+    east = east360 if east360 <= 180.0 else east360 - 360.0
+    if abs(west - 180.0) < 1e-9 and east < 0.0:
+        west = -180.0
     if west <= east:
         return [[west, south, east, north]]
     return [[west, south, 180.0, north], [-180.0, south, east, north]]
-
 
 def _geometry_bboxes(geometry: dict) -> list[list[float]]:
     if not geometry:
