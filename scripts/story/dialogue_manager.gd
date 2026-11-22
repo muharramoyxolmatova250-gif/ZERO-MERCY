@@ -43,7 +43,13 @@ func choose(choice_index: int) -> void:
 	var choices: Array = node.get("choices", [])
 	if choice_index < 0 or choice_index >= choices.size():
 		return
-	var next_id := str(choices[choice_index].get("next", ""))
+	var selected_choice: Dictionary = choices[choice_index]
+	var choice_id := str(selected_choice.get("choice_id", dialogue_id + "." + current_node_id))
+	var choice_value := str(selected_choice.get("value", selected_choice.get("text", "")))
+	if selected_choice.has("flag"):
+		MissionManager.set_story_flag(str(selected_choice.get("flag", "")), selected_choice.get("flag_value", true))
+	MissionManager.record_choice(choice_id, choice_value)
+	var next_id := str(selected_choice.get("next", ""))
 	if next_id == "" or not nodes.has(next_id):
 		finish_dialogue()
 		return
