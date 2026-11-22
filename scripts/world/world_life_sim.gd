@@ -1,0 +1,303 @@
+extends Node
+## Hierarchical life simulation: aggregate populations plus persistent individual residents.
+@export_range(15.0, 3600.0, 15.0) var month_seconds := 180.0
+@export_range(1000, 100000, 1000) var max_saved_profiles := 50000
+const SAVE_PATH := "user://zero_mercy_life_state.json"
+const JOBS := ["engineer", "doctor", "teacher", "pilot", "police", "mechanic", "designer", "courier", "scientist", "merchant", "artist", "security"]
+const SCHOOLS := ["Neo Primary School", "Cybernetics Academy", "District Technical School", "Global Science Institute"]
+var simulation_day := 1
+var simulation_month := 1
+var simulation_year := 1
+var hub_state: Dictionary = {}
+var resident_profiles: Dictionary = {}
+var births_total := 0
+var deaths_total := 0
+var marriages_total := 0
+var graduations_total := 0
+var _elapsed := 0.0
+var _rng := RandomNumberGenerator.new()
+
+func _ready() -> void:
+    add_to_group("world_life_sim")
+    _rng.randomize()
+    _load_state()
+    _ensure_hub("Neo-Tashkent")
+    print("ZERO MERCY life simulation ready: ", hub_state.size(), " city hubs, ", resident_profiles.size(), " saved resident profiles.")
+
+func _process(delta: float) -> void:
+    _elapsed += delta
+    if _elapsed >= month_seconds:
+        _elapsed = 0.0
+        advance_month()
+
+func _ensure_hub(city_id: String) -> void:
+    if hub_state.has(city_id):
+        return
+    hub_state[city_id] = {
+        "city": city_id, "population": 100000, "births": 0, "deaths": 0,
+        "students": 18000, "workers": 46000, "unemployed": 6000,
+        "married_families": 24000, "retired": 9000, "public_mood": 0.62,
+        "schools": SCHOOLS.duplicate(), "jobs": 0, "last_updated_day": simulation_day
+    }
+
+func register_citizen(citizen_id: String, city_id: String, fallback_occupation: String = "resident") -> Dictionary:
+    _ensure_hub(city_id)
+    if resident_profiles.has(citizen_id):
+        var existing: Dictionary = resident_profiles[citizen_id]
+        existing["active"] = true
+        existing["last_seen_day"] = simulation_day
+        resident_profiles[citizen_id] = existing
+        return existing
+    var local_rng := RandomNumberGenerator.new()
+    local_rng.seed = int(abs(hash(citizen_id)))
+    var age := local_rng.randi_range(5, 78)
+    var stage := _stage_for_age(age)
+    var sex := "female" if local_rng.randf() < 0.5 else "male"
+    var job := fallback_occupation
+    if stage == "student":
+        job = "student"
+    elif stage == "child":
+        job = "child"
+    elif stage == "retired":
+        job = "retired"
+    elif job == "resident" or job.is_empty():
+        job = JOBS[local_rng.randi_range(0, JOBS.size() - 1)]
+    var married := age >= 22 and age <= 62 and local_rng.randf() < 0.48
+    var profile := {
+        "id": citizen_id, "city": city_id, "sex": sex,
+        "age_days": age * 365 + local_rng.randi_range(0, 364), "age_years": age,
+        "life_stage": stage, "occupation": job,
+        "education": _education_for_age(age, local_rng),
+        "school": SCHOOLS[local_rng.randi_range(0, SCHOOLS.size() - 1)] if stage == "student" else "",
+        "marital_status": "married" if married else "single",
+        "partner_id": "family_" + str(abs(hash(citizen_id))) if married else "",
+        "children_count": local_rng.randi_range(0, 3) if married and age >= 25 else 0,
+        "family_id": "family_" + str(abs(hash(citizen_id))) if married else "",
+        "money": local_rng.randi_range(50, 250000), "health": local_rng.randf_range(0.65, 1.0),
+        "happiness": local_rng.randf_range(0.35, 0.9), "active": true,
+        "born_day": simulation_day - age * 365, "last_seen_day": simulation_day,
+        "last_activity": "commute", "life_events": ["registered_in_world"]
+    }
+    resident_profiles[citizen_id] = profile
+    _sync_hub_demographics(city_id)
+    _prune_profiles_if_needed()
+    return profile
+
+func unregister_citizen(citizen_id: String) -> void:
+    if not resident_profiles.has(citizen_id):
+        return
+    var profile: Dictionary = resident_profiles[citizen_id]
+    profile["active"] = false
+    profile["last_seen_day"] = simulation_day
+    resident_profiles[citizen_id] = profile
+
+func record_activity(citizen_id: String, activity: String) -> void:
+    if not resident_profiles.has(citizen_id):
+        return
+    var profile: Dictionary = resident_profiles[citizen_id]
+    profile["last_activity"] = activity
+    if activity in ["family", "social", "play", "leisure"]:
+        profile["happiness"] = clampf(float(profile.get("happiness", 0.5)) + 0.002, 0.0, 1.0)
+    elif activity == "work":
+        profile["money"] = int(profile.get("money", 0)) + 1
+    resident_profiles[citizen_id] = profile
+
+func record_event(citizen_id: String, event_name: String) -> void:
+    if not resident_profiles.has(citizen_id):
+        return
+    var profile: Dictionary = resident_profiles[citizen_id]
+    var events: Array = profile.get("life_events", [])
+    events.append({"day": simulation_day, "event": event_name})
+    while events.size() > 32:
+        events.pop_front()
+    profile["life_events"] = events
+    resident_profiles[citizen_id] = profile
+
+func advance_month() -> void:
+    simulation_day += 30
+    simulation_month += 1
+    if simulation_month > 12:
+        simulation_month = 1
+        simulation_year += 1
+    for city_id in hub_state.keys():
+        var hub: Dictionary = hub_state[city_id]
+        var population := int(hub.get("population", 100000))
+        var births := maxi(1, int(round(float(population) * 0.0011)))
+        var deaths := maxi(1, int(round(float(population) * 0.00065)))
+        hub["births"] = int(hub.get("births", 0)) + births
+        hub["deaths"] = int(hub.get("deaths", 0)) + deaths
+        hub["population"] = maxi(1, population + births - deaths)
+        hub["public_mood"] = clampf(float(hub.get("public_mood", 0.6)) + _rng.randf_range(-0.025, 0.025), 0.1, 0.95)
+        births_total += births
+        deaths_total += deaths
+        hub["last_updated_day"] = simulation_day
+        hub_state[city_id] = hub
+    var ids := resident_profiles.keys()
+    for citizen_id in ids:
+        var profile: Dictionary = resident_profiles[citizen_id]
+        if str(profile.get("life_stage", "")) == "deceased":
+            continue
+        profile["age_days"] = int(profile.get("age_days", 0)) + 30
+        var old_age := int(profile.get("age_years", 0))
+        var new_age := int(floor(float(profile["age_days"]) / 365.0))
+        profile["age_years"] = new_age
+        var old_stage := str(profile.get("life_stage", "adult"))
+        var new_stage := _stage_for_age(new_age)
+        if new_stage != old_stage:
+            profile["life_stage"] = new_stage
+            _apply_stage_transition(profile, old_stage, new_stage)
+        if new_age >= 22 and new_age <= 45 and str(profile.get("marital_status", "single")) == "single" and _rng.randf() < 0.008:
+            profile["marital_status"] = "married"
+            profile["family_id"] = "family_" + str(abs(hash(str(citizen_id) + ":" + str(simulation_day))))
+            profile["partner_id"] = profile["family_id"]
+            marriages_total += 1
+            _append_event(profile, "married")
+        if new_age >= 20 and new_age <= 42 and str(profile.get("marital_status", "single")) == "married" and _rng.randf() < 0.012:
+            profile["children_count"] = int(profile.get("children_count", 0)) + 1
+            births_total += 1
+            _append_event(profile, "new_child_born")
+        if new_age >= 82 and _rng.randf() < 0.006:
+            profile["life_stage"] = "deceased"
+            profile["active"] = false
+            deaths_total += 1
+            _append_event(profile, "died_of_old_age")
+        profile["health"] = clampf(float(profile.get("health", 0.9)) + _rng.randf_range(-0.015, 0.008), 0.05, 1.0)
+        resident_profiles[citizen_id] = profile
+    _recount_all_hubs()
+    _save_state()
+    print("ZERO MERCY life month ", simulation_year, "-", simulation_month,
+        ": births=", births_total, " deaths=", deaths_total, " marriages=", marriages_total,
+        " residents=", resident_profiles.size())
+
+func _stage_for_age(age: int) -> String:
+    if age < 6: return "child"
+    if age < 18: return "student"
+    if age < 65: return "adult"
+    return "retired"
+
+func _education_for_age(age: int, rng: RandomNumberGenerator) -> String:
+    if age < 6: return "early_childhood"
+    if age < 18: return "school"
+    if age < 23: return "secondary_or_university"
+    return ["secondary", "technical", "university", "postgraduate"][rng.randi_range(0, 3)]
+
+func _apply_stage_transition(profile: Dictionary, old_stage: String, new_stage: String) -> void:
+    if new_stage == "student":
+        profile["occupation"] = "student"
+        profile["school"] = SCHOOLS[_rng.randi_range(0, SCHOOLS.size() - 1)]
+        _append_event(profile, "started_school")
+    elif old_stage == "student" and new_stage == "adult":
+        profile["occupation"] = JOBS[_rng.randi_range(0, JOBS.size() - 1)]
+        profile["school"] = ""
+        profile["education"] = "graduated"
+        graduations_total += 1
+        _append_event(profile, "graduated_and_started_work")
+    elif new_stage == "retired":
+        profile["occupation"] = "retired"
+        _append_event(profile, "retired")
+    elif new_stage == "child":
+        profile["occupation"] = "child"
+        _append_event(profile, "born_into_world")
+
+func _append_event(profile: Dictionary, event_name: String) -> void:
+    var events: Array = profile.get("life_events", [])
+    events.append({"day": simulation_day, "event": event_name})
+    while events.size() > 32:
+        events.pop_front()
+    profile["life_events"] = events
+
+func _sync_hub_demographics(city_id: String) -> void:
+    var hub: Dictionary = hub_state.get(city_id, {})
+    var students := 0
+    var workers := 0
+    var retired := 0
+    var families := 0
+    for profile in resident_profiles.values():
+        if str(profile.get("city", "")) != city_id:
+            continue
+        match str(profile.get("life_stage", "")):
+            "student", "child": students += 1
+            "adult": workers += 1
+            "retired": retired += 1
+        if str(profile.get("marital_status", "")) == "married":
+            families += 1
+    hub["sample_students"] = students
+    hub["sample_workers"] = workers
+    hub["sample_retired"] = retired
+    hub["sample_families"] = families
+    hub_state[city_id] = hub
+
+func _recount_all_hubs() -> void:
+    for city_id in hub_state.keys():
+        _sync_hub_demographics(str(city_id))
+
+func _prune_profiles_if_needed() -> void:
+    if resident_profiles.size() <= max_saved_profiles:
+        return
+    var inactive: Array[String] = []
+    for citizen_id in resident_profiles:
+        var profile: Dictionary = resident_profiles[citizen_id]
+        if not bool(profile.get("active", false)):
+            inactive.append(str(citizen_id))
+    inactive.sort_custom(func(a: String, b: String) -> bool:
+        return int(resident_profiles[a].get("last_seen_day", 0)) < int(resident_profiles[b].get("last_seen_day", 0))
+    )
+    for citizen_id in inactive:
+        if resident_profiles.size() <= max_saved_profiles:
+            break
+        resident_profiles.erase(citizen_id)
+
+func get_world_life_snapshot() -> Dictionary:
+    var population := 0
+    for hub in hub_state.values():
+        population += int(hub.get("population", 0))
+    var active := 0
+    var students := 0
+    var workers := 0
+    var retired := 0
+    for profile in resident_profiles.values():
+        if bool(profile.get("active", false)):
+            active += 1
+        match str(profile.get("life_stage", "")):
+            "child", "student": students += 1
+            "adult": workers += 1
+            "retired": retired += 1
+    return {
+        "simulation_day": simulation_day, "simulation_month": simulation_month,
+        "simulation_year": simulation_year, "city_hubs": hub_state.size(),
+        "aggregate_population": population, "individual_profiles": resident_profiles.size(),
+        "active_residents": active, "sample_students": students, "sample_workers": workers,
+        "sample_retired": retired, "births_total": births_total, "deaths_total": deaths_total,
+        "marriages_total": marriages_total, "graduations_total": graduations_total
+    }
+
+func _load_state() -> void:
+    if not FileAccess.file_exists(SAVE_PATH):
+        return
+    var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+    if file == null:
+        return
+    var parsed: Variant = JSON.parse_string(file.get_as_text())
+    if typeof(parsed) != TYPE_DICTIONARY:
+        return
+    simulation_day = int(parsed.get("simulation_day", simulation_day))
+    simulation_month = int(parsed.get("simulation_month", simulation_month))
+    simulation_year = int(parsed.get("simulation_year", simulation_year))
+    hub_state = parsed.get("hub_state", {})
+    resident_profiles = parsed.get("resident_profiles", {})
+    births_total = int(parsed.get("births_total", 0))
+    deaths_total = int(parsed.get("deaths_total", 0))
+    marriages_total = int(parsed.get("marriages_total", 0))
+    graduations_total = int(parsed.get("graduations_total", 0))
+
+func _save_state() -> void:
+    var data := {
+        "simulation_day": simulation_day, "simulation_month": simulation_month,
+        "simulation_year": simulation_year, "hub_state": hub_state,
+        "resident_profiles": resident_profiles, "births_total": births_total,
+        "deaths_total": deaths_total, "marriages_total": marriages_total,
+        "graduations_total": graduations_total
+    }
+    var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+    if file != null:
+        file.store_string(JSON.stringify(data))
