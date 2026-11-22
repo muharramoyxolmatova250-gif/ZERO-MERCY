@@ -6,6 +6,11 @@ config/name="ZERO MERCY"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 
+[autoload]
+MissionManager="*res://scripts/story/mission_manager.gd"
+DialogueManager="*res://scripts/story/dialogue_manager.gd"
+SaveManager="*res://scripts/save/save_manager.gd"
+
 [display]
 window/size/viewport_width=1920
 window/size/viewport_height=1080
@@ -43,4 +48,9 @@ sprint={
 jump={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"physical_keycode":32)]
+}
+
+interact={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":69)]
 }
