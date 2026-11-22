@@ -54,7 +54,7 @@ GitHub Actions runs the planner smoke test, then imports the Godot project headl
 ## Remaining work (not falsely marked complete)
 
 - Download and process selected global/continent/country datasets; validate coverage and missing areas.
-- Integrate elevation/DEM, detailed coastlines, rivers/lakes, land cover and administrative levels.
+- Acquire and process real DEM, detailed coastlines, rivers/lakes, land cover and administrative levels for every target region.
 - Replace first-pass local tangent projection with robust globe-to-local tile transforms and dateline/polar handling.
 - Add multipolygon holes, topology fixes, road junctions, tile LOD, batching, asynchronous generation and memory budgets.
 - Integrate globe selection into the gameplay world and verify seamless travel from globe overview to ground-level regions.
@@ -69,3 +69,8 @@ A reusable DEM conversion and rendering path is now included:
 - \`docs/DEM_TERRAIN_IMPORT.md\` documents the import steps.
 
 No global DEM files are included or claimed as downloaded. Real elevation coverage must be sourced and processed per region.
+
+
+## Latest terrain placement improvement
+
+The DEM converter now transforms source bounds to WGS84, derives the tile's local anchor-relative origin and dimensions, and writes that placement metadata. The Godot loader places the generated mesh at that geographic origin and can generate a matching trimesh collision shape. This is still dependent on user-supplied DEM GeoTIFFs; no worldwide elevation dataset is bundled.
