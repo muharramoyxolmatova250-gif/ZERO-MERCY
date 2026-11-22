@@ -85,7 +85,7 @@ def build_queue(catalog: dict, natural_earth_path: Path = NATURAL_EARTH) -> list
         selected.append(entry)
         seen.add(parent_id)
 
-    return sorted(selected, key=lambda x: (x["name"].casefold(), x["id"]))
+    return sorted(selected, key=lambda x: (x.get("extract_kind") != "country", x["name"].casefold(), x["id"]))
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
