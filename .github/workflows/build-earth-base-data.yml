@@ -7,7 +7,7 @@ on:
         description: "Natural Earth map detail"
         required: true
         type: choice
-        options: ["50m", "110m", "both"]
+        options: ["50m", "110m", "all"]
         default: "50m"
   schedule:
     - cron: "17 4 1 * *"
