@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/rescue_zone.gd" id="1"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_safe"]
+size = Vector3(5, 0.12, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_safe"]
+size = Vector3(5, 2.5, 5)
+
+[node name="RescueZone" type="Area3D"]
+script = ExtResource("1")
+collision_layer = 0
+collision_mask = 1
+
+[node name="Visual" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.08, 0)
+mesh = SubResource("BoxMesh_safe")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_safe")
