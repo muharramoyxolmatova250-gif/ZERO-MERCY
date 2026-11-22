@@ -14,7 +14,7 @@ def build_queue(catalog: dict) -> list[dict]:
         region_id = str(region.get("id", "")).strip()
         raw_codes = region.get("iso3166_1") or []
         if isinstance(raw_codes, str):
-            raw_codes = [raw_codes]
+            raw_codes = [code.strip() for code in raw_codes.split(",")]
         codes = sorted({str(code).upper() for code in raw_codes
                         if isinstance(code, str) and len(code) == 2})
         bboxes = region.get("bboxes") or ([region["bbox"]] if isinstance(region.get("bbox"), list) else [])
