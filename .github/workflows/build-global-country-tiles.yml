@@ -20,6 +20,7 @@ on:
       - "scripts/world/dem_terrain_tile.gd"
       - "scenes/world/dem_terrain_tile.tscn"
       - "tests/test_etopo_tile_index.py"
+      - "tests/test_dem_conversion.py"
       - "scripts/world/region_streamer.gd"
       - "scripts/world/osm_region.gd"
   workflow_dispatch:
@@ -113,7 +114,9 @@ jobs:
           key: zero-mercy-pbf-v1-${{ steps.select.outputs.safe_region }}
       - name: Install raster DEM dependencies
         if: steps.select.outputs.has_work == 'true'
-        run: python -m pip install --disable-pip-version-check rasterio numpy
+        run: |
+          python -m pip install --disable-pip-version-check rasterio numpy
+          python tests/test_dem_conversion.py
       - name: Restore cached ETOPO source tiles
         if: steps.select.outputs.has_work == 'true'
         uses: actions/cache/restore@v4
