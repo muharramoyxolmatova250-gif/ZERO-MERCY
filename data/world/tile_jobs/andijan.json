@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "region": "andijan",
+  "created_utc": "2026-11-22T08:35:28.131116+00:00",
+  "source_bbox": [
+    72.2,
+    40.6,
+    72.4,
+    40.8
+  ],
+  "tile_degrees": 0.1,
+  "tile_size_m": 8000.0,
+  "anchor_lon": 72.3,
+  "anchor_lat": 40.7,
+  "tile_count": 4,
+  "tiles": [
+    {
+      "id": "722_406",
+      "bbox": [
+        72.2,
+        40.6,
+        72.3,
+        40.7
+      ],
+      "center_lat": 40.650000000000006,
+      "center_lon": 72.25,
+      "origin_x": -4219.776,
+      "origin_z": 5566.0,
+      "pbf_output": "data/osm/tiles/andijan/722_406.osm.pbf",
+      "geojson_output": "data/osm/tiles/andijan/722_406.geojson",
+      "godot_geojson_path": "res://data/osm/tiles/andijan/722_406.geojson",
+      "region_size_m": 12022.56
+    },
+    {
+      "id": "723_406",
+      "bbox": [
+        72.3,
+        40.6,
+        72.4,
+        40.7
+      ],
+      "center_lat": 40.650000000000006,
+      "center_lon": 72.35,
+      "origin_x": 4219.776,
+      "origin_z": 5566.0,
+      "pbf_output": "data/osm/tiles/andijan/723_406.osm.pbf",
+      "geojson_output": "data/osm/tiles/andijan/723_406.geojson",
+      "godot_geojson_path": "res://data/osm/tiles/andijan/723_406.geojson",
+      "region_size_m": 12022.56
+    },
+    {
+      "id": "722_407",
+      "bbox": [
+        72.2,
+        40.7,
+        72.3,
+        40.8
+      ],
+      "center_lat": 40.75,
+      "center_lon": 72.25,
+      "origin_x": -4219.776,
+      "origin_z": -5566.0,
+      "pbf_output": "data/osm/tiles/andijan/722_407.osm.pbf",
+      "geojson_output": "data/osm/tiles/andijan/722_407.geojson",
+      "godot_geojson_path": "res://data/osm/tiles/andijan/722_407.geojson",
+      "region_size_m": 12022.56
+    },
+    {
+      "id": "723_407",
+      "bbox": [
+        72.3,
+        40.7,
+        72.4,
+        40.8
+      ],
+      "center_lat": 40.75,
+      "center_lon": 72.35,
+      "origin_x": 4219.776,
+      "origin_z": -5566.0,
+      "pbf_output": "data/osm/tiles/andijan/723_407.osm.pbf",
+      "geojson_output": "data/osm/tiles/andijan/723_407.geojson",
+      "godot_geojson_path": "res://data/osm/tiles/andijan/723_407.geojson",
+      "region_size_m": 12022.56
+    }
+  ]
+}
