@@ -1,51 +1,84 @@
 #!/usr/bin/env python3
-"""Clip and export all tiles from a plan created by plan_region_tiles.py.
-
-Requires osmium-tool. Run in batches using --start/--count to control disk and CPU.
-"""
+"""Batch-extract OSM tiles in one Osmium pass, then export each tile to GeoJSON."""
 from __future__ import annotations
 import argparse, json, subprocess
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[2]
 
-def run(cmd:list[str])->None:
-    print("+"," ".join(cmd),flush=True)
-    subprocess.run(cmd,check=True)
+def run(cmd: list[str]) -> None:
+    print("+", " ".join(cmd), flush=True)
+    subprocess.run(cmd, check=True)
 
-def main()->int:
-    p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument("source",type=Path,help="Downloaded source .osm.pbf")
-    p.add_argument("plan",type=Path,help="Tile plan JSON")
-    p.add_argument("--start",type=int,default=0)
-    p.add_argument("--count",type=int,default=100)
-    p.add_argument("--force",action="store_true")
-    a=p.parse_args()
-    if not a.source.is_file(): p.error(f"Source PBF not found: {a.source}")
-    plan=json.loads(a.plan.read_text(encoding="utf-8"))
-    tiles=plan.get("tiles",[])
-    if not isinstance(tiles,list): p.error("Plan has no tiles array.")
-    if a.start<0 or a.count<1: p.error("--start must be >=0 and --count >=1")
-    selected=tiles[a.start:a.start+a.count]
+def main() -> int:
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("source", type=Path, help="Downloaded source .osm.pbf")
+    p.add_argument("plan", type=Path, help="Tile plan JSON")
+    p.add_argument("--start", type=int, default=0)
+    p.add_argument("--count", type=int, default=32)
+    p.add_argument("--force", action="store_true")
+    a = p.parse_args()
+    if not a.source.is_file():
+        p.error(f"Source PBF not found: {a.source}")
+    plan = json.loads(a.plan.read_text(encoding="utf-8"))
+    tiles = plan.get("tiles", [])
+    if not isinstance(tiles, list):
+        p.error("Plan has no tiles array.")
+    if a.start < 0 or a.count < 1:
+        p.error("--start must be >=0 and --count >=1")
+    selected = tiles[a.start:a.start + a.count]
     if not selected:
-        print("No tile jobs in requested range."); return 0
-    completed=0
+        print("No tile jobs in requested range.")
+        return 0
+
+    pending = []
     for tile in selected:
-        west,south,east,north=tile["bbox"]
-        pbf=ROOT/tile["pbf_output"]; geo=ROOT/tile["geojson_output"]
-        pbf.parent.mkdir(parents=True,exist_ok=True); geo.parent.mkdir(parents=True,exist_ok=True)
-        if geo.exists() and geo.stat().st_size>100 and not a.force:
-            print(f"Skip existing {geo}"); completed+=1; continue
-        temp=pbf.with_name(pbf.stem+".part.osm.pbf")
-        run(["osmium","extract","-b",f"{west},{south},{east},{north}",str(a.source),"-o",str(temp),"--overwrite"])
-        temp.replace(pbf)
-        geo_tmp=geo.with_name(geo.stem+".part.geojson")
-        run(["osmium","export",str(pbf),"-o",str(geo_tmp),"--overwrite"])
-        if geo_tmp.stat().st_size<2: raise RuntimeError(f"Empty GeoJSON export: {geo_tmp}")
+        pbf = ROOT / tile["pbf_output"]
+        geo = ROOT / tile["geojson_output"]
+        pbf.parent.mkdir(parents=True, exist_ok=True)
+        geo.parent.mkdir(parents=True, exist_ok=True)
+        if geo.is_file() and geo.stat().st_size > 100 and not a.force:
+            print(f"Skip existing {geo}")
+            continue
+        west, south, east, north = tile["bbox"]
+        temp_pbf = pbf.with_name(pbf.stem + ".part.osm.pbf")
+        pending.append({"tile": tile, "pbf": pbf, "geo": geo, "temp_pbf": temp_pbf,
+                        "extract": {"output": temp_pbf.name,
+                                    "bbox": [west, south, east, north],
+                                    "description": str(tile["id"])}})
+
+    if pending:
+        output_dir = pending[0]["pbf"].parent
+        config_path = output_dir / f"{plan.get('region', 'region')}.extracts.json"
+        config = {"directory": str(output_dir.resolve()),
+                  "extracts": [item["extract"] for item in pending]}
+        config_path.write_text(json.dumps(config, indent=2), encoding="utf-8")
+        try:
+            # Osmium reads the source once per strategy pass, not once per tile.
+            run(["osmium", "extract", "--config", str(config_path), str(a.source), "--overwrite"])
+        finally:
+            config_path.unlink(missing_ok=True)
+
+    completed = 0
+    for item in pending:
+        tile, pbf, geo, temp_pbf = item["tile"], item["pbf"], item["geo"], item["temp_pbf"]
+        if not temp_pbf.is_file() or temp_pbf.stat().st_size < 2:
+            raise RuntimeError(f"Osmium did not create tile extract: {temp_pbf}")
+        temp_pbf.replace(pbf)
+        geo_tmp = geo.with_name(geo.stem + ".part.geojson")
+        run(["osmium", "export", str(pbf), "-o", str(geo_tmp), "--overwrite"])
+        if not geo_tmp.is_file() or geo_tmp.stat().st_size < 2:
+            raise RuntimeError(f"Empty GeoJSON export: {geo_tmp}")
+        # Validate JSON structure here; empty FeatureCollections are legitimate
+        # for uninhabited land cells and are checked by the batch validator.
+        data = json.loads(geo_tmp.read_text(encoding="utf-8"))
+        if data.get("type") != "FeatureCollection" or not isinstance(data.get("features"), list):
+            raise RuntimeError(f"Invalid GeoJSON FeatureCollection: {geo_tmp}")
         geo_tmp.replace(geo)
-        completed+=1
-        print(f"[{completed}/{len(selected)}] {tile['id']} -> {geo}")
-    print(f"Batch complete: {completed} tiles processed or already present.")
+        completed += 1
+        print(f"[{completed}/{len(pending)}] {tile['id']} -> {geo} ({len(data['features'])} features)")
+    print(f"Batch complete: {completed} new tiles; {len(selected) - len(pending)} already present.")
     return 0
-if __name__=="__main__":
+
+if __name__ == "__main__":
     raise SystemExit(main())
