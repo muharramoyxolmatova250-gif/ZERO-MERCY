@@ -5,6 +5,7 @@ extends Node
 const SAVE_PATH := "user://zero_mercy_life_state.json"
 const JOBS := ["engineer", "doctor", "teacher", "pilot", "police", "mechanic", "designer", "courier", "scientist", "merchant", "artist", "security"]
 const SCHOOLS := ["Neo Primary School", "Cybernetics Academy", "District Technical School", "Global Science Institute"]
+const START_HUBS := ["Neo-Tashkent", "Neo-Tokyo", "Neo-Seoul", "Neo-Shanghai", "Neo-Singapore", "Neo-Dubai", "Neo-Istanbul", "Neo-London", "Neo-Paris", "Neo-New York", "Neo-Los Angeles", "Neo-Sao Paulo", "Neo-Sydney", "Neo-Cairo", "Neo-Mumbai", "Neo-Mexico City", "Neo-Johannesburg", "Neo-Toronto"]
 var simulation_day := 1
 var simulation_month := 1
 var simulation_year := 1
@@ -21,7 +22,8 @@ func _ready() -> void:
     add_to_group("world_life_sim")
     _rng.randomize()
     _load_state()
-    _ensure_hub("Neo-Tashkent")
+    for city_id in START_HUBS:
+        _ensure_hub(city_id)
     print("ZERO MERCY life simulation ready: ", hub_state.size(), " city hubs, ", resident_profiles.size(), " saved resident profiles.")
 
 func _process(delta: float) -> void:
@@ -166,7 +168,7 @@ func advance_month() -> void:
             profile["partner_id"] = profile["family_id"]
             marriages_total += 1
             _append_event(profile, "married")
-        if new_age >= 20 and new_age <= 42 and str(profile.get("marital_status", "single")) == "married" and _rng.randf() < 0.012:
+        if new_age >= 20 and new_age <= 42 and str(profile.get("sex", "")) == "female" and str(profile.get("marital_status", "single")) == "married" and _rng.randf() < 0.012:
             profile["children_count"] = int(profile.get("children_count", 0)) + 1
             births_total += 1
             _append_event(profile, "new_child_born")
