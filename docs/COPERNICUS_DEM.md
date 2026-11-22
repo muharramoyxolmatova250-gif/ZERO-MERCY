@@ -23,13 +23,16 @@ This example covers a small area near Andijan in eastern Uzbekistan. It download
 
 Review the current licence and attribution requirements before redistributing source tiles or derived products. Cite Copernicus DEM as required by its licence.
 
-## Convert to game terrain
+## Convert to a game heightmap
 
-The downloaded files are source rasters, not ready-made Godot heightmaps. The next processing step should use GDAL to:
-1. Clip each source COG to a game region.
-2. Reproject to a suitable local metric CRS for that region.
-3. Resample to a controlled grid size for the target LOD.
-4. Export a 16-bit heightmap plus metadata (minimum/maximum elevation, bounds, scale).
-5. Build terrain mesh/heightfield chunks and stream them by region.
+The repository now includes a GDAL-based preparation script. Install GDAL command-line tools, then run:
+
+```bash
+python tools/geodata/prepare_dem_heightmap.py data/dem/copernicus-glo30/YOUR_TILE.tif
+```
+
+It creates a normalized 16-bit PNG and a matching JSON metadata file in a `prepared/` folder. The JSON stores the source elevation minimum/maximum, geotransform, coordinate system, and the formula needed to restore heights in metres. Use `--size 257`, `513` (default), or another supported grid size to control terrain detail.
+
+The current converter resamples the whole one-degree source tile. For production regions, add clipping/reprojection to a local metric CRS and seam-aware neighboring-tile borders before generating final LOD chunks.
 
 Do not use one giant global terrain mesh or load every raster into RAM.
