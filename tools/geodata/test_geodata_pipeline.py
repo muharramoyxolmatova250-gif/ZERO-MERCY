@@ -6,6 +6,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PLANNER = ROOT / "tools" / "geodata" / "plan_region_tiles.py"
+sys.path.insert(0, str(ROOT / "tools" / "geodata"))
+from build_global_manifest import build_catalog
 
 def main() -> int:
     with tempfile.TemporaryDirectory() as tmp:
@@ -30,6 +32,16 @@ def main() -> int:
             assert west < east and south < north
             assert tile["godot_geojson_path"].startswith("res://")
         print("PASS: planner creates 4 valid geographic jobs and 4 runtime index entries.")
+    catalogue = build_catalog({
+        "features": [{
+            "properties": {
+                "id": "uzbekistan", "name": "Uzbekistan", "parent": "asia",
+                "urls": {"pbf": "https://download.geofabrik.de/asia/uzbekistan/uzbekistan-latest.osm.pbf"}
+            }
+        }]
+    })
+    assert catalogue["regions"][0]["pbf_url"] == "https://download.geofabrik.de/asia/uzbekistan-latest.osm.pbf"
+    print("PASS: Geofabrik Uzbekistan extract URL is normalized to the live download endpoint.")
     return 0
 
 if __name__ == "__main__":
