@@ -102,3 +102,9 @@ func _complete_active_mission() -> void:
 	if not completed_missions.has(completed_id):
 		completed_missions.append(completed_id)
 	mission_completed.emit(completed_id)
+	if has_node("/root/SaveManager"):
+		SaveManager.save_game({
+			"chapter": "prologue",
+			"completed_missions": completed_missions,
+			"last_completed_mission": completed_id
+		})
