@@ -2,6 +2,7 @@ import unittest, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools.geodata.build_global_country_queue import build_queue
+from tools.geodata.build_global_manifest import _geometry_bboxes, build_offline_catalog, ROOT
 
 class GlobalCountryQueueTests(unittest.TestCase):
     def test_country_and_combined_extracts(self):
@@ -23,6 +24,21 @@ class GlobalCountryQueueTests(unittest.TestCase):
             "bboxes": [[170,-20,180,-10],[-180,-20,-175,-10]]
         }]})
         self.assertEqual(len(queue[0]["bboxes"]), 2)
+
+    def test_geometry_bounds_split_at_antimeridian(self):
+        geometry = {"type": "MultiPolygon", "coordinates": [
+            [[[179,-20],[180,-20],[180,-10],[179,-10],[179,-20]]],
+            [[[-180,-20],[-179,-20],[-179,-10],[-180,-10],[-180,-20]]],
+        ]}
+        boxes = _geometry_bboxes(geometry)
+        self.assertEqual(len(boxes), 2)
+        self.assertEqual(boxes[0][0], 179.0)
+        self.assertEqual(boxes[1][0], -180.0)
+
+    def test_offline_catalogue_has_usable_country_bounds(self):
+        catalog = build_offline_catalog(ROOT / "data/world/global_regions.json")
+        queue = build_queue(catalog)
+        self.assertGreater(len(queue), 100)
 
 if __name__ == "__main__":
     unittest.main()
