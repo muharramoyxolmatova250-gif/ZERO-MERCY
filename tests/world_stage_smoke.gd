@@ -17,6 +17,17 @@ func _run() -> void:
 		_fail("Cyberpunk district generated too few meshes: " + str(city_meshes))
 		return
 	print("PASS Stage 3: cyberpunk district generated ", city_meshes, " mesh instances.")
+	var citizens := city.get_tree().get_nodes_in_group("city_citizen").size()
+	var traffic := city.get_tree().get_nodes_in_group("city_traffic").size()
+	if citizens < 8 or traffic < 4:
+		_fail("City life missing: citizens=" + str(citizens) + ", traffic=" + str(traffic))
+		return
+	print("PASS Stage 3: ", citizens, " pedestrians and ", traffic, " electric vehicles spawned.")
+	var overview := load("res://scenes/world/earth_overview.tscn")
+	if overview == null:
+		_fail("Earth overview scene failed to load.")
+		return
+	print("PASS Stage 2: explorable Earth overview scene loads.")
 
 	var globe_scene: PackedScene = load("res://scenes/world/earth_globe.tscn")
 	if globe_scene == null:
