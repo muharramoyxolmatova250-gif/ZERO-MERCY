@@ -58,6 +58,7 @@ permissions:
   contents: write
 
 concurrency:
+  # Shared lock with the Earth catalogue workflow; only one world-data writer runs at a time.
   group: zero-mercy-repository-data-build
   cancel-in-progress: false
 
