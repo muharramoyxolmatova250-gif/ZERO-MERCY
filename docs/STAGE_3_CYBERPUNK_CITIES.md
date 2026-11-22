@@ -13,3 +13,8 @@ This is a procedural cyberpunk district generator, not a replica of every real-w
 ## Main gameplay integration
 
 `scripts/main.gd` now instantiates the seeded district generator as `NeoCityDistrict` during startup. The standalone scene is also available for editor placement. This remains a procedural prototype: production city-scale performance, instanced/batched geometry, real mapped street layouts, interiors, traffic, NPC crowds, and full LOD are not complete.
+
+
+## Automated acceptance smoke test
+
+GitHub Actions runs the district scene headlessly and checks that procedural geometry is generated. Facade window instances use MultiMesh. This is a structural smoke test, not a performance benchmark or a visual acceptance test on target PCs. Real mapped city coverage, interiors, traffic, NPCs, advanced LOD and production art remain outside this stage foundation.
