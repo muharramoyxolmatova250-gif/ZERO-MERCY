@@ -35,6 +35,11 @@ func _run() -> void:
 		_fail("Electric traffic movement did not advance.")
 		return
 	print("PASS Stage 3: pedestrian and electric traffic movement advanced.")
+	var street_lights := _count_nodes_of_type(city, OmniLight3D)
+	if street_lights < 4:
+		_fail("Cyberpunk street lighting missing: " + str(street_lights))
+		return
+	print("PASS Stage 3: ", street_lights, " street lights generated at district junctions.")
 	var overview := load("res://scenes/world/earth_overview.tscn")
 	if overview == null:
 		_fail("Earth overview scene failed to load.")
@@ -125,6 +130,12 @@ func _run() -> void:
 	print("PASS Stage 2: DEM terrain mesh and collision generated.")
 	print("WORLD STAGE SMOKE TESTS PASSED.")
 	quit(0)
+
+func _count_nodes_of_type(node: Node, type: Variant) -> int:
+	var total := 1 if is_instance_of(node, type) else 0
+	for child in node.get_children():
+		total += _count_nodes_of_type(child, type)
+	return total
 
 func _count_meshes(node: Node) -> int:
 	var total := 1 if node is MeshInstance3D else 0
