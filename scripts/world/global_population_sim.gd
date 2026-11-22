@@ -1,6 +1,6 @@
 extends Node3D
 ## Global background population cohorts; not thousands of expensive scene nodes.
-@export_range(1000,100000,1000) var residents_per_hub := 12000
+@export_range(1000,250000,1000) var residents_per_hub := 100000
 @export_range(1.0,60.0,1.0) var tick_seconds := 5.0
 const HUBS := [
  ["Tashkent","Uzbekistan",41.2579,69.2812],["Tokyo","Japan",35.6762,139.6503],
