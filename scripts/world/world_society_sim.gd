@@ -1,6 +1,6 @@
 extends Node
 ## Background world institutions and social feed. Aggregate simulation, not individual human cognition.
-@export_range(1.0, 120.0, 1.0) var update_interval := 15.0
+@export_range(1.0, 120.0, 1.0) var update_interval := 5.0
 @export_range(1, 100, 1) var posts_per_update := 8
 const CITY_NAMES := ["Neo-Tashkent","Neo-Tokyo","Neo-Seoul","Neo-Shanghai","Neo-Singapore","Neo-Dubai","Neo-Istanbul","Neo-London","Neo-Paris","Neo-New York","Neo-Los Angeles","Neo-Sao Paulo","Neo-Sydney","Neo-Cairo","Neo-Mumbai","Neo-Mexico City","Neo-Johannesburg","Neo-Toronto"]
 const INSTITUTIONS := ["government","police","hospital","school","university","transit","energy","media","commerce","emergency"]
@@ -14,6 +14,7 @@ var _elapsed := 0.0
 var _rng := RandomNumberGenerator.new()
 var total_generated_posts := 0
 func _ready() -> void:
+ add_to_group("world_society_sim")
  _rng.randomize()
  for city in CITY_NAMES:
   city_state.append({"city":city,"population_cohort":100000,"employment":_rng.randf_range(0.82,0.97),"public_mood":_rng.randf_range(0.35,0.75),"crime_pressure":_rng.randf_range(0.03,0.18),"infrastructure":_rng.randf_range(0.65,0.98),"active_events":[]})
