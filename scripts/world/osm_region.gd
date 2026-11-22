@@ -215,8 +215,11 @@ func _ring_to_heights(ring: Array) -> PackedFloat32Array:
 	for coord in ring:
 		if coord is Array and coord.size() >= 2:
 			heights.append(_sample_elevation(float(coord[1]), float(coord[0])) * metres_per_unit)
-	if heights.size() > 2 and is_equal_approx(heights[0], heights[heights.size() - 1]):
-		heights.remove_at(heights.size() - 1)
+	if ring.size() > 2 and ring[0] is Array and ring[ring.size() - 1] is Array:
+		var first: Array = ring[0]
+		var last: Array = ring[ring.size() - 1]
+		if first.size() >= 2 and last.size() >= 2 and is_equal_approx(float(first[0]), float(last[0])) and is_equal_approx(float(first[1]), float(last[1])):
+			heights.remove_at(heights.size() - 1)
 	return heights
 
 
