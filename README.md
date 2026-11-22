@@ -69,3 +69,11 @@ Stage 2 is a foundation, not a claim that all global street/building/terrain dat
 ## Global data acquisition and stage verification
 
 See [Global Earth data acquisition](docs/GLOBAL_EARTH_DATA_ACQUISITION.md) for the Natural Earth country-boundary downloader, Geofabrik regional OSM workflow, DEM import steps, source licensing, and the acceptance checklist. The main scene's unreachable legacy city-generation code has been removed; the seeded NeoCity district generator is the active city path. Automated smoke tests exist for the globe, DEM terrain and district generator, but their GitHub Actions result must be checked before calling them passed. The repository does not yet contain complete planet-wide processed map data or a production-finished city simulation.
+
+
+## Earth map and living city controls
+
+- Press **M** during gameplay to open/close the 3D Earth overview. Mouse wheel zooms; the globe rotates automatically.
+- Before viewing country landmasses, download Natural Earth data: `python tools/geodata/download_natural_earth.py --scale 110m`.
+- The procedural NeoCity district spawns ambient pedestrians and four looping electric vehicles. These are foundational ambient agents, not a full life simulation or traffic AI.
+- The headless stage test checks globe scene loading, DEM mesh/collision creation, city geometry, pedestrian and vehicle counts. A successful CI run is still required before treating this test as passed.
