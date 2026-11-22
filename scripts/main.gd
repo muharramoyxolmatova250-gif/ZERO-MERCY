@@ -7,6 +7,7 @@ const RESCUE_SCENE := preload("res://scenes/world/rescue_zone.tscn")
 const ENEMY_SCENE := preload("res://scenes/combat/training_enemy.tscn")
 const REGION_SCENE := preload("res://scenes/world/osm_region.tscn")
 const STREAMER_SCRIPT := preload("res://scripts/world/region_streamer.gd")
+const LIFE_SIM_SCRIPT := preload("res://scripts/world/world_life_sim.gd")
 const EARTH_OVERVIEW_SCENE := preload("res://scenes/world/earth_overview.tscn")
 var _earth_overview: Node3D
 var _player: CharacterBody3D
@@ -15,6 +16,7 @@ var rng := RandomNumberGenerator.new()
 func _ready() -> void:
  rng.randomize()
  _build_environment()
+ _start_world_life_simulation()
  _build_city()
  var player := PLAYER_SCENE.instantiate() as CharacterBody3D
  player.name = "Dara"
@@ -34,6 +36,13 @@ func _ready() -> void:
  var enemy := ENEMY_SCENE.instantiate()
  enemy.position = Vector3(0, 0, -18)
  add_child(enemy)
+
+
+func _start_world_life_simulation() -> void:
+ var life_sim := Node.new()
+ life_sim.name = "WorldLifeSimulation"
+ life_sim.set_script(LIFE_SIM_SCRIPT)
+ add_child(life_sim)
 
 func _start_region_streaming() -> void:
  var streamer := Node3D.new()
