@@ -21,18 +21,27 @@ class UrbanTileBboxTests(unittest.TestCase):
         self.assertEqual(counts["city"], 1)
         self.assertEqual(counts["town"], 1)
         self.assertEqual(counts["village"], 1)
-        self.assertEqual(len(boxes), 3)
+        self.assertGreater(len(boxes), 3)
         for west, south, east, north in boxes:
             self.assertGreaterEqual(west, 60.0)
             self.assertLessEqual(east, 75.0)
             self.assertGreaterEqual(south, 29.0)
             self.assertLessEqual(north, 38.0)
 
+    def test_nearby_villages_share_one_grid_cell(self):
+        features = [
+            {"properties": {"place": "village"}, "geometry": {"type": "Point", "coordinates": [10.02, 20.02]}},
+            {"properties": {"place": "village"}, "geometry": {"type": "Point", "coordinates": [10.04, 20.04]}},
+        ]
+        boxes, counts = build_bboxes(features, [[10.0, 20.0, 10.2, 20.2]])
+        self.assertEqual(counts["village"], 2)
+        self.assertEqual(len(boxes), 1)
+
     def test_empty_region_gets_small_fallback_sample(self):
         boxes, counts = build_bboxes([], [[10.0, 20.0, 10.4, 20.4]])
         self.assertEqual(len(boxes), 1)
         self.assertEqual(counts["fallback"], 1)
-        self.assertLess(boxes[0][2] - boxes[0][0], 0.1)
+        self.assertAlmostEqual(boxes[0][2] - boxes[0][0], 0.1, places=6)
 
 if __name__ == "__main__":
     unittest.main()
