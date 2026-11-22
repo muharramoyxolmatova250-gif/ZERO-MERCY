@@ -18,6 +18,14 @@ class GlobalCountryQueueTests(unittest.TestCase):
         self.assertEqual([x["id"] for x in queue], ["germany", "israel-and-palestine"])
         self.assertEqual(queue[1]["iso3166_1"], ["IL", "PS"])
 
+    def test_starting_region_is_prioritized(self):
+        queue = build_queue({"regions": [
+            {"id": "germany", "name": "Germany", "iso3166_1": ["DE"], "bboxes": [[5,47,15,55]]},
+            {"id": "afghanistan", "name": "Afghanistan", "iso3166_1": ["AF"], "bboxes": [[60,29,75,39]]},
+            {"id": "uzbekistan", "name": "Uzbekistan", "iso3166_1": ["UZ"], "bboxes": [[55,37,74,46]]},
+        ]})
+        self.assertEqual([item["id"] for item in queue], ["uzbekistan", "afghanistan", "germany"])
+
     def test_antimeridian_parts_are_preserved(self):
         queue = build_queue({"regions": [{
             "id": "fiji", "name": "Fiji", "iso3166_1": ["FJ"],
