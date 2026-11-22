@@ -12,6 +12,7 @@ on:
       - "tests/test_global_build_state.py"
       - "tools/geodata/select_global_country_batch.py"
       - "tools/geodata/advance_global_country_batch.py"
+      - "tools/geodata/rebuild_global_runtime_index.py"
   workflow_dispatch:
     inputs:
       detail:
