@@ -40,10 +40,11 @@ def main()->int:
     "center_lat":lat,"center_lon":lon,"origin_x":round(ox,3),"origin_z":round(oz,3),
     "pbf_output":f"data/osm/tiles/{a.region}/{tile_id}.osm.pbf",
     "geojson_output":f"data/osm/tiles/{a.region}/{tile_id}.geojson",
-    "godot_geojson_path":f"res://data/osm/tiles/{a.region}/{tile_id}.geojson"}
+    "godot_geojson_path":f"res://data/osm/tiles/{a.region}/{tile_id}.geojson",
+    "region_size_m":round(max((e-w)*111320.0*math.cos(math.radians(lat)),(n-s)*111320.0)*1.08,3)}
    tiles.append(entry)
    index[key]={"geojson_path":entry["godot_geojson_path"],"center_lat":lat,"center_lon":lon,
-    "origin_x":round(ox,3),"origin_z":round(oz,3),"tile_id":tile_id,"region":a.region}
+    "origin_x":round(ox,3),"origin_z":round(oz,3),"region_size_m":round(max((e-w)*111320.0*math.cos(math.radians(lat)),(n-s)*111320.0)*1.08,3),"tile_id":tile_id,"region":a.region}
  plan={"schema_version":2,"region":a.region,"created_utc":datetime.now(timezone.utc).isoformat(),
   "source_bbox":[west,south,east,north],"tile_degrees":a.tile_deg,"tile_size_m":tile_size_m,
   "anchor_lon":anchor_lon,"anchor_lat":anchor_lat,"tile_count":len(tiles),"tiles":tiles}
