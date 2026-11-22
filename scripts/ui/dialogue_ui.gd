@@ -92,3 +92,6 @@ func _choose(index: int) -> void:
 
 func _on_dialogue_finished(_dialogue_id: String) -> void:
     visible = false
+    var phone := get_parent().get_node_or_null("DaraPhone")
+    if phone == null or not bool(phone.call("is_phone_open")):
+        Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
