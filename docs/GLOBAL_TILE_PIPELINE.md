@@ -16,7 +16,7 @@ The queue contains downloadable country-level extracts with ISO-3166-1 codes. Co
 
 ## Shared global tile grid and automatic progress
 
-All country extracts use the same equirectangular tile grid, anchored at longitude 72.3°, latitude 40.7° (the ZERO MERCY starting-world origin). A tile crossing a national boundary can contain several GeoJSON source files. The runtime index keeps every source path and the region streamer loads them together.
+All country extracts use the same equirectangular tile grid, anchored at longitude 72.3°, latitude 40.7° (the ZERO MERCY starting-world origin). A tile crossing a national boundary can contain several GeoJSON source files. The runtime index keeps every source path and the region streamer loads them together. It can be regenerated from all committed tile plans with `python tools/geodata/rebuild_global_runtime_index.py`, so a regional smoke test cannot permanently erase global coverage.
 
 The scheduled workflow `.github/workflows/build-global-country-tiles.yml` runs every six hours. It selects the next unfinished country automatically, downloads or restores its PBF, plans globally aligned cells, processes a bounded tile batch, validates it, advances `data/world/global_build_state.json`, and commits the verified result. It resumes the same country on the next run until all its tiles are processed, then moves to the next country. Manual dispatch can target a specific `region_id` or let the queue choose the next one.
 
