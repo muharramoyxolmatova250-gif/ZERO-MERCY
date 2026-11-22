@@ -86,7 +86,7 @@ func _build_environment() -> void:
 func _build_city() -> void:
  # Keep a starter cyberpunk district only until the Uzbekistan settlement catalogue
  # is present; once real OSM settlements stream, avoid stacking two city cores.
- if FileAccess.file_exists("res://data/world/tile_jobs/urban_bboxes/uzbekistan.json"):
+ if FileAccess.file_exists("res://data/osm/tiles/uzbekistan/723_407.geojson"):
   return
  var district := Node3D.new()
  district.name = "NeoCityDistrictFallback"
