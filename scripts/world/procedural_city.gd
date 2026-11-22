@@ -17,6 +17,7 @@ func _ready() -> void:
 	rng.seed = seed_value
 	_materials()
 	_roads_and_blocks()
+	_spawn_street_furniture()
 	_spawn_city_life()
 
 func _materials() -> void:
@@ -130,6 +131,40 @@ func _box(pos: Vector3, size: Vector3, color: Color, glow: bool, collision: bool
 		shape.shape = box_shape
 		body.add_child(shape)
 		add_child(body)
+
+
+func _spawn_street_furniture() -> void:
+	# Cyberpunk street lighting and visible pedestrian crossings at selected junctions.
+	var extent := blocks_per_side * block_spacing
+	var first := -float(blocks_per_side) * block_spacing * 0.5
+	for ix in range(blocks_per_side + 1):
+		for iz in range(blocks_per_side + 1):
+			if ix % 2 != 0 and iz % 2 != 0:
+				continue
+			var x := first + float(ix) * block_spacing
+			var z := first + float(iz) * block_spacing
+			_crosswalk(Vector3(x, 0.11, z), true)
+			if (ix + iz) % 2 == 0:
+				_street_light(Vector3(x + road_width * 0.62, 0.0, z + road_width * 0.62))
+				_street_light(Vector3(x - road_width * 0.62, 0.0, z - road_width * 0.62))
+
+func _crosswalk(center: Vector3, along_x: bool) -> void:
+	for stripe in range(6):
+		var offset := (float(stripe) - 2.5) * 1.15
+		var size := Vector3(0.65, 0.035, 5.2) if along_x else Vector3(5.2, 0.035, 0.65)
+		var position := center + (Vector3(offset, 0.0, road_width * 0.5 + 2.0) if along_x else Vector3(road_width * 0.5 + 2.0, 0.0, offset))
+		_box(position, size, Color(0.18, 0.72, 0.88), true, false)
+
+func _street_light(base: Vector3) -> void:
+	_box(base + Vector3(0.0, 4.0, 0.0), Vector3(0.16, 8.0, 0.16), Color(0.035, 0.055, 0.075), false, false)
+	_box(base + Vector3(0.0, 8.0, 0.0), Vector3(1.15, 0.12, 0.22), Color(0.0, 0.72, 1.0), true, false)
+	var lamp := OmniLight3D.new()
+	lamp.position = base + Vector3(0.0, 7.7, 0.0)
+	lamp.light_color = Color(0.0, 0.58, 1.0)
+	lamp.light_energy = 1.25
+	lamp.omni_range = 13.0
+	lamp.shadow_enabled = false
+	add_child(lamp)
 
 func _spawn_city_life() -> void:
 	var citizen_script := load("res://scripts/world/city_citizen.gd")
