@@ -4,24 +4,27 @@ on:
   workflow_dispatch:
     inputs:
       region_id:
-        description: Exact country extract ID from global_country_queue.json
-        required: true
+        description: Optional exact country extract ID; blank selects the next unfinished country
+        required: false
+        default: ""
+        type: string
+      tile_start:
+        description: Optional tile offset; blank resumes saved progress
+        required: false
+        default: ""
+        type: string
+      tile_count:
+        description: Tiles to process in this run
+        required: false
+        default: "32"
         type: string
       tile_degrees:
-        description: Geographic tile width in degrees
+        description: Global grid tile width in degrees
         required: true
         default: "0.1"
         type: string
-      tile_start:
-        description: First tile job index
-        required: true
-        default: "0"
-        type: string
-      tile_count:
-        description: Maximum tiles to process in this run
-        required: true
-        default: "8"
-        type: string
+  schedule:
+    - cron: "17 */6 * * *"
 
 permissions:
   contents: write
@@ -33,7 +36,7 @@ concurrency:
 jobs:
   build-country-batch:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 360
     steps:
       - name: Checkout ZERO MERCY
         uses: actions/checkout@v4
@@ -46,69 +49,109 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Refresh global catalogue and country queue
+      - name: Refresh worldwide catalogue and country queue
         run: |
           python tools/geodata/build_global_manifest.py
           python tools/geodata/build_global_country_queue.py
-      - name: Resolve country bounds and download extract
+          python tests/test_global_country_queue.py
+          python tests/test_global_tile_grid.py
+          python tests/test_global_build_state.py
+      - name: Select next country batch
+        id: select
         env:
-          REGION_ID: ${{ inputs.region_id }}
+          INPUT_REGION_ID: ${{ inputs.region_id || '' }}
+          INPUT_TILE_START: ${{ inputs.tile_start || '' }}
+          INPUT_TILE_COUNT: ${{ inputs.tile_count || '32' }}
         run: |
-          python - <<'PY'
-          import json, os, subprocess
-          queue=json.load(open("data/world/global_country_queue.json", encoding="utf-8"))
-          item=next((x for x in queue["countries"] if x["id"]==os.environ["REGION_ID"]), None)
-          if item is None:
-              raise SystemExit("Unknown country-level extract ID")
-          bboxes=item["bboxes"]
-          if not bboxes:
-              raise SystemExit("Country extract has no valid geographic bounds")
-          with open(os.environ["GITHUB_ENV"],"a",encoding="utf-8") as env:
-              env.write("COUNTRY_BBOXES_JSON="+json.dumps(bboxes,separators=(",",":"))+"\n")
-          subprocess.run(["python","tools/geodata/build_global_manifest.py","--region",item["id"],"--download"],check=True)
-          PY
+          python tools/geodata/select_global_country_batch.py \
+            --region-id "$INPUT_REGION_ID" --tile-start "$INPUT_TILE_START" \
+            --tile-count "$INPUT_TILE_COUNT" --output "$GITHUB_OUTPUT"
+      - name: Restore cached country PBF
+        if: steps.select.outputs.has_work == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: data/osm/pbf/${{ steps.select.outputs.safe_region }}.osm.pbf
+          key: zero-mercy-pbf-v1-${{ steps.select.outputs.safe_region }}
+      - name: Download selected country extract
+        if: steps.select.outputs.has_work == 'true'
+        env:
+          REGION_ID: ${{ steps.select.outputs.region_id }}
+        run: |
+          python tools/geodata/build_global_manifest.py --region "$REGION_ID" --download
+      - name: Cache country PBF for following batches
+        if: steps.select.outputs.has_work == 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: data/osm/pbf/${{ steps.select.outputs.safe_region }}.osm.pbf
+          key: zero-mercy-pbf-v1-${{ steps.select.outputs.safe_region }}
       - name: Plan country tiles in the shared global grid
+        if: steps.select.outputs.has_work == 'true'
         env:
-          REGION_ID: ${{ inputs.region_id }}
-          TILE_DEGREES: ${{ inputs.tile_degrees }}
+          REGION_ID: ${{ steps.select.outputs.region_id }}
+          SAFE_REGION: ${{ steps.select.outputs.safe_region }}
+          TILE_DEGREES: ${{ inputs.tile_degrees || '0.1' }}
         run: |
           python - <<'PY'
           import json, os, subprocess
-          bboxes=json.loads(os.environ["COUNTRY_BBOXES_JSON"])
+          bboxes=json.loads(os.environ["COUNTRY_BBOXES_JSON"]) if "COUNTRY_BBOXES_JSON" in os.environ else None
+          if not bboxes:
+              queue=json.load(open("data/world/global_country_queue.json", encoding="utf-8"))
+              item=next(x for x in queue["countries"] if x["id"]==os.environ["REGION_ID"])
+              bboxes=item["bboxes"]
           tile_deg=float(os.environ["TILE_DEGREES"])
           tile_size=tile_deg*111320.0
-          region=os.environ["REGION_ID"].replace("/","_")
-          cmd=["python","tools/geodata/plan_region_tiles.py","--region",region,
+          cmd=["python","tools/geodata/plan_region_tiles.py","--region",os.environ["SAFE_REGION"],
                "--tile-deg",str(tile_deg),"--tile-size-m",str(tile_size),
                "--anchor","72.3","40.7","--global-grid","--merge-index",
-               "--output",f"data/world/tile_jobs/{region}.json",
+               "--output",f"data/world/tile_jobs/{os.environ['SAFE_REGION']}.json",
                "--index-output","data/world/region_tiles.json"]
           for bbox in bboxes:
               cmd += ["--bbox",*map(str,bbox)]
           subprocess.run(cmd,check=True)
           PY
-      - name: Process and validate bounded tile batch
+      - name: Process bounded tile batch
+        if: steps.select.outputs.has_work == 'true'
         env:
-          REGION_ID: ${{ inputs.region_id }}
-          TILE_START: ${{ inputs.tile_start }}
-          TILE_COUNT: ${{ inputs.tile_count }}
+          REGION_ID: ${{ steps.select.outputs.region_id }}
+          SAFE_REGION: ${{ steps.select.outputs.safe_region }}
+          TILE_START: ${{ steps.select.outputs.tile_start }}
+          TILE_COUNT: ${{ steps.select.outputs.tile_count }}
         run: |
-          SAFE_REGION=$(printf '%s' "$REGION_ID" | tr '/' '_')
           python tools/geodata/process_region_tiles.py "data/osm/pbf/$SAFE_REGION.osm.pbf" \
             "data/world/tile_jobs/$SAFE_REGION.json" --start "$TILE_START" --count "$TILE_COUNT"
+      - name: Validate tile batch and shared runtime index
+        if: steps.select.outputs.has_work == 'true'
+        env:
+          SAFE_REGION: ${{ steps.select.outputs.safe_region }}
+          TILE_START: ${{ steps.select.outputs.tile_start }}
+          TILE_COUNT: ${{ steps.select.outputs.tile_count }}
+        run: |
           python tools/geodata/validate_osm_tile_batch.py "data/world/tile_jobs/$SAFE_REGION.json" \
             --start "$TILE_START" --count "$TILE_COUNT" --index data/world/region_tiles.json
-      - name: Commit verified country tiles
+      - name: Advance persistent global build progress
+        if: steps.select.outputs.has_work == 'true'
         env:
-          REGION_ID: ${{ inputs.region_id }}
+          REGION_ID: ${{ steps.select.outputs.region_id }}
+          SAFE_REGION: ${{ steps.select.outputs.safe_region }}
+          TILE_START: ${{ steps.select.outputs.tile_start }}
+          TILE_COUNT: ${{ steps.select.outputs.tile_count }}
         run: |
-          SAFE_REGION=$(printf '%s' "$REGION_ID" | tr '/' '_')
+          python tools/geodata/advance_global_country_batch.py --region-id "$REGION_ID" \
+            --tile-start "$TILE_START" --tile-count "$TILE_COUNT" \
+            --plan "data/world/tile_jobs/$SAFE_REGION.json"
+      - name: Commit verified country tiles and progress
+        if: steps.select.outputs.has_work == 'true'
+        env:
+          SAFE_REGION: ${{ steps.select.outputs.safe_region }}
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/world/global_regions.json data/world/global_country_queue.json data/world/region_tiles.json \
+          git add data/world/global_regions.json data/world/global_country_queue.json \
+            data/world/global_build_state.json data/world/region_tiles.json \
             "data/world/tile_jobs/$SAFE_REGION.json" "data/osm/tiles/$SAFE_REGION/"
           if git diff --cached --quiet; then
-            echo "No changed tiles in this batch."
+            echo "No changed tile outputs in this batch."
           else
             git commit -m "Build verified global OSM tiles for $SAFE_REGION"
             git pull --rebase origin "${GITHUB_REF_NAME:-main}"
