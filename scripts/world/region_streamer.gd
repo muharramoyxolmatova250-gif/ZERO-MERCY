@@ -37,6 +37,8 @@ func _ready() -> void:
     if typeof(data) != TYPE_DICTIONARY:
         push_error("Region index must be a JSON object.")
         return
+    _anchor_lon = float(data.get("_anchor_lon", _anchor_lon))
+    _anchor_lat = float(data.get("_anchor_lat", _anchor_lat))
     if data.has("_tile_size_m"):
         tile_size_m = maxf(100.0, float(data["_tile_size_m"]))
     for key in data:
@@ -112,7 +114,9 @@ func _load_queue() -> void:
                     str(path_value),
                     float(entry.get("center_lat", 0.0)),
                     float(entry.get("center_lon", 0.0)),
-                    str(entry.get("projection", "")) == "global_equirectangular"
+                    str(entry.get("projection", "")) == "global_equirectangular",
+                    str(entry.get("dem_metadata_path", "")),
+                    str(entry.get("dem_height_path", ""))
                 )
             if entry.has("region_size_m"):
                 instance.set("region_size_m", float(entry["region_size_m"]))
@@ -123,9 +127,31 @@ func _load_queue() -> void:
                 float(entry.get("origin_z", coord.y * tile_size_m))
             )
             nodes.append(instance)
+        var dem_metadata := str(entry.get("dem_metadata_path", ""))
+        var dem_height := str(entry.get("dem_height_path", ""))
+        if terrain_scene != null and not dem_metadata.is_empty() and not dem_height.is_empty():
+            if FileAccess.file_exists(dem_metadata) and FileAccess.file_exists(dem_height):
+                var terrain := terrain_scene.instantiate() as Node3D
+                terrain.set("metadata_path", dem_metadata)
+                terrain.set("height_path", dem_height)
+                _root.add_child(terrain)
+                nodes.append(terrain)
+                _place_target_on_terrain(terrain)
         if not nodes.is_empty():
             _loaded[key] = {"coord": coord, "nodes": nodes}
             done += 1
+
+
+func _place_target_on_terrain(terrain: Node3D) -> void:
+    if _target == null or not terrain.has_method("sample_elevation"):
+        return
+    var latitude := _anchor_lat - (_target.global_position.z / 111320.0)
+    var longitude := _anchor_lon + (_target.global_position.x / 111320.0)
+    var elevation := float(terrain.call("sample_elevation", latitude, longitude))
+    if is_finite(elevation):
+        var position := _target.global_position
+        position.y = maxf(position.y, elevation + 1.5)
+        _target.global_position = position
 
 func _key(coord: Vector2i) -> String:
     return str(coord.x) + "," + str(coord.y)
