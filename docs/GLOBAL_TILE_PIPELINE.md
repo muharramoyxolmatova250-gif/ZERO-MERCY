@@ -46,6 +46,19 @@ python tools/geodata/prepare_osm_region.py data/osm/pbf/uzbekistan.osm.pbf --bbo
 
 The current Godot OSM importer creates first-pass roads, building extrusions and waterways from GeoJSON. It is a regional preview and does not yet handle full multipolygon building holes, terrain draping, full road junction topology, global projection, threaded tile generation or production LOD/streaming. Generated cyberpunk buildings should be used only as visual filler where real footprints are absent.
 
+## Batch validation
+
+Every processed batch should be validated before it is committed or added to the runtime index:
+
+```bash
+python tools/geodata/validate_osm_tile_batch.py \
+  data/world/tile_jobs/andijan.json \
+  --start 0 --count 4 \
+  --index data/world/region_tiles.json
+```
+
+The validator checks each exported GeoJSON FeatureCollection, verifies non-empty geometry features and road/building coverage, checks the geographic bounding boxes, and confirms that the Godot runtime index includes the planned region tiles. The Andijan GitHub Actions workflow runs this validator automatically before committing generated data. A passing validation confirms data integrity for that batch only; it does not prove global geographic coverage or runtime performance.
+
 ## Required production milestones
 
 1. Fetch selected country extracts in batches; keep source URLs, timestamps, checksums and licences in the catalogue.
