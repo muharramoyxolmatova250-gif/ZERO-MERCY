@@ -6,3 +6,8 @@
 *.bak
 .DS_Store
 Thumbs.db
+
+# Large downloaded OSM source extracts and temporary tile PBFs are build artifacts.
+data/osm/pbf/
+data/osm/tmp/
+data/osm/tiles/**/*.osm.pbf
