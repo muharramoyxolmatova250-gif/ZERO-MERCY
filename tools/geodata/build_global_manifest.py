@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Build a machine-readable global OSM extract catalogue.
 
-The catalogue is generated from Geofabrik's official no-geometry index. It
-records downloadable regional PBFs; it does not download the planet by default.
-Use --download to fetch selected extracts after checking disk space.
+The catalogue uses Geofabrik's worldwide index with an offline Natural Earth
+boundary fallback when the extract index is unreachable. It records regional
+PBFs and never downloads the planet implicitly.
 """
 from __future__ import annotations
 
@@ -11,6 +11,8 @@ import argparse
 import json
 import re
 import sys
+import time
+import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,10 +24,20 @@ PBF_DIR = ROOT / "data" / "osm" / "pbf"
 USER_AGENT = "ZERO-MERCY-world-builder/1.0"
 
 
-def read_json(url: str) -> dict:
+def read_json(url: str, attempts: int = 5) -> dict:
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(request, timeout=90) as response:
-        return json.loads(response.read())
+    last_error = None
+    for attempt in range(attempts):
+        try:
+            with urllib.request.urlopen(request, timeout=90) as response:
+                return json.loads(response.read())
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            last_error = exc
+            if attempt + 1 < attempts:
+                delay = min(30, 3 * (2 ** attempt))
+                print(f"Geofabrik index request failed ({exc}); retrying in {delay}s...", file=sys.stderr)
+                time.sleep(delay)
+    raise RuntimeError(f"Could not retrieve Geofabrik index after {attempts} attempts: {last_error}")
 
 
 def safe_id(value: str) -> str:
@@ -101,7 +113,36 @@ def build_catalog(index: dict) -> dict:
     }
 
 
-def download(entry: dict, force: bool = False) -> Path:
+def build_offline_catalog(existing_path: Path) -> dict:
+    if not existing_path.is_file():
+        raise RuntimeError(f"No cached Geofabrik catalogue is available at {existing_path}")
+    natural_earth = ROOT / "data/geodata/world-110m.geojson"
+    if not natural_earth.is_file():
+        raise RuntimeError(f"No offline country boundaries available at {natural_earth}")
+    catalog = json.loads(existing_path.read_text(encoding="utf-8"))
+    boundary_data = json.loads(natural_earth.read_text(encoding="utf-8"))
+    bounds_by_code: dict[str, list[list[float]]] = {}
+    for feature in boundary_data.get("features", []):
+        props = feature.get("properties", {})
+        code = str(props.get("ISO_A2_EH") or props.get("ISO_A2") or "").upper()
+        if len(code) != 2 or code == "-99":
+            continue
+        bounds_by_code.setdefault(code, []).extend(_geometry_bboxes(feature.get("geometry") or {}))
+    enriched = 0
+    for region in catalog.get("regions", []):
+        boxes = []
+        for code in region.get("iso3166_1") or []:
+            boxes.extend(bounds_by_code.get(str(code).upper(), []))
+        if boxes:
+            region["bboxes"] = boxes
+            enriched += 1
+    catalog["generated_utc"] = datetime.now(timezone.utc).isoformat()
+    catalog["bbox_source"] = "Natural Earth 110m offline fallback; Geofabrik IDs and PBF URLs from cached catalogue"
+    print(f"Offline fallback: added country bounds to {enriched} Geofabrik extracts.")
+    return catalog
+
+
+def download(entry: dict, force: bool = False, attempts: int = 5) -> Path:
     PBF_DIR.mkdir(parents=True, exist_ok=True)
     filename = safe_id(entry["id"].replace("/", "_")) + ".osm.pbf"
     target = PBF_DIR / filename
@@ -112,21 +153,28 @@ def download(entry: dict, force: bool = False) -> Path:
     temporary = target.with_suffix(target.suffix + ".part")
     print(f"Downloading {entry['name']} ({entry['id']})")
     print(f"Source: {entry['pbf_url']}")
-    try:
-        with urllib.request.urlopen(request, timeout=180) as response, temporary.open("wb") as out:
-            while True:
-                chunk = response.read(1024 * 1024)
-                if not chunk:
-                    break
-                out.write(chunk)
-        if temporary.stat().st_size < 1024:
-            raise RuntimeError("Downloaded PBF is unexpectedly small.")
-        temporary.replace(target)
-    except Exception:
-        temporary.unlink(missing_ok=True)
-        raise
-    print(f"Saved {target} ({target.stat().st_size:,} bytes)")
-    return target
+    last_error = None
+    for attempt in range(attempts):
+        try:
+            with urllib.request.urlopen(request, timeout=180) as response, temporary.open("wb") as out:
+                while True:
+                    chunk = response.read(1024 * 1024)
+                    if not chunk:
+                        break
+                    out.write(chunk)
+            if temporary.stat().st_size < 1024:
+                raise RuntimeError("Downloaded PBF is unexpectedly small.")
+            temporary.replace(target)
+            print(f"Saved {target} ({target.stat().st_size:,} bytes)")
+            return target
+        except Exception as exc:
+            last_error = exc
+            temporary.unlink(missing_ok=True)
+            if attempt + 1 < attempts:
+                delay = min(60, 5 * (2 ** attempt))
+                print(f"PBF download failed ({exc}); retrying in {delay}s...", file=sys.stderr)
+                time.sleep(delay)
+    raise RuntimeError(f"Could not download {entry['id']} after {attempts} attempts: {last_error}")
 
 
 def main() -> int:
@@ -139,7 +187,11 @@ def main() -> int:
     args = parser.parse_args()
 
     print("Fetching Geofabrik global extract index...")
-    catalog = build_catalog(read_json(INDEX_URL))
+    try:
+        catalog = build_catalog(read_json(INDEX_URL))
+    except Exception as exc:
+        print(f"Geofabrik index unavailable: {exc}", file=sys.stderr)
+        catalog = build_offline_catalog(args.output)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Catalogue saved: {args.output} ({len(catalog['regions'])} downloadable entries)")
