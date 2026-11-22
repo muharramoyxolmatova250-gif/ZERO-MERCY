@@ -23,6 +23,7 @@ var _memory: Array[String] = []
 var ai_decision_count := 0
 var current_goal := "commute"
 var relationship_score := 0.0
+var life_profile: Dictionary = {}
 @export var citizen_id := ""
 @export var occupation := "resident"
 
@@ -88,6 +89,18 @@ func _decide_goal() -> void:
 	ai_decision_count += 1
 	var hour := int(Time.get_time_dict_from_system().get("hour", 12))
 	var scores := {"work": (1.0 if hour >= 8 and hour < 18 else 0.12) + (0.18 if occupation != "unemployed" else 0.0), "food": _hunger * 1.65, "social": _social_need * (1.0 + float(personality) * 0.12) + (0.25 if is_instance_valid(_social_target) else 0.0), "rest": (1.0 - _energy) * 1.5 + (0.35 if hour >= 21 or hour < 6 else 0.0), "explore": _curiosity * (0.75 + float(personality) * 0.08), "commute": 0.9 if hour in [7, 8, 17, 18] else 0.18, "avoid_crowd": _stress * 0.55}
+	var life_stage := str(life_profile.get("life_stage", "adult"))
+	if life_stage != "adult":
+		scores["work"] = float(scores["work"]) * 0.2
+	if life_stage == "student":
+		scores["school"] = 1.25 if hour >= 7 and hour < 16 else 0.08
+	elif life_stage == "child":
+		scores["play"] = 1.0 if hour >= 8 and hour < 20 else 0.2
+	elif life_stage == "retired":
+		scores["leisure"] = 0.85
+	if str(life_profile.get("marital_status", "single")) == "married":
+		scores["family"] = 0.35 + _social_need * 0.2
+	var previous_goal := current_goal
 	var best := "commute"
 	var best_score := -1.0
 	for goal in scores:
@@ -97,6 +110,10 @@ func _decide_goal() -> void:
 			best_score = score
 			best = goal
 	current_goal = best
+	if best != previous_goal:
+		var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+		if life_sim != null:
+			life_sim.call("record_activity", citizen_id, best)
 	if best == "food": _hunger = maxf(0.0, _hunger - 0.12)
 	elif best == "social": _social_need = maxf(0.0, _social_need - 0.1)
 	elif best == "rest": _energy = minf(1.0, _energy + 0.08)
@@ -114,6 +131,10 @@ func _choose_next_waypoint() -> void:
 func _pause_for_goal() -> float:
 	match current_goal:
 		"social": return _rng.randf_range(1.5, 4.0)
+		"school": return _rng.randf_range(1.5, 3.5)
+		"play": return _rng.randf_range(2.0, 5.0)
+		"family": return _rng.randf_range(2.0, 4.5)
+		"leisure": return _rng.randf_range(2.0, 5.0)
 		"food": return _rng.randf_range(1.0, 2.8)
 		"rest": return _rng.randf_range(2.0, 4.5)
 		"explore": return _rng.randf_range(0.5, 1.8)
@@ -130,10 +151,13 @@ func _scan_social_context() -> void:
 			_social_target = candidate
 
 func get_ai_snapshot() -> Dictionary:
-	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"memories":_memory.size(),"decisions":ai_decision_count}
+	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"memories":_memory.size(),"decisions":ai_decision_count,"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
 
 func remember_event(event_name: String) -> void:
 	_memory.append(event_name)
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	if life_sim != null:
+		life_sim.call("record_event", citizen_id, event_name)
 	relationship_score = clampf(relationship_score + 0.02, -1.0, 1.0)
 	if _memory.size() > 24: _memory.pop_front()
 
@@ -179,3 +203,9 @@ func _build_appearance() -> void:
 	_phone.material_override = phone_material
 	_phone.visible = false
 	add_child(_phone)
+
+
+func _exit_tree() -> void:
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	if life_sim != null and not citizen_id.is_empty():
+		life_sim.call("unregister_citizen", citizen_id)
