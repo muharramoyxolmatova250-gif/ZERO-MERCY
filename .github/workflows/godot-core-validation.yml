@@ -18,6 +18,8 @@ jobs:
           version: 4.3.0
           use-dotnet: false
           include-templates: false
+      - name: Test geographic tile planner
+        run: python tools/geodata/test_geodata_pipeline.py
       - name: Import and parse project
         run: godot --headless --editor --path . --quit
       - name: Launch main scene smoke test
