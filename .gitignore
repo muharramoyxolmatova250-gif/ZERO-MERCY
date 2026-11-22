@@ -11,3 +11,6 @@ Thumbs.db
 data/osm/pbf/
 data/osm/tmp/
 data/osm/tiles/**/*.osm.pbf
+
+# NOAA ETOPO source GeoTIFFs are cached build inputs, not committed game tiles.
+data/terrain/source/
