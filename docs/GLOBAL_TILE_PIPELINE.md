@@ -1,8 +1,8 @@
 # ZERO MERCY — Global Earth data pipeline
 
-## Worldwide catalogue and country queue
+## Worldwide country and settlement catalogue
 
-The catalogue uses Geofabrik's full `index-v1.json` to obtain country boundary geometry. If that index is unreachable, the builder retries and then enriches the cached Geofabrik extract catalogue with the committed Natural Earth 110m boundaries. Dateline-crossing extents are split into two rectangles.
+The global catalogue uses Geofabrik's downloadable extracts and Natural Earth 110m country geometry. If the full Geofabrik geometry index is unreachable, the builder enriches the cached extract catalogue with Natural Earth country bounds. Countries without a dedicated extract are covered by clipped continent-parent extracts.
 
 ```bash
 python tools/geodata/build_global_manifest.py
@@ -10,20 +10,45 @@ python tools/geodata/build_global_country_queue.py
 python tests/test_global_country_queue.py
 python tests/test_global_tile_grid.py
 python tests/test_global_build_state.py
+python tests/test_etopo_tile_index.py
+python tests/test_osm_urban_tile_bboxes.py
 ```
 
-The queue contains downloadable country-level extracts with ISO-3166-1 codes. Combined extracts retain every code they cover.
+The current queue covers 204 ISO-3166 codes with 195 extract jobs, including five supplemental parent extracts. The exact queue is regenerated from the source catalogue rather than hand-maintained.
 
-## Shared global tile grid and automatic progress
+## Populated-place detail tiles
 
-All country extracts use the same equirectangular tile grid, anchored at longitude 72.3°, latitude 40.7° (the ZERO MERCY starting-world origin). A tile crossing a national boundary can contain several GeoJSON source files. The runtime index keeps every source path and the region streamer loads them together. It can be regenerated from all committed tile plans with `python tools/geodata/rebuild_global_runtime_index.py`, so a regional smoke test cannot permanently erase global coverage.
+A country extract is not expanded into every 0.1-degree cell in its bounding rectangle. The pipeline first filters OSM `place=city,town,village,hamlet` features, then creates clipped detail bounds around each settlement. Large cities receive a wider detail radius; towns, villages and hamlets receive smaller radii. Isolated territories with no place features receive only a small fallback sample. This avoids spending years building empty desert, ocean and mountain cells while preserving a worldwide settlement-first streaming plan.
 
-The scheduled workflow `.github/workflows/build-global-country-tiles.yml` runs every six hours. It selects the next unfinished country automatically, downloads or restores its PBF, plans globally aligned cells, processes a bounded tile batch, validates it, advances `data/world/global_build_state.json`, and commits the verified result. It resumes the same country on the next run until all its tiles are processed, then moves to the next country. Manual dispatch can target a specific `region_id` or let the queue choose the next one.
+The shared world grid is globally aligned at 0.1-degree cells, anchored at longitude 72.3°, latitude 40.7°. Country extracts that overlap the same cell share one runtime index entry and retain all source GeoJSON paths. The index can be reconstructed from saved plans with:
 
-The Andijan workflow is a four-tile smoke test on the same shared grid. It is not the world-data target.
+```bash
+python tools/geodata/rebuild_global_runtime_index.py
+```
 
-## Current technical boundary
+## Automatic OSM and terrain processing
 
-The shared grid is a flat equirectangular coordinate frame, not a spherical globe-native streaming system. It is a foundation for global geographic coverage, not yet seamless planetary traversal. Globe movement, elevation/terrain, coastlines and landcover, rivers/lakes, LOD, detailed cyberpunk city dressing and performance qualification remain separate engineering tasks.
+The workflow `.github/workflows/build-global-country-tiles.yml` runs hourly and after a successful Earth catalogue build. It resumes the next unfinished country and processes eight cells per batch:
 
-OpenStreetMap-derived data requires attribution **© OpenStreetMap contributors** and compliance with ODbL 1.0: https://www.openstreetmap.org/copyright.
+1. Download or restore the selected country/parent OSM PBF
+2. Extract city, town, village and hamlet bounds
+3. Plan globally aligned OSM cells around those places
+4. Extract OSM cells in a single Osmium multi-extract pass
+5. Download the NOAA ETOPO 2022 15-arc-second source tile(s) for each cell
+6. Crop and resample the DEM to float32 terrain samples aligned to the OSM cell
+7. Validate OSM GeoJSON, DEM dimensions, geographic bounds and shared runtime-index paths
+8. Advance persistent progress and commit only the game-ready GeoJSON/DEM tiles
+
+Large source PBF and ETOPO GeoTIFF files are cached build inputs and are not committed. The game loads the generated DEM mesh and collision alongside the OSM cell; roads and building footprints are draped over sampled terrain elevations.
+
+## Global overview and detailed terrain
+
+The Earth overview uses Natural Earth country polygons, major rivers, lakes and elevation-point mountain markers. The ETOPO pipeline adds actual terrain relief for generated detailed cells. The OSM tiles add roads, buildings and waterways around populated places. The world overview therefore covers all continents and countries, while detailed city-scale OSM/DEM coverage grows incrementally around settlements rather than precomputing every square kilometre.
+
+The current world grid is a flat equirectangular gameplay projection, not yet a globe-native continuous planetary coordinate system. Seamless spherical traversal, higher-resolution terrain layers, detailed city interiors and performance qualification remain separate work.
+
+## Attribution and licensing
+
+- OpenStreetMap-derived data: **© OpenStreetMap contributors**, https://www.openstreetmap.org/copyright. Review ODbL 1.0 attribution and share-alike obligations.
+- NOAA ETOPO 2022 global relief model: DOI **10.25921/fd45-gt74**.
+- Natural Earth vector geography is public domain.
