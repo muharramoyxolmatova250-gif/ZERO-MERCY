@@ -149,7 +149,7 @@ func _run() -> void:
 	if int(life_snapshot.get("city_hubs", 0)) < 1:
 		_fail("World life simulation has no population hubs.")
 		return
-	var active_citizens := get_tree().get_nodes_in_group("city_citizen")
+	var active_citizens: Array = get_nodes_in_group("city_citizen")
 	if active_citizens.is_empty():
 		_fail("Cyberpunk city did not spawn life-simulated citizens.")
 		return
