@@ -1,8 +1,10 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "source_catalogue": "/home/runner/work/ZERO-MERCY/ZERO-MERCY/data/world/global_regions.json",
-  "selection": "Geofabrik country-level extracts carrying ISO-3166-1 codes; combined extracts retain all codes",
-  "country_extract_count": 190,
+  "selection": "Country extracts plus continent PBF fallbacks clipped to uncovered country boundaries",
+  "extract_count": 195,
+  "covered_iso3166_1_count": 204,
+  "supplemental_parent_extract_count": 5,
   "countries": [
     {
       "id": "afghanistan",
@@ -15,12 +17,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          60.48760999999999,
+          60.48761,
           29.36856,
           74.90017,
           38.50674
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "albania",
@@ -33,12 +36,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          18.896479999999997,
+          18.89648,
           39.62738,
-          21.062849999999997,
+          21.06285,
           42.66313
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "algeria",
@@ -51,12 +55,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -8.704894999999993,
+          -8.704895000000022,
           18.92874,
-          12.035979999999995,
+          12.03598,
           37.77284
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "andorra",
@@ -69,12 +74,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          1.4123679999999865,
+          1.412368,
           42.4276,
-          1.7874810000000139,
+          1.787481,
           42.65717
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "angola",
@@ -87,12 +93,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          10.538479999999993,
+          10.53848,
           -18.06508,
           24.10297,
           -4.327925
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "antarctica",
@@ -110,7 +117,8 @@
           -179.999999,
           -60.0
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "argentina",
@@ -125,10 +133,11 @@
         [
           -73.61453,
           -55.68296,
-          -53.63534,
+          -53.635339999999985,
           -21.72575
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "armenia",
@@ -143,10 +152,11 @@
         [
           43.43821,
           38.83743,
-          46.642619999999994,
+          46.64262,
           41.31029
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "australia",
@@ -164,7 +174,8 @@
           169.0016,
           -8.809565
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "austria",
@@ -177,12 +188,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          9.526780000000002,
+          9.52678,
           46.36979,
-          17.164080000000013,
+          17.16408,
           49.02403
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "azerbaijan",
@@ -195,12 +207,19 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          44.75005999999999,
+          44.93408,
           38.24727,
-          51.72309999999999,
+          51.7231,
           42.67437
+        ],
+        [
+          44.75006,
+          38.83258,
+          46.15767,
+          39.81065
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "bahamas",
@@ -213,12 +232,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -81.51857,
+          -81.51857000000001,
           20.27251,
-          -71.86673,
+          -71.86673000000002,
           27.97497
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "bangladesh",
@@ -231,12 +251,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          87.99765000000002,
+          87.99765,
           18.58403,
-          92.69713999999999,
+          92.69714,
           26.64677
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "belarus",
@@ -249,12 +270,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          23.174800000000005,
+          23.1748,
           51.23441,
-          32.76947000000001,
+          32.76947,
           56.17385
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "belgium",
@@ -267,12 +289,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          2.340724999999992,
+          2.340725,
           49.49489,
-          6.41026500000001,
+          6.410265,
           51.59839
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "belize",
@@ -285,12 +308,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -89.22892,
+          -89.22892000000002,
           15.88308,
-          -86.85983,
+          -86.85982999999999,
           18.4984
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "benin",
@@ -303,12 +327,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          0.7614890000000116,
+          0.761489,
           5.984817,
           3.861694,
           12.43658
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "bhutan",
@@ -323,10 +348,11 @@
         [
           88.73917,
           26.6948,
-          92.13159000000002,
+          92.13159,
           28.25372
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "bolivia",
@@ -339,12 +365,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -69.65675,
+          -69.65674999999999,
           -22.92551,
-          -57.43481,
+          -57.43480999999997,
           -9.63866
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "bosnia-herzegovina",
@@ -357,12 +384,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          15.715599999999995,
+          15.7156,
           42.55239,
-          19.626390000000015,
+          19.62639,
           45.27803
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "botswana",
@@ -375,12 +403,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          19.987449999999995,
+          19.98745,
           -26.91539,
-          29.385490000000004,
+          29.38549,
           -17.77403
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "brazil",
@@ -393,12 +422,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -74.02313,
+          -74.02312999999998,
           -35.46552,
-          -27.67249000000001,
+          -27.672489999999982,
           5.522895
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "bulgaria",
@@ -411,12 +441,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          22.348749999999995,
+          22.34875,
           41.22681,
-          29.18818999999999,
+          29.18819,
           44.21777
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "burkina-faso",
@@ -429,12 +460,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -5.527409000000006,
+          -5.527408999999977,
           9.384107,
-          2.4125290000000064,
+          2.412529,
           15.09271
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "burundi",
@@ -449,10 +481,11 @@
         [
           29.00018,
           -4.481328,
-          30.85114999999999,
+          30.85115,
           -2.307893
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "cambodia",
@@ -465,12 +498,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          101.85219999999998,
+          101.8522,
           8.858092,
           107.6397,
           14.71875
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "cameroon",
@@ -483,12 +517,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          8.330000000000013,
+          8.33,
           1.645663,
-          16.203120000000013,
+          16.20312,
           13.09278
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "canada",
@@ -503,10 +538,11 @@
         [
           -141.7761,
           41.66009,
-          -44.17684,
+          -44.17683999999997,
           85.04032
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "cape-verde",
@@ -519,12 +555,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -26.323790000000002,
+          -26.323789999999974,
           14.00485,
           -21.390960000000007,
           18.005
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "central-african-republic",
@@ -537,12 +574,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          14.409079999999989,
+          14.40908,
           2.208735,
-          27.475779999999986,
+          27.47578,
           11.03264
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "chad",
@@ -555,12 +593,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          13.401289999999989,
+          13.40129,
           7.428518,
-          24.025270000000006,
+          24.02527,
           23.53793
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "chile",
@@ -575,10 +614,11 @@
         [
           -113.2233,
           -58.45195,
-          -65.5141,
+          -65.51409999999998,
           -17.45743
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "china",
@@ -593,10 +633,11 @@
         [
           73.41788,
           14.27437,
-          134.80359999999996,
+          134.8036,
           53.65559
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "colombia",
@@ -609,12 +650,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -83.23104,
+          -83.23104000000001,
           -4.25732,
-          -66.81472,
+          -66.81471999999997,
           16.41924
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "congo-democratic-republic",
@@ -627,12 +669,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          11.883430000000004,
+          11.88343,
           -13.5006,
           31.33569,
           5.401396
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "congo-brazzaville",
@@ -645,12 +688,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          10.944169999999986,
+          10.94417,
           -5.195885,
-          18.66783000000001,
+          18.66783,
           3.740932
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "cook-islands",
@@ -668,7 +712,8 @@
           -154.8056,
           -5.800506
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "costa-rica",
@@ -681,12 +726,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -87.82473,
+          -87.82472999999999,
           4.937746,
-          -82.34952,
+          -82.34951999999998,
           11.2237
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "croatia",
@@ -699,12 +745,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          13.089159999999993,
+          13.08916,
           42.16483,
           19.45997,
           46.55756
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "cuba",
@@ -717,12 +764,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -85.4242,
+          -85.42419999999998,
           19.2533,
-          -73.70831,
+          -73.70830999999998,
           23.60427
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "cyprus",
@@ -735,12 +783,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          31.952439999999996,
+          31.95244,
           34.23374,
-          34.96146999999999,
+          34.96147,
           36.00323
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "czech-republic",
@@ -753,12 +802,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          12.084769999999992,
+          12.08477,
           48.54292,
-          18.86321000000001,
+          18.86321,
           51.06426
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "denmark",
@@ -771,12 +821,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          7.701099999999997,
+          7.7011,
           54.44065,
-          15.65449000000001,
+          15.65449,
           58.06239
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "djibouti",
@@ -789,12 +840,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          41.76177000000001,
+          41.76177,
           10.88824,
-          43.84568999999999,
+          43.84569,
           12.82615
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "east-timor",
@@ -807,12 +859,19 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          123.7912,
+          124.9303,
           -9.690103,
-          127.59109999999998,
+          127.5911,
           -8.057869
+        ],
+        [
+          123.7912,
+          -9.512555,
+          124.6866,
+          -8.502251
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "ecuador",
@@ -825,12 +884,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -93.56487,
+          -93.56486999999998,
           -5.024173,
-          -75.16149,
+          -75.16149000000001,
           2.843487
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "egypt",
@@ -843,12 +903,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          24.62628000000001,
+          24.62628,
           21.9838,
-          37.16263000000001,
+          37.16263,
           32.52518
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "el-salvador",
@@ -861,12 +922,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -90.50091,
+          -90.50090999999998,
           12.03598,
-          -87.58438,
+          -87.58438000000001,
           14.45762
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "equatorial-guinea",
@@ -879,12 +941,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          5.1656309999999905,
+          5.165631,
           -1.792669,
-          11.423380000000009,
+          11.42338,
           4.147134
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "eritrea",
@@ -897,12 +960,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          36.42070000000001,
+          36.4207,
           12.34385,
-          43.33233000000001,
+          43.33233,
           18.32962
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "estonia",
@@ -915,12 +979,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          20.85166000000001,
+          20.85166,
           57.49764,
-          28.214259999999996,
+          28.21426,
           59.99705
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "ethiopia",
@@ -935,10 +1000,11 @@
         [
           32.96722,
           3.389192,
-          48.005449999999996,
+          48.00545,
           14.91626
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "faroe-islands",
@@ -956,7 +1022,8 @@
           -5.515148000000011,
           62.90523
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "fiji",
@@ -969,18 +1036,19 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
+          -180.0,
+          -24.38196,
+          -176.2675,
+          -13.90864
+        ],
+        [
           172.7647,
           -25.08127,
           180.0,
           -9.783321
-        ],
-        [
-          -180.0,
-          -25.08127,
-          -176.2675,
-          -9.783321
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "finland",
@@ -995,10 +1063,11 @@
         [
           19.02427,
           59.28783,
-          31.61590000000001,
+          31.6159,
           70.09959
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "france",
@@ -1013,10 +1082,11 @@
         [
           -6.937207000000001,
           41.23866,
-          9.900000000000006,
+          9.9,
           51.4288
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "gabon",
@@ -1029,12 +1099,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          7.3897269999999935,
+          7.389727,
           -5.995799,
-          14.551389999999998,
+          14.55139,
           2.325716
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "gcc-states",
@@ -1051,12 +1122,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          34.434889999999996,
+          34.43489,
           15.24752,
-          60.947479999999985,
+          60.94748,
           32.19653
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "georgia",
@@ -1069,12 +1141,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          39.880930000000006,
+          39.88093,
           41.05117,
-          46.73958999999999,
+          46.73959,
           43.5899
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "germany",
@@ -1087,12 +1160,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          5.864417000000003,
+          5.864417,
           47.26543,
-          15.050780000000003,
+          15.05078,
           55.14777
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "ghana",
@@ -1105,12 +1179,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -3.8073990000000038,
+          -3.8073989999999753,
           3.704056,
-          1.3940379999999948,
+          1.394038,
           11.17772
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "greece",
@@ -1123,12 +1198,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          18.970640000000003,
+          18.97064,
           34.59111,
-          29.656830000000014,
+          29.65683,
           41.74954
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "greenland",
@@ -1141,12 +1217,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -75.3894,
+          -75.38940000000002,
           58.67169,
           -9.454384000000005,
           84.44358
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "guatemala",
@@ -1159,12 +1236,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -92.73303,
+          -92.73302999999999,
           12.74168,
-          -87.95177,
+          -87.95177000000001,
           17.83533
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "guinea",
@@ -1179,10 +1257,11 @@
         [
           -16.857079999999996,
           7.183332,
-          -7.627259000000009,
+          -7.627258999999981,
           12.68322
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "guinea-bissau",
@@ -1200,7 +1279,8 @@
           -13.629230000000007,
           12.6936
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "guyana",
@@ -1213,12 +1293,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -61.421009999999995,
+          -61.421010000000024,
           1.149369,
-          -56.42321,
+          -56.42320999999998,
           9.182536
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "guyane",
@@ -1231,12 +1312,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -54.62299,
+          -54.622990000000016,
           2.093117,
-          -50.86670000000001,
+          -50.86669999999998,
           6.370288
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "haiti-and-domrep",
@@ -1255,7 +1337,8 @@
           -68.05482,
           21.45307
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "honduras",
@@ -1270,10 +1353,11 @@
         [
           -89.36005,
           12.96943,
-          -81.66138,
+          -81.66138000000001,
           17.93171
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "hungary",
@@ -1286,12 +1370,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          16.108450000000005,
+          16.10845,
           45.73207,
-          22.90648999999999,
+          22.90649,
           48.58921
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "iceland",
@@ -1309,7 +1394,8 @@
           -12.417079999999999,
           67.50085
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "india",
@@ -1322,12 +1408,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          67.67457000000002,
+          67.67457,
           5.896067,
-          97.41989000000001,
+          97.41989,
           35.73091
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "indonesia",
@@ -1340,12 +1427,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          92.76481000000001,
+          92.76481,
           -11.60655,
           141.0217,
           6.99933
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "iran",
@@ -1358,12 +1446,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          44.023030000000006,
+          44.02303,
           24.03947,
           63.35413,
           39.79045
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "iraq",
@@ -1376,12 +1465,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          38.78399999999999,
+          38.784,
           29.01775,
-          49.55108000000001,
+          49.55108,
           37.39063
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "ireland-and-northern-ireland",
@@ -1396,10 +1486,11 @@
         [
           -14.402240000000006,
           49.60002,
-          -5.059265000000011,
+          -5.059264999999982,
           56.86553
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "israel-and-palestine",
@@ -1413,12 +1504,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          33.99994000000001,
+          33.99994,
           29.4396,
-          35.915310000000005,
+          35.91531,
           33.45436
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "italy",
@@ -1431,12 +1523,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          6.602696000000009,
+          6.602696,
           35.07638,
-          19.124989999999997,
+          19.12499,
           47.10005
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "ivory-coast",
@@ -1449,12 +1542,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -8.633881000000002,
+          -8.633880999999974,
           4.141916,
-          -2.4762149999999963,
+          -2.4762150000000247,
           10.75034
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "jamaica",
@@ -1467,12 +1561,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -78.85,
+          -78.85000000000002,
           16.35,
-          -75.51,
+          -75.50999999999999,
           19.16
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "japan",
@@ -1487,10 +1582,11 @@
         [
           122.5607,
           20.08228,
-          154.47090000000003,
+          154.4709,
           45.8154
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "jordan",
@@ -1503,12 +1599,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          34.868859999999984,
+          34.86886,
           29.18213,
-          39.310220000000015,
+          39.31022,
           33.37922
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "kazakhstan",
@@ -1521,12 +1618,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          46.423040000000015,
+          46.42304,
           40.55346,
           87.35359,
           55.50799
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "kenya",
@@ -1539,12 +1637,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          33.86789999999999,
+          33.8679,
           -4.816276,
-          41.97685000000001,
+          41.97685,
           4.629931
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "kiribati",
@@ -1557,18 +1656,25 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          167.8684,
-          -13.83833,
-          180.0,
-          6.472283
+          -180.0,
+          -3.762181,
+          -179.8198,
+          -1.58287
         ],
         [
-          -180.0,
+          -177.6431,
           -13.83833,
           -147.0336,
           6.472283
+        ],
+        [
+          167.8684,
+          -3.770672,
+          180.0,
+          5.617103
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "kyrgyzstan",
@@ -1581,12 +1687,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          69.25506999999999,
+          69.25507,
           39.15136,
-          80.27710000000002,
+          80.2771,
           43.2812
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "laos",
@@ -1599,12 +1706,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          100.08280000000002,
+          100.0828,
           13.90159,
-          107.65030000000002,
+          107.6503,
           22.52825
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "latvia",
@@ -1617,12 +1725,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          19.733479999999986,
+          19.73348,
           55.66109,
           28.25501,
           58.0947
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "lebanon",
@@ -1637,10 +1746,11 @@
         [
           34.76799,
           33.05299,
-          36.636660000000006,
+          36.63666,
           34.80253
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "lesotho",
@@ -1653,12 +1763,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          27.009199999999993,
+          27.0092,
           -30.68472,
-          29.463930000000005,
+          29.46393,
           -28.56734
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "liberia",
@@ -1676,7 +1787,8 @@
           -7.245720000000006,
           8.570158
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "libya",
@@ -1689,12 +1801,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          9.374404999999996,
+          9.374405,
           19.45087,
-          25.407260000000008,
+          25.40726,
           33.57972
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "liechtenstein",
@@ -1707,12 +1820,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          9.471078000000006,
+          9.471078,
           47.04774,
-          9.636216999999988,
+          9.636217,
           47.27128
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "lithuania",
@@ -1725,12 +1839,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          20.61859000000001,
+          20.61859,
           53.89221,
-          26.838729999999998,
+          26.83873,
           56.45329
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "luxembourg",
@@ -1743,12 +1858,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          5.733033000000006,
+          5.733033,
           49.44553,
-          6.532249000000007,
+          6.532249,
           50.18496
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "macedonia",
@@ -1761,12 +1877,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          20.446709999999996,
+          20.44671,
           40.84759,
           23.04012,
           42.37969
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "madagascar",
@@ -1779,12 +1896,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          42.30124000000001,
+          42.30124,
           -26.5823,
-          51.14842999999999,
+          51.14843,
           -11.02746
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "malawi",
@@ -1797,12 +1915,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          32.664410000000004,
+          32.66441,
           -17.13324,
-          35.92940999999999,
+          35.92941,
           -9.362691
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "malaysia-singapore-brunei",
@@ -1817,12 +1936,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          99.25611000000004,
+          99.25611,
           0.830813,
-          119.66829999999999,
+          119.6683,
           7.736849
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "maldives",
@@ -1835,12 +1955,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          71.69999999999999,
+          71.7,
           -1.36,
           74.5,
           7.69
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "mali",
@@ -1855,10 +1976,11 @@
         [
           -12.247009999999989,
           10.1176,
-          4.330256999999989,
+          4.330257,
           25.09499
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "malta",
@@ -1873,10 +1995,11 @@
         [
           14.0,
           35.51985,
-          14.856099999999998,
+          14.8561,
           36.33296
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "marshall-islands",
@@ -1894,7 +2017,8 @@
           175.5118,
           17.94606
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "mauritania",
@@ -1907,12 +2031,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -17.35015999999999,
+          -17.350160000000017,
           14.71578,
           -4.816056000000003,
           27.33613
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "mauritius",
@@ -1927,10 +2052,11 @@
         [
           53.54727,
           -22.2411,
-          64.66991000000002,
+          64.66991,
           -9.183617
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "mexico",
@@ -1945,10 +2071,11 @@
         [
           -132.4952,
           9.456709,
-          -85.49087,
+          -85.49086999999997,
           32.72067
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "micronesia",
@@ -1961,12 +2088,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          135.31240000000003,
+          135.3124,
           -1.147444,
           165.6345,
           13.21917
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "moldova",
@@ -1979,12 +2107,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          26.61232000000001,
+          26.61232,
           45.46164,
-          30.192489999999992,
+          30.19249,
           48.49397
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "monaco",
@@ -1997,12 +2126,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          7.408582999999993,
+          7.408583,
           43.48382,
-          7.59567100000001,
+          7.595671,
           43.75293
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "mongolia",
@@ -2015,12 +2145,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          87.70254999999997,
+          87.70255,
           41.50035,
-          120.02010000000001,
+          120.0201,
           52.19582
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "montenegro",
@@ -2035,10 +2166,11 @@
         [
           18.17282,
           41.61621,
-          20.35883000000001,
+          20.35883,
           43.56217
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "morocco",
@@ -2051,12 +2183,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -18.18350000000001,
+          -18.18349999999998,
           20.40373,
-          -0.9935759999999902,
+          -0.9935760000000187,
           36.06077
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "mozambique",
@@ -2069,12 +2202,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          30.207420000000013,
+          30.20742,
           -26.93837,
-          42.53488999999999,
+          42.53489,
           -9.986206
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "myanmar",
@@ -2087,12 +2221,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          90.65133000000003,
+          90.65133,
           9.510211,
-          101.19709999999998,
+          101.1971,
           28.57476
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "namibia",
@@ -2105,12 +2240,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          9.784615000000002,
+          9.784615,
           -30.20686,
-          25.265890000000013,
+          25.26589,
           -16.91682
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "nauru",
@@ -2125,10 +2261,11 @@
         [
           163.7052,
           -3.771196,
-          168.55989999999997,
+          168.5599,
           2.693851
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "nepal",
@@ -2141,12 +2278,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          80.04912999999999,
+          80.04913,
           26.3445,
-          88.22212999999999,
+          88.22213,
           30.47822
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "netherlands",
@@ -2159,12 +2297,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          2.9360949999999946,
+          2.936095,
           50.74753,
-          7.230455000000006,
+          7.230455,
           54.01786
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "new-caledonia",
@@ -2177,12 +2316,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          157.89999999999998,
+          157.9,
           -25.0,
-          174.10000000000002,
+          174.1,
           -16.9
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "new-zealand",
@@ -2197,16 +2337,17 @@
         [
           162.096,
           -56.75268,
-          180.0,
-          -28.488
+          179.9999,
+          -32.667
         ],
         [
-          -180.0,
-          -56.75268,
+          -179.989,
+          -45.58329,
           -173.5849,
           -28.488
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "nicaragua",
@@ -2219,12 +2360,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -87.9774,
+          -87.97739999999999,
           10.70177,
           -82.37865,
           15.1119
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "niger",
@@ -2237,12 +2379,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          0.11972099999999841,
+          0.119721,
           11.68684,
           16.05605,
           23.56864
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "nigeria",
@@ -2255,12 +2398,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          2.66452799999999,
+          2.664528,
           2.674022,
-          14.680569999999989,
+          14.68057,
           13.89874
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "niue",
@@ -2278,7 +2422,8 @@
           -166.2989,
           -16.63667
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "north-korea",
@@ -2296,7 +2441,8 @@
           131.6447,
           43.02043
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "norway",
@@ -2309,12 +2455,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -11.368009999999998,
+          -11.368010000000027,
           57.55323,
-          35.52710999999999,
+          35.52711,
           81.05195
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "pakistan",
@@ -2327,12 +2474,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          60.821680000000015,
+          60.82168,
           23.3763,
-          77.22426999999999,
+          77.22427,
           37.10667
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "palau",
@@ -2345,12 +2493,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          130.10339999999997,
+          130.1034,
           1.621407,
-          136.95410000000004,
+          136.9541,
           11.48818
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "panama",
@@ -2363,12 +2512,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -83.46462,
+          -83.46461999999997,
           6.644027,
-          -77.08126,
+          -77.08125999999999,
           11.20708
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "papua-new-guinea",
@@ -2381,12 +2531,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          139.20140000000004,
+          139.2014,
           -14.74845,
           162.8034,
           2.587814
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "paraguay",
@@ -2401,10 +2552,11 @@
         [
           -62.69475,
           -27.65675,
-          -54.20176000000001,
+          -54.20175999999998,
           -19.24012
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "peru",
@@ -2417,12 +2569,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -86.02509,
+          -86.02508999999998,
           -20.30552,
-          -68.55439,
+          -68.55439000000001,
           0.060049
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "philippines",
@@ -2435,12 +2588,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          112.16610000000003,
+          112.1661,
           4.382696,
-          127.07420000000002,
+          127.0742,
           21.53021
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "pitcairn-islands",
@@ -2455,10 +2609,11 @@
         [
           -133.0664,
           -27.66403,
-          -118.3448,
+          -118.34480000000002,
           -21.59613
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "poland",
@@ -2471,12 +2626,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          13.990219999999994,
+          13.99022,
           48.98642,
-          24.161020000000008,
+          24.16102,
           55.22826
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "polynesie-francaise",
@@ -2494,7 +2650,8 @@
           -132.5391,
           -4.915789
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "portugal",
@@ -2507,12 +2664,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -31.599999999999994,
+          -31.600000000000023,
           29.7,
           -6.179512999999986,
           42.1639
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "us/puerto-rico",
@@ -2525,12 +2683,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -68.31024,
+          -68.31024000000002,
           17.51573,
-          -65.09262,
+          -65.09262000000001,
           18.81272
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "romania",
@@ -2543,12 +2702,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          20.241809999999987,
+          20.24181,
           43.61247,
-          30.278960000000012,
+          30.27896,
           48.26948
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "russia",
@@ -2561,18 +2721,25 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          19.40836999999999,
+          26.39009,
           35.61404,
           180.0,
           83.83133
         ],
         [
           -180.0,
-          35.61404,
+          62.26134,
           -168.684085,
-          83.83133
+          72.2916
+        ],
+        [
+          19.40837,
+          54.31282,
+          22.89215,
+          55.3899
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "rwanda",
@@ -2585,12 +2752,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          28.85929999999999,
+          28.8593,
           -2.848747,
-          30.90863999999999,
+          30.90864,
           -1.03831
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "saint-helena-ascension-and-tristan-da-cunha",
@@ -2603,12 +2771,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -15.57025999999999,
+          -15.570260000000019,
           -43.83245,
           -2.781277999999986,
           -4.591221
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "samoa",
@@ -2626,7 +2795,8 @@
           -170.5427,
           -10.96083
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "sao-tome-and-principe",
@@ -2639,12 +2809,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          5.273915999999986,
+          5.273916,
           -0.525565,
-          8.366995000000003,
+          8.366995,
           2.440286
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "senegal-and-gambia",
@@ -2658,12 +2829,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -19.85623000000001,
+          -19.856229999999982,
           12.01511,
-          -11.335949999999997,
+          -11.335950000000025,
           16.70088
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "serbia",
@@ -2676,12 +2848,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          18.808940000000007,
+          18.80894,
           42.22979,
-          23.01034999999999,
+          23.01035,
           46.19207
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "seychelles",
@@ -2694,12 +2867,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          45.684950000000015,
+          45.68495,
           -12.55844,
           57.57433,
           -3.17239
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "sierra-leone",
@@ -2712,12 +2886,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -14.764510000000001,
+          -14.764509999999973,
           5.391619,
-          -10.255799999999994,
+          -10.255800000000022,
           10.00571
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "slovakia",
@@ -2730,12 +2905,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          16.83071000000001,
+          16.83071,
           47.72646,
-          22.570510000000013,
+          22.57051,
           49.6186
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "slovenia",
@@ -2748,12 +2924,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          13.305090000000007,
+          13.30509,
           45.42081,
-          16.60033999999999,
+          16.60034,
           46.87956
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "solomon-islands",
@@ -2768,10 +2945,11 @@
         [
           154.5856,
           -16.12694,
-          173.59339999999997,
+          173.5934,
           -4.139945
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "somalia",
@@ -2784,12 +2962,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          40.974890000000016,
+          40.97489,
           -1.816753,
-          52.448710000000005,
+          52.44871,
           12.51177
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "south-africa",
@@ -2804,10 +2983,11 @@
         [
           15.99606,
           -47.58493,
-          39.24259000000001,
+          39.24259,
           -22.11736
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "south-korea",
@@ -2820,12 +3000,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          124.31880000000001,
+          124.3188,
           32.36076,
-          132.33860000000004,
+          132.3386,
           38.64966
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "south-sudan",
@@ -2838,12 +3019,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          23.42491000000001,
+          23.42491,
           3.461547,
-          35.962980000000016,
+          35.96298,
           12.23937
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "spain",
@@ -2856,12 +3038,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -9.77901399999999,
+          -9.779014000000018,
           35.26393,
-          5.098524999999995,
+          5.098525,
           44.14855
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "sri-lanka",
@@ -2874,12 +3057,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          79.16415999999998,
+          79.16416,
           5.621275,
           82.64612,
           10.07153
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "sudan",
@@ -2892,12 +3076,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          21.781000000000006,
+          21.781,
           8.653747,
-          39.62781000000001,
+          39.62781,
           22.34706
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "suriname",
@@ -2915,7 +3100,8 @@
           -53.328190000000006,
           7.761698
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "swaziland",
@@ -2928,12 +3114,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          30.785750000000007,
+          30.78575,
           -27.31826,
-          32.136979999999994,
+          32.13698,
           -25.71781
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "sweden",
@@ -2946,12 +3133,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          10.541380000000004,
+          10.54138,
           55.02652,
-          24.22471999999999,
+          24.22472,
           69.06643
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "switzerland",
@@ -2964,12 +3152,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          5.954418000000004,
+          5.954418,
           45.81642,
-          10.495839999999987,
+          10.49584,
           47.81126
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "syria",
@@ -2982,12 +3171,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          35.28548000000001,
+          35.28548,
           32.3066,
-          42.38382999999999,
+          42.38383,
           37.32239
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "taiwan",
@@ -3000,12 +3190,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          118.10360000000003,
+          118.1036,
           20.72799,
-          122.93119999999999,
+          122.9312,
           26.60305
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "tajikistan",
@@ -3020,10 +3211,11 @@
         [
           67.3201,
           36.66374,
-          75.16570999999999,
+          75.16571,
           41.05502
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "tanzania",
@@ -3036,12 +3228,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          29.243950000000012,
+          29.24395,
           -11.77595,
-          40.69487000000001,
+          40.69487,
           -0.974988
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "thailand",
@@ -3054,12 +3247,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          97.13562000000002,
+          97.13562,
           5.597877,
-          105.63920000000002,
+          105.6392,
           20.46875
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "togo",
@@ -3072,12 +3266,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -0.14833799999999542,
+          -0.14833800000002384,
           5.892541,
-          1.8109420000000114,
+          1.810942,
           11.14395
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "tokelau",
@@ -3095,7 +3290,8 @@
           -167.4097,
           -6.664586
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "tonga",
@@ -3113,7 +3309,8 @@
           -171.3053,
           -14.15464
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "tunisia",
@@ -3126,12 +3323,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          7.513960999999995,
+          7.513961,
           30.20864,
-          12.068000000000012,
+          12.068,
           37.77474
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "turkey",
@@ -3144,12 +3342,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          25.523979999999995,
+          25.52398,
           35.717,
-          44.85991999999999,
+          44.85992,
           43.07481
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "turkmenistan",
@@ -3162,12 +3361,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          51.83270999999999,
+          51.83271,
           35.12355,
-          66.72271999999998,
+          66.72272,
           42.81253
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "tuvalu",
@@ -3180,18 +3380,19 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
+          -180.0,
+          -12.93801,
+          -176.757,
+          -4.061646
+        ],
+        [
           172.9953,
           -13.24039,
           180.0,
           -4.061646
-        ],
-        [
-          -180.0,
-          -13.24039,
-          -176.757,
-          -4.061646
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "uganda",
@@ -3206,10 +3407,11 @@
         [
           29.57056,
           -1.487315,
-          35.010310000000004,
+          35.01031,
           4.250552
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "ukraine",
@@ -3222,12 +3424,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          22.13264000000001,
+          22.13264,
           44.00862,
-          40.238110000000006,
+          40.23811,
           52.3865
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "united-kingdom",
@@ -3242,10 +3445,11 @@
         [
           -14.858499999999992,
           49.4192,
-          2.641785999999996,
+          2.641786,
           61.13564
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "us",
@@ -3258,18 +3462,19 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          170.9033,
+          -180.0,
           15.92097,
-          180.0,
+          -66.87576000000001,
           72.98845
         ],
         [
-          -180.0,
-          15.92097,
-          -66.87576,
-          72.98845
+          170.9033,
+          50.02187,
+          180.0,
+          56.3099
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "uruguay",
@@ -3284,10 +3489,11 @@
         [
           -58.525890000000004,
           -36.2487,
-          -52.7723,
+          -52.77229999999997,
           -30.07355
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "uzbekistan",
@@ -3302,10 +3508,11 @@
         [
           55.97708,
           37.16636,
-          73.17462999999998,
+          73.17463,
           45.61884
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "vanuatu",
@@ -3323,7 +3530,8 @@
           173.6089,
           -12.29626
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "venezuela",
@@ -3336,12 +3544,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -73.38098,
+          -73.38098000000002,
           0.621727,
-          -59.51474,
+          -59.51474000000002,
           15.96134
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "vietnam",
@@ -3354,12 +3563,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          102.09590000000003,
+          102.0959,
           7.382239,
-          114.64229999999998,
+          114.6423,
           23.40214
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "us/us-virgin-islands",
@@ -3372,12 +3582,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          -65.17502,
+          -65.17502000000002,
           17.28246,
-          -63.95554,
+          -63.955539999999985,
           18.48596
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "wallis-et-futuna",
@@ -3395,7 +3606,8 @@
           -174.1553,
           -9.05868
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "yemen",
@@ -3410,10 +3622,11 @@
         [
           41.06894,
           11.36768,
-          55.51167000000001,
+          55.51167,
           19.03189
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "zambia",
@@ -3426,12 +3639,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          21.98982000000001,
+          21.98982,
           -18.08777,
-          33.71773000000002,
+          33.71773,
           -8.239483
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "zimbabwe",
@@ -3444,12 +3658,13 @@
       "estimated_size_bytes": null,
       "bboxes": [
         [
-          25.22290000000001,
+          25.2229,
           -22.44725,
-          33.085409999999996,
+          33.08541,
           -15.58707
         ]
-      ]
+      ],
+      "extract_kind": "country"
     },
     {
       "id": "ile-de-clipperton",
@@ -3464,10 +3679,113 @@
         [
           -110.1215,
           9.595339,
-          -108.3746,
+          -108.37459999999999,
           11.15685
         ]
-      ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "africa",
+      "name": "Africa supplemental extracts",
+      "iso3166_1": [
+        "EH",
+        "TF"
+      ],
+      "parent": null,
+      "pbf_url": "https://download.geofabrik.de/africa/africa-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -17.063423,
+          20.999752,
+          -8.665123999999992,
+          27.656426
+        ],
+        [
+          68.72,
+          -49.775,
+          70.56,
+          -48.625
+        ]
+      ],
+      "extract_kind": "supplemental_parent"
+    },
+    {
+      "id": "asia",
+      "name": "Asia supplemental extracts",
+      "iso3166_1": [
+        "SA"
+      ],
+      "parent": null,
+      "pbf_url": "https://download.geofabrik.de/asia/asia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          34.632336,
+          16.347891,
+          55.666659,
+          32.161009
+        ]
+      ],
+      "extract_kind": "supplemental_parent"
+    },
+    {
+      "id": "central-america",
+      "name": "Central America supplemental extracts",
+      "iso3166_1": [
+        "TT"
+      ],
+      "parent": null,
+      "pbf_url": "https://download.geofabrik.de/central-america/central-america-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -61.94999999999999,
+          10.0,
+          -60.89499999999998,
+          10.89
+        ]
+      ],
+      "extract_kind": "supplemental_parent"
+    },
+    {
+      "id": "europe",
+      "name": "Europe supplemental extracts",
+      "iso3166_1": [
+        "XK"
+      ],
+      "parent": null,
+      "pbf_url": "https://download.geofabrik.de/europe/europe-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          20.0707,
+          41.84711,
+          21.77505,
+          43.27205
+        ]
+      ],
+      "extract_kind": "supplemental_parent"
+    },
+    {
+      "id": "south-america",
+      "name": "South America supplemental extracts",
+      "iso3166_1": [
+        "FK"
+      ],
+      "parent": null,
+      "pbf_url": "https://download.geofabrik.de/south-america/south-america-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -61.19999999999999,
+          -52.3,
+          -57.75,
+          -51.1
+        ]
+      ],
+      "extract_kind": "supplemental_parent"
     }
   ]
 }
