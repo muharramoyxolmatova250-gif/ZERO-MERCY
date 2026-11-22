@@ -141,6 +141,28 @@ func _run() -> void:
 	var main := main_scene.instantiate()
 	root.add_child(main)
 	await process_frame
+	var life_sim := main.get_node_or_null("WorldLifeSimulation")
+	if life_sim == null:
+		_fail("Persistent world life simulation did not start.")
+		return
+	var life_snapshot: Dictionary = life_sim.call("get_world_life_snapshot")
+	if int(life_snapshot.get("city_hubs", 0)) < 1:
+		_fail("World life simulation has no population hubs.")
+		return
+	var active_citizens := get_tree().get_nodes_in_group("city_citizen")
+	if active_citizens.is_empty():
+		_fail("Cyberpunk city did not spawn life-simulated citizens.")
+		return
+	var citizen_snapshot: Dictionary = active_citizens[0].call("get_ai_snapshot")
+	if not citizen_snapshot.has("age_years") or not citizen_snapshot.has("life_stage"):
+		_fail("NPC does not expose persistent life-cycle data.")
+		return
+	life_sim.call("advance_month")
+	var advanced_snapshot: Dictionary = life_sim.call("get_world_life_snapshot")
+	if int(advanced_snapshot.get("simulation_day", 0)) < 31:
+		_fail("NPC life simulation did not advance its world calendar.")
+		return
+	print("PASS Stage 5: persistent NPC profiles, ages, school/work stages and monthly life simulation.")
 	main.call("_unhandled_input", _map_key_event())
 	await process_frame
 	if main.get_node_or_null("EarthMapOverview") == null:
