@@ -17,6 +17,11 @@ func _run() -> void:
 		_fail("Cyberpunk district generated too few meshes: " + str(city_meshes))
 		return
 	print("PASS Stage 3: cyberpunk district generated ", city_meshes, " mesh instances.")
+	var pickup_count := city.get_tree().get_nodes_in_group("world_pickup").size()
+	if pickup_count < 4:
+		_fail("Interactive world props did not spawn.")
+		return
+	print("PASS Stage 3: ", pickup_count, " physical world props can be picked up and placed.")
 	var citizens := city.get_tree().get_nodes_in_group("city_citizen").size()
 	var traffic := city.get_tree().get_nodes_in_group("city_traffic").size()
 	if citizens < 8 or traffic < 4:
