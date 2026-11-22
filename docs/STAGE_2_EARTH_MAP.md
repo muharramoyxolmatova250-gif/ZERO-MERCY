@@ -61,3 +61,11 @@ GitHub Actions runs the planner smoke test, then imports the Godot project headl
 - Run Godot editor/runtime checks and profile real hardware.
 
 **Completion boundary:** Stage 2's data/rendering foundation and repeatable pipeline are implemented. The complete, detailed, seamless, fully playable Earth is not yet finished; that requires downloading, processing and validating the actual regional source datasets plus the remaining systems above.
+
+## Elevation import added
+A reusable DEM conversion and rendering path is now included:
+- \`tools/geodata/convert_dem.py\` converts a georeferenced GeoTIFF into little-endian float32 samples plus metadata (requires rasterio and numpy).
+- \`scripts/world/dem_terrain_tile.gd\` validates the data and constructs a terrain mesh.
+- \`docs/DEM_TERRAIN_IMPORT.md\` documents the import steps.
+
+No global DEM files are included or claimed as downloaded. Real elevation coverage must be sourced and processed per region.
