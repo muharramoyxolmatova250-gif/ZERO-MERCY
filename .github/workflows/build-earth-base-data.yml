@@ -6,6 +6,8 @@ on:
       - ".github/workflows/build-earth-base-data.yml"
       - "tools/geodata/download_natural_earth.py"
       - "tools/geodata/build_global_manifest.py"
+      - "tools/geodata/build_global_country_queue.py"
+      - "tests/test_global_country_queue.py"
   workflow_dispatch:
     inputs:
       detail:
@@ -21,7 +23,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: zero-mercy-earth-base-data
+  group: zero-mercy-repository-data-build
   cancel-in-progress: false
 
 jobs:
@@ -51,14 +53,19 @@ jobs:
           PY
       - name: Build global OSM regional source catalogue
         run: python tools/geodata/build_global_manifest.py
+      - name: Build country extract queue and test it
+        run: |
+          python tools/geodata/build_global_country_queue.py
+          python -m unittest tests/test_global_country_queue.py
       - name: Commit generated base map data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/geodata/world-*.geojson data/world/global_regions.json
+          git add data/geodata/world-*.geojson data/world/global_regions.json data/world/global_country_queue.json
           if git diff --cached --quiet; then
             echo "Global map data is already current."
           else
             git commit -m "Build global Earth country map data"
-            git push
+            git pull --rebase origin "${GITHUB_REF_NAME:-main}"
+            git push origin "HEAD:${GITHUB_REF_NAME:-main}"
           fi
