@@ -38,7 +38,7 @@ on:
         default: "0.1"
         type: string
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "17 * * * *"
   workflow_run:
     workflows: ["Build ZERO MERCY Earth base data"]
     types: [completed]
