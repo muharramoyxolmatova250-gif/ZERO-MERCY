@@ -18,6 +18,8 @@ var _road_material: StandardMaterial3D
 var _building_material: StandardMaterial3D
 var _water_material: StandardMaterial3D
 var _ground_material: StandardMaterial3D
+var _neon_cyan: StandardMaterial3D
+var _neon_magenta: StandardMaterial3D
 
 
 
@@ -36,10 +38,12 @@ func _ready() -> void:
 
 
 func _setup_materials() -> void:
-	_road_material = _material(Color(0.035, 0.055, 0.075), Color(0.015, 0.08, 0.12), 0.65)
-	_building_material = _material(Color(0.12, 0.16, 0.20), Color(0.02, 0.16, 0.19), 0.25)
-	_water_material = _material(Color(0.015, 0.22, 0.38), Color(0.01, 0.12, 0.3), 0.9)
-	_ground_material = _material(Color(0.035, 0.09, 0.075), Color(0.005, 0.025, 0.02), 0.15)
+	_road_material = _material(Color(0.012, 0.02, 0.035), Color(0.0, 0.025, 0.06), 0.35)
+	_building_material = _material(Color(0.025, 0.04, 0.065), Color(0.0, 0.08, 0.13), 0.5)
+	_water_material = _material(Color(0.005, 0.12, 0.25), Color(0.0, 0.08, 0.22), 1.2)
+	_ground_material = _material(Color(0.012, 0.022, 0.035), Color(0.0, 0.025, 0.05), 0.25)
+	_neon_cyan = _material(Color(0.0, 0.72, 1.0), Color(0.0, 0.65, 1.0), 2.0)
+	_neon_magenta = _material(Color(1.0, 0.04, 0.38), Color(1.0, 0.02, 0.25), 2.0)
 
 
 func _material(base: Color, glow: Color, energy: float) -> StandardMaterial3D:
@@ -115,6 +119,7 @@ func _add_road_geometry(kind: String, coords: Variant, tags: Dictionary) -> void
 	for path in paths:
 		if path is Array:
 			_add_strip(path, width, 0.025, _road_material, "Road")
+			_add_strip(path, maxf(0.18, width * 0.035), 0.06, _neon_cyan if highway in ["motorway", "trunk", "primary"] else _neon_magenta, "RoadNeon")
 
 
 func _add_water_geometry(kind: String, coords: Variant) -> void:
@@ -212,6 +217,12 @@ func _add_extruded_polygon(ring: Array, height: float) -> void:
 	building.mesh = mesh
 	building.material_override = _building_material
 	add_child(building)
+	var body := StaticBody3D.new()
+	body.name = "OSM_BuildingCollision"
+	var collision := CollisionShape3D.new()
+	collision.shape = mesh.create_trimesh_shape()
+	body.add_child(collision)
+	add_child(body)
 
 
 func _add_triangle(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -> void:
