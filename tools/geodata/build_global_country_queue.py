@@ -12,7 +12,10 @@ def build_queue(catalog: dict) -> list[dict]:
     selected, seen = [], set()
     for region in catalog.get("regions", []):
         region_id = str(region.get("id", "")).strip()
-        codes = sorted({str(code).upper() for code in (region.get("iso3166_1") or [])
+        raw_codes = region.get("iso3166_1") or []
+        if isinstance(raw_codes, str):
+            raw_codes = [raw_codes]
+        codes = sorted({str(code).upper() for code in raw_codes
                         if isinstance(code, str) and len(code) == 2})
         bboxes = region.get("bboxes") or ([region["bbox"]] if isinstance(region.get("bbox"), list) else [])
         if not region_id or region_id in seen or not codes or not isinstance(bboxes, list):
