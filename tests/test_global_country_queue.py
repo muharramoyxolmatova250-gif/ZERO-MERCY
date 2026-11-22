@@ -1,4 +1,6 @@
-import unittest
+import unittest, sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools.geodata.build_global_country_queue import build_queue
 
 class GlobalCountryQueueTests(unittest.TestCase):
