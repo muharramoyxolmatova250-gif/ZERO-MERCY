@@ -18,6 +18,7 @@ on:
       - "tools/geodata/build_dem_tile_batch.py"
       - "tools/geodata/validate_dem_tile_batch.py"
       - "tools/geodata/build_osm_urban_tile_bboxes.py"
+      - "tests/test_osm_urban_tile_bboxes.py"
       - "scripts/world/dem_terrain_tile.gd"
       - "scenes/world/dem_terrain_tile.tscn"
       - "tests/test_etopo_tile_index.py"
@@ -84,6 +85,7 @@ jobs:
           python tests/test_global_tile_grid.py
           python tests/test_global_build_state.py
           python tests/test_etopo_tile_index.py
+          python tests/test_osm_urban_tile_bboxes.py
       - name: Select next country batch
         id: select
         env:
