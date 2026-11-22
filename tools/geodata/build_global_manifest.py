@@ -32,6 +32,22 @@ def safe_id(value: str) -> str:
     return re.sub(r"[^a-zA-Z0-9._-]+", "_", value).strip("_")
 
 
+def _geometry_bbox(geometry: dict) -> list[float] | None:
+    points: list[tuple[float, float]] = []
+    def visit(value):
+        if isinstance(value, (list, tuple)):
+            if len(value) >= 2 and isinstance(value[0], (int, float)) and isinstance(value[1], (int, float)):
+                points.append((float(value[0]), float(value[1])))
+            else:
+                for child in value:
+                    visit(child)
+    visit((geometry or {}).get("coordinates", []))
+    if not points:
+        return None
+    xs, ys = zip(*points)
+    return [min(xs), min(ys), max(xs), max(ys)]
+
+
 def build_catalog(index: dict) -> dict:
     features = index.get("features", [])
     if not isinstance(features, list):
@@ -59,6 +75,7 @@ def build_catalog(index: dict) -> dict:
             "pbf_url": pbf,
             "updates_url": urls.get("updates"),
             "estimated_size_bytes": props.get("pbf_file_size"),
+            "bbox": feature.get("bbox") or _geometry_bbox(feature.get("geometry", {})),
         })
     entries.sort(key=lambda item: (item["name"].casefold(), item["id"]))
     return {
