@@ -2,14 +2,14 @@
   "schema_version": 1,
   "current_region_id": "uzbekistan",
   "next_tile_by_region": {
-    "uzbekistan": 8,
+    "uzbekistan": 16,
     "afghanistan": 0
   },
   "completed_regions": [],
-  "last_updated_utc": "2026-11-22T11:01:46.699535+00:00",
+  "last_updated_utc": "2026-11-22T18:04:46.934247+00:00",
   "last_batch": {
     "region_id": "uzbekistan",
-    "start": 0,
+    "start": 8,
     "processed": 8,
     "total_tiles": 1711
   }
