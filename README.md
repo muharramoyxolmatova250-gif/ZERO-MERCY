@@ -37,3 +37,13 @@ Controls:
 - Do not present placeholder systems as finished or real online services.
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the long-term plan and [docs/EARTH_DATA.md](docs/EARTH_DATA.md) for geography ingestion notes.
+
+## Real Earth geography prototype
+
+The next milestone adds a Natural Earth GeoJSON downloader and a Godot globe scene. To generate the data locally:
+
+```bash
+python tools/geodata/download_natural_earth.py --scale 110m
+```
+
+Then open `scenes/world/earth_globe.tscn` in Godot 4.3+. For a more detailed global dataset, use `--scale 50m`. Generated GeoJSON files are not committed; see [docs/EARTH_DATA_PIPELINE.md](docs/EARTH_DATA_PIPELINE.md) for sources, licensing, limitations, and the next terrain/OSM/streaming stages.
