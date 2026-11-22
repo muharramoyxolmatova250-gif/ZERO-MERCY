@@ -15,7 +15,7 @@ on:
         required: true
         type: choice
         options: ["50m", "110m", "all"]
-        default: "50m"
+        default: "110m"
   schedule:
     - cron: "17 4 1 * *"
 
@@ -39,7 +39,7 @@ jobs:
           python-version: "3.12"
       - name: Download and validate global country geometry
         run: |
-          python tools/geodata/download_natural_earth.py --scale "${{ inputs.detail || '50m' }}"
+          python tools/geodata/download_natural_earth.py --scale "${{ inputs.detail || '110m' }}" --reuse-existing
           python - <<'PY'
           import json
           from pathlib import Path
