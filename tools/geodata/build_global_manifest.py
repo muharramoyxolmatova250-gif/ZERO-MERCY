@@ -131,7 +131,10 @@ def build_offline_catalog(existing_path: Path) -> dict:
     enriched = 0
     for region in catalog.get("regions", []):
         boxes = []
-        for code in region.get("iso3166_1") or []:
+        codes = region.get("iso3166_1") or []
+        if isinstance(codes, str):
+            codes = [codes]
+        for code in codes:
             boxes.extend(bounds_by_code.get(str(code).upper(), []))
         if boxes:
             region["bboxes"] = boxes
