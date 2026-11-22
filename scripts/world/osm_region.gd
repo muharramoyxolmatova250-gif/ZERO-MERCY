@@ -20,6 +20,12 @@ var _water_material: StandardMaterial3D
 var _ground_material: StandardMaterial3D
 
 
+
+func configure_region(path: String, center_lat: float, center_lon: float) -> void:
+	geojson_path = path
+	region_center_lat = center_lat
+	region_center_lon = center_lon
+
 func _ready() -> void:
 	_setup_materials()
 	_add_ground()
