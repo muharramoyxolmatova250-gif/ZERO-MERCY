@@ -1,6 +1,11 @@
 name: Build ZERO MERCY Earth base data
 
 on:
+  push:
+    paths:
+      - ".github/workflows/build-earth-base-data.yml"
+      - "tools/geodata/download_natural_earth.py"
+      - "tools/geodata/build_global_manifest.py"
   workflow_dispatch:
     inputs:
       detail:
@@ -36,10 +41,13 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          for path in sorted(Path("data/geodata").glob("world-*.geojson")):
-              data=json.loads(path.read_text(encoding="utf-8"))
-              assert data.get("type")=="FeatureCollection" and len(data.get("features",[]))>100
-              print(f"{path}: {len(data['features'])} map features, {path.stat().st_size:,} bytes")
+          files = sorted(Path("data/geodata").glob("world-*.geojson"))
+          assert files, "No world country GeoJSON was generated."
+          for path in files:
+              data = json.loads(path.read_text(encoding="utf-8"))
+              features = data.get("features", [])
+              assert data.get("type") == "FeatureCollection" and len(features) > 100, path
+              print(f"{path}: {len(features)} map features, {path.stat().st_size:,} bytes")
           PY
       - name: Build global OSM regional source catalogue
         run: python tools/geodata/build_global_manifest.py
