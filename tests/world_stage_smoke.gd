@@ -28,6 +28,7 @@ func _run() -> void:
 		_fail("City citizens are missing personal phones: " + str(citizen_phones))
 		return
 	print("PASS Stage 3: every spawned citizen has a personal cyberpunk phone prop.")
+	var first_citizen := city.get_tree().get_first_node_in_group("city_citizen") as Node3D
 	if first_citizen.ai_decision_count < 1 or first_citizen.get_memory_snapshot().is_empty():
 		_fail("Citizen utility AI did not produce decisions and memory.")
 		return
@@ -52,7 +53,6 @@ func _run() -> void:
 		_fail("Global airline network did not initialize international flights.")
 		return
 	print("PASS Global aviation: ", air_snapshot.airport_count, " airports and ", air_snapshot.active_flights, " active cyberpunk flights.")
-	var first_citizen := city.get_tree().get_first_node_in_group("city_citizen") as Node3D
 	var first_car := city.get_tree().get_first_node_in_group("city_traffic") as Node3D
 	var citizen_start := first_citizen.position
 	var car_start := first_car.position
