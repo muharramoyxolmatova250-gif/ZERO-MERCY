@@ -47,3 +47,7 @@ python tools/geodata/download_natural_earth.py --scale 110m
 ```
 
 Then open `scenes/world/earth_globe.tscn` in Godot 4.3+. For a more detailed global dataset, use `--scale 50m`. Generated GeoJSON files are not committed; see [docs/EARTH_DATA_PIPELINE.md](docs/EARTH_DATA_PIPELINE.md) for sources, licensing, limitations, and the next terrain/OSM/streaming stages.
+
+## First local Earth map test scene
+
+A small integration scene is available at `scenes/world/earth_test_world.tscn`. It includes a temporary WASD player and a configured region streamer. Follow [docs/FIRST_EARTH_MAP_TEST.md](docs/FIRST_EARTH_MAP_TEST.md) and [docs/ANDIJAN_TEST_REGION.md](docs/ANDIJAN_TEST_REGION.md) to prepare a small OSM GeoJSON tile and run the scene with F6 in Godot. The scene has not yet been validated in the Godot editor.
