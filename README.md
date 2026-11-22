@@ -55,3 +55,24 @@ A small integration scene is available at `scenes/world/earth_test_world.tscn`. 
 ## Story and progression foundations
 
 The repository also includes data-driven mission objectives, branching dialogue, and versioned local saves. See [docs/STORY_SYSTEMS.md](docs/STORY_SYSTEMS.md). A short prologue mission and dialogue sample are included as data; they are not yet connected to a finished mission HUD, cinematic sequence, or complete campaign.
+
+## Integrated prologue gameplay slice (code committed; editor validation pending)
+
+The main cyberpunk city scene now instantiates:
+- the existing third-person player;
+- a mission HUD connected to the MissionManager autoload;
+- a signal beacon that advances the first objective when the player enters its area and presses `E`;
+- a rescue zone that completes the final prologue objective when entered;
+- local save writing after mission completion.
+
+### Prologue route
+
+1. Walk to the signal beacon in the city.
+2. Enter its area to register reaching the old market.
+3. Press `E` to inspect the beacon.
+4. Walk to the marked rescue zone to complete the escort objective.
+5. Mission completion is written through SaveManager to a local JSON save.
+
+Controls: WASD move, mouse look, Shift sprint, Space jump, E interact, Esc release mouse.
+
+This is a small integrated gameplay slice, not the full ZERO MERCY campaign. It does not yet contain the final Dara character, cinematic story, combat, vehicles, life simulation, global Earth world, online phone/social systems, or the requested ~70-hour campaign. No Godot editor/runtime test has been performed in this environment; run it in Godot 4 and resolve any parse/runtime issues before treating it as verified.
