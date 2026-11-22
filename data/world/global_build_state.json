@@ -2,14 +2,15 @@
   "schema_version": 1,
   "current_region_id": "afghanistan",
   "next_tile_by_region": {
-    "afghanistan": 8
+    "afghanistan": 0
   },
   "completed_regions": [],
-  "last_updated_utc": "2026-11-22T10:43:17.955707+00:00",
+  "last_updated_utc": "2026-11-22T10:48:00+00:00",
   "last_batch": {
     "region_id": "afghanistan",
     "start": 0,
-    "processed": 8,
-    "total_tiles": 24431
+    "processed": 0,
+    "total_tiles": 0,
+    "plan_version": "unique-settlement-cells-v2"
   }
 }
