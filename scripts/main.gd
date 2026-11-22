@@ -8,6 +8,7 @@ const ENEMY_SCENE := preload("res://scenes/combat/training_enemy.tscn")
 const REGION_SCENE := preload("res://scenes/world/osm_region.tscn")
 const STREAMER_SCRIPT := preload("res://scripts/world/region_streamer.gd")
 const LIFE_SIM_SCRIPT := preload("res://scripts/world/world_life_sim.gd")
+const PHONE_UI_SCRIPT := preload("res://scripts/ui/phone_ui.gd")
 const EARTH_OVERVIEW_SCENE := preload("res://scenes/world/earth_overview.tscn")
 var _earth_overview: Node3D
 var _player: CharacterBody3D
@@ -26,6 +27,7 @@ func _ready() -> void:
  _start_region_streaming()
  _start_global_world_simulation()
  _start_society_simulation()
+ _start_phone_ui()
  add_child(HUD_SCENE.instantiate())
  var beacon := BEACON_SCENE.instantiate()
  beacon.position = Vector3(0, 0, -8)
@@ -37,6 +39,13 @@ func _ready() -> void:
  enemy.position = Vector3(0, 0, -18)
  add_child(enemy)
 
+
+
+func _start_phone_ui() -> void:
+ var phone := CanvasLayer.new()
+ phone.name = "DaraPhone"
+ phone.set_script(PHONE_UI_SCRIPT)
+ add_child(phone)
 
 func _start_world_life_simulation() -> void:
  var life_sim := Node.new()
