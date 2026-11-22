@@ -14,6 +14,7 @@ extends Node3D
 @export_range(100.0, 50000.0, 100.0) var region_size_m := 4000.0
 @export var max_features := 100000
 var feature_stats: Dictionary = {}
+var global_equirectangular := false
 
 var _road_material: StandardMaterial3D
 var _building_material: StandardMaterial3D
@@ -24,10 +25,11 @@ var _neon_magenta: StandardMaterial3D
 
 
 
-func configure_region(path: String, center_lat: float, center_lon: float) -> void:
+func configure_region(path: String, center_lat: float, center_lon: float, use_global_equirectangular: bool = false) -> void:
 	geojson_path = path
 	region_center_lat = center_lat
 	region_center_lon = center_lon
+	global_equirectangular = use_global_equirectangular
 
 func _ready() -> void:
 	_setup_materials()
@@ -262,6 +264,15 @@ func _add_quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3) 
 func _coordinate_to_local(coord: Array) -> Vector3:
 	if coord.size() < 2:
 		return Vector3.ZERO
+	if global_equirectangular:
+		var longitude := float(coord[0])
+		while longitude - region_center_lon > 180.0:
+			longitude -= 360.0
+		while longitude - region_center_lon < -180.0:
+			longitude += 360.0
+		var x := (longitude - region_center_lon) * 111320.0
+		var z := -(float(coord[1]) - region_center_lat) * 111320.0
+		return Vector3(x * metres_per_unit, 0.0, z * metres_per_unit)
 	var local := EarthCoordinates.lat_lon_to_local(
 		float(coord[1]), float(coord[0]), region_center_lat, region_center_lon
 	)
