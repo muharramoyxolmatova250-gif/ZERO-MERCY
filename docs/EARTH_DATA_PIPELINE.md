@@ -57,7 +57,17 @@ https://www.geofabrik.de/data/download.html
 
 Import OSM PBF files offline, filter by feature tags, simplify geometry by level of detail, and generate spatially indexed region bundles. Do not scrape or request the entire planet from the public Nominatim or Overpass services.
 
-## Stage 5: planet streaming
+
+## Stage 5: first OSM-to-Godot 3D preview (code added)
+
+A Godot region prototype now lives at `scenes/world/osm_region.tscn` with script `scripts/world/osm_region.gd`. It reads a small regional GeoJSON FeatureCollection and creates:
+- road strips from OSM `highway` line features;
+- simple extruded building footprints;
+- blue waterway strips.
+
+See [OSM_TO_GODOT.md](OSM_TO_GODOT.md) for export and scene setup. This preview uses a local equirectangular coordinate approximation and is intended for a small region only. It is not yet terrain-draped, seam-safe, optimized, or streamed. Godot runtime validation is still pending.
+
+## Stage 6: planet streaming
 
 Partition the globe into deterministic spatial cells (initial prototype: latitude/longitude tiles; production: cube-sphere or another seam-safe scheme). Load nearby cells asynchronously, retain a small neighbor ring, cancel stale jobs, and unload distant cells. Terrain, roads, buildings, and NPC simulation should have separate streaming budgets.
 
