@@ -73,22 +73,6 @@ func _build_city() -> void:
  district.name = "NeoCityDistrict"
  district.set_script(load("res://scripts/world/procedural_city.gd"))
  add_child(district)
- return
- _add_box(Vector3(0,-0.25,0),Vector3(100,0.5,100),Color(0.025,0.03,0.055))
- _add_box(Vector3(0,-0.01,0),Vector3(8,0.04,100),Color(0.012,0.014,0.022))
- _add_box(Vector3(0,0.015,0),Vector3(0.12,0.025,100),Color(0.0,0.85,1.0),true)
- for x in [-32,-20,20,32]:
-  for z in [-32,-20,20,32]:
-   var h:=rng.randf_range(10.0,27.0)
-   var w:=rng.randf_range(7.0,10.0)
-   var d:=rng.randf_range(7.0,10.0)
-   var base:=Vector3(x,h*0.5,z)
-   _add_box(base,Vector3(w,h,d),Color(0.035,0.045,0.075))
-   _add_box(base+Vector3(0,h*0.5+0.08,0),Vector3(w+0.2,0.16,d+0.2),Color(0.0,0.75,1.0) if x<0 else Color(1.0,0.12,0.48),true)
-   _add_windows(x,z,h,w,d)
- _add_box(Vector3(0,5,-18),Vector3(18,0.3,0.5),Color(1.0,0.08,0.38),true)
- _add_box(Vector3(0,5.5,-18),Vector3(0.12,1.0,0.12),Color(0.0,0.9,1.0),true)
-
 func _add_windows(x:float,z:float,h:float,w:float,d:float)->void:
  for row in range(1,int(h/2.4)):
   for col in range(2):
