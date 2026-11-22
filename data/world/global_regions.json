@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "source": "https://download.geofabrik.de/index-v1-nogeom.json",
-  "generated_utc": "2026-11-22T07:19:03.892031+00:00",
+  "generated_utc": "2026-11-22T07:25:48.201678+00:00",
   "attribution": "© OpenStreetMap contributors",
   "license": "Open Database License (ODbL) 1.0",
   "regions": [
@@ -5011,7 +5011,7 @@
       "parent": "asia",
       "iso3166_1": "UZ",
       "iso3166_2": [],
-      "pbf_url": "https://download.geofabrik.de/asia/uzbekistan/uzbekistan-latest.osm.pbf",
+      "pbf_url": "https://download.geofabrik.de/asia/uzbekistan-latest.osm.pbf",
       "updates_url": "https://download.geofabrik.de/asia/uzbekistan/updates",
       "estimated_size_bytes": null
     },
