@@ -1,0 +1,1 @@
+# Generated OpenStreetMap data\n\nRegional PBF downloads and filtered extracts are stored here. They are downloaded inputs and are not committed to Git. Read [docs/OPENSTREETMAP_PIPELINE.md](../../docs/OPENSTREETMAP_PIPELINE.md) before downloading or redistributing.\n
