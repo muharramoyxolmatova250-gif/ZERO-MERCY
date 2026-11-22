@@ -19,6 +19,7 @@ func _ready() -> void:
 	_roads_and_blocks()
 	_spawn_street_furniture()
 	_spawn_city_life()
+	_spawn_interactive_props()
 
 func _materials() -> void:
 	for c in [Color(0.018, 0.028, 0.05), Color(0.035, 0.025, 0.065), Color(0.045, 0.055, 0.075), Color(0.065, 0.025, 0.055)]:
@@ -287,3 +288,19 @@ func _spawn_city_life() -> void:
 		car.set("vehicle_color", [Color(0.02,0.12,0.2), Color(0.12,0.025,0.09), Color(0.08,0.1,0.14), Color(0.16,0.09,0.025)][i % 4])
 		car.position = route[0]
 		add_child(car)
+
+func _spawn_interactive_props() -> void:
+ var prop_script := load("res://scripts/world/world_pickup.gd")
+ var props := [
+  [Vector3(-9.0,0.65,-18.0),"Neon energy drink",Color(0.0,0.75,1.0)],
+  [Vector3(8.0,0.55,-24.0),"Holo data tablet",Color(1.0,0.12,0.42)],
+  [Vector3(14.0,0.45,12.0),"Cybernetic component",Color(0.95,0.58,0.2)],
+  [Vector3(-16.0,0.5,9.0),"Smart device",Color(0.25,0.95,0.72)]
+ ]
+ for entry in props:
+  var item := StaticBody3D.new()
+  item.set_script(prop_script)
+  item.set("display_name",entry[1])
+  item.set("glow_color",entry[2])
+  item.position = entry[0]
+  add_child(item)
