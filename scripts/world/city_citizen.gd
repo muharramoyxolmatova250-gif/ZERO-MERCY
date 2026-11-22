@@ -16,6 +16,7 @@ func _ready() -> void:
 	_build_appearance()
 	if route.size() < 2:
 		route = PackedVector3Array([Vector3(-5,0,-5), Vector3(5,0,-5), Vector3(5,0,5), Vector3(-5,0,5)])
+	_target_index = 1
 
 func _process(delta: float) -> void:
 	if route.size() < 2:
