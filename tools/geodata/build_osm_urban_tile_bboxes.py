@@ -102,7 +102,14 @@ def build_bboxes(features: list, region_bboxes: list[list[float]],
             cells.add((math.floor(lon / tile_deg), math.floor(lat / tile_deg)))
         counts["fallback"] = len(cells)
     bboxes = []
-    for gx, gy in sorted(cells, key=lambda item: (item[1], item[0])):
+    start_gx = math.floor(72.3 / tile_deg)
+    # Player spawns 12 m south of the anchor, in the lower-latitude row.
+    start_gy = math.floor((40.7 - 1e-6) / tile_deg)
+    ordered_cells = sorted(cells, key=lambda item: (
+        abs(item[0] - start_gx) + abs(item[1] - start_gy),
+        abs(item[0] - start_gx), item[1], item[0]
+    ))
+    for gx, gy in ordered_cells:
         west = max(-180.0, gx * tile_deg)
         east = min(180.0, (gx + 1) * tile_deg)
         south = max(-90.0, gy * tile_deg)
@@ -130,7 +137,8 @@ def main() -> int:
         existing = json.loads(a.output.read_text(encoding="utf-8"))
         if (existing.get("region_id") == a.region_id
                 and abs(float(existing.get("tile_deg", -1)) - a.tile_deg) < 1e-9
-                and existing.get("bboxes") and "settlements" in existing):
+                and existing.get("bboxes") and "settlements" in existing
+                and existing.get("priority_anchor") == {"lon": 72.3, "lat": 40.7}):
             print(f"Reusing {len(existing['bboxes'])} unique populated-place cells for {a.region_id}.")
             return 0
     queue = json.loads(a.queue.read_text(encoding="utf-8"))
@@ -151,7 +159,8 @@ def main() -> int:
     for settlement in settlements:
         settlement["region_id"] = a.region_id
     result = {
-        "schema_version": 3, "region_id": a.region_id, "tile_deg": a.tile_deg,
+        "schema_version": 4, "region_id": a.region_id, "tile_deg": a.tile_deg,
+        "priority_anchor": {"lon": 72.3, "lat": 40.7},
         "source_pbf": a.source.name, "place_feature_count": len(features),
         "selected_place_counts": dict(counts), "tile_cell_count": len(bboxes),
         "settlement_count": len(settlements), "bboxes": bboxes, "settlements": settlements,
