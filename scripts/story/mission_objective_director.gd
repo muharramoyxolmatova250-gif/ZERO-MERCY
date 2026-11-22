@@ -69,10 +69,10 @@ func _spawn_current_objective() -> void:
     var side_offset := float((_spawn_serial % 3) - 1) * 5.0
     _spawn_serial += 1
     var marker := TARGET_SCRIPT.new() as StaticBody3D
-    marker.event_id = str(objective.get("event", ""))
-    marker.display_title = str(objective.get("title", "MISSION OBJECTIVE"))
-    marker.current = int(objective.get("current", 0))
-    marker.target = int(objective.get("target", 1))
+    marker.set("event_id", str(objective.get("event", "")))
+    marker.set("display_title", str(objective.get("title", "MISSION OBJECTIVE")))
+    marker.set("current", int(objective.get("current", 0)))
+    marker.set("target", int(objective.get("target", 1))
     add_child(marker)
     marker.global_position = player.global_position + forward * distance + right * side_offset + Vector3.UP * 0.4
     _target = marker
