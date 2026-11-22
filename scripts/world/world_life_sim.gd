@@ -11,6 +11,7 @@ var simulation_month := 1
 var simulation_year := 1
 var hub_state: Dictionary = {}
 var resident_profiles: Dictionary = {}
+var _claim_cache: Dictionary = {}
 var births_total := 0
 var deaths_total := 0
 var marriages_total := 0
@@ -22,6 +23,7 @@ func _ready() -> void:
     add_to_group("world_life_sim")
     _rng.randomize()
     _load_state()
+    _rebuild_claim_cache()
     for city_id in START_HUBS:
         _ensure_hub(city_id)
     print("ZERO MERCY life simulation ready: ", hub_state.size(), " city hubs, ", resident_profiles.size(), " saved resident profiles.")
@@ -49,6 +51,8 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         existing["active"] = true
         existing["last_seen_day"] = simulation_day
         resident_profiles[citizen_id] = existing
+        if _claim_cache.has(city_id):
+            _claim_cache[city_id].erase(citizen_id)
         return existing
     var local_rng := RandomNumberGenerator.new()
     local_rng.seed = int(abs(hash(citizen_id)))
@@ -85,19 +89,24 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
     return profile
 
 func claim_resident_id(city_id: String) -> String:
-    var candidates: Array[String] = []
-    for citizen_id in resident_profiles.keys():
-        var profile: Dictionary = resident_profiles[citizen_id]
-        if str(profile.get("city", "")) == city_id and not bool(profile.get("active", false)) and str(profile.get("life_stage", "")) != "deceased":
-            candidates.append(str(citizen_id))
-    if candidates.is_empty():
-        return ""
-    var selected_id := candidates[_rng.randi_range(0, candidates.size() - 1)]
-    var selected: Dictionary = resident_profiles[selected_id]
-    selected["active"] = true
-    selected["last_seen_day"] = simulation_day
-    resident_profiles[selected_id] = selected
-    return selected_id
+    if not _claim_cache.has(city_id):
+        _claim_cache[city_id] = []
+    var candidates: Array = _claim_cache[city_id]
+    while not candidates.is_empty():
+        var candidate_index := _rng.randi_range(0, candidates.size() - 1)
+        var selected_id := str(candidates.pop_at(candidate_index))
+        if not resident_profiles.has(selected_id):
+            continue
+        var selected: Dictionary = resident_profiles[selected_id]
+        if bool(selected.get("active", false)) or str(selected.get("life_stage", "")) == "deceased":
+            continue
+        selected["active"] = true
+        selected["last_seen_day"] = simulation_day
+        resident_profiles[selected_id] = selected
+        _claim_cache[city_id] = candidates
+        return selected_id
+    _claim_cache[city_id] = candidates
+    return ""
 
 func unregister_citizen(citizen_id: String) -> void:
     if not resident_profiles.has(citizen_id):
@@ -106,6 +115,11 @@ func unregister_citizen(citizen_id: String) -> void:
     profile["active"] = false
     profile["last_seen_day"] = simulation_day
     resident_profiles[citizen_id] = profile
+    var city_id := str(profile.get("city", ""))
+    if not _claim_cache.has(city_id):
+        _claim_cache[city_id] = []
+    if not _claim_cache[city_id].has(citizen_id):
+        _claim_cache[city_id].append(citizen_id)
 
 func record_activity(citizen_id: String, activity: String) -> void:
     if not resident_profiles.has(citizen_id):
@@ -193,8 +207,9 @@ func _create_child_profile(parent: Dictionary) -> void:
     var child_id := "birth_" + str(abs(hash(parent_id + ":" + str(simulation_day) + ":" + str(child_number))))
     if resident_profiles.has(child_id):
         return
+    var city_id := str(parent.get("city", ""))
     resident_profiles[child_id] = {
-        "id": child_id, "city": str(parent.get("city", "")),
+        "id": child_id, "city": city_id,
         "sex": "female" if _rng.randf() < 0.5 else "male",
         "age_days": 0, "age_years": 0, "life_stage": "child",
         "occupation": "child", "education": "early_childhood", "school": "",
@@ -205,6 +220,20 @@ func _create_child_profile(parent: Dictionary) -> void:
         "last_seen_day": simulation_day, "last_activity": "sleep",
         "life_events": [{"day": simulation_day, "event": "born"}]
     }
+    if not _claim_cache.has(city_id):
+        _claim_cache[city_id] = []
+    _claim_cache[city_id].append(child_id)
+
+func _rebuild_claim_cache() -> void:
+    _claim_cache.clear()
+    for citizen_id in resident_profiles.keys():
+        var profile: Dictionary = resident_profiles[citizen_id]
+        if bool(profile.get("active", false)) or str(profile.get("life_stage", "")) == "deceased":
+            continue
+        var city_id := str(profile.get("city", ""))
+        if not _claim_cache.has(city_id):
+            _claim_cache[city_id] = []
+        _claim_cache[city_id].append(str(citizen_id))
 
 func _stage_for_age(age: int) -> String:
     if age < 6: return "child"
