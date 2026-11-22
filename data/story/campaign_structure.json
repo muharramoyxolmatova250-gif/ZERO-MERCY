@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "title": "ZERO MERCY",
+  "estimated_total_hours": 70,
+  "playtime_breakdown": {
+    "main_story": 40,
+    "side_missions": 15,
+    "character_arcs": 5,
+    "world_exploration": 10
+  },
+  "chapters": [
+    {
+      "id": "prologue",
+      "title": "Prologue — Uzilgan signal",
+      "missions": [
+        "prologue_signal",
+        "prologue_aftershock",
+        "prologue_ghost_chip"
+      ]
+    },
+    {
+      "id": "quiet_district",
+      "title": "I bob — Sukunat tumani",
+      "missions": [
+        "quiet_district",
+        "underground_archive",
+        "first_witness"
+      ]
+    },
+    {
+      "id": "ghost_protocol",
+      "title": "II bob — Ghost Protocol",
+      "missions": [
+        "ghost_protocol",
+        "memory_fragment",
+        "signal_hunt"
+      ]
+    },
+    {
+      "id": "denni_shadow",
+      "title": "III bob — Denni soyasi",
+      "missions": [
+        "denni_contact",
+        "false_route",
+        "denni_betrayal"
+      ]
+    },
+    {
+      "id": "yelena_last_light",
+      "title": "IV bob — Yelenaning so‘nggi nuri",
+      "missions": [
+        "yelena_rescue",
+        "last_transmission",
+        "yelena_fall"
+      ]
+    },
+    {
+      "id": "borderless_world",
+      "title": "V bob — Chegarasiz dunyo",
+      "missions": [
+        "airport_escape",
+        "border_crossing",
+        "black_market_network"
+      ]
+    },
+    {
+      "id": "bloodline",
+      "title": "VI bob — Qon izi",
+      "missions": [
+        "father_clue",
+        "genetic_archive",
+        "bloodline_reveal"
+      ]
+    },
+    {
+      "id": "sovereign_city",
+      "title": "VII bob — Sovereign City",
+      "missions": [
+        "neo_city_infiltration",
+        "council_chamber",
+        "father_confrontation",
+        "sovereign_truth"
+      ]
+    },
+    {
+      "id": "throne_glass",
+      "title": "VIII bob — Shisha taxt",
+      "missions": [
+        "power_vacuum",
+        "faction_choice",
+        "throne_offer"
+      ]
+    },
+    {
+      "id": "world_collapse",
+      "title": "IX bob — Dunyo qulashi",
+      "missions": [
+        "network_shutdown",
+        "city_war",
+        "core_overload",
+        "worldwide_blackout"
+      ]
+    },
+    {
+      "id": "no_crown",
+      "title": "X bob — Tojsiz",
+      "missions": [
+        "last_defense",
+        "destroy_control",
+        "reject_throne"
+      ]
+    },
+    {
+      "id": "golden_finger",
+      "title": "XI bob — Oltin barmoq",
+      "missions": [
+        "aftershock",
+        "ghost_signal_epilogue",
+        "golden_finger"
+      ]
+    }
+  ],
+  "main_order": [
+    "prologue_signal",
+    "prologue_aftershock",
+    "prologue_ghost_chip",
+    "quiet_district",
+    "underground_archive",
+    "first_witness",
+    "ghost_protocol",
+    "memory_fragment",
+    "signal_hunt",
+    "denni_contact",
+    "false_route",
+    "denni_betrayal",
+    "yelena_rescue",
+    "last_transmission",
+    "yelena_fall",
+    "airport_escape",
+    "border_crossing",
+    "black_market_network",
+    "father_clue",
+    "genetic_archive",
+    "bloodline_reveal",
+    "neo_city_infiltration",
+    "council_chamber",
+    "father_confrontation",
+    "sovereign_truth",
+    "power_vacuum",
+    "faction_choice",
+    "throne_offer",
+    "network_shutdown",
+    "city_war",
+    "core_overload",
+    "worldwide_blackout",
+    "last_defense",
+    "destroy_control",
+    "reject_throne",
+    "aftershock",
+    "ghost_signal_epilogue",
+    "golden_finger"
+  ],
+  "side_missions": [
+    "side_missing_child",
+    "side_blackout",
+    "side_medical_run",
+    "side_data_leak",
+    "side_rooftop_race",
+    "side_drone_rescue",
+    "side_old_soldier",
+    "side_night_market",
+    "side_water_crisis",
+    "side_school_network",
+    "side_lost_android",
+    "side_street_art",
+    "side_airport_smuggling",
+    "side_train_ghost",
+    "side_family_debt",
+    "side_cyberclinic",
+    "side_signal_hunter",
+    "side_flooded_tunnel",
+    "side_rebel_supply",
+    "side_corporate_witness",
+    "side_memory_market",
+    "side_satellite_fall",
+    "side_yelena_echo",
+    "side_denni_debt"
+  ],
+  "characters": [
+    {
+      "id": "dara",
+      "name": "Dara",
+      "role": "Bosh qahramon; tizim ijrochisi, chip nosozligi ortidan insoniy tanlov qiladi."
+    },
+    {
+      "id": "yelena",
+      "name": "Yelena",
+      "role": "Daraning ittifoqchisi; uning so‘nggi xabari global voqealarni o‘zgartiradi."
+    },
+    {
+      "id": "denni",
+      "name": "Denni",
+      "role": "Daraning eski sherigi; ishonchni suiiste’mol qilib xiyonat qiladi."
+    },
+    {
+      "id": "biological_father",
+      "name": "Biologik ota",
+      "role": "Neo-City rahbari; global nazorat tizimining me’morlaridan biri."
+    },
+    {
+      "id": "golden_finger",
+      "name": "Oltin barmoqli noma’lum shaxs",
+      "role": "Post-kredit sirli antagonist yoki yangi davr boshlovchisi."
+    }
+  ],
+  "endings": [
+    {
+      "id": "no_crown",
+      "title": "Tojsiz ozodlik",
+      "condition": "throne_rejected=true va control_system_destroyed=true"
+    },
+    {
+      "id": "sovereign",
+      "title": "Yangi hukmdor",
+      "condition": "throne_rejected=false va global_protocol_revealed=true"
+    },
+    {
+      "id": "fractured_world",
+      "title": "Bo‘lingan Yer",
+      "condition": "world_protocol_activated=false yoki asosiy tarmoq barqarorlashmagan"
+    }
+  ]
+}
