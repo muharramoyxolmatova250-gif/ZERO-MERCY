@@ -27,6 +27,7 @@ FILES = {
 HYDROGRAPHY = {
     "rivers": ("ne_110m_rivers_lake_centerlines.geojson", {"LineString", "MultiLineString"}),
     "lakes": ("ne_110m_lakes.geojson", {"Polygon", "MultiPolygon"}),
+    "elevation_points": ("ne_110m_geography_regions_elevation_points.geojson", {"Point"}),
 }
 
 
