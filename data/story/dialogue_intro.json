@@ -1,0 +1,44 @@
+{
+  "start": "dara_intro",
+  "nodes": {
+    "dara_intro": {
+      "speaker": "Dara",
+      "text": "Signal yana uzildi. Bu hududda kimdir tizimni yashiryapti.",
+      "choices": [
+        {
+          "text": "Signal manbasini topaman.",
+          "next": "operator_reply"
+        },
+        {
+          "text": "Avval tinch aholini tekshiraman.",
+          "next": "civilian_reply"
+        }
+      ]
+    },
+    "operator_reply": {
+      "speaker": "Operator",
+      "text": "Eski bozor sektoriga bor. Qurilma shu yerda bo‘lishi kerak.",
+      "choices": [
+        {
+          "text": "Qabul qilindi.",
+          "next": "end"
+        }
+      ]
+    },
+    "civilian_reply": {
+      "speaker": "Operator",
+      "text": "Bu buyruqqa kirmaydi. Lekin qaror seniki.",
+      "choices": [
+        {
+          "text": "Tushundim.",
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "Dara",
+      "text": "Aloqani tugataman.",
+      "choices": []
+    }
+  }
+}
