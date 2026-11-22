@@ -40,3 +40,14 @@ This creates accessible ground-floor lobby space in the procedural district. It 
 - The environment uses a dark metallic/neon palette for generated citizens, vehicles and aircraft.
 
 These are simulation foundations, not a finished planet-scale life simulator or GTA-level autonomous AI. Advanced pathfinding, interaction, jobs/buildings, family relationships, births/aging, individual long-term schedules, and streaming of populated real-world cities remain incomplete.
+
+
+## Advanced citizen AI and crowd scale update
+
+- Local district crowd cap increased to 240 individually simulated citizen agents (default five-block district spawns 120).
+- Citizens periodically perceive nearby agents, approach one another, exchange short event memories and adjust their social utility decisions.
+- Needs include energy, hunger, social drive, curiosity and stress; AI decision snapshots are exposed for debugging.
+- Utility scoring now accounts for personality, social opportunities and crowd stress.
+- Local traffic target increased from 20 to 36 stylized electric vehicles.
+- The global cohort simulation is now started by the main gameplay scene and represents 1.8 million residents across 18 city hubs as aggregate cohorts, not individually rendered NPCs.
+- This is a stronger simulation foundation, not GTA-level full autonomy, 9K rendering, or production-ready performance. Full dialogue, persistent family trees, births/aging, navigation meshes and populated streamed cities remain future work.
