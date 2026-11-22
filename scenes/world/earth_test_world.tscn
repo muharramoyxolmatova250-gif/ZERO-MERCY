@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/region_streamer.gd" id="1_streamer"]
+[ext_resource type="PackedScene" path="res://scenes/world/osm_region.tscn" id="2_region"]
+[ext_resource type="Script" path="res://scripts/world/earth_test_player.gd" id="3_player"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
+radius = 0.45
+height = 1.8
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
+radius = 0.45
+height = 1.8
+
+[node name="EarthTestWorld" type="Node3D"]
+
+[node name="Player" type="CharacterBody3D" parent="."]
+position = Vector3(0, 1, 0)
+script = ExtResource("3_player")
+
+[node name="Visual" type="MeshInstance3D" parent="Player"]
+position = Vector3(0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_player")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+shape = SubResource("CapsuleShape3D_player")
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+position = Vector3(0, 1.6, 5)
+rotation = Vector3(-0.12, 0, 0)
+current = true
+
+[node name="RegionStreamer" type="Node3D" parent="."]
+script = ExtResource("1_streamer")
+target_path = NodePath("../Player")
+region_scene = ExtResource("2_region")
+tile_index_path = "res://data/world/region_tiles.json"
+tile_size_m = 2000.0
+load_radius = 1
+unload_radius = 2
