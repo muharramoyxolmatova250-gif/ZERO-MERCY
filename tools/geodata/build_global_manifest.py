@@ -46,6 +46,10 @@ def build_catalog(index: dict) -> dict:
         region_id = str(props.get("id", "")).strip()
         if not region_id:
             continue
+        # Geofabrik's current Uzbekistan download is served from the parent
+        # Asia directory; the nested URL in some index snapshots returns 404.
+        if region_id == "uzbekistan":
+            pbf = "https://download.geofabrik.de/asia/uzbekistan-latest.osm.pbf"
         entries.append({
             "id": region_id,
             "name": str(props.get("name", region_id)),
