@@ -2,14 +2,15 @@
   "schema_version": 1,
   "current_region_id": "afghanistan",
   "next_tile_by_region": {
-    "afghanistan": 32
+    "afghanistan": 0
   },
   "completed_regions": [],
-  "last_updated_utc": "2026-11-22T10:39:14.007470+00:00",
+  "last_updated_utc": "2026-11-22T10:50:00+00:00",
   "last_batch": {
     "region_id": "afghanistan",
-    "start": 24,
-    "processed": 8,
-    "total_tiles": 13578
+    "start": 0,
+    "processed": 0,
+    "total_tiles": 0,
+    "plan_version": "populated-place-tiles-v1"
   }
 }
