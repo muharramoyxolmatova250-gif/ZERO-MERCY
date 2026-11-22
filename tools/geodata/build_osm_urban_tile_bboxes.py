@@ -43,9 +43,10 @@ def _radius(place: str, population: int) -> float:
     return 0.002
 
 def build_bboxes(features: list, region_bboxes: list[list[float]],
-                 tile_deg: float = 0.1) -> tuple[list[list[float]], Counter]:
+                 tile_deg: float = 0.1) -> tuple[list[list[float]], Counter, list[dict]]:
     cells: set[tuple[int, int]] = set()
     counts = Counter()
+    settlements: list[dict] = []
     for feature in features:
         if not isinstance(feature, dict):
             continue
@@ -65,7 +66,17 @@ def build_bboxes(features: list, region_bboxes: list[list[float]],
                             and box[1] - 1e-6 <= lat <= box[3] + 1e-6]
         if not matching_regions:
             continue
-        radius = _radius(place, _population(tags.get("population")))
+        population = _population(tags.get("population"))
+        radius = _radius(place, population)
+        home_gx = math.floor(min(179.999999, lon) / tile_deg)
+        home_gy = math.floor(min(89.999999, lat) / tile_deg)
+        raw_id = str(feature.get("id") or tags.get("@id") or props.get("@id") or "")
+        settlement_id = raw_id or f"{place}:{round(lat, 5)}:{round(lon, 5)}"
+        settlements.append({
+            "id": settlement_id, "name": str(tags.get("name", props.get("name", ""))),
+            "place": place, "population": population, "lon": lon, "lat": lat,
+            "home_tile_id": f"{home_gx}_{home_gy}", "region_id": str(props.get("region_id", "")),
+        })
         lon_radius = min(1.5, radius / max(0.2, abs(math.cos(math.radians(lat)))))
         gx0 = math.floor((lon - lon_radius) / tile_deg)
         gx1 = math.ceil((lon + lon_radius) / tile_deg) - 1
@@ -98,7 +109,11 @@ def build_bboxes(features: list, region_bboxes: list[list[float]],
         north = min(90.0, (gy + 1) * tile_deg)
         if west < east and south < north:
             bboxes.append([west, south, east, north])
-    return bboxes, counts
+    settlements.sort(key=lambda item: (
+        {"city": 0, "town": 1, "village": 2, "hamlet": 3}.get(item["place"], 4),
+        -int(item["population"]), item["name"].casefold(), item["id"]
+    ))
+    return bboxes, counts, settlements
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
@@ -115,7 +130,7 @@ def main() -> int:
         existing = json.loads(a.output.read_text(encoding="utf-8"))
         if (existing.get("region_id") == a.region_id
                 and abs(float(existing.get("tile_deg", -1)) - a.tile_deg) < 1e-9
-                and existing.get("bboxes")):
+                and existing.get("bboxes") and "settlements" in existing):
             print(f"Reusing {len(existing['bboxes'])} unique populated-place cells for {a.region_id}.")
             return 0
     queue = json.loads(a.queue.read_text(encoding="utf-8"))
@@ -132,12 +147,14 @@ def main() -> int:
     subprocess.run(["osmium", "export", str(filtered), "-o", str(exported), "--overwrite"], check=True)
     data = json.loads(exported.read_text(encoding="utf-8"))
     features = data.get("features", [])
-    bboxes, counts = build_bboxes(features, item.get("bboxes", []), a.tile_deg)
+    bboxes, counts, settlements = build_bboxes(features, item.get("bboxes", []), a.tile_deg)
+    for settlement in settlements:
+        settlement["region_id"] = a.region_id
     result = {
-        "schema_version": 2, "region_id": a.region_id, "tile_deg": a.tile_deg,
+        "schema_version": 3, "region_id": a.region_id, "tile_deg": a.tile_deg,
         "source_pbf": a.source.name, "place_feature_count": len(features),
         "selected_place_counts": dict(counts), "tile_cell_count": len(bboxes),
-        "bboxes": bboxes,
+        "settlement_count": len(settlements), "bboxes": bboxes, "settlements": settlements,
     }
     a.output.parent.mkdir(parents=True, exist_ok=True)
     a.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
