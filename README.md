@@ -6,7 +6,7 @@ ZERO MERCY is planned as a planet-scale open-world game set on a cyberpunk versi
 
 ## Current development stage
 
-Stage 1 — Core Game Foundation implementation is complete in the repository. It includes a third-person controller, player health and stamina, a basic hitscan weapon, a live HUD, a data-driven prologue objective chain, a local save manager and a procedural cyberpunk blockout city.
+Stage 1 — Core Game Foundation implementation is complete. Stage 2 — Real Earth geography foundation is implemented: a standalone globe scene, Natural Earth country-boundary downloader, WGS84-style coordinate helpers, and a regional OSM tile pipeline are in the repository. It includes a third-person controller, player health and stamina, a basic hitscan weapon, a live HUD, a data-driven prologue objective chain, a local save manager and a procedural cyberpunk blockout city.
 
 **Verification note:** Stage 1 implementation is complete; automated Godot 4.3 headless validation and an end-to-end playtest are still required before runtime correctness is certified. The protagonist is currently a capsule blockout, not the final character model. See [docs/STAGE_1_CORE_FOUNDATION.md](docs/STAGE_1_CORE_FOUNDATION.md) for the acceptance checklist and known limitations.
 
@@ -48,4 +48,4 @@ Each stage is announced as complete only after its implementation and acceptance
 - Use properly licensed and attributed geographic data.
 - Never present placeholders as finished systems or real online services.
 
-See [docs/ROADMAP.md](docs/ROADMAP.md), [docs/STAGE_1_CORE_FOUNDATION.md](docs/STAGE_1_CORE_FOUNDATION.md), and [docs/GLOBAL_TILE_PIPELINE.md](docs/GLOBAL_TILE_PIPELINE.md).
+Stage 2 is a foundation, not a claim that all global street/building/terrain data has been downloaded or that seamless planet-wide gameplay is complete. See [docs/STAGE_2_EARTH_MAP.md](docs/STAGE_2_EARTH_MAP.md), [docs/ROADMAP.md](docs/ROADMAP.md), [docs/STAGE_1_CORE_FOUNDATION.md](docs/STAGE_1_CORE_FOUNDATION.md), and [docs/GLOBAL_TILE_PIPELINE.md](docs/GLOBAL_TILE_PIPELINE.md).
