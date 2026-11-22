@@ -1,6 +1,8 @@
 extends Node3D
 ## Seeded cyberpunk district with instanced facade lights to reduce draw calls.
 @export_range(2, 12, 1) var blocks_per_side := 5
+@export_range(0.05, 1.0, 0.05) var population_density := 0.25
+@export_range(0.05, 1.0, 0.05) var traffic_density := 0.15
 @export var block_spacing := 52.0
 @export var road_width := 14.0
 @export var seed_value := 20261122
