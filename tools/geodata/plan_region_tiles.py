@@ -47,7 +47,7 @@ def main() -> int:
         p.error("Tile size must be at least 100 metres.")
 
     tiles, index = [], {}
-    for west, south, east, north in a.bbox:
+    for west, south, east, north in bboxes:
         gx0, gx1 = math.floor(west / a.tile_deg), math.ceil(east / a.tile_deg)
         gy0, gy1 = math.floor(south / a.tile_deg), math.ceil(north / a.tile_deg)
         for gy in range(gy0, gy1):
