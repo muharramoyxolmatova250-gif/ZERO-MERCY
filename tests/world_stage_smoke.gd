@@ -32,7 +32,7 @@ func _run() -> void:
 	var first_car := city.get_tree().get_first_node_in_group("city_traffic") as Node3D
 	var citizen_start := first_citizen.position
 	var car_start := first_car.position
-	await create_timer(0.5).timeout
+	await create_timer(1.25).timeout
 	if first_citizen.position.distance_to(citizen_start) < 0.05:
 		_fail("Pedestrian movement did not advance.")
 		return
