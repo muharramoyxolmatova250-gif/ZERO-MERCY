@@ -22,6 +22,9 @@ def main() -> int:
         index = json.loads(index_path.read_text(encoding="utf-8"))
         assert plan["tile_count"] == 4, plan["tile_count"]
         assert len([key for key in index if not key.startswith("_")]) == 4
+        assert index["_tile_size_m"] > 100
+        coords = [tuple(map(int, key.split(","))) for key in index if not key.startswith("_")]
+        assert len(set(coords)) == 4, coords
         for tile in plan["tiles"]:
             west, south, east, north = tile["bbox"]
             assert west < east and south < north
