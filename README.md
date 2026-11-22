@@ -64,3 +64,8 @@ Stage 2 is a foundation, not a claim that all global street/building/terrain dat
 - Cyberpunk facade windows are batched with MultiMesh to reduce object/draw-call overhead.
 - OSM-derived roads now receive cyan/magenta neon strips, and imported OSM building meshes receive collision shapes.
 - These changes improve the technical foundations for Stages 2 and 3. They do not mean the complete global map or a production-scale finished city has been delivered: actual source datasets still need to be downloaded, processed, visually checked, and profiled in Godot.
+
+
+## Global data acquisition and stage verification
+
+See [Global Earth data acquisition](docs/GLOBAL_EARTH_DATA_ACQUISITION.md) for the Natural Earth country-boundary downloader, Geofabrik regional OSM workflow, DEM import steps, source licensing, and the acceptance checklist. The main scene's unreachable legacy city-generation code has been removed; the seeded NeoCity district generator is the active city path. Automated smoke tests exist for the globe, DEM terrain and district generator, but their GitHub Actions result must be checked before calling them passed. The repository does not yet contain complete planet-wide processed map data or a production-finished city simulation.
