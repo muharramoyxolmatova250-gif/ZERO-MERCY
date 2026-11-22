@@ -9,6 +9,9 @@ on:
       - "tools/geodata/build_global_country_queue.py"
       - "tests/test_global_country_queue.py"
       - "tests/test_global_tile_grid.py"
+      - "tests/test_global_build_state.py"
+      - "tools/geodata/select_global_country_batch.py"
+      - "tools/geodata/advance_global_country_batch.py"
   workflow_dispatch:
     inputs:
       detail:
@@ -59,6 +62,7 @@ jobs:
           python tools/geodata/build_global_country_queue.py
           python tests/test_global_country_queue.py
           python tests/test_global_tile_grid.py
+          python tests/test_global_build_state.py
       - name: Commit generated base map data
         run: |
           git config user.name "github-actions[bot]"
