@@ -35,6 +35,23 @@ class GlobalCountryQueueTests(unittest.TestCase):
         self.assertEqual(boxes[0][0], 179.0)
         self.assertEqual(boxes[1][0], -180.0)
 
+    def test_missing_country_uses_continent_parent_extract(self):
+        import json, tempfile
+        from pathlib import Path
+        catalog = {"regions": [
+            {"id": "asia", "name": "Asia", "pbf_url": "https://example.invalid/asia.osm.pbf"}
+        ]}
+        feature = {"type": "Feature", "properties": {"ISO_A2": "SA", "ADMIN": "Saudi Arabia"},
+                   "geometry": {"type": "Polygon", "coordinates": [[[42,16],[55,16],[55,33],[42,33],[42,16]]]}}
+        with tempfile.TemporaryDirectory() as temp:
+            ne = Path(temp) / "world.geojson"
+            ne.write_text(json.dumps({"type": "FeatureCollection", "features": [feature]}))
+            queue = build_queue(catalog, ne)
+        self.assertEqual(len(queue), 1)
+        self.assertEqual(queue[0]["id"], "asia")
+        self.assertEqual(queue[0]["iso3166_1"], ["SA"])
+        self.assertEqual(queue[0]["extract_kind"], "supplemental_parent")
+
     def test_offline_catalogue_has_usable_country_bounds(self):
         catalog = build_offline_catalog(ROOT / "data/world/global_regions.json")
         queue = build_queue(catalog)
