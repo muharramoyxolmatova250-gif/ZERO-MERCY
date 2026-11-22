@@ -56,3 +56,11 @@ Stage 2 is a foundation, not a claim that all global street/building/terrain dat
 - Stage 2: Earth geography foundation includes a globe renderer, country-boundary source downloader, WGS84-style coordinate helpers, regional OSM preparation/streaming, and a DEM elevation import pipeline. Actual worldwide datasets are not bundled; full detailed Earth coverage, seamless globe-to-ground travel, and runtime validation remain open.
 - Stage 3: A seeded cyberpunk district generator is integrated into the main gameplay scene, with neon road grids, variable-height towers, facade lights, rooftop details, and optional building collision. This is a visual foundation, not a finished city simulation or AAA environment.
 - See [Stage 2 Earth map](docs/STAGE_2_EARTH_MAP.md), [DEM terrain import](docs/DEM_TERRAIN_IMPORT.md), and [Stage 3 cyberpunk cities](docs/STAGE_3_CYBERPUNK_CITIES.md).
+
+
+## Latest world-building updates (2026-11-22)
+
+- DEM conversion now preserves geographic placement relative to the configured longitude/latitude anchor; the Godot terrain loader applies that origin and can build collision from the terrain mesh.
+- Cyberpunk facade windows are batched with MultiMesh to reduce object/draw-call overhead.
+- OSM-derived roads now receive cyan/magenta neon strips, and imported OSM building meshes receive collision shapes.
+- These changes improve the technical foundations for Stages 2 and 3. They do not mean the complete global map or a production-scale finished city has been delivered: actual source datasets still need to be downloaded, processed, visually checked, and profiled in Godot.
