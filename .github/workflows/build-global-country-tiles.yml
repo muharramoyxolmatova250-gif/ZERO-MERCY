@@ -138,7 +138,7 @@ jobs:
         run: |
           python tools/geodata/build_osm_urban_tile_bboxes.py "data/osm/pbf/$SAFE_REGION.osm.pbf" \
             --queue data/world/global_country_queue.json --region-id "$REGION_ID" \
-            --output "data/world/tile_jobs/urban_bboxes/$SAFE_REGION.json"
+            --output "data/world/tile_jobs/urban_bboxes/$SAFE_REGION.json" --tile-deg "$TILE_DEGREES"
           python tools/geodata/plan_region_tiles.py --region "$SAFE_REGION" \
             --tile-deg "$TILE_DEGREES" --tile-size-m "$(python -c 'import os; print(float(os.environ["TILE_DEGREES"])*111320.0)')" \
             --anchor 72.3 40.7 --global-grid --merge-index \
