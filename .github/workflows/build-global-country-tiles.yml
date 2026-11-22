@@ -1,6 +1,19 @@
 name: Build global ZERO MERCY country tiles
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-global-country-tiles.yml"
+      - "tools/geodata/build_global_manifest.py"
+      - "tools/geodata/build_global_country_queue.py"
+      - "tools/geodata/plan_region_tiles.py"
+      - "tools/geodata/process_region_tiles.py"
+      - "tools/geodata/validate_osm_tile_batch.py"
+      - "tools/geodata/select_global_country_batch.py"
+      - "tools/geodata/advance_global_country_batch.py"
+      - "scripts/world/region_streamer.gd"
+      - "scripts/world/osm_region.gd"
   workflow_dispatch:
     inputs:
       region_id:
