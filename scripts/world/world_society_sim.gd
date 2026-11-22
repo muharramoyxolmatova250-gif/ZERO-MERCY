@@ -44,15 +44,50 @@ func _advance_world() -> void:
   institution_activity[institution] = activity
  _generate_social_posts()
 func _generate_social_posts() -> void:
+ var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+ var profiles: Dictionary = life_sim.get("resident_profiles") if life_sim != null else {}
+ var profile_ids: Array = profiles.keys()
  for i in range(posts_per_update):
   var city_index := _rng.randi_range(0,CITY_NAMES.size()-1)
-  var topic: String = FEED_TOPICS[_rng.randi_range(0,FEED_TOPICS.size()-1)]
   var city: Dictionary = city_state[city_index]
-  var post := {"post_id":"ZM-"+str(simulation_day)+"-"+str(simulation_hour)+"-"+str(total_generated_posts),"city":city.city,"author_id":"resident_"+str(_rng.randi_range(100000,999999)),"topic":topic,"likes":_rng.randi_range(0,9000),"comments":_rng.randi_range(0,800),"created_day":simulation_day,"created_hour":simulation_hour,"caption":_caption_for(topic,str(city.city)),"video":topic in ["neon_festival","street_art","music_release","night_market"]}
+  var topic: String = FEED_TOPICS[_rng.randi_range(0,FEED_TOPICS.size()-1)]
+  var author_id := "resident_" + str(_rng.randi_range(100000,999999))
+  var author_name := "Citizen " + author_id.trim_prefix("resident_")
+  var city_name := str(city.city)
+  if not profile_ids.is_empty():
+   var selected_profile: Dictionary = {}
+   for attempt in range(5):
+    var candidate_id := str(profile_ids[_rng.randi_range(0, profile_ids.size() - 1)])
+    var candidate: Dictionary = profiles[candidate_id]
+    if bool(candidate.get("active", false)):
+     selected_profile = candidate
+     break
+   if selected_profile.is_empty():
+    selected_profile = profiles[str(profile_ids[_rng.randi_range(0, profile_ids.size() - 1)])]
+   author_id = str(selected_profile.get("id", author_id))
+   author_name = str(selected_profile.get("name", author_name))
+   city_name = str(selected_profile.get("city", city_name))
+   topic = _topic_for_resident(selected_profile, topic)
+  var post := {"post_id":"ZM-"+str(simulation_day)+"-"+str(simulation_hour)+"-"+str(total_generated_posts),"city":city_name,"author_id":author_id,"author_name":author_name,"topic":topic,"likes":_rng.randi_range(0,9000),"comments":_rng.randi_range(0,800),"created_day":simulation_day,"created_hour":simulation_hour,"caption":_caption_for(topic,city_name),"video":topic in ["neon_festival","street_art","music_release","night_market"]}
   social_feed.push_front(post)
   total_generated_posts += 1
  while social_feed.size() > 300:
   social_feed.pop_back()
+
+func _topic_for_resident(profile: Dictionary, fallback: String) -> String:
+ var activity := str(profile.get("last_activity", ""))
+ var stage := str(profile.get("life_stage", "adult"))
+ if activity == "school" or stage == "student":
+  return "school_event"
+ if activity == "work":
+  return "new_product"
+ if activity == "family" or str(profile.get("marital_status", "")) == "married":
+  return "community_meetup"
+ if activity == "play" or stage == "child":
+  return "street_art"
+ if stage == "retired":
+  return "city_council"
+ return fallback
 func _caption_for(topic: String, city: String) -> String:
  match topic:
   "night_market": return "Night market is alive in "+city+" tonight."
