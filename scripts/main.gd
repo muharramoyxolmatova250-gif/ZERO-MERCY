@@ -69,6 +69,11 @@ func _build_environment() -> void:
  add_child(sun)
 
 func _build_city() -> void:
+ var district := Node3D.new()
+ district.name = "NeoCityDistrict"
+ district.set_script(load("res://scripts/world/procedural_city.gd"))
+ add_child(district)
+ return
  _add_box(Vector3(0,-0.25,0),Vector3(100,0.5,100),Color(0.025,0.03,0.055))
  _add_box(Vector3(0,-0.01,0),Vector3(8,0.04,100),Color(0.012,0.014,0.022))
  _add_box(Vector3(0,0.015,0),Vector3(0.12,0.025,100),Color(0.0,0.85,1.0),true)
