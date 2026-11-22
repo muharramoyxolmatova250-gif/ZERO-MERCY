@@ -2,16 +2,15 @@
   "schema_version": 1,
   "current_region_id": "uzbekistan",
   "next_tile_by_region": {
-    "uzbekistan": 0,
+    "uzbekistan": 8,
     "afghanistan": 0
   },
   "completed_regions": [],
-  "last_updated_utc": "2026-11-22T10:52:00+00:00",
+  "last_updated_utc": "2026-11-22T10:57:05.462205+00:00",
   "last_batch": {
     "region_id": "uzbekistan",
     "start": 0,
-    "processed": 0,
-    "total_tiles": 0,
-    "plan_version": "unique-settlement-cells-v3"
+    "processed": 8,
+    "total_tiles": 1711
   }
 }
