@@ -158,10 +158,14 @@ func _run() -> void:
 	root.add_child(globe)
 	await process_frame
 	var globe_meshes := _count_meshes(globe)
-	if globe_meshes < 3:
-		_fail("Earth globe did not render ocean, land and border meshes: " + str(globe_meshes))
+	if globe_meshes < 5:
+		_fail("Earth globe did not render ocean, land, inland water and borders: " + str(globe_meshes))
 		return
-	print("PASS Stage 2: Earth globe generated ", globe_meshes, " mesh instances.")
+	var inland_water_count := globe.get_tree().get_nodes_in_group("earth_inland_water").size()
+	if inland_water_count < 1:
+		_fail("Earth globe did not render the polygon interior ring as inland water.")
+		return
+	print("PASS Stage 2: Earth globe generated ", globe_meshes, " meshes including ", inland_water_count, " inland-water surfaces.")
 
 	var metadata_path := "user://zero_mercy_dem_smoke.json"
 	var heights_path := "user://zero_mercy_dem_smoke.f32"
