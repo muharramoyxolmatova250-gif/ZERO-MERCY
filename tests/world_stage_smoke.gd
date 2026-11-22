@@ -64,6 +64,26 @@ func _run() -> void:
 		_fail("WGS84 ECEF round-trip exceeded tolerance: " + str(restored_ecef))
 		return
 	print("PASS Stage 2: WGS84 ECEF/local transforms and antimeridian handling.")
+	# Import a tiny OSM GeoJSON fixture and verify roads, buildings and waterways become geometry.
+	var osm_region := Node3D.new()
+	osm_region.set_script(load("res://scripts/world/osm_region.gd"))
+	osm_region.set("geojson_path", "res://tests/fixtures/osm_region_smoke.geojson")
+	osm_region.set("region_center_lat", 41.0)
+	osm_region.set("region_center_lon", 69.0)
+	osm_region.set("region_size_m", 1000.0)
+	root.add_child(osm_region)
+	await process_frame
+	var osm_roads := _count_named_nodes(osm_region, "Road")
+	var osm_buildings := _count_named_nodes(osm_region, "OSM_Building")
+	var osm_water := _count_named_nodes(osm_region, "Waterway")
+	if osm_roads < 1 or osm_buildings < 1 or osm_water < 1:
+		_fail("OSM fixture import missing geometry: roads=" + str(osm_roads) + ", buildings=" + str(osm_buildings) + ", water=" + str(osm_water))
+		return
+	if int(osm_region.feature_stats.get("processed", 0)) != 3:
+		_fail("OSM feature accounting did not process all fixture features.")
+		return
+	print("PASS Stage 2: WGS84 OSM roads, building footprints and waterways imported.")
+
 	var main_scene: PackedScene = load("res://scenes/main.tscn")
 	if main_scene == null:
 		_fail("Main gameplay scene failed to load.")
@@ -130,6 +150,12 @@ func _run() -> void:
 	print("PASS Stage 2: DEM terrain mesh and collision generated.")
 	print("WORLD STAGE SMOKE TESTS PASSED.")
 	quit(0)
+
+func _count_named_nodes(node: Node, wanted_name: String) -> int:
+	var total := 1 if node.name == wanted_name else 0
+	for child in node.get_children():
+		total += _count_named_nodes(child, wanted_name)
+	return total
 
 func _count_nodes_of_type(node: Node, type: Variant) -> int:
 	var total := 1 if is_instance_of(node, type) else 0
