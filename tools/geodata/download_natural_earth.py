@@ -36,10 +36,26 @@ def download(scale: str) -> None:
         raw = response.read()
     # Validate before replacing a previously downloaded file.
     parsed = json.loads(raw)
-    if parsed.get("type") != "FeatureCollection" or not parsed.get("features"):
-        raise RuntimeError(f"Unexpected GeoJSON structure from {url}")
+    features = parsed.get("features", [])
+    if parsed.get("type") != "FeatureCollection" or len(features) < 100:
+        raise RuntimeError(f"Unexpected or incomplete GeoJSON FeatureCollection from {url}")
+    invalid = []
+    for index, feature in enumerate(features):
+        geometry = feature.get("geometry") or {}
+        geometry_type = geometry.get("type")
+        coordinates = geometry.get("coordinates")
+        if geometry_type not in {"Polygon", "MultiPolygon"} or not coordinates:
+            invalid.append(index)
+    if invalid:
+        raise RuntimeError(
+            f"Country dataset contains {len(invalid)} invalid geometries; "
+            f"first invalid feature indexes: {invalid[:10]}"
+        )
     target.write_bytes(raw)
-    print(f"Saved {target.relative_to(ROOT)} ({len(parsed['features'])} features, {len(raw):,} bytes)")
+    print(
+        f"Validated and saved {target.relative_to(ROOT)} "
+        f"({len(features)} map features, {len(raw):,} bytes)"
+    )
 
 
 def main() -> None:
