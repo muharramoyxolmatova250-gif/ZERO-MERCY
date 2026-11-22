@@ -22,6 +22,7 @@ func build_from_files() -> void:
 	if typeof(meta) != TYPE_DICTIONARY:
 		push_error("Invalid DEM metadata JSON.")
 		return
+	_metadata = meta
 	var w := int(meta.get("width", 0))
 	var h := int(meta.get("height", 0))
 	if w < 2 or h < 2:
@@ -40,12 +41,15 @@ func build_from_files() -> void:
 	var depth_m := float(meta.get("horizontal_depth_m", 4000.0)) / metres_per_unit
 	var origin_x := float(meta.get("origin_x", 0.0)) / metres_per_unit
 	var origin_z := float(meta.get("origin_z", 0.0)) / metres_per_unit
+	_samples.resize(w * h)
+	for sample_index in range(w * h):
+		_samples[sample_index] = bytes.decode_float(sample_index * 4)
 	var vertices := PackedVector3Array()
 	var uvs := PackedVector2Array()
 	for z in range(h):
 		for x in range(w):
 			var index := (z * w + x) * 4
-			var elevation := bytes.decode_float(index) / metres_per_unit * vertical_scale + vertical_offset
+			var elevation := _samples[z * w + x] / metres_per_unit * vertical_scale + vertical_offset
 			vertices.append(Vector3((float(x) / float(w - 1) - 0.5) * width_m, elevation,
 				(float(z) / float(h - 1) - 0.5) * depth_m))
 			uvs.append(Vector2(float(x) / float(w - 1), float(z) / float(h - 1)))
@@ -84,3 +88,33 @@ func build_from_files() -> void:
 		body.add_child(shape)
 		add_child(body)
 	print("ZERO MERCY DEM: rendered and placed ", w, "x", h, " samples at ", instance.position)
+
+
+func sample_elevation(latitude: float, longitude: float) -> float:
+	if _samples.is_empty():
+		return NAN
+	var west := float(_metadata.get("west", 0.0))
+	var east := float(_metadata.get("east", 0.0))
+	var south := float(_metadata.get("south", 0.0))
+	var north := float(_metadata.get("north", 0.0))
+	if east <= west or north <= south:
+		return NAN
+	if longitude < west - 0.000001 or longitude > east + 0.000001:
+		return NAN
+	if latitude < south - 0.000001 or latitude > north + 0.000001:
+		return NAN
+	var width := int(_metadata.get("width", 0))
+	var height := int(_metadata.get("height", 0))
+	if width < 2 or height < 2:
+		return NAN
+	var fx := clampf((longitude - west) / (east - west), 0.0, 1.0) * float(width - 1)
+	var fy := clampf((north - latitude) / (north - south), 0.0, 1.0) * float(height - 1)
+	var x0 := floori(fx)
+	var y0 := floori(fy)
+	var x1 := mini(x0 + 1, width - 1)
+	var y1 := mini(y0 + 1, height - 1)
+	var tx := fx - float(x0)
+	var ty := fy - float(y0)
+	var top := lerpf(_samples[y0 * width + x0], _samples[y0 * width + x1], tx)
+	var bottom := lerpf(_samples[y1 * width + x0], _samples[y1 * width + x1], tx)
+	return lerpf(top, bottom, ty)
