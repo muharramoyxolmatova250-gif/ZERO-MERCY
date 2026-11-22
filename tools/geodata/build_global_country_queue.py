@@ -41,10 +41,10 @@ def main() -> int:
         "countries": entries,
     }
     a.output.parent.mkdir(parents=True, exist_ok=True)
-    a.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    a.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Wrote {len(entries)} country extracts to {a.output}")
     for item in entries:
-        print(f'{item["iso3166_1"]}\\t{item["id"]}\\t{item["name"]}')
+        print(f'{item["iso3166_1"]}\t{item["id"]}\t{item["name"]}')
     return 0
 
 if __name__ == "__main__":
