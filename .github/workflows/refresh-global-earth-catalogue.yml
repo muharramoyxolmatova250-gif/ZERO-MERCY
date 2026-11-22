@@ -35,7 +35,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y osmium-tool
       - name: Download and process real Andijan OSM extract
         run: |
-          python tools/geodata/build_global_manifest.py --output data/world/global_regions.json --region uzbekistan --download
+          mkdir -p data/osm/pbf
+          curl --fail --location --retry 3 --retry-delay 5 https://download.geofabrik.de/asia/uzbekistan-latest.osm.pbf --output data/osm/pbf/uzbekistan.osm.pbf
           python tools/geodata/prepare_osm_region.py data/osm/pbf/uzbekistan.osm.pbf --bbox 72.325 40.765 72.355 40.795 --tile 0,0 --anchor 72.34 40.78
           python - <<'PY'
           import json
