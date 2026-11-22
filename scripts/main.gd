@@ -6,8 +6,7 @@ const BEACON_SCENE := preload("res://scenes/world/mission_beacon.tscn")
 const RESCUE_SCENE := preload("res://scenes/world/rescue_zone.tscn")
 const ENEMY_SCENE := preload("res://scenes/combat/training_enemy.tscn")
 const REGION_SCENE := preload("res://scenes/world/osm_region.tscn")
-const REGION_STREAMER_SCRIPT := preload("res://scripts/world/region_streamer.gd")
-
+const STREAMER_SCRIPT := preload("res://scripts/world/region_streamer.gd")
 var rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
@@ -19,8 +18,7 @@ func _ready() -> void:
  player.position = Vector3(0, 1.2, 12)
  add_child(player)
  _start_region_streaming()
- var hud := HUD_SCENE.instantiate()
- add_child(hud)
+ add_child(HUD_SCENE.instantiate())
  var beacon := BEACON_SCENE.instantiate()
  beacon.position = Vector3(0, 0, -8)
  add_child(beacon)
@@ -34,7 +32,7 @@ func _ready() -> void:
 func _start_region_streaming() -> void:
  var streamer := Node3D.new()
  streamer.name = "EarthRegionStreamer"
- streamer.set_script(REGION_STREAMER_SCRIPT)
+ streamer.set_script(STREAMER_SCRIPT)
  streamer.set("target_path", NodePath("../Dara"))
  streamer.set("tile_index_path", "res://data/world/region_tiles.json")
  streamer.set("region_scene", REGION_SCENE)
@@ -71,48 +69,47 @@ func _build_environment() -> void:
  add_child(sun)
 
 func _build_city() -> void:
- _add_box(Vector3(0, -0.25, 0), Vector3(100, 0.5, 100), Color(0.025, 0.03, 0.055))
- _add_box(Vector3(0, -0.01, 0), Vector3(8, 0.04, 100), Color(0.012, 0.014, 0.022))
- _add_box(Vector3(0, 0.015, 0), Vector3(0.12, 0.025, 100), Color(0.0, 0.85, 1.0), true)
- for x in [-32, -20, 20, 32]:
-  for z in [-32, -20, 20, 32]:
-   var height := rng.randf_range(10.0, 27.0)
-   var width := rng.randf_range(7.0, 10.0)
-   var depth := rng.randf_range(7.0, 10.0)
-   var base := Vector3(x, height * 0.5, z)
-   _add_box(base, Vector3(width, height, depth), Color(0.035, 0.045, 0.075))
-   _add_box(base + Vector3(0, height * 0.5 + 0.08, 0), Vector3(width + 0.2, 0.16, depth + 0.2), Color(0.0, 0.75, 1.0) if x < 0 else Color(1.0, 0.12, 0.48), true)
-   _add_windows(x, z, height, width, depth)
- _add_box(Vector3(0, 5, -18), Vector3(18, 0.3, 0.5), Color(1.0, 0.08, 0.38), true)
- _add_box(Vector3(0, 5.5, -18), Vector3(0.12, 1.0, 0.12), Color(0.0, 0.9, 1.0), true)
+ _add_box(Vector3(0,-0.25,0),Vector3(100,0.5,100),Color(0.025,0.03,0.055))
+ _add_box(Vector3(0,-0.01,0),Vector3(8,0.04,100),Color(0.012,0.014,0.022))
+ _add_box(Vector3(0,0.015,0),Vector3(0.12,0.025,100),Color(0.0,0.85,1.0),true)
+ for x in [-32,-20,20,32]:
+  for z in [-32,-20,20,32]:
+   var h:=rng.randf_range(10.0,27.0)
+   var w:=rng.randf_range(7.0,10.0)
+   var d:=rng.randf_range(7.0,10.0)
+   var base:=Vector3(x,h*0.5,z)
+   _add_box(base,Vector3(w,h,d),Color(0.035,0.045,0.075))
+   _add_box(base+Vector3(0,h*0.5+0.08,0),Vector3(w+0.2,0.16,d+0.2),Color(0.0,0.75,1.0) if x<0 else Color(1.0,0.12,0.48),true)
+   _add_windows(x,z,h,w,d)
+ _add_box(Vector3(0,5,-18),Vector3(18,0.3,0.5),Color(1.0,0.08,0.38),true)
+ _add_box(Vector3(0,5.5,-18),Vector3(0.12,1.0,0.12),Color(0.0,0.9,1.0),true)
 
-func _add_windows(x: float, z: float, height: float, width: float, depth: float) -> void:
- var rows := int(height / 2.4)
- for row in range(1, rows):
+func _add_windows(x:float,z:float,h:float,w:float,d:float)->void:
+ for row in range(1,int(h/2.4)):
   for col in range(2):
-   var wx := x + (float(col) - 0.5) * width * 0.55
-   var wy := row * 2.2
-   var color := Color(0.0, 0.75, 1.0) if rng.randf() > 0.5 else Color(1.0, 0.15, 0.45)
-   _add_box(Vector3(wx, wy, z - depth * 0.505), Vector3(0.65, 0.9, 0.06), color, true)
+   var wx:=x+(float(col)-0.5)*w*0.55
+   var wy:=row*2.2
+   var color:=Color(0.0,0.75,1.0) if rng.randf()>0.5 else Color(1.0,0.15,0.45)
+   _add_box(Vector3(wx,wy,z-d*0.505),Vector3(0.65,0.9,0.06),color,true)
 
-func _add_box(pos: Vector3, size: Vector3, color: Color, emissive := false) -> void:
- var body := StaticBody3D.new()
- body.position = pos
- var mesh := MeshInstance3D.new()
- var box := BoxMesh.new()
- box.size = size
- mesh.mesh = box
- var material := StandardMaterial3D.new()
- material.albedo_color = color
+func _add_box(pos:Vector3,size:Vector3,color:Color,emissive:=false)->void:
+ var body:=StaticBody3D.new()
+ body.position=pos
+ var mesh:=MeshInstance3D.new()
+ var box:=BoxMesh.new()
+ box.size=size
+ mesh.mesh=box
+ var material:=StandardMaterial3D.new()
+ material.albedo_color=color
  if emissive:
-  material.emission_enabled = true
-  material.emission = color
-  material.emission_energy_multiplier = 1.8
- mesh.material_override = material
+  material.emission_enabled=true
+  material.emission=color
+  material.emission_energy_multiplier=1.8
+ mesh.material_override=material
  body.add_child(mesh)
- var collision := CollisionShape3D.new()
- var shape := BoxShape3D.new()
- shape.size = size
- collision.shape = shape
+ var collision:=CollisionShape3D.new()
+ var shape:=BoxShape3D.new()
+ shape.size=size
+ collision.shape=shape
  body.add_child(collision)
  add_child(body)
