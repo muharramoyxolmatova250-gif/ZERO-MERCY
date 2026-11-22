@@ -28,6 +28,17 @@ Add Natural Earth 10m country and Admin-1 state/province layers for close-range 
 
 Add tiled DEM sources (for example Copernicus DEM or NASA SRTM where coverage is available), plus rivers, lakes, land cover, and coastlines. Convert source rasters to game-ready tiles outside the runtime. Never load a planet-wide heightmap into one scene.
 
+
+## Stage 3: real elevation tiles (downloader added)
+
+The repository includes a regional Copernicus DEM GLO-30 downloader:
+```bash
+python tools/geodata/download_copernicus_dem.py --bbox 72.0 40.0 73.5 41.0
+```
+The example downloads one-degree tiles intersecting a small test area near Andijan, Uzbekistan. Tiles are written to `data/dem/copernicus-glo30/`. Do not download the whole planet in one run.
+
+See [COPERNICUS_DEM.md](COPERNICUS_DEM.md) for source, tile naming, licensing, and the next conversion steps. GLO-30 is a Digital Surface Model (DSM), not bare-earth terrain; ocean tiles are not included. Missing/unreleased 30 m tiles are reported and skipped. The downloader has been added to the repository but has not yet been run against the live bucket or tested locally.
+
 ## Stage 4: roads, buildings, and settlements
 
 Use country/region extracts from OpenStreetMap. OSM data is licensed under ODbL; attribution and share-alike obligations apply. Review the current OSM attribution and ODbL guidance before distributing derived databases:
