@@ -92,9 +92,21 @@ func _add_polygon(rings: Array, country_name: String) -> void:
 	if ring.size() < 4:
 		return
 	var points := PackedVector2Array()
+	var previous_lon := 0.0
+	var has_previous := false
 	for coordinate in ring:
 		if coordinate is Array and coordinate.size() >= 2:
-			points.append(Vector2(float(coordinate[0]), float(coordinate[1])))
+			var longitude := float(coordinate[0])
+			# Unwrap antimeridian-crossing rings before planar triangulation.
+			# Sphere projection later wraps naturally through sin/cos.
+			if has_previous:
+				while longitude - previous_lon > 180.0:
+					longitude -= 360.0
+				while longitude - previous_lon < -180.0:
+					longitude += 360.0
+			points.append(Vector2(longitude, float(coordinate[1])))
+			previous_lon = longitude
+			has_previous = true
 	if points.size() > 2 and points[0].is_equal_approx(points[points.size() - 1]):
 		points.remove_at(points.size() - 1)
 	if points.size() < 3:
