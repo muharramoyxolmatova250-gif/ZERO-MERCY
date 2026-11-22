@@ -1,0 +1,37 @@
+name: Refresh global Earth map catalogue
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * 1"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-global-earth-catalogue
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build worldwide OSM region catalogue
+        run: python tools/geodata/build_global_manifest.py --output data/world/global_regions.json
+      - name: Commit catalogue when changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/world/global_regions.json
+          if git diff --cached --quiet; then
+            echo "Global region catalogue is already current."
+          else
+            git commit -m "Refresh global Earth map region catalogue"
+            git push
+          fi
