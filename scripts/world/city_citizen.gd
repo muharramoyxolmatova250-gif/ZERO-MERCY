@@ -24,6 +24,8 @@ var ai_decision_count := 0
 var current_goal := "commute"
 var relationship_score := 0.0
 var life_profile: Dictionary = {}
+var _last_visual_age := -1
+var _age_refresh_timer := 0.0
 @export var citizen_id := ""
 @export var occupation := "resident"
 
@@ -39,6 +41,14 @@ func _ready() -> void:
 	_decide_goal()
 
 func _physics_process(delta: float) -> void:
+	_age_refresh_timer += delta
+	if _age_refresh_timer >= 10.0:
+		_age_refresh_timer = 0.0
+		var current_age := int(life_profile.get("age_years", _last_visual_age))
+		if current_age != _last_visual_age:
+			_last_visual_age = current_age
+			var body_scale := 0.55 if current_age < 6 else (0.76 if current_age < 18 else (0.94 if current_age >= 65 else 1.0))
+			scale = Vector3.ONE * body_scale
 	_decision_timer += delta
 	if _decision_timer >= 2.5:
 		_decision_timer = 0.0
