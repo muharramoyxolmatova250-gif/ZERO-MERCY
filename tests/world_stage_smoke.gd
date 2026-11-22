@@ -181,7 +181,7 @@ func _run() -> void:
 	var metadata_path := "user://zero_mercy_dem_smoke.json"
 	var heights_path := "user://zero_mercy_dem_smoke.f32"
 	var metadata := {
-		"width": 3, "height": 3, "horizontal_width_m": 100.0,
+		"width": 3, "height": 3, "west": 0.0, "south": 0.0, "east": 1.0, "north": 1.0, "horizontal_width_m": 100.0,
 		"horizontal_depth_m": 100.0, "origin_x": 250.0, "origin_z": -125.0,
 		"metres_per_unit": 1.0
 	}
@@ -212,7 +212,11 @@ func _run() -> void:
 	if terrain.get_node_or_null("DEM_Collision") == null:
 		_fail("DEM collision shape was not generated.")
 		return
-	print("PASS Stage 2: DEM terrain mesh and collision generated.")
+	var sampled_height := float(terrain.call("sample_elevation", 0.5, 0.5))
+	if absf(sampled_height - 40.0) > 0.001:
+		_fail("DEM bilinear height sampling returned an incorrect value: " + str(sampled_height))
+		return
+	print("PASS Stage 2: DEM terrain mesh, collision and bilinear elevation sampling generated.")
 	print("WORLD STAGE SMOKE TESTS PASSED.")
 	quit(0)
 
