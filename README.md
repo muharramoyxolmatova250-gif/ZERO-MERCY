@@ -49,3 +49,10 @@ Each stage is announced as complete only after its implementation and acceptance
 - Never present placeholders as finished systems or real online services.
 
 Stage 2 is a foundation, not a claim that all global street/building/terrain data has been downloaded or that seamless planet-wide gameplay is complete. See [docs/STAGE_2_EARTH_MAP.md](docs/STAGE_2_EARTH_MAP.md), [docs/ROADMAP.md](docs/ROADMAP.md), [docs/STAGE_1_CORE_FOUNDATION.md](docs/STAGE_1_CORE_FOUNDATION.md), and [docs/GLOBAL_TILE_PIPELINE.md](docs/GLOBAL_TILE_PIPELINE.md).
+
+
+## World production progress
+
+- Stage 2: Earth geography foundation includes a globe renderer, country-boundary source downloader, WGS84-style coordinate helpers, regional OSM preparation/streaming, and a DEM elevation import pipeline. Actual worldwide datasets are not bundled; full detailed Earth coverage, seamless globe-to-ground travel, and runtime validation remain open.
+- Stage 3: A seeded cyberpunk district generator is integrated into the main gameplay scene, with neon road grids, variable-height towers, facade lights, rooftop details, and optional building collision. This is a visual foundation, not a finished city simulation or AAA environment.
+- See [Stage 2 Earth map](docs/STAGE_2_EARTH_MAP.md), [DEM terrain import](docs/DEM_TERRAIN_IMPORT.md), and [Stage 3 cyberpunk cities](docs/STAGE_3_CYBERPUNK_CITIES.md).
