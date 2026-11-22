@@ -177,14 +177,21 @@ func _run() -> void:
 		_fail("Dara smartphone did not open.")
 		return
 	phone.call("set_phone_open", false)
-	if MissionManager.campaign_order.size() < 30 or MissionManager.side_mission_ids.size() < 20:
+	var mission_manager := root.get_node_or_null("MissionManager")
+	var dialogue_manager := root.get_node_or_null("DialogueManager")
+	if mission_manager == null or dialogue_manager == null:
+		_fail("Campaign or dialogue autoload is missing.")
+		return
+	var main_order: Array = mission_manager.get("campaign_order")
+	var side_order: Array = mission_manager.get("side_mission_ids")
+	if main_order.size() < 30 or side_order.size() < 20:
 		_fail("The full ZERO MERCY campaign and side operations were not loaded.")
 		return
-	var campaign_snapshot: Dictionary = MissionManager.get_campaign_snapshot()
+	var campaign_snapshot: Dictionary = mission_manager.call("get_campaign_snapshot")
 	if int(campaign_snapshot.get("estimated_total_hours", 0)) != 70:
 		_fail("The 70-hour campaign structure is missing.")
 		return
-	if MissionManager.active_mission_id == "" and not MissionManager.start_next_campaign_mission():
+	if str(mission_manager.get("active_mission_id")) == "" and not bool(mission_manager.call("start_next_campaign_mission")):
 		_fail("The campaign could not start its next main mission.")
 		return
 	var mission_director := main.get_node_or_null("MissionObjectiveDirector")
@@ -192,15 +199,15 @@ func _run() -> void:
 		_fail("The active campaign objective did not create a world interaction marker.")
 		return
 	var dialogue_ui := main.get_node_or_null("DialogueUI")
-	if dialogue_ui == null or not DialogueManager.start_dialogue("smoke_intro", "res://data/story/dialogue_intro.json"):
+	if dialogue_ui == null or not bool(dialogue_manager.call("start_dialogue", "smoke_intro", "res://data/story/dialogue_intro.json")):
 		_fail("Branching story dialogue did not start.")
 		return
 	if not bool(dialogue_ui.visible):
 		_fail("Dialogue interface did not appear.")
 		return
-	DialogueManager.choose(0)
-	DialogueManager.choose(0)
-	DialogueManager.finish_dialogue()
+	dialogue_manager.call("choose", 0)
+	dialogue_manager.call("choose", 0)
+	dialogue_manager.call("finish_dialogue")
 	if bool(dialogue_ui.visible):
 		_fail("Dialogue interface did not close.")
 		return
