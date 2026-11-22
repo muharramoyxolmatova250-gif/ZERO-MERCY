@@ -85,12 +85,12 @@ func _load_queue() -> void:
         if _loaded.has(key) or not _tiles.has(coord):
             continue
         var entry: Dictionary = _tiles[coord]
-        var scene := region_scene
+        var scene: PackedScene = region_scene
         var scene_path := str(entry.get("scene_path", ""))
         if scene_path != "":
             var resource: Resource = load(scene_path)
             if resource is PackedScene:
-                scene = resource
+                scene = resource as PackedScene
         if scene == null:
             push_warning("ZERO MERCY: no PackedScene configured for tile " + key)
             continue
@@ -101,9 +101,8 @@ func _load_queue() -> void:
                 paths.append(single)
         var nodes: Array[Node3D] = []
         for path_value in paths:
-            var instance := scene.instantiate()
-            if not instance is Node3D:
-                instance.queue_free()
+            var instance := scene.instantiate() as Node3D
+            if instance == null:
                 continue
             if instance.has_method("configure_region"):
                 instance.configure_region(
