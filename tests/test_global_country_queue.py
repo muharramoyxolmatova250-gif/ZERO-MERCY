@@ -7,7 +7,7 @@ from tools.geodata.build_global_manifest import _geometry_bboxes, build_offline_
 class GlobalCountryQueueTests(unittest.TestCase):
     def test_country_and_combined_extracts(self):
         catalog = {"regions": [
-            {"id": "germany", "name": "Germany", "iso3166_1": ["DE"], "bboxes": [[5,47,15,55]]},
+            {"id": "germany", "name": "Germany", "iso3166_1": "DE", "bboxes": [[5,47,15,55]]},
             {"id": "israel-and-palestine", "name": "Israel and Palestine",
              "iso3166_1": ["PS","IL"], "bboxes": [[34,29,36,34]]},
             {"id": "california", "name": "California", "iso3166_1": [],
