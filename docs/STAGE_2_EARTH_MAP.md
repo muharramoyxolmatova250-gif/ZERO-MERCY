@@ -79,3 +79,12 @@ The DEM converter now transforms source bounds to WGS84, derives the tile's loca
 ## Automated acceptance smoke test
 
 GitHub Actions now runs `tests/world_stage_smoke.gd`, which creates a fixture-based Earth globe, builds a small DEM terrain mesh plus collision, and checks the cyberpunk district scene produces geometry. This verifies the code paths with synthetic fixtures only. It does not validate worldwide source-data coverage, real DEM quality, or full game performance. Check the Actions run for a green result before treating the smoke test as passed.
+
+
+## Global country boundary data integration
+
+- The global data workflow downloads both Natural Earth 110m and 50m country-boundary GeoJSON datasets.
+- It validates both FeatureCollections and checks that each contains a substantial country/map-unit feature set before committing.
+- The globe prefers the 50m dataset for greater geographic detail and falls back to 110m if the detailed file is absent.
+- Natural Earth country boundaries are public-domain data; OpenStreetMap road/building extracts remain separately sourced and subject to ODbL attribution and share-alike obligations.
+- This is global country-boundary coverage, not a complete global terrain/road/building database. Regional OSM PBFs must still be selected and processed into runtime tiles.
