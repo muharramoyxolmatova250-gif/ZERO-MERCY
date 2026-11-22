@@ -96,3 +96,14 @@ GitHub Actions now runs `tests/world_stage_smoke.gd`, which creates a fixture-ba
 - The Earth globe smoke fixture includes a polygon with an interior ring, and the smoke test asserts that an inland-water surface is created.
 - GitHub Actions validation passed on commit `27f761f5771197c6477708da57c2fb5aea637fd5`: project import, geography planner, Earth globe (5 fixture meshes including 1 inland-water surface), DEM mesh/collision, city generation, and main-scene launch all completed successfully.
 - This is a fixture-based code validation only. It does not mean global OSM roads/buildings or worldwide DEM terrain have been downloaded.
+
+
+## Global base-data download completed
+
+GitHub Actions run `45002973692` completed successfully and committed the generated base data in commit `4f286882290b099a0a34cc7e1024431d3f18ec1f`:
+
+- `data/geodata/world-50m.geojson`: 242 country/map-unit features (3,083,490 bytes).
+- `data/geodata/world-110m.geojson`: 177 country/map-unit features (838,726 bytes).
+- `data/world/global_regions.json`: 554 downloadable regional OSM source entries (204,693 bytes).
+
+The country-boundary files are now in the repository and can be loaded by the Earth globe scene. The regional catalogue is a list of available source extracts, not the downloaded 3D streets/buildings themselves. Regional PBF downloads, conversion into playable tiles, and global terrain data remain outstanding.
