@@ -51,3 +51,7 @@ Then open `scenes/world/earth_globe.tscn` in Godot 4.3+. For a more detailed glo
 ## First local Earth map test scene
 
 A small integration scene is available at `scenes/world/earth_test_world.tscn`. It includes a temporary WASD player and a configured region streamer. Follow [docs/FIRST_EARTH_MAP_TEST.md](docs/FIRST_EARTH_MAP_TEST.md) and [docs/ANDIJAN_TEST_REGION.md](docs/ANDIJAN_TEST_REGION.md) to prepare a small OSM GeoJSON tile and run the scene with F6 in Godot. The scene has not yet been validated in the Godot editor.
+
+## Story and progression foundations
+
+The repository also includes data-driven mission objectives, branching dialogue, and versioned local saves. See [docs/STORY_SYSTEMS.md](docs/STORY_SYSTEMS.md). A short prologue mission and dialogue sample are included as data; they are not yet connected to a finished mission HUD, cinematic sequence, or complete campaign.
