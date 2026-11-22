@@ -103,6 +103,7 @@ func _building_lobby(base: Vector3, size: Vector3, accent: Color) -> void:
 		_box(lobby_center + Vector3(seat_x * room_width * 0.27, 0.42, -room_depth * 0.25), Vector3(1.0, 0.35, 0.75), Color(0.04, 0.055, 0.08), false, false)
 	var lobby_light := OmniLight3D.new()
 	lobby_light.name = "LobbyNeonLight"
+	lobby_light.add_to_group("building_lobby_light")
 	lobby_light.position = lobby_center + Vector3(0.0, 2.8, 0.0)
 	lobby_light.light_color = accent
 	lobby_light.light_energy = 1.1
