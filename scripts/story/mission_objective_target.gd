@@ -15,6 +15,7 @@ func _ready() -> void:
     var shape_node := CollisionShape3D.new()
     var sphere := SphereShape3D.new()
     sphere.radius = 1.25
+    shape_node.position.y = 1.0
     shape_node.shape = sphere
     add_child(shape_node)
 
