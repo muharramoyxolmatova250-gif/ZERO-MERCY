@@ -183,10 +183,10 @@ func _add_building_geometry(kind: String, coords: Variant, tags: Dictionary) -> 
 		height = maxf(2.5, str(tags["building:levels"]).to_float() * 3.1)
 	for polygon in polygons:
 		if polygon is Array and not polygon.is_empty():
-			_add_extruded_polygon(polygon[0], height)
+			_add_extruded_polygon(polygon, height)
 
 
-func _add_extruded_polygon(ring: Array, height: float) -> void:
+func _ring_to_local(ring: Array) -> PackedVector2Array:
 	var points := PackedVector2Array()
 	for coord in ring:
 		if coord is Array and coord.size() >= 2:
@@ -194,25 +194,41 @@ func _add_extruded_polygon(ring: Array, height: float) -> void:
 			points.append(Vector2(p.x, p.z))
 	if points.size() > 2 and points[0].is_equal_approx(points[points.size() - 1]):
 		points.remove_at(points.size() - 1)
-	if points.size() < 3:
+	return points
+
+
+func _add_extruded_polygon(rings: Array, height: float) -> void:
+	if rings.is_empty():
 		return
-	var indices := Geometry2D.triangulate_polygon(points)
+	var outer := _ring_to_local(rings[0])
+	if outer.size() < 3:
+		return
+	var holes: Array[PackedVector2Array] = []
+	var all_rings: Array[PackedVector2Array] = [outer]
+	for ring_index in range(1, rings.size()):
+		var hole := _ring_to_local(rings[ring_index])
+		if hole.size() >= 3:
+			holes.append(hole)
+			all_rings.append(hole)
+	var indices := Geometry2D.triangulate_polygon(outer, holes)
 	if indices.is_empty():
+		push_warning("OSM building polygon could not be triangulated; skipped invalid footprint.")
 		return
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for i in range(0, indices.size(), 3):
-		var a := Vector3(points[indices[i]].x, height, points[indices[i]].y)
-		var b := Vector3(points[indices[i + 1]].x, height, points[indices[i + 1]].y)
-		var c := Vector3(points[indices[i + 2]].x, height, points[indices[i + 2]].y)
+		var a := Vector3(outer[indices[i]].x, height, outer[indices[i]].y)
+		var b := Vector3(outer[indices[i + 1]].x, height, outer[indices[i + 1]].y)
+		var c := Vector3(outer[indices[i + 2]].x, height, outer[indices[i + 2]].y)
 		_add_triangle(st, a, b, c)
-	for i in range(points.size()):
-		var j := (i + 1) % points.size()
-		var a := Vector3(points[i].x, 0.0, points[i].y)
-		var b := Vector3(points[j].x, 0.0, points[j].y)
-		var c := Vector3(points[j].x, height, points[j].y)
-		var d := Vector3(points[i].x, height, points[i].y)
-		_add_quad(st, a, b, c, d)
+	for ring in all_rings:
+		for i in range(ring.size()):
+			var j := (i + 1) % ring.size()
+			var a := Vector3(ring[i].x, 0.0, ring[i].y)
+			var b := Vector3(ring[j].x, 0.0, ring[j].y)
+			var c := Vector3(ring[j].x, height, ring[j].y)
+			var d := Vector3(ring[i].x, height, ring[i].y)
+			_add_quad(st, a, b, c, d)
 	var mesh := st.commit()
 	if mesh == null:
 		return
