@@ -55,6 +55,11 @@ func _run() -> void:
 		_fail("Enterable building lobbies are missing: " + str(lobby_lights))
 		return
 	print("PASS Stage 3: ", lobby_lights, " building interiors/lobbies generated with neon lighting.")
+	var shell_panels := city.get_tree().get_nodes_in_group("building_shell_visual").size()
+	if shell_panels < lobby_lights * 6:
+		_fail("Building shells are not hollow/open for entry: panels=" + str(shell_panels))
+		return
+	print("PASS Stage 3: hollow building shells preserve an open lobby entrance (", shell_panels, " wall/roof panels).")
 	var overview := load("res://scenes/world/earth_overview.tscn")
 	if overview == null:
 		_fail("Earth overview scene failed to load.")
