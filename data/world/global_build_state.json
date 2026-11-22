@@ -2,16 +2,15 @@
   "schema_version": 1,
   "current_region_id": "uzbekistan",
   "next_tile_by_region": {
-    "uzbekistan": 0,
+    "uzbekistan": 8,
     "afghanistan": 0
   },
   "completed_regions": [],
-  "last_updated_utc": "2026-11-22T11:01:00+00:00",
+  "last_updated_utc": "2026-11-22T11:01:46.699535+00:00",
   "last_batch": {
     "region_id": "uzbekistan",
     "start": 0,
-    "processed": 0,
-    "total_tiles": 1711,
-    "plan_version": "andijan-priority-v1"
+    "processed": 8,
+    "total_tiles": 1711
   }
 }
