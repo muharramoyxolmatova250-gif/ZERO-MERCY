@@ -177,7 +177,17 @@ func _run() -> void:
 		_fail("Dara smartphone did not open.")
 		return
 	phone.call("set_phone_open", false)
-	print("PASS Stage 5: persistent NPC profiles, life simulation and live Dara smartphone.")
+	if MissionManager.campaign_order.size() < 30 or MissionManager.side_mission_ids.size() < 20:
+		_fail("The full ZERO MERCY campaign and side operations were not loaded.")
+		return
+	var campaign_snapshot: Dictionary = MissionManager.get_campaign_snapshot()
+	if int(campaign_snapshot.get("estimated_total_hours", 0)) != 70:
+		_fail("The 70-hour campaign structure is missing.")
+		return
+	if MissionManager.active_mission_id == "" and not MissionManager.start_next_campaign_mission():
+		_fail("The campaign could not start its next main mission.")
+		return
+	print("PASS Stage 8: 70-hour campaign, main mission order, side operations and persistent story state.")
 	main.call("_unhandled_input", _map_key_event())
 	await process_frame
 	if main.get_node_or_null("EarthMapOverview") == null:
