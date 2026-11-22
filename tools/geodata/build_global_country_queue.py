@@ -22,12 +22,15 @@ def main() -> int:
         codes = region.get("iso3166_1") or []
         if len(codes) != 1 or not isinstance(codes[0], str) or len(codes[0]) != 2:
             continue
+        bbox = region.get("bbox")
+        if not isinstance(bbox, list) or len(bbox) != 4 or bbox[0] >= bbox[2] or bbox[1] >= bbox[3]:
+            continue
         code = codes[0].upper()
         region_id = str(region.get("id", ""))
         depth = region_id.count("/")
         candidate = {"id": region_id, "name": region.get("name", region_id),
                      "iso3166_1": code, "pbf_url": region.get("pbf_url"),
-                     "estimated_size_bytes": region.get("estimated_size_bytes"),
+                     "estimated_size_bytes": region.get("estimated_size_bytes"), "bbox": bbox,
                      "hierarchy_depth": depth}
         current = chosen.get(code)
         if current is None or (depth, len(region_id)) < (current["hierarchy_depth"], len(current["id"])):
