@@ -59,3 +59,18 @@ The current Godot OSM importer creates first-pass roads, building extrusions and
 ## Licensing and attribution
 
 Geofabrik distributes OpenStreetMap extracts under ODbL 1.0. Display clear attribution: **© OpenStreetMap contributors** with a link to https://www.openstreetmap.org/copyright. Review attribution and share-alike requirements for any publicly distributed derived database. Do not assume that all imagery, textures, terrain or third-party assets are covered by OSM's licence.
+
+## First playable real-data region: Andijan / Asaka
+
+The automated workflow `.github/workflows/build-andijan-osm-tiles.yml` downloads the Uzbekistan Geofabrik PBF, creates four adjacent 0.1-degree geographic tiles covering 72.2–72.4°E and 40.6–40.8°N, and exports roads, building footprints and waterways to `data/osm/tiles/andijan/`.
+
+Verified first-region source coverage:
+- 4 GeoJSON tiles
+- 223,211 OSM features total
+- 12,087 road features
+- 204,187 building features
+- 79 waterway features
+
+Each tile carries its physical ground extent so the Godot region scene can size its base plane to the actual geographic tile. The runtime index uses a shared 72.3°E, 40.7°N local anchor and an 8 km grid.
+
+Source data is © OpenStreetMap contributors, ODbL 1.0. This is the first regional dataset, not global building coverage. The largest tile is about 55 MB as GeoJSON; production-scale streaming still needs geometry batching, progressive detail, memory budgets and more performance testing.
