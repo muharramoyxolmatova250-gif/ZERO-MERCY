@@ -64,6 +64,7 @@ func _building(base: Vector3, size: Vector3) -> void:
 	var accent: Color = _window_materials[accent_index].albedo_color
 	_box(base + Vector3(0, size.y + 0.12, 0), Vector3(size.x + 0.4, 0.24, size.z + 0.4), accent, true, false)
 	_facade_windows_instanced(base, size, accent_index)
+	_ground_floor_frontage(base, size, accent)
 	_roof_detail(base, size, accent)
 
 func _facade_windows_instanced(base: Vector3, size: Vector3, accent_index: int) -> void:
@@ -97,6 +98,24 @@ func _facade_windows_instanced(base: Vector3, size: Vector3, accent_index: int) 
 		instance.multimesh = mm
 		instance.material_override = _window_materials[category]
 		add_child(instance)
+
+
+func _ground_floor_frontage(base: Vector3, size: Vector3, accent: Color) -> void:
+	# A visible entrance, illuminated shopfront and canopy give each tower a street-level identity.
+	var front_z := base.z - size.z * 0.5 - 0.055
+	var door_width := minf(2.2, size.x * 0.24)
+	var door_height := minf(3.1, size.y * 0.28)
+	_box(base + Vector3(0.0, door_height * 0.5, -size.z * 0.5 - 0.07),
+		Vector3(door_width, door_height, 0.12), Color(0.008, 0.018, 0.032), false, false)
+	_box(base + Vector3(0.0, door_height + 0.14, -size.z * 0.5 - 0.1),
+		Vector3(door_width + 0.55, 0.18, 0.18), accent, true, false)
+	var shop_width := minf(size.x * 0.62, 7.0)
+	_box(base + Vector3(-size.x * 0.27, 1.65, -size.z * 0.5 - 0.065),
+		Vector3(shop_width * 0.45, 2.25, 0.1), Color(0.015, 0.12, 0.17), true, false)
+	_box(base + Vector3(0.0, 3.45, -size.z * 0.5 - 0.16),
+		Vector3(minf(size.x * 0.78, 9.0), 0.28, 0.55), accent, true, false)
+	_box(base + Vector3(0.0, 0.18, -size.z * 0.5 - 0.32),
+		Vector3(minf(size.x * 0.8, 9.0), 0.22, 1.1), Color(0.025, 0.045, 0.065), false, false)
 
 func _roof_detail(base: Vector3, size: Vector3, accent: Color) -> void:
 	var roof_y := size.y + 0.8
