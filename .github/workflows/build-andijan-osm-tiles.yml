@@ -41,7 +41,7 @@ jobs:
             --region andijan \
             --bbox 72.2 40.6 72.4 40.8 \
             --tile-deg 0.1 \
-            --tile-size-m 10000 \
+            --tile-size-m 8000 \
             --anchor 72.3 40.7 \
             --index-output data/world/region_tiles.json
       - name: Clip and export real OSM streets, buildings and waterways
