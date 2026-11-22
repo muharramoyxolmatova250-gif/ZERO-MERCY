@@ -3,6 +3,9 @@ extends Node3D
 ## Download data first with: python tools/geodata/download_natural_earth.py --scale 110m
 
 @export_file("*.geojson") var geojson_path: String = "res://data/geodata/world-50m.geojson"
+@export_file("*.geojson") var rivers_geojson_path: String = "res://data/geodata/world-110m-rivers.geojson"
+@export_file("*.geojson") var lakes_geojson_path: String = "res://data/geodata/world-110m-lakes.geojson"
+@export var draw_hydrography := true
 @export_range(10.0, 1000.0, 1.0) var globe_radius: float = 100.0
 @export var draw_country_borders: bool = true
 
@@ -12,6 +15,7 @@ const BORDER_HEIGHT := 0.42
 var _land_material: StandardMaterial3D
 var _border_material: StandardMaterial3D
 var _inland_water_material: StandardMaterial3D
+var _river_material: StandardMaterial3D
 
 
 func _ready() -> void:
@@ -25,6 +29,11 @@ func _ready() -> void:
 			push_warning("Earth GeoJSON missing. Run tools/geodata/download_natural_earth.py --scale all first.")
 			return
 	_load_geojson(geojson_path)
+	if draw_hydrography:
+		if FileAccess.file_exists(lakes_geojson_path):
+			_load_lakes(lakes_geojson_path)
+		if FileAccess.file_exists(rivers_geojson_path):
+			_load_rivers(rivers_geojson_path)
 
 
 func _setup_materials() -> void:
@@ -45,6 +54,12 @@ func _setup_materials() -> void:
 	_inland_water_material.metallic = 0.58
 	_inland_water_material.roughness = 0.3
 	_inland_water_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+
+	_river_material = StandardMaterial3D.new()
+	_river_material.albedo_color = Color(0.02, 0.42, 0.9, 0.96)
+	_river_material.emission_enabled = true
+	_river_material.emission = Color(0.01, 0.24, 0.72)
+	_river_material.emission_energy_multiplier = 1.8
 
 
 func _add_ocean() -> void:
@@ -100,7 +115,7 @@ func _add_polygon(rings: Array, country_name: String) -> void:
 	var exterior := _ring_to_points(rings[0])
 	if exterior.size() < 3:
 		return
-	_add_surface_polygon(exterior, country_name, _land_material, LAND_HEIGHT, true)
+	_add_surface_polygon(exterior, country_name, _land_material, LAND_HEIGHT, draw_country_borders)
 
 	# GeoJSON Polygon rings after the first are interior holes (lakes and enclaves).
 	# Render them as ocean-coloured patches slightly above the land surface so
@@ -182,6 +197,99 @@ func _add_border(points: PackedVector2Array, country_name: String) -> void:
 	border.name = country_name.validate_node_name() + "_Border"
 	border.mesh = line
 	add_child(border)
+
+
+
+func _load_lakes(path: String) -> void:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		push_warning("Could not open Natural Earth lakes: " + path)
+		return
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY or not parsed.has("features"):
+		push_warning("Invalid Natural Earth lakes FeatureCollection.")
+		return
+	var count := 0
+	for feature in parsed["features"]:
+		if typeof(feature) != TYPE_DICTIONARY:
+			continue
+		var geometry: Dictionary = feature.get("geometry", {})
+		var props: Dictionary = feature.get("properties", {})
+		var lake_name := str(props.get("name", props.get("NAME", "Lake")))
+		var kind := str(geometry.get("type", ""))
+		var coordinates: Variant = geometry.get("coordinates", [])
+		if kind == "Polygon":
+			_add_lake_polygon(coordinates, lake_name)
+			count += 1
+		elif kind == "MultiPolygon":
+			for polygon in coordinates:
+				_add_lake_polygon(polygon, lake_name)
+				count += 1
+	print("ZERO MERCY Earth: rendered ", count, " global lake polygons.")
+
+
+func _add_lake_polygon(rings: Array, lake_name: String) -> void:
+	if rings.is_empty():
+		return
+	var exterior := _ring_to_points(rings[0])
+	if exterior.size() >= 3:
+		_add_surface_polygon(exterior, "Lake_" + lake_name, _inland_water_material, LAND_HEIGHT + 0.025, false)
+
+
+func _load_rivers(path: String) -> void:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		push_warning("Could not open Natural Earth rivers: " + path)
+		return
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY or not parsed.has("features"):
+		push_warning("Invalid Natural Earth rivers FeatureCollection.")
+		return
+	var count := 0
+	for feature in parsed["features"]:
+		if typeof(feature) != TYPE_DICTIONARY:
+			continue
+		var geometry: Dictionary = feature.get("geometry", {})
+		var props: Dictionary = feature.get("properties", {})
+		var river_name := str(props.get("name", props.get("NAME", "River")))
+		var kind := str(geometry.get("type", ""))
+		var coordinates: Variant = geometry.get("coordinates", [])
+		if kind == "LineString":
+			_add_river_line(coordinates, river_name)
+			count += 1
+		elif kind == "MultiLineString":
+			for line in coordinates:
+				_add_river_line(line, river_name)
+				count += 1
+	print("ZERO MERCY Earth: rendered ", count, " major river lines.")
+
+
+func _add_river_line(coordinates: Array, river_name: String) -> void:
+	if coordinates.size() < 2:
+		return
+	var line := ImmediateMesh.new()
+	line.surface_begin(Mesh.PRIMITIVE_LINE_STRIP, _river_material)
+	var previous := Vector3.ZERO
+	var has_previous := false
+	for coordinate in coordinates:
+		if not coordinate is Array or coordinate.size() < 2:
+			continue
+		var current := _lat_lon_to_sphere(float(coordinate[1]), float(coordinate[0]), 1.0).normalized()
+		if has_previous:
+			var angle := acos(clampf(previous.dot(current), -1.0, 1.0))
+			var steps := maxi(1, ceili(angle / deg_to_rad(1.0)))
+			for step in range(1, steps + 1):
+				var point := previous.slerp(current, float(step) / float(steps)).normalized()
+				line.surface_add_vertex(point * (globe_radius + LAND_HEIGHT + 0.045))
+		else:
+			line.surface_add_vertex(current * (globe_radius + LAND_HEIGHT + 0.045))
+		previous = current
+		has_previous = true
+	line.surface_end()
+	var river := MeshInstance3D.new()
+	river.name = ("River_" + river_name).validate_node_name()
+	river.mesh = line
+	add_child(river)
 
 
 func _lat_lon_to_sphere(latitude: float, longitude: float, radius: float) -> Vector3:
