@@ -19,6 +19,7 @@ on:
       - "tools/geodata/validate_dem_tile_batch.py"
       - "scripts/world/dem_terrain_tile.gd"
       - "scenes/world/dem_terrain_tile.tscn"
+      - "tests/test_etopo_tile_index.py"
       - "scripts/world/region_streamer.gd"
       - "scripts/world/osm_region.gd"
   workflow_dispatch:
@@ -80,6 +81,7 @@ jobs:
           python tests/test_global_country_queue.py
           python tests/test_global_tile_grid.py
           python tests/test_global_build_state.py
+          python tests/test_etopo_tile_index.py
       - name: Select next country batch
         id: select
         env:
