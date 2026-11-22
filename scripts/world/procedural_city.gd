@@ -256,7 +256,7 @@ func _spawn_city_life() -> void:
 	var traffic_script := load("res://scripts/world/city_traffic.gd")
 	var half := blocks_per_side * block_spacing * 0.5
 	var inset := road_width * 0.5 + 2.0
-	for i in range(mini(12, blocks_per_side * 2)):
+	for i in range(mini(96, blocks_per_side * 10)):
 		var citizen := Node3D.new()
 		citizen.set_script(citizen_script)
 		citizen.add_to_group("city_citizen")
@@ -271,7 +271,7 @@ func _spawn_city_life() -> void:
 		citizen.set("walk_speed", rng.randf_range(0.8, 1.6))
 		citizen.position = Vector3(lane - 8.0, 0, side * (half - inset))
 		add_child(citizen)
-	for i in range(4):
+	for i in range(20):
 		var car := Node3D.new()
 		car.set_script(traffic_script)
 		car.add_to_group("city_traffic")
