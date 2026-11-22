@@ -68,7 +68,7 @@ def main() -> int:
                     "id": tile_id, "bbox": [round(w, 8), round(s, 8), round(e, 8), round(n, 8)],
                     "center_lat": lat, "center_lon": lon,
                     "origin_x": round(ox, 3), "origin_z": round(oz, 3),
-                    "pbf_output": f"data/osm/tiles/{a.region}/{tile_id}.osm.pbf",
+                    "pbf_output": f"data/osm/tmp/{a.region}/{tile_id}.osm.pbf",
                     "geojson_output": f"data/osm/tiles/{a.region}/{tile_id}.geojson",
                     "godot_geojson_path": f"res://data/osm/tiles/{a.region}/{tile_id}.geojson",
                     "region_size_m": round(max(region_width, (n - s) * 111320.0) * 1.08, 3),
