@@ -72,7 +72,7 @@ func _refresh(center:Vector2i)->void:
 func _load_queue()->void:
 	var done:=0
 	while not _queue.is_empty() and done<max_operations_per_frame:
-		var c:=_queue.pop_front()
+		var c:Vector2i=_queue.pop_front()
 		var k:=_key(c)
 		if _loaded.has(k) or not _tiles.has(c): continue
 		var e:Dictionary=_tiles[c]
