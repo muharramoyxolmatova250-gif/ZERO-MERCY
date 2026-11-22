@@ -78,7 +78,7 @@ def download(scale: str, reuse_existing: bool = False, attempts: int = 5) -> Non
 
 def download_hydrography(reuse_existing: bool = False, attempts: int = 5) -> None:
     for layer, (filename, allowed_geometry) in HYDROGRAPHY.items():
-        url = f"${BASE}/{filename}"
+        url = f"{BASE}/{filename}"
         target = OUT / f"world-110m-{layer}.geojson"
         def validate(raw: bytes) -> tuple[int, int]:
             parsed = json.loads(raw)
