@@ -30,6 +30,7 @@ func _ready() -> void:
 	if route.size() < 2:
 		route = PackedVector3Array([Vector3(-5,0,-5), Vector3(5,0,-5), Vector3(5,0,5), Vector3(-5,0,5)])
 	_target_index = 1
+	_decide_goal()
 
 func _physics_process(delta: float) -> void:
 	_decision_timer += delta
