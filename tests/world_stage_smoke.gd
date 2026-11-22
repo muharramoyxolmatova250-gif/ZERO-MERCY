@@ -28,6 +28,30 @@ func _run() -> void:
 		_fail("City citizens are missing personal phones: " + str(citizen_phones))
 		return
 	print("PASS Stage 3: every spawned citizen has a personal cyberpunk phone prop.")
+	if first_citizen.ai_decision_count < 1 or first_citizen.get_memory_snapshot().is_empty():
+		_fail("Citizen utility AI did not produce decisions and memory.")
+		return
+	print("PASS Stage 3: citizens run needs-driven decisions and keep short memories.")
+	var global_population := load("res://scripts/world/global_population_sim.gd")
+	var population_node := Node3D.new()
+	population_node.set_script(global_population)
+	root.add_child(population_node)
+	await process_frame
+	var population_snapshot: Dictionary = population_node.get_world_population_snapshot()
+	if int(population_snapshot.get("city_hubs", 0)) < 12 or int(population_snapshot.get("represented_residents", 0)) < 100000:
+		_fail("Global population cohorts did not initialize across world hubs.")
+		return
+	print("PASS Global life: ", population_snapshot.city_hubs, " hubs represent ", population_snapshot.represented_residents, " simulated residents.")
+	var air_script := load("res://scripts/world/global_air_traffic.gd")
+	var air_node := Node3D.new()
+	air_node.set_script(air_script)
+	root.add_child(air_node)
+	await process_frame
+	var air_snapshot: Dictionary = air_node.get_flight_snapshot()
+	if int(air_snapshot.get("airport_count", 0)) < 12 or int(air_snapshot.get("active_flights", 0)) < 8:
+		_fail("Global airline network did not initialize international flights.")
+		return
+	print("PASS Global aviation: ", air_snapshot.airport_count, " airports and ", air_snapshot.active_flights, " active cyberpunk flights.")
 	var first_citizen := city.get_tree().get_first_node_in_group("city_citizen") as Node3D
 	var first_car := city.get_tree().get_first_node_in_group("city_traffic") as Node3D
 	var citizen_start := first_citizen.position
