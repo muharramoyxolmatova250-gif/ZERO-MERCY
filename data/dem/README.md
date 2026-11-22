@@ -1,0 +1,1 @@
+# Generated elevation data\n\nCopernicus DEM tiles downloaded by `tools/geodata/download_copernicus_dem.py` are stored under `copernicus-glo30/`. Source rasters are generated/downloaded inputs and are not committed to Git. See [docs/COPERNICUS_DEM.md](../../docs/COPERNICUS_DEM.md) for instructions and licensing.\n
