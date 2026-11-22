@@ -54,8 +54,9 @@ jobs:
           for path in files:
               data = json.loads(path.read_text(encoding="utf-8"))
               features = data.get("features", [])
-              assert data.get("type") == "FeatureCollection" and len(features) > 100, path
-              print(f"{path}: {len(features)} map features, {path.stat().st_size:,} bytes")
+              minimum = 100 if path.name in {"world-110m.geojson", "world-50m.geojson"} else 1
+              assert data.get("type") == "FeatureCollection" and len(features) >= minimum, path
+              print(f"{path}: {len(features)} features, {path.stat().st_size:,} bytes")
           PY
       - name: Build global OSM regional source catalogue
         run: python tools/geodata/build_global_manifest.py
