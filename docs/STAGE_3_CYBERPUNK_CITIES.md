@@ -51,3 +51,13 @@ These are simulation foundations, not a finished planet-scale life simulator or 
 - Local traffic target increased from 20 to 36 stylized electric vehicles.
 - The global cohort simulation is now started by the main gameplay scene and represents 1.8 million residents across 18 city hubs as aggregate cohorts, not individually rendered NPCs.
 - This is a stronger simulation foundation, not GTA-level full autonomy, 9K rendering, or production-ready performance. Full dialogue, persistent family trees, births/aging, navigation meshes and populated streamed cities remain future work.
+
+
+## Autonomous world society simulation foundation
+
+- Added an always-running world society service with 18 city hubs and aggregate public indicators: employment, mood, crime pressure and infrastructure.
+- Added institution service-load state for government, police, hospitals, schools, universities, transit, energy, media, commerce and emergency services.
+- Added a generated in-world social feed with city-linked resident posts, likes, comments and video-style post categories.
+- Local district targets up to 240 individually instantiated ambient agents and 36 electric traffic agents; this is a prototype cap, not a measured performance guarantee.
+- The world society and feed are aggregate procedural simulations. They do not yet implement actual AI citizens with persistent biographies, family trees, real government decisions, uploaded video files or online multiplayer social networking.
+- 9K remains a target render mode; actual resolution and quality depend on GPU, memory, display and rendering pipeline.
