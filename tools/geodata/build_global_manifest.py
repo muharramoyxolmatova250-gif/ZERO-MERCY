@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-INDEX_URL = "https://download.geofabrik.de/index-v1-nogeom.json"
+INDEX_URL = "https://download.geofabrik.de/index-v1.json"
 OUT = ROOT / "data" / "world" / "global_regions.json"
 PBF_DIR = ROOT / "data" / "osm" / "pbf"
 USER_AGENT = "ZERO-MERCY-world-builder/1.0"
@@ -32,7 +32,7 @@ def safe_id(value: str) -> str:
     return re.sub(r"[^a-zA-Z0-9._-]+", "_", value).strip("_")
 
 
-def _geometry_bbox(geometry: dict) -> list[float] | None:
+def _geometry_bboxes(geometry: dict) -> list[list[float]]:
     points: list[tuple[float, float]] = []
     def visit(value):
         if isinstance(value, (list, tuple)):
@@ -43,9 +43,22 @@ def _geometry_bbox(geometry: dict) -> list[float] | None:
                     visit(child)
     visit((geometry or {}).get("coordinates", []))
     if not points:
-        return None
-    xs, ys = zip(*points)
-    return [min(xs), min(ys), max(xs), max(ys)]
+        return []
+    longitudes = sorted({((lon + 180.0) % 360.0) - 180.0 for lon, _ in points})
+    south = min(lat for _, lat in points)
+    north = max(lat for _, lat in points)
+    if len(longitudes) == 1:
+        return [[longitudes[0], south, longitudes[0] + 0.000001, north]]
+    gaps = []
+    for i, lon in enumerate(longitudes):
+        nxt = longitudes[(i + 1) % len(longitudes)] + (360.0 if i == len(longitudes) - 1 else 0.0)
+        gaps.append((nxt - lon, i))
+    _, gap_index = max(gaps)
+    west = longitudes[(gap_index + 1) % len(longitudes)]
+    east = longitudes[gap_index]
+    if west <= east:
+        return [[west, south, east, north]]
+    return [[west, south, 180.0, north], [-180.0, south, east, north]]
 
 
 def build_catalog(index: dict) -> dict:
@@ -75,7 +88,7 @@ def build_catalog(index: dict) -> dict:
             "pbf_url": pbf,
             "updates_url": urls.get("updates"),
             "estimated_size_bytes": props.get("pbf_file_size"),
-            "bbox": feature.get("bbox") or _geometry_bbox(feature.get("geometry", {})),
+            "bboxes": _geometry_bboxes(feature.get("geometry", {})),
         })
     entries.sort(key=lambda item: (item["name"].casefold(), item["id"]))
     return {
