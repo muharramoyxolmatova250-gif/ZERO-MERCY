@@ -1,0 +1,1 @@
+{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"featurecla":"mountain","name":"Mount Test","elevation":4000},"geometry":{"type":"Point","coordinates":[69.1,41.1]}}]}
