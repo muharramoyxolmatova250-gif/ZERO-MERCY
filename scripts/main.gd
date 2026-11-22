@@ -4,6 +4,7 @@ const PLAYER_SCENE := preload("res://scenes/player.tscn")
 const HUD_SCENE := preload("res://scenes/ui/mission_hud.tscn")
 const BEACON_SCENE := preload("res://scenes/world/mission_beacon.tscn")
 const RESCUE_SCENE := preload("res://scenes/world/rescue_zone.tscn")
+const ENEMY_SCENE := preload("res://scenes/combat/training_enemy.tscn")
 
 var rng := RandomNumberGenerator.new()
 
@@ -22,6 +23,9 @@ func _ready() -> void:
 	var rescue_zone := RESCUE_SCENE.instantiate()
 	rescue_zone.position = Vector3(15, 0, -25)
 	add_child(rescue_zone)
+	var enemy := ENEMY_SCENE.instantiate()
+	enemy.position = Vector3(0, 0, -18)
+	add_child(enemy)
 
 func _build_environment() -> void:
 	var world_env := WorldEnvironment.new()
