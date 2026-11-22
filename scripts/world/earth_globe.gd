@@ -163,6 +163,8 @@ func _add_surface_polygon(points: PackedVector2Array, surface_name: String, mate
 	land.name = surface_name.validate_node_name()
 	land.mesh = mesh
 	land.material_override = material
+	if surface_name.contains("_Water_"):
+		land.add_to_group("earth_inland_water")
 	add_child(land)
 
 	if add_border:
