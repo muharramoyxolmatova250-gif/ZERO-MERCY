@@ -1,46 +1,74 @@
 {
-  "_comment": "Generated for andijan; coordinates use this shared local anchor.",
-  "_tile_size_m": 8000.0,
+  "_comment": "Globally aligned equirectangular tile index; not a spherical globe projection.",
+  "_tile_size_m": 11132.0,
   "_anchor_lon": 72.3,
   "_anchor_lat": 40.7,
   "-1,0": {
     "geojson_path": "res://data/osm/tiles/andijan/722_406.geojson",
+    "geojson_paths": [
+      "res://data/osm/tiles/andijan/722_406.geojson"
+    ],
+    "source_regions": [
+      "andijan"
+    ],
     "center_lat": 40.650000000000006,
     "center_lon": 72.25,
-    "origin_x": -4219.776,
+    "origin_x": -5566.0,
     "origin_z": 5566.0,
     "region_size_m": 12022.56,
     "tile_id": "722_406",
-    "region": "andijan"
+    "region": "andijan",
+    "projection": "global_equirectangular"
   },
   "0,0": {
     "geojson_path": "res://data/osm/tiles/andijan/723_406.geojson",
+    "geojson_paths": [
+      "res://data/osm/tiles/andijan/723_406.geojson"
+    ],
+    "source_regions": [
+      "andijan"
+    ],
     "center_lat": 40.650000000000006,
     "center_lon": 72.35,
-    "origin_x": 4219.776,
+    "origin_x": 5566.0,
     "origin_z": 5566.0,
     "region_size_m": 12022.56,
     "tile_id": "723_406",
-    "region": "andijan"
+    "region": "andijan",
+    "projection": "global_equirectangular"
   },
   "-1,-1": {
     "geojson_path": "res://data/osm/tiles/andijan/722_407.geojson",
+    "geojson_paths": [
+      "res://data/osm/tiles/andijan/722_407.geojson"
+    ],
+    "source_regions": [
+      "andijan"
+    ],
     "center_lat": 40.75,
     "center_lon": 72.25,
-    "origin_x": -4219.776,
+    "origin_x": -5566.0,
     "origin_z": -5566.0,
     "region_size_m": 12022.56,
     "tile_id": "722_407",
-    "region": "andijan"
+    "region": "andijan",
+    "projection": "global_equirectangular"
   },
   "0,-1": {
     "geojson_path": "res://data/osm/tiles/andijan/723_407.geojson",
+    "geojson_paths": [
+      "res://data/osm/tiles/andijan/723_407.geojson"
+    ],
+    "source_regions": [
+      "andijan"
+    ],
     "center_lat": 40.75,
     "center_lon": 72.35,
-    "origin_x": 4219.776,
+    "origin_x": 5566.0,
     "origin_z": -5566.0,
     "region_size_m": 12022.56,
     "tile_id": "723_407",
-    "region": "andijan"
+    "region": "andijan",
+    "projection": "global_equirectangular"
   }
 }

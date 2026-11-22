@@ -1,17 +1,20 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "region": "andijan",
-  "created_utc": "2026-11-22T10:09:33.844710+00:00",
-  "source_bbox": [
-    72.2,
-    40.6,
-    72.4,
-    40.8
+  "created_utc": "2026-11-22T10:10:27.781928+00:00",
+  "source_bboxes": [
+    [
+      72.2,
+      40.6,
+      72.4,
+      40.8
+    ]
   ],
   "tile_degrees": 0.1,
-  "tile_size_m": 8000.0,
+  "tile_size_m": 11132.0,
   "anchor_lon": 72.3,
   "anchor_lat": 40.7,
+  "projection": "global_equirectangular",
   "tile_count": 4,
   "tiles": [
     {
@@ -24,7 +27,7 @@
       ],
       "center_lat": 40.650000000000006,
       "center_lon": 72.25,
-      "origin_x": -4219.776,
+      "origin_x": -5566.0,
       "origin_z": 5566.0,
       "pbf_output": "data/osm/tiles/andijan/722_406.osm.pbf",
       "geojson_output": "data/osm/tiles/andijan/722_406.geojson",
@@ -41,7 +44,7 @@
       ],
       "center_lat": 40.650000000000006,
       "center_lon": 72.35,
-      "origin_x": 4219.776,
+      "origin_x": 5566.0,
       "origin_z": 5566.0,
       "pbf_output": "data/osm/tiles/andijan/723_406.osm.pbf",
       "geojson_output": "data/osm/tiles/andijan/723_406.geojson",
@@ -58,7 +61,7 @@
       ],
       "center_lat": 40.75,
       "center_lon": 72.25,
-      "origin_x": -4219.776,
+      "origin_x": -5566.0,
       "origin_z": -5566.0,
       "pbf_output": "data/osm/tiles/andijan/722_407.osm.pbf",
       "geojson_output": "data/osm/tiles/andijan/722_407.geojson",
@@ -75,7 +78,7 @@
       ],
       "center_lat": 40.75,
       "center_lon": 72.35,
-      "origin_x": 4219.776,
+      "origin_x": 5566.0,
       "origin_z": -5566.0,
       "pbf_output": "data/osm/tiles/andijan/723_407.osm.pbf",
       "geojson_output": "data/osm/tiles/andijan/723_407.geojson",
