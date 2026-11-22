@@ -17,6 +17,7 @@ on:
       - "tools/geodata/convert_dem.py"
       - "tools/geodata/build_dem_tile_batch.py"
       - "tools/geodata/validate_dem_tile_batch.py"
+      - "tools/geodata/build_osm_urban_tile_bboxes.py"
       - "scripts/world/dem_terrain_tile.gd"
       - "scenes/world/dem_terrain_tile.tscn"
       - "tests/test_etopo_tile_index.py"
@@ -125,31 +126,22 @@ jobs:
           key: zero-mercy-etopo15s-v1-${{ steps.select.outputs.safe_region }}-${{ steps.select.outputs.tile_start }}
           restore-keys: |
             zero-mercy-etopo15s-v1-${{ steps.select.outputs.safe_region }}-
-      - name: Plan country tiles in the shared global grid
+      - name: Plan populated-place tiles in the shared global grid
         if: steps.select.outputs.has_work == 'true'
         env:
           REGION_ID: ${{ steps.select.outputs.region_id }}
           SAFE_REGION: ${{ steps.select.outputs.safe_region }}
           TILE_DEGREES: ${{ inputs.tile_degrees || '0.1' }}
         run: |
-          python - <<'PY'
-          import json, os, subprocess
-          bboxes=json.loads(os.environ["COUNTRY_BBOXES_JSON"]) if "COUNTRY_BBOXES_JSON" in os.environ else None
-          if not bboxes:
-              queue=json.load(open("data/world/global_country_queue.json", encoding="utf-8"))
-              item=next(x for x in queue["countries"] if x["id"]==os.environ["REGION_ID"])
-              bboxes=item["bboxes"]
-          tile_deg=float(os.environ["TILE_DEGREES"])
-          tile_size=tile_deg*111320.0
-          cmd=["python","tools/geodata/plan_region_tiles.py","--region",os.environ["SAFE_REGION"],
-               "--tile-deg",str(tile_deg),"--tile-size-m",str(tile_size),
-               "--anchor","72.3","40.7","--global-grid","--merge-index",
-               "--output",f"data/world/tile_jobs/{os.environ['SAFE_REGION']}.json",
-               "--index-output","data/world/region_tiles.json"]
-          for bbox in bboxes:
-              cmd += ["--bbox",*map(str,bbox)]
-          subprocess.run(cmd,check=True)
-          PY
+          python tools/geodata/build_osm_urban_tile_bboxes.py "data/osm/pbf/$SAFE_REGION.osm.pbf" \
+            --queue data/world/global_country_queue.json --region-id "$REGION_ID" \
+            --output "data/world/tile_jobs/urban_bboxes/$SAFE_REGION.json"
+          python tools/geodata/plan_region_tiles.py --region "$SAFE_REGION" \
+            --tile-deg "$TILE_DEGREES" --tile-size-m "$(python -c 'import os; print(float(os.environ["TILE_DEGREES"])*111320.0)')" \
+            --anchor 72.3 40.7 --global-grid --merge-index \
+            --bbox-file "data/world/tile_jobs/urban_bboxes/$SAFE_REGION.json" \
+            --output "data/world/tile_jobs/$SAFE_REGION.json" \
+            --index-output data/world/region_tiles.json
           python tools/geodata/rebuild_global_runtime_index.py
       - name: Process bounded tile batch
         if: steps.select.outputs.has_work == 'true'
@@ -215,7 +207,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/world/global_regions.json data/world/global_country_queue.json \
             data/world/global_build_state.json data/world/region_tiles.json \
-            "data/world/tile_jobs/$SAFE_REGION.json" "data/osm/tiles/$SAFE_REGION/" \
+            "data/world/tile_jobs/$SAFE_REGION.json" "data/world/tile_jobs/urban_bboxes/$SAFE_REGION.json" "data/osm/tiles/$SAFE_REGION/" \
             data/terrain/tiles/global/
           if git diff --cached --quiet; then
             echo "No changed tile outputs in this batch."
