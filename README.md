@@ -26,6 +26,8 @@ Controls:
 - Mouse — look around
 - `Shift` — sprint
 - `Space` — jump
+- Left mouse button — fire weapon (when mouse is captured)
+- `R` — reload magazine
 - `Esc` — release the mouse
 
 ## Project principles
@@ -76,3 +78,10 @@ The main cyberpunk city scene now instantiates:
 Controls: WASD move, mouse look, Shift sprint, Space jump, E interact, Esc release mouse.
 
 This is a small integrated gameplay slice, not the full ZERO MERCY campaign. It does not yet contain the final Dara character, cinematic story, combat, vehicles, life simulation, global Earth world, online phone/social systems, or the requested ~70-hour campaign. No Godot editor/runtime test has been performed in this environment; run it in Godot 4 and resolve any parse/runtime issues before treating it as verified.
+
+
+## First combat slice
+
+The main city scene now spawns a training target with health. Dara has a raycast weapon with a 12-round magazine, 60 reserve rounds, a reload action, a fire-rate limit, and 34 damage per hit. Aim with the mouse and fire with the left mouse button; press R to reload. The target is removed when its health reaches zero.
+
+This is a basic combat prototype: it does not yet include enemy perception/AI, animations, weapon models, sound, hit effects, a player health loop, or a finished combat HUD. The new code has been committed but still needs a Godot editor/runtime validation pass.
