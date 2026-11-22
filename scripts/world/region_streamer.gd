@@ -112,11 +112,7 @@ func _process_queue() -> void:
 			var center_lat := float(entry.get("center_lat", 0.0))
 			var center_lon := float(entry.get("center_lon", 0.0))
 			if instance.has_method("configure_region"):
-				instance.call("configure_region", str(entry.get("geojson_path", "")), center_lat, center_lon)
-			elif "geojson_path" in instance:
-				instance.set("geojson_path", str(entry.get("geojson_path", "")))
-				instance.set("region_center_lat", center_lat)
-				instance.set("region_center_lon", center_lon)
+				instance.configure_region(str(entry.get("geojson_path", "")), center_lat, center_lon)
 			instance.position = Vector3(
 				float(entry.get("origin_x", coord.x * tile_size_m)),
 				0.0,
