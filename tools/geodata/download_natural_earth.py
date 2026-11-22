@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 import urllib.request
 from pathlib import Path
 
@@ -25,46 +26,57 @@ FILES = {
 }
 
 
-def download(scale: str) -> None:
+def download(scale: str, reuse_existing: bool = False, attempts: int = 5) -> None:
     filename = FILES[scale]
     url = f"{BASE}/{filename}"
     target = OUT / f"world-{scale}.geojson"
     OUT.mkdir(parents=True, exist_ok=True)
+    def validate(raw: bytes) -> tuple[int, int]:
+        parsed = json.loads(raw)
+        features = parsed.get("features", [])
+        if parsed.get("type") != "FeatureCollection" or len(features) < 100:
+            raise RuntimeError(f"Unexpected or incomplete GeoJSON FeatureCollection from {url}")
+        invalid = []
+        for index, feature in enumerate(features):
+            geometry = feature.get("geometry") or {}
+            if geometry.get("type") not in {"Polygon", "MultiPolygon"} or not geometry.get("coordinates"):
+                invalid.append(index)
+        if invalid:
+            raise RuntimeError(f"Country dataset contains {len(invalid)} invalid geometries; first indexes: {invalid[:10]}")
+        return len(features), len(raw)
+
+    if reuse_existing and target.is_file():
+        count, size = validate(target.read_bytes())
+        print(f"Reusing validated {target.relative_to(ROOT)} ({count} map features, {size:,} bytes)")
+        return
     request = urllib.request.Request(url, headers={"User-Agent": "ZERO-MERCY-geodata/1.0"})
-    print(f"Downloading {scale} country boundaries...")
-    with urllib.request.urlopen(request, timeout=90) as response:
-        raw = response.read()
-    # Validate before replacing a previously downloaded file.
-    parsed = json.loads(raw)
-    features = parsed.get("features", [])
-    if parsed.get("type") != "FeatureCollection" or len(features) < 100:
-        raise RuntimeError(f"Unexpected or incomplete GeoJSON FeatureCollection from {url}")
-    invalid = []
-    for index, feature in enumerate(features):
-        geometry = feature.get("geometry") or {}
-        geometry_type = geometry.get("type")
-        coordinates = geometry.get("coordinates")
-        if geometry_type not in {"Polygon", "MultiPolygon"} or not coordinates:
-            invalid.append(index)
-    if invalid:
-        raise RuntimeError(
-            f"Country dataset contains {len(invalid)} invalid geometries; "
-            f"first invalid feature indexes: {invalid[:10]}"
-        )
-    target.write_bytes(raw)
-    print(
-        f"Validated and saved {target.relative_to(ROOT)} "
-        f"({len(features)} map features, {len(raw):,} bytes)"
-    )
+    last_error = None
+    for attempt in range(attempts):
+        try:
+            print(f"Downloading {scale} country boundaries (attempt {attempt + 1}/{attempts})...")
+            with urllib.request.urlopen(request, timeout=90) as response:
+                raw = response.read()
+            count, size = validate(raw)
+            target.write_bytes(raw)
+            print(f"Validated and saved {target.relative_to(ROOT)} ({count} map features, {size:,} bytes)")
+            return
+        except Exception as exc:
+            last_error = exc
+            if attempt + 1 < attempts:
+                delay = min(30, 3 * (2 ** attempt))
+                print(f"Boundary download failed ({exc}); retrying in {delay}s...")
+                time.sleep(delay)
+    raise RuntimeError(f"Could not download {scale} country boundaries after {attempts} attempts: {last_error}")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scale", choices=["110m", "50m", "all"], default="110m")
+    parser.add_argument("--reuse-existing", action="store_true", help="Validate and reuse existing boundary files.")
     args = parser.parse_args()
     scales = FILES if args.scale == "all" else [args.scale]
     for scale in scales:
-        download(scale)
+        download(scale, reuse_existing=args.reuse_existing)
     print("Done. Open scenes/world/earth_globe.tscn in Godot 4.3+ to view the globe.")
 
 
