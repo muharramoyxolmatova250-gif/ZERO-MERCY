@@ -1,6 +1,6 @@
 extends Node
 ## Hierarchical life simulation: aggregate populations plus persistent individual residents.
-@export_range(15.0, 3600.0, 15.0) var month_seconds := 180.0
+@export_range(60.0, 86400.0, 60.0) var month_seconds := 3600.0
 @export_range(1000, 100000, 1000) var max_saved_profiles := 50000
 const SAVE_PATH := "user://zero_mercy_life_state.json"
 const JOBS := ["engineer", "doctor", "teacher", "pilot", "police", "mechanic", "designer", "courier", "scientist", "merchant", "artist", "security"]
