@@ -67,7 +67,14 @@ A Godot region prototype now lives at `scenes/world/osm_region.tscn` with script
 
 See [OSM_TO_GODOT.md](OSM_TO_GODOT.md) for export and scene setup. This preview uses a local equirectangular coordinate approximation and is intended for a small region only. It is not yet terrain-draped, seam-safe, optimized, or streamed. Godot runtime validation is still pending.
 
-## Stage 6: planet streaming
+
+## Stage 7: local region streaming prototype (code added)
+
+The repository now includes `scripts/world/region_streamer.gd`, an example tile index at `data/world/region_tiles.json`, and setup notes in [REGION_STREAMING.md](REGION_STREAMING.md). It loads indexed region scenes near a target and unloads distant ones with a small per-frame operation budget.
+
+The sample tile index contains placeholder GeoJSON paths and illustrative coordinates. The streamer is a local planar prototype; it is not threaded, not connected to a generated real tile set, and not validated for planet-scale performance. Terrain/collision seam stitching and NPC state handoff remain future work.
+
+## Stage 8: planet streaming
 
 Partition the globe into deterministic spatial cells (initial prototype: latitude/longitude tiles; production: cube-sphere or another seam-safe scheme). Load nearby cells asynchronously, retain a small neighbor ring, cancel stale jobs, and unload distant cells. Terrain, roads, buildings, and NPC simulation should have separate streaming budgets.
 
