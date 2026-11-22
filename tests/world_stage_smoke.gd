@@ -23,11 +23,37 @@ func _run() -> void:
 		_fail("City life missing: citizens=" + str(citizens) + ", traffic=" + str(traffic))
 		return
 	print("PASS Stage 3: ", citizens, " pedestrians and ", traffic, " electric vehicles spawned.")
+	var first_citizen := city.get_tree().get_first_node_in_group("city_citizen") as Node3D
+	var first_car := city.get_tree().get_first_node_in_group("city_traffic") as Node3D
+	var citizen_start := first_citizen.position
+	var car_start := first_car.position
+	await create_timer(0.5).timeout
+	if first_citizen.position.distance_to(citizen_start) < 0.05:
+		_fail("Pedestrian movement did not advance.")
+		return
+	if first_car.position.distance_to(car_start) < 0.05:
+		_fail("Electric traffic movement did not advance.")
+		return
+	print("PASS Stage 3: pedestrian and electric traffic movement advanced.")
 	var overview := load("res://scenes/world/earth_overview.tscn")
 	if overview == null:
 		_fail("Earth overview scene failed to load.")
 		return
 	print("PASS Stage 2: explorable Earth overview scene loads.")
+	var main_scene: PackedScene = load("res://scenes/main.tscn")
+	if main_scene == null:
+		_fail("Main gameplay scene failed to load.")
+		return
+	var main := main_scene.instantiate()
+	root.add_child(main)
+	await process_frame
+	main.call("_unhandled_input", _map_key_event())
+	await process_frame
+	if main.get_node_or_null("EarthMapOverview") == null:
+		_fail("M key did not open the Earth map from gameplay.")
+		return
+	print("PASS Stage 2: M key opens the Earth overview from gameplay.")
+	main.queue_free()
 
 	var globe_scene: PackedScene = load("res://scenes/world/earth_globe.tscn")
 	if globe_scene == null:
@@ -90,3 +116,9 @@ func _count_meshes(node: Node) -> int:
 func _fail(message: String) -> void:
 	push_error(message)
 	quit(1)
+
+func _map_key_event() -> InputEventKey:
+	var event := InputEventKey.new()
+	event.keycode = KEY_M
+	event.pressed = true
+	return event
