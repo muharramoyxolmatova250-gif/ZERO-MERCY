@@ -39,7 +39,17 @@ The example downloads one-degree tiles intersecting a small test area near Andij
 
 See [COPERNICUS_DEM.md](COPERNICUS_DEM.md) for source, tile naming, licensing, and the next conversion steps. GLO-30 is a Digital Surface Model (DSM), not bare-earth terrain; ocean tiles are not included. Missing/unreleased 30 m tiles are reported and skipped. The downloader has been added to the repository but has not yet been run against the live bucket or tested locally.
 
-## Stage 4: roads, buildings, and settlements
+
+## Stage 4: roads, buildings, settlements, waterways (pipeline added)
+
+Regional OpenStreetMap extract tooling is now in the repository:
+- `tools/geodata/download_osm_extract.py` discovers Geofabrik region IDs and downloads the chosen PBF.
+- `tools/geodata/filter_osm_extract.py` separates road, building, place, waterway, and landuse/natural features with `osmium-tool`.
+- Full instructions and ODbL attribution notes: [OPENSTREETMAP_PIPELINE.md](OPENSTREETMAP_PIPELINE.md).
+
+Start with one country/region and check available disk space. OSM coverage is uneven, and these scripts only download/filter source data; they do not yet generate finished Godot roads, buildings, or NPC-ready city scenes. Do not bulk-query public Nominatim/Overpass services.
+
+## Stage 4: roads, buildings, and settlements (production conversion still pending)
 
 Use country/region extracts from OpenStreetMap. OSM data is licensed under ODbL; attribution and share-alike obligations apply. Review the current OSM attribution and ODbL guidance before distributing derived databases:
 https://www.openstreetmap.org/copyright
