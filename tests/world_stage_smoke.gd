@@ -187,7 +187,24 @@ func _run() -> void:
 	if MissionManager.active_mission_id == "" and not MissionManager.start_next_campaign_mission():
 		_fail("The campaign could not start its next main mission.")
 		return
-	print("PASS Stage 8: 70-hour campaign, main mission order, side operations and persistent story state.")
+	var mission_director := main.get_node_or_null("MissionObjectiveDirector")
+	if mission_director == null or mission_director.get_child_count() == 0:
+		_fail("The active campaign objective did not create a world interaction marker.")
+		return
+	var dialogue_ui := main.get_node_or_null("DialogueUI")
+	if dialogue_ui == null or not DialogueManager.start_dialogue("smoke_intro", "res://data/story/dialogue_intro.json"):
+		_fail("Branching story dialogue did not start.")
+		return
+	if not bool(dialogue_ui.visible):
+		_fail("Dialogue interface did not appear.")
+		return
+	DialogueManager.choose(0)
+	DialogueManager.choose(0)
+	DialogueManager.finish_dialogue()
+	if bool(dialogue_ui.visible):
+		_fail("Dialogue interface did not close.")
+		return
+	print("PASS Stage 8: 70-hour campaign, interactive mission markers, branching dialogue and story saves.")
 	main.call("_unhandled_input", _map_key_event())
 	await process_frame
 	if main.get_node_or_null("EarthMapOverview") == null:
