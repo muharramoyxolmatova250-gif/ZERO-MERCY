@@ -15,6 +15,10 @@ var _hunger := 0.2
 var _social_need := 0.4
 var _curiosity := 0.5
 var _decision_timer := 0.0
+var _social_scan_timer := 0.0
+var _social_target: Node3D
+var _stress := 0.15
+var personality := 3
 var _memory: Array[String] = []
 var ai_decision_count := 0
 var current_goal := "commute"
@@ -30,14 +34,19 @@ func _ready() -> void:
 	if route.size() < 2:
 		route = PackedVector3Array([Vector3(-5,0,-5), Vector3(5,0,-5), Vector3(5,0,5), Vector3(-5,0,5)])
 	_target_index = 1
+	personality = _rng.randi_range(1, 5)
 	_decide_goal()
 
 func _physics_process(delta: float) -> void:
 	_decision_timer += delta
-	if _decision_timer >= 2.8:
+	if _decision_timer >= 2.5:
 		_decision_timer = 0.0
 		_update_needs()
 		_decide_goal()
+	_social_scan_timer += delta
+	if _social_scan_timer >= 5.0:
+		_social_scan_timer = 0.0
+		_scan_social_context()
 	if route.size() < 2:
 		return
 	if _pause_remaining > 0.0:
@@ -47,9 +56,17 @@ func _physics_process(delta: float) -> void:
 			if _phone != null: _phone.visible = false
 		return
 	var target := route[_target_index]
+	if current_goal == "social" and is_instance_valid(_social_target):
+		target = _social_target.global_position
 	var direction := target - position
 	direction.y = 0.0
-	if direction.length() < 0.35:
+	if direction.length() < (1.8 if current_goal == "social" else 0.35):
+		if current_goal == "social" and is_instance_valid(_social_target):
+			_social_target.call("remember_event", "met:" + citizen_id)
+			remember_event("conversation:" + str(_social_target.get("citizen_id")))
+			_social_target = null
+			_pause_remaining = _rng.randf_range(2.0, 5.0)
+			return
 		_choose_next_waypoint()
 		_pause_remaining = _pause_for_goal()
 		is_using_phone = current_goal in ["social", "commute", "explore"] and _rng.randf() < 0.68
@@ -64,12 +81,13 @@ func _update_needs() -> void:
 	_energy = clampf(_energy - 0.002, 0.0, 1.0)
 	_hunger = clampf(_hunger + 0.003, 0.0, 1.0)
 	_social_need = clampf(_social_need + 0.002, 0.0, 1.0)
-	_curiosity = clampf(_curiosity + 0.001, 0.0, 1.0)
+	_curiosity = clampf(_curiosity + 0.0015, 0.0, 1.0)
+	_stress = clampf(_stress + (0.001 if current_goal == "work" else -0.0015), 0.0, 1.0)
 
 func _decide_goal() -> void:
 	ai_decision_count += 1
 	var hour := int(Time.get_time_dict_from_system().get("hour", 12))
-	var scores := {"work": (1.0 if hour >= 8 and hour < 18 else 0.12) + (0.15 if occupation != "unemployed" else 0.0), "food": _hunger * 1.5, "social": _social_need * 1.25, "rest": (1.0 - _energy) * 1.4 + (0.25 if hour >= 21 or hour < 6 else 0.0), "explore": _curiosity * 0.9, "commute": 0.8 if hour in [7, 8, 17, 18] else 0.2}
+	var scores := {"work": (1.0 if hour >= 8 and hour < 18 else 0.12) + (0.18 if occupation != "unemployed" else 0.0), "food": _hunger * 1.65, "social": _social_need * (1.0 + float(personality) * 0.12) + (0.25 if is_instance_valid(_social_target) else 0.0), "rest": (1.0 - _energy) * 1.5 + (0.35 if hour >= 21 or hour < 6 else 0.0), "explore": _curiosity * (0.75 + float(personality) * 0.08), "commute": 0.9 if hour in [7, 8, 17, 18] else 0.18, "avoid_crowd": _stress * 0.55}
 	var best := "commute"
 	var best_score := -1.0
 	for goal in scores:
@@ -83,8 +101,9 @@ func _decide_goal() -> void:
 	elif best == "social": _social_need = maxf(0.0, _social_need - 0.1)
 	elif best == "rest": _energy = minf(1.0, _energy + 0.08)
 	elif best == "explore": _curiosity = maxf(0.0, _curiosity - 0.08)
+	if best == "avoid_crowd": _stress = maxf(0.0, _stress - 0.08)
 	_memory.append("decision:" + best)
-	if _memory.size() > 12: _memory.pop_front()
+	if _memory.size() > 24: _memory.pop_front()
 
 func _choose_next_waypoint() -> void:
 	if route.size() <= 2 or _rng.randf() < 0.75:
@@ -100,10 +119,23 @@ func _pause_for_goal() -> float:
 		"explore": return _rng.randf_range(0.5, 1.8)
 		_: return _rng.randf_range(0.25, 1.0)
 
+func _scan_social_context() -> void:
+	_social_target = null
+	var nearest_distance := 11.0
+	for candidate in get_tree().get_nodes_in_group("city_citizen"):
+		if candidate == self or not is_instance_valid(candidate): continue
+		var distance := global_position.distance_to(candidate.global_position)
+		if distance < nearest_distance:
+			nearest_distance = distance
+			_social_target = candidate
+
+func get_ai_snapshot() -> Dictionary:
+	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"memories":_memory.size(),"decisions":ai_decision_count}
+
 func remember_event(event_name: String) -> void:
 	_memory.append(event_name)
 	relationship_score = clampf(relationship_score + 0.02, -1.0, 1.0)
-	if _memory.size() > 12: _memory.pop_front()
+	if _memory.size() > 24: _memory.pop_front()
 
 func get_memory_snapshot() -> PackedStringArray:
 	return PackedStringArray(_memory)
