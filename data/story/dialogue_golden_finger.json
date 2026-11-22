@@ -1,0 +1,42 @@
+{
+  "start": "unknown_signal",
+  "nodes": {
+    "unknown_signal": {
+      "speaker": "Noma’lum ovoz",
+      "text": "Sen taxtni yo‘q qilding, Dara. Lekin Yer ostidagi eski protokol hali uyg‘onmagan.",
+      "choices": [
+        {
+          "text": "Kim gapiryapti?",
+          "next": "unknown_answer"
+        }
+      ]
+    },
+    "unknown_answer": {
+      "speaker": "Noma’lum ovoz",
+      "text": "Oltin barmoq — keyingi kalit. Biz seni anchadan beri kuzatamiz.",
+      "choices": [
+        {
+          "text": "Signal manbasini kuzataman.",
+          "next": "end",
+          "choice_id": "golden_finger_response",
+          "value": "trace",
+          "flag": "golden_finger_seen",
+          "flag_value": true
+        },
+        {
+          "text": "Bu safar men seni topaman.",
+          "next": "end",
+          "choice_id": "golden_finger_response",
+          "value": "hunt",
+          "flag": "golden_finger_seen",
+          "flag_value": true
+        }
+      ]
+    },
+    "end": {
+      "speaker": "Dara",
+      "text": "Ekran o‘chdi. Bitta oltin iz qoldi.",
+      "choices": []
+    }
+  }
+}
