@@ -1,0 +1,70 @@
+{
+  "start": "throne_offer",
+  "nodes": {
+    "throne_offer": {
+      "speaker": "Biologik ota",
+      "text": "Mening o‘rnimni egalla. Sen tizimni mendan yaxshiroq boshqarasan. Bir buyruq bilan urushlarni tugatishing mumkin.",
+      "choices": [
+        {
+          "text": "Men hech qanday taxtni qabul qilmayman.",
+          "next": "reject",
+          "choice_id": "throne_choice",
+          "value": "reject",
+          "flag": "throne_rejected",
+          "flag_value": true
+        },
+        {
+          "text": "Men boshqaruvni qo‘lga olaman.",
+          "next": "accept",
+          "choice_id": "throne_choice",
+          "value": "accept",
+          "flag": "throne_rejected",
+          "flag_value": false
+        },
+        {
+          "text": "Tizimni odamlarga topshiraman.",
+          "next": "reform",
+          "choice_id": "throne_choice",
+          "value": "reform",
+          "flag": "distributed_control",
+          "flag_value": true
+        }
+      ]
+    },
+    "reject": {
+      "speaker": "Dara",
+      "text": "Odamlarga yana bir hukmdor kerak emas. Ularga erkin tanlov kerak.",
+      "choices": [
+        {
+          "text": "Qarorni tasdiqlash.",
+          "next": "end"
+        }
+      ]
+    },
+    "accept": {
+      "speaker": "Dara",
+      "text": "Agar bu dunyoni saqlash uchun yagona yo‘l bo‘lsa, men nazoratni olaman.",
+      "choices": [
+        {
+          "text": "Qarorni tasdiqlash.",
+          "next": "end"
+        }
+      ]
+    },
+    "reform": {
+      "speaker": "Dara",
+      "text": "Hech kim butun Yer ustidan hukmronlik qilmaydi. Boshqaruv tarqatiladi.",
+      "choices": [
+        {
+          "text": "Qarorni tasdiqlash.",
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "Biologik ota",
+      "text": "Unda oxirgi protokolni ishga tushir.",
+      "choices": []
+    }
+  }
+}
