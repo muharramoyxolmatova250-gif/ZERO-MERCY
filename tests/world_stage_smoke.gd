@@ -40,6 +40,25 @@ func _run() -> void:
 		_fail("Earth overview scene failed to load.")
 		return
 	print("PASS Stage 2: explorable Earth overview scene loads.")
+
+	# WGS84 coordinate round-trips, including the antimeridian.
+	var origin_geo := Vector2(41.3111, 69.2797)
+	var nearby_geo := Vector2(41.3150, 69.2860)
+	var local_xy := EarthCoordinates.lat_lon_to_local(nearby_geo.x, nearby_geo.y, origin_geo.x, origin_geo.y)
+	var restored_geo := EarthCoordinates.local_to_lat_lon(local_xy, origin_geo.x, origin_geo.y)
+	if absf(restored_geo.x - nearby_geo.x) > 0.00001 or absf(restored_geo.y - nearby_geo.y) > 0.00001:
+		_fail("WGS84 local coordinate round-trip exceeded tolerance: " + str(restored_geo))
+		return
+	var dateline_xy := EarthCoordinates.lat_lon_to_local(10.0, -179.9, 10.0, 179.9)
+	if dateline_xy.x < 0.0 or dateline_xy.x > 30000.0:
+		_fail("Antimeridian local projection selected the long route: " + str(dateline_xy))
+		return
+	var ecef := EarthCoordinates.lat_lon_to_ecef(nearby_geo.x, nearby_geo.y, 125.0)
+	var restored_ecef := EarthCoordinates.ecef_to_lat_lon(ecef)
+	if absf(restored_ecef.x - nearby_geo.x) > 0.0001 or absf(restored_ecef.y - nearby_geo.y) > 0.0001:
+		_fail("WGS84 ECEF round-trip exceeded tolerance: " + str(restored_ecef))
+		return
+	print("PASS Stage 2: WGS84 ECEF/local transforms and antimeridian handling.")
 	var main_scene: PackedScene = load("res://scenes/main.tscn")
 	if main_scene == null:
 		_fail("Main gameplay scene failed to load.")
