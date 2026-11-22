@@ -1,0 +1,52 @@
+{
+  "start": "yelena_transmission",
+  "nodes": {
+    "yelena_transmission": {
+      "speaker": "Yelena",
+      "text": "Dara, global uzatma yuborildi. Endi butun Yer haqiqatni eshitadi.",
+      "choices": [
+        {
+          "text": "Seni bu yerdan olib chiqaman.",
+          "next": "dara_refuses"
+        }
+      ]
+    },
+    "dara_refuses": {
+      "speaker": "Dara",
+      "text": "Men seni tashlab ketmayman.",
+      "choices": [
+        {
+          "text": "Uzatmani saqlab qolaman.",
+          "next": "yelena_final",
+          "choice_id": "yelena_last_choice",
+          "value": "save_message",
+          "flag": "yelena_message_saved",
+          "flag_value": true
+        },
+        {
+          "text": "Sen bilan qolaman.",
+          "next": "yelena_final",
+          "choice_id": "yelena_last_choice",
+          "value": "stay_with_yelena",
+          "flag": "dara_stayed_with_yelena",
+          "flag_value": true
+        }
+      ]
+    },
+    "yelena_final": {
+      "speaker": "Yelena",
+      "text": "Unda eslab qol: odamlarni tizim emas, ularning tanlovi inson qiladi.",
+      "choices": [
+        {
+          "text": "Xayr, Yelena.",
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "Dara",
+      "text": "Yelenaning ovozi jim bo‘ldi. Uning xabari esa saqlanib qoldi.",
+      "choices": []
+    }
+  }
+}
