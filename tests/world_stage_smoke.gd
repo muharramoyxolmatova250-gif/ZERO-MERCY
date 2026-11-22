@@ -93,14 +93,21 @@ func _run() -> void:
 		_fail("OSM feature accounting did not process all fixture features.")
 		return
 	print("PASS Stage 2: WGS84 OSM roads, building footprints and waterways imported.")
-	var courtyard := Geometry2D.triangulate_polygon(
-		PackedVector2Array([Vector2(0,0), Vector2(10,0), Vector2(10,10), Vector2(0,10)]),
-		[PackedVector2Array([Vector2(3,3), Vector2(3,7), Vector2(7,7), Vector2(7,3)])]
-	)
-	if courtyard.is_empty():
-		_fail("Polygon with an inner courtyard ring failed triangulation.")
+	var courtyard_outer := PackedVector2Array([Vector2(0,0), Vector2(10,0), Vector2(10,10), Vector2(0,10)])
+	var courtyard_hole := PackedVector2Array([Vector2(3,3), Vector2(3,7), Vector2(7,7), Vector2(7,3)])
+	var courtyard_parts := Geometry2D.clip_polygons(courtyard_outer, courtyard_hole)
+	if courtyard_parts.is_empty():
+		_fail("Polygon clipping removed the entire building footprint around a courtyard.")
 		return
-	print("PASS Stage 2: building polygon holes/courtyards triangulate without filling the courtyard.")
+	var courtyard_area := 0.0
+	for part in courtyard_parts:
+		var triangles := Geometry2D.triangulate_polygon(part)
+		for i in range(0, triangles.size(), 3):
+			courtyard_area += absf((part[triangles[i + 1]].x - part[triangles[i]].x) * (part[triangles[i + 2]].y - part[triangles[i]].y) - (part[triangles[i + 1]].y - part[triangles[i]].y) * (part[triangles[i + 2]].x - part[triangles[i]].x)) * 0.5
+	if absf(courtyard_area - 84.0) > 0.1:
+		_fail("Courtyard area was not preserved by polygon clipping: " + str(courtyard_area))
+		return
+	print("PASS Stage 2: OSM building courtyard clipping preserves the inner open area.")
 
 
 
