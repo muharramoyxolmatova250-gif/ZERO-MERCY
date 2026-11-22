@@ -1,14 +1,6 @@
-name: Build playable Andijan OSM tiles
+name: Andijan regional OSM smoke test (manual)
 
 on:
-  push:
-    paths:
-      - ".github/workflows/build-andijan-osm-tiles.yml"
-      - "tools/geodata/build_global_manifest.py"
-      - "tools/geodata/plan_region_tiles.py"
-      - "tools/geodata/process_region_tiles.py"
-      - "scripts/world/region_streamer.gd"
-      - "scripts/world/osm_region.gd"
   workflow_dispatch:
 
 permissions:
