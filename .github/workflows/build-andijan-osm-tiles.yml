@@ -74,6 +74,12 @@ jobs:
           assert totals["buildings"] > 0, "No real building footprints were exported."
           print("Validated OSM totals:", totals)
           PY
+      - name: Strictly validate OSM batch and Godot runtime index
+        run: |
+          python tools/geodata/validate_osm_tile_batch.py \
+            data/world/tile_jobs/andijan.json \
+            --start 0 --count 4 \
+            --index data/world/region_tiles.json
       - name: Commit playable Andijan tiles and index
         run: |
           git config user.name "github-actions[bot]"
