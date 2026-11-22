@@ -1,0 +1,62 @@
+{
+  "start": "dara_confronts_denni",
+  "nodes": {
+    "dara_confronts_denni": {
+      "speaker": "Dara",
+      "text": "Denni, koordinatalar soxta edi. Sen meni pistirmaga olib kelding.",
+      "choices": [
+        {
+          "text": "Nega bunday qilding?",
+          "next": "denni_answer"
+        }
+      ]
+    },
+    "denni_answer": {
+      "speaker": "Denni",
+      "text": "Men tanlov qildim. Tizim meni ham, oilamni ham qo‘lida ushlab turardi. Men tirik qolishni tanladim.",
+      "choices": [
+        {
+          "text": "Seni kechirmayman. Yo‘limdan chiq.",
+          "next": "denni_rejected",
+          "choice_id": "denni_fate",
+          "value": "rejected",
+          "flag": "denni_betrayed",
+          "flag_value": true
+        },
+        {
+          "text": "Hozir ket. Keyin yana uchrashamiz.",
+          "next": "denni_spared",
+          "choice_id": "denni_fate",
+          "value": "spared",
+          "flag": "denni_spared",
+          "flag_value": true
+        }
+      ]
+    },
+    "denni_rejected": {
+      "speaker": "Dara",
+      "text": "Endi sen mening sherigim emassan.",
+      "choices": [
+        {
+          "text": "Aloqani uzish.",
+          "next": "end"
+        }
+      ]
+    },
+    "denni_spared": {
+      "speaker": "Dara",
+      "text": "Bu oxirgi imkoniyating bo‘lishi mumkin.",
+      "choices": [
+        {
+          "text": "Aloqani uzish.",
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "Denni",
+      "text": "Bu shahar hech kimni kechirmaydi.",
+      "choices": []
+    }
+  }
+}
