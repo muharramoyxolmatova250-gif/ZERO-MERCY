@@ -39,6 +39,16 @@ class UrbanTileBboxTests(unittest.TestCase):
         self.assertEqual(counts["village"], 2)
         self.assertEqual(len(boxes), 1)
 
+    def test_andijan_starting_cell_is_first(self):
+        features = [
+            {"properties": {"place": "city", "population": "1000000"},
+             "geometry": {"type": "Point", "coordinates": [10.0, 20.0]}},
+            {"properties": {"place": "village"},
+             "geometry": {"type": "Point", "coordinates": [72.32, 40.65]}},
+        ]
+        boxes, counts, settlements = build_bboxes(features, [[0.0, 0.0, 100.0, 90.0]])
+        self.assertEqual(boxes[0], [72.3, 40.6, 72.39999999999999, 40.7])
+
     def test_empty_region_gets_small_fallback_sample(self):
         boxes, counts, settlements = build_bboxes([], [[10.0, 20.0, 10.4, 20.4]])
         self.assertEqual(len(boxes), 1)
