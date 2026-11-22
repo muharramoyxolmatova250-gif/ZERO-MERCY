@@ -18,16 +18,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "data" / "dem" / "copernicus-glo30"
-BASE = "https://copernicus-dem-30m.s3.eu-central-1.amazonaws.com"
+BASE = "https://copernicus-dem-30m.s3.amazonaws.com"
 
 
-def coord_token(value: int, positive: str, negative: str) -> str:
-    return f"{positive if value >= 0 else negative}{abs(value):02d}_00"
+def coord_token(value: int, positive: str, negative: str, width: int) -> str:
+    return f"{positive if value >= 0 else negative}{abs(value):0{width}d}_00"
 
 
 def tile_stem(lat: int, lon: int) -> str:
-    return f"Copernicus_DSM_COG_10_{coord_token(lat, 'N', 'S')}_{coord_token(lon, 'E', 'W')}_DEM"
-
+    # Copernicus naming uses 2 digits for latitude and 3 for longitude.
+    return f"Copernicus_DSM_COG_10_{coord_token(lat, 'N', 'S', 2)}_{coord_token(lon, 'E', 'W', 3)}_DEM"
 
 def download_tile(lat: int, lon: int) -> bool:
     stem = tile_stem(lat, lon)
