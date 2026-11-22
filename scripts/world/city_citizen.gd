@@ -5,8 +5,14 @@ extends Node3D
 @export var pause_at_waypoints := false
 var _target_index := 0
 var _body: MeshInstance3D
+var _phone: MeshInstance3D
+var _pause_remaining := 0.0
+var is_using_phone := false
+var phone_interaction_count := 0
+var _rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
+	_rng.seed = int(absf(position.x * 97.0 + position.z * 131.0)) + 20261122
 	_build_appearance()
 	if route.size() < 2:
 		route = PackedVector3Array([Vector3(-5,0,-5), Vector3(5,0,-5), Vector3(5,0,5), Vector3(-5,0,5)])
@@ -14,11 +20,24 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if route.size() < 2:
 		return
+	if _pause_remaining > 0.0:
+		_pause_remaining = maxf(0.0, _pause_remaining - delta)
+		if _pause_remaining == 0.0:
+			is_using_phone = false
+			if _phone != null:
+				_phone.visible = false
+		return
 	var target := route[_target_index]
 	var direction := target - position
 	direction.y = 0.0
 	if direction.length() < 0.35:
 		_target_index = (_target_index + 1) % route.size()
+		_pause_remaining = _rng.randf_range(0.35, 1.4)
+		is_using_phone = _rng.randf() < 0.72
+		if is_using_phone:
+			phone_interaction_count += 1
+		if _phone != null:
+			_phone.visible = is_using_phone
 		return
 	position += direction.normalized() * walk_speed * delta
 	if direction.length_squared() > 0.001:
@@ -49,3 +68,17 @@ func _build_appearance() -> void:
 	head.position.y = 1.78
 	head.material_override = glow
 	add_child(head)
+	_phone = MeshInstance3D.new()
+	_phone.name = "Phone"
+	var phone_mesh := BoxMesh.new()
+	phone_mesh.size = Vector3(0.12, 0.2, 0.035)
+	_phone.mesh = phone_mesh
+	_phone.position = Vector3(0.34, 1.05, -0.12)
+	var phone_material := StandardMaterial3D.new()
+	phone_material.albedo_color = Color(0.0, 0.8, 1.0)
+	phone_material.emission_enabled = true
+	phone_material.emission = Color(0.0, 0.55, 1.0)
+	phone_material.emission_energy_multiplier = 2.0
+	_phone.material_override = phone_material
+	_phone.visible = false
+	add_child(_phone)
