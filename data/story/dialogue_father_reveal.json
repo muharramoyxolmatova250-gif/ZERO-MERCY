@@ -1,0 +1,62 @@
+{
+  "start": "father_reveal",
+  "nodes": {
+    "father_reveal": {
+      "speaker": "Biologik ota",
+      "text": "Dara. Sen mening qizimsan. Men seni tizimdan yashirdim, lekin oxir-oqibat o‘zim ham uning mahbusiga aylandim.",
+      "choices": [
+        {
+          "text": "Sen butun shaharlarni qafasga aylantirding.",
+          "next": "father_answer"
+        }
+      ]
+    },
+    "father_answer": {
+      "speaker": "Dara",
+      "text": "Tartib deb millionlab odamlarning irodasini tortib olding. Buni qanday oqlaysan?",
+      "choices": [
+        {
+          "text": "Sening yolg‘oningga ishonmayman.",
+          "next": "father_rejected",
+          "choice_id": "father_response",
+          "value": "reject",
+          "flag": "father_rejected",
+          "flag_value": true
+        },
+        {
+          "text": "Avval hamma haqiqatni eshitaman.",
+          "next": "father_heard",
+          "choice_id": "father_response",
+          "value": "listen",
+          "flag": "father_heard",
+          "flag_value": true
+        }
+      ]
+    },
+    "father_rejected": {
+      "speaker": "Biologik ota",
+      "text": "Unda meni dushman deb bil. Lekin yadro qulaganda kim javob berishini o‘yla.",
+      "choices": [
+        {
+          "text": "Davom etish.",
+          "next": "end"
+        }
+      ]
+    },
+    "father_heard": {
+      "speaker": "Biologik ota",
+      "text": "Men seni himoya qilish uchun yaratgan protokolni endi sen tugatishing kerak.",
+      "choices": [
+        {
+          "text": "Davom etish.",
+          "next": "end"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "Dara",
+      "text": "Endi ortga yo‘l yo‘q.",
+      "choices": []
+    }
+  }
+}
