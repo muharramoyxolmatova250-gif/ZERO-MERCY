@@ -182,11 +182,15 @@ func _load_cyberpunk_districts(entry: Dictionary, nodes: Array[Node3D], terrain:
                 district.set("block_spacing", 68.0 if population >= 1000000 else 58.0)
                 district.set("min_building_height", 32.0 if population >= 1000000 else 22.0)
                 district.set("max_building_height", 210.0 if population >= 1000000 else 150.0)
+                district.set("population_density", 0.4 if population >= 1000000 else 0.32)
+                district.set("traffic_density", 0.22 if population >= 1000000 else 0.18)
             else:
                 district.set("blocks_per_side", 3)
                 district.set("block_spacing", 44.0)
                 district.set("min_building_height", 10.0)
                 district.set("max_building_height", 70.0)
+                district.set("population_density", 0.2)
+                district.set("traffic_density", 0.1)
             district.set("seed_value", int(abs(hash(settlement_id))))
             district.name = ("Cyberpunk_" + str(settlement.get("name", place))).validate_node_name()
             district.position = Vector3(
