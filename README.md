@@ -77,3 +77,11 @@ See [Global Earth data acquisition](docs/GLOBAL_EARTH_DATA_ACQUISITION.md) for t
 - Before viewing country landmasses, download Natural Earth data: `python tools/geodata/download_natural_earth.py --scale 110m`.
 - The procedural NeoCity district spawns ambient pedestrians and four looping electric vehicles. These are foundational ambient agents, not a full life simulation or traffic AI.
 - The headless stage test checks globe scene loading, DEM mesh/collision creation, city geometry, pedestrian and vehicle counts. A successful CI run is still required before treating this test as passed.
+
+
+## Latest stage hardening
+
+- The tile planner now derives a runtime grid-cell size from the geographic tile width at the anchor latitude; the Godot region streamer reads the same value from the generated index. This reduces key collisions between adjacent longitude tiles.
+- The geographic pipeline test now asserts unique tile keys and runtime grid metadata.
+- The Godot stage smoke test now also checks that pedestrian and vehicle agents actually move and that pressing M in the main gameplay scene opens the Earth overview.
+- These are code-level acceptance checks. The project is not declared complete until the GitHub Actions run passes and real global source datasets have been downloaded, processed, visually inspected and profiled.
