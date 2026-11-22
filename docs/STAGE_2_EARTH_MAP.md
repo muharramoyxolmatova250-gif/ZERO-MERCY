@@ -47,6 +47,10 @@ The regional pipeline is intentionally batched: do not download or process every
 - OpenStreetMap extracts: © OpenStreetMap contributors, ODbL 1.0. Keep visible attribution and review share-alike requirements for redistributed derived databases.
 - OSM footprints do not provide building interiors, full terrain elevation, complete land cover or all hydrography.
 
+## Automated checks
+
+GitHub Actions runs the planner smoke test, then imports the Godot project headlessly and launches the main scene for a short smoke test. The workflow result must be checked in the Actions tab; adding the workflow does not itself prove a successful run.
+
 ## Remaining work (not falsely marked complete)
 
 - Download and process selected global/continent/country datasets; validate coverage and missing areas.
