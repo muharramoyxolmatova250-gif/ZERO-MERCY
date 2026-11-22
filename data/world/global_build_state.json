@@ -2,13 +2,13 @@
   "schema_version": 1,
   "current_region_id": "afghanistan",
   "next_tile_by_region": {
-    "afghanistan": 24
+    "afghanistan": 32
   },
   "completed_regions": [],
-  "last_updated_utc": "2026-11-22T10:36:32.922754+00:00",
+  "last_updated_utc": "2026-11-22T10:39:14.007470+00:00",
   "last_batch": {
     "region_id": "afghanistan",
-    "start": 16,
+    "start": 24,
     "processed": 8,
     "total_tiles": 13578
   }
