@@ -93,6 +93,14 @@ func _run() -> void:
 		_fail("OSM feature accounting did not process all fixture features.")
 		return
 	print("PASS Stage 2: WGS84 OSM roads, building footprints and waterways imported.")
+	var courtyard := Geometry2D.triangulate_polygon(
+		PackedVector2Array([Vector2(0,0), Vector2(10,0), Vector2(10,10), Vector2(0,10)]),
+		[PackedVector2Array([Vector2(3,3), Vector2(3,7), Vector2(7,7), Vector2(7,3)])]
+	)
+	if courtyard.is_empty():
+		_fail("Polygon with an inner courtyard ring failed triangulation.")
+		return
+	print("PASS Stage 2: building polygon holes/courtyards triangulate without filling the courtyard.")
 
 
 
