@@ -1,22 +1,27 @@
 # ZERO MERCY — Global Earth data pipeline
 
-The global queue is generated from Geofabrik's official worldwide extract index:
+## Worldwide catalogue and country queue
+
+The catalogue uses Geofabrik's full `index-v1.json` to obtain country boundary geometry. It stores compact bounding rectangles rather than the full source polygons. Dateline-crossing extents are split into two rectangles.
 
 ```bash
 python tools/geodata/build_global_manifest.py
 python tools/geodata/build_global_country_queue.py
+python tests/test_global_country_queue.py
 ```
 
-The queue retains one shallowest downloadable extract per ISO-3166-1 country code and includes the catalogue's geographic bounding box. Aggregate continent extracts and nested regional duplicates are excluded.
+The queue contains downloadable country-level extracts with ISO-3166-1 codes. Combined extracts retain every code they cover.
 
-## Country batch workflow
+## Shared global tile grid
 
-Use `.github/workflows/build-global-country-tiles.yml`. Supply a country extract ID from `data/world/global_country_queue.json`, tile width, and a bounded tile range. The workflow resolves that country's bounds automatically, downloads only its PBF, plans tiles in a shared world coordinate frame, merges the runtime tile index, processes the requested batch, validates outputs and commits verified data.
+All country extracts use the same equirectangular tile grid, anchored at longitude 72.3°, latitude 40.7° (the ZERO MERCY starting-world origin). A tile crossing a national boundary can contain several GeoJSON source files. The runtime index keeps every source path and the region streamer loads them together, rather than replacing one country's tile with another.
 
-Run successive batches by increasing `tile_start`. Large countries require many runs; the PBF itself may exceed GitHub runner disk or time limits. The old Andijan workflow is only a small smoke test.
+Use `.github/workflows/build-global-country-tiles.yml` with a country `region_id`, tile width and bounded tile range. The workflow resolves all bounding-box parts automatically, downloads only the selected country's PBF, plans globally aligned cells, processes the requested batch, validates the exports and merges their paths into `data/world/region_tiles.json`.
 
-## Remaining world-scale engineering
+The Andijan workflow is a four-tile smoke test on the same shared grid. It is not the world-data target.
 
-This pipeline is for real OSM roads, building footprints and waterways. It is not a finished planet: spherical globe streaming, elevation/terrain coverage, coastlines, landcover, rivers/lakes, global LOD, detailed interiors and performance qualification still require implementation. The current regional streamer uses a flat shared coordinate grid; a globe-native tile selector is required before using it for seamless travel across the entire spherical Earth.
+## Current technical boundary
+
+The shared grid is a flat equirectangular coordinate frame, not a spherical globe-native streaming system. It is a foundation for global geographic coverage, not yet seamless planetary traversal. Globe movement, elevation/terrain, coastlines and landcover, rivers/lakes, LOD, detailed cyberpunk city dressing and performance qualification remain separate engineering tasks.
 
 OpenStreetMap-derived data requires attribution **© OpenStreetMap contributors** and compliance with ODbL 1.0: https://www.openstreetmap.org/copyright.
