@@ -78,7 +78,8 @@ def main() -> int:
     for key, entry in runtime.items():
         if key.startswith("_") or not isinstance(entry, dict):
             continue
-        if entry.get("region") == plan.get("region"):
+        source_regions = entry.get("source_regions", [entry.get("region")])
+        if plan.get("region") in source_regions:
             indexed += 1
     if indexed < len(tiles):
         raise ValueError(f"Runtime index has {indexed} entries for region {plan.get('region')}, expected at least {len(tiles)}")
