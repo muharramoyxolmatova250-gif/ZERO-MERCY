@@ -210,17 +210,28 @@ func _add_extruded_polygon(rings: Array, height: float) -> void:
 		if hole.size() >= 3:
 			holes.append(hole)
 			all_rings.append(hole)
-	var indices := Geometry2D.triangulate_polygon(outer, holes)
-	if indices.is_empty():
-		push_warning("OSM building polygon could not be triangulated; skipped invalid footprint.")
+	var top_polygons: Array[PackedVector2Array] = [outer]
+	for hole in holes:
+		var next_polygons: Array[PackedVector2Array] = []
+		for polygon_to_clip in top_polygons:
+			for clipped in Geometry2D.clip_polygons(polygon_to_clip, hole):
+				if clipped.size() >= 3:
+					next_polygons.append(clipped)
+		top_polygons = next_polygons
+		if top_polygons.is_empty():
+			break
+	if top_polygons.is_empty():
+		push_warning("OSM building polygon could not be clipped/triangulated; skipped invalid footprint.")
 		return
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for i in range(0, indices.size(), 3):
-		var a := Vector3(outer[indices[i]].x, height, outer[indices[i]].y)
-		var b := Vector3(outer[indices[i + 1]].x, height, outer[indices[i + 1]].y)
-		var c := Vector3(outer[indices[i + 2]].x, height, outer[indices[i + 2]].y)
-		_add_triangle(st, a, b, c)
+	for top_polygon in top_polygons:
+		var indices := Geometry2D.triangulate_polygon(top_polygon)
+		for i in range(0, indices.size(), 3):
+			var a := Vector3(top_polygon[indices[i]].x, height, top_polygon[indices[i]].y)
+			var b := Vector3(top_polygon[indices[i + 1]].x, height, top_polygon[indices[i + 1]].y)
+			var c := Vector3(top_polygon[indices[i + 2]].x, height, top_polygon[indices[i + 2]].y)
+			_add_triangle(st, a, b, c)
 	for ring in all_rings:
 		for i in range(ring.size()):
 			var j := (i + 1) % ring.size()
