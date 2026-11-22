@@ -83,5 +83,6 @@ jobs:
             echo "Andijan OSM tiles are already current."
           else
             git commit -m "Build real Andijan OSM world tiles"
-            git push
+            git pull --rebase origin "${GITHUB_REF_NAME:-main}"
+            git push origin "HEAD:${GITHUB_REF_NAME:-main}"
           fi
