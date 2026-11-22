@@ -79,7 +79,7 @@ func _load_queue()->void:
 		var scene:=region_scene
 		var scene_path:=str(e.get("scene_path",""))
 		if scene_path!="":
-			var resource=load(scene_path)
+			var resource: Resource = load(scene_path)
 			if resource is PackedScene: scene=resource
 		if scene == null:
 			push_warning("ZERO MERCY: no PackedScene configured for region tile " + k)
