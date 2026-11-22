@@ -50,6 +50,11 @@ func _run() -> void:
 		_fail("Procedural city building collision/frontage count too low: " + str(city_doors))
 		return
 	print("PASS Stage 3: building entrances and illuminated street-level frontage generated.")
+	var lobby_lights := _count_named_nodes(city, "LobbyNeonLight")
+	if lobby_lights < 10:
+		_fail("Enterable building lobbies are missing: " + str(lobby_lights))
+		return
+	print("PASS Stage 3: ", lobby_lights, " building interiors/lobbies generated with neon lighting.")
 	var overview := load("res://scenes/world/earth_overview.tscn")
 	if overview == null:
 		_fail("Earth overview scene failed to load.")
