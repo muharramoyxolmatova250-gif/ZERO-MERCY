@@ -18,6 +18,12 @@ FALLBACK_PARENT_BY_ISO = {
     "EH": "africa", "TF": "africa", "FK": "south-america",
     "SA": "asia", "XK": "europe", "TT": "central-america",
 }
+# Keep the current Afghanistan cursor resumable, then prioritize the player's
+# Uzbekistan starting region before other major world hubs.
+COUNTRY_PRIORITY = {
+    "UZ": 0, "AF": 1, "US": 2, "CN": 3, "JP": 4,
+    "IN": 5, "KR": 6, "GB": 7, "DE": 8, "FR": 9,
+}
 
 def _iso_codes(region: dict) -> list[str]:
     raw = region.get("iso3166_1") or []
@@ -85,7 +91,11 @@ def build_queue(catalog: dict, natural_earth_path: Path = NATURAL_EARTH) -> list
         selected.append(entry)
         seen.add(parent_id)
 
-    return sorted(selected, key=lambda x: (x.get("extract_kind") != "country", x["name"].casefold(), x["id"]))
+    def priority(item: dict) -> int:
+        return min((COUNTRY_PRIORITY.get(code, 100) for code in item["iso3166_1"]), default=100)
+    return sorted(selected, key=lambda x: (
+        x.get("extract_kind") != "country", priority(x), x["name"].casefold(), x["id"]
+    ))
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
@@ -99,8 +109,8 @@ def main() -> int:
     supplemental = sum(item.get("extract_kind") == "supplemental_parent" for item in entries)
     codes = sorted({code for item in entries for code in item["iso3166_1"]})
     result = {
-        "schema_version": 3, "source_catalogue": str(a.catalog),
-        "selection": "Country extracts plus continent PBF fallbacks clipped to uncovered country boundaries",
+        "schema_version": 4, "source_catalogue": str(a.catalog),
+        "selection": "Priority country extracts plus continent PBF fallbacks clipped to uncovered country boundaries",
         "extract_count": len(entries), "covered_iso3166_1_count": len(codes),
         "supplemental_parent_extract_count": supplemental, "countries": entries,
     }
