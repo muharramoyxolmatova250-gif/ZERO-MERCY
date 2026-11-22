@@ -95,7 +95,7 @@ jobs:
           TILE_START: ${{ inputs.tile_start }}
           TILE_COUNT: ${{ inputs.tile_count }}
         run: |
-          SAFE_REGION="${REGION_ID//\\//_}"
+          SAFE_REGION=$(printf '%s' "$REGION_ID" | tr '/' '_')
           python tools/geodata/process_region_tiles.py \
             "data/osm/pbf/${SAFE_REGION}.osm.pbf" \
             "data/world/tile_jobs/${SAFE_REGION}.json" \
@@ -105,9 +105,10 @@ jobs:
             --start "${TILE_START}" --count "${TILE_COUNT}" \
             --index data/world/region_tiles.json
       - name: Commit verified country tiles
+        env:
+          REGION_ID: ${{ inputs.region_id }}
         run: |
-          SAFE_REGION="${{ inputs.region_id }}"
-          SAFE_REGION="${SAFE_REGION//\\//_}"
+          SAFE_REGION=$(printf '%s' "$REGION_ID" | tr '/' '_')
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/world/global_regions.json data/world/global_country_queue.json data/world/region_tiles.json "data/world/tile_jobs/${SAFE_REGION}.json" "data/osm/tiles/${SAFE_REGION}/"
