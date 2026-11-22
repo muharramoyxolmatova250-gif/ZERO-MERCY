@@ -59,6 +59,7 @@ permissions:
 
 concurrency:
   # Shared lock with the Earth catalogue workflow; only one world-data writer runs at a time.
+  # The saved cursor resumes Uzbekistan first, then continues every other world region.
   group: zero-mercy-repository-data-build
   cancel-in-progress: false
 
