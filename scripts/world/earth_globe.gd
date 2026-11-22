@@ -5,6 +5,7 @@ extends Node3D
 @export_file("*.geojson") var geojson_path: String = "res://data/geodata/world-50m.geojson"
 @export_file("*.geojson") var rivers_geojson_path: String = "res://data/geodata/world-110m-rivers.geojson"
 @export_file("*.geojson") var lakes_geojson_path: String = "res://data/geodata/world-110m-lakes.geojson"
+@export_file("*.geojson") var elevation_points_geojson_path: String = "res://data/geodata/world-110m-elevation_points.geojson"
 @export var draw_hydrography := true
 @export_range(10.0, 1000.0, 1.0) var globe_radius: float = 100.0
 @export var draw_country_borders: bool = true
@@ -16,6 +17,7 @@ var _land_material: StandardMaterial3D
 var _border_material: StandardMaterial3D
 var _inland_water_material: StandardMaterial3D
 var _river_material: StandardMaterial3D
+var _peak_material: StandardMaterial3D
 
 
 func _ready() -> void:
@@ -34,6 +36,8 @@ func _ready() -> void:
 			_load_lakes(lakes_geojson_path)
 		if FileAccess.file_exists(rivers_geojson_path):
 			_load_rivers(rivers_geojson_path)
+		if FileAccess.file_exists(elevation_points_geojson_path):
+			_load_elevation_points(elevation_points_geojson_path)
 
 
 func _setup_materials() -> void:
@@ -60,6 +64,14 @@ func _setup_materials() -> void:
 	_river_material.emission_enabled = true
 	_river_material.emission = Color(0.01, 0.24, 0.72)
 	_river_material.emission_energy_multiplier = 1.8
+
+	_peak_material = StandardMaterial3D.new()
+	_peak_material.albedo_color = Color(1.0, 0.62, 0.08)
+	_peak_material.metallic = 0.65
+	_peak_material.roughness = 0.28
+	_peak_material.emission_enabled = true
+	_peak_material.emission = Color(0.9, 0.32, 0.015)
+	_peak_material.emission_energy_multiplier = 1.2
 
 
 func _add_ocean() -> void:
@@ -291,6 +303,57 @@ func _add_river_line(coordinates: Array, river_name: String) -> void:
 	river.mesh = line
 	river.add_to_group("earth_river")
 	add_child(river)
+
+
+
+func _load_elevation_points(path: String) -> void:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		push_warning("Could not open Natural Earth elevation points: " + path)
+		return
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY or not parsed.has("features"):
+		push_warning("Invalid Natural Earth elevation-points FeatureCollection.")
+		return
+	var count := 0
+	for feature in parsed["features"]:
+		if typeof(feature) != TYPE_DICTIONARY:
+			continue
+		var geometry: Dictionary = feature.get("geometry", {})
+		var props: Dictionary = feature.get("properties", {})
+		if str(props.get("featurecla", "")) != "mountain":
+			continue
+		var coordinates: Variant = geometry.get("coordinates", [])
+		if not coordinates is Array or coordinates.size() < 2:
+			continue
+		var mountain_name := str(props.get("name", "Mountain"))
+		var elevation := int(props.get("elevation", 0))
+		var surface_point := _lat_lon_to_sphere(float(coordinates[1]), float(coordinates[0]), globe_radius + 0.6)
+		var marker_mesh := SphereMesh.new()
+		marker_mesh.radius = 0.58
+		marker_mesh.height = 1.16
+		marker_mesh.radial_segments = 10
+		marker_mesh.rings = 6
+		var marker := MeshInstance3D.new()
+		marker.name = ("Peak_" + mountain_name).validate_node_name()
+		marker.mesh = marker_mesh
+		marker.material_override = _peak_material
+		marker.position = surface_point
+		marker.add_to_group("earth_mountain_peak")
+		add_child(marker)
+		var label := Label3D.new()
+		label.name = ("PeakLabel_" + mountain_name).validate_node_name()
+		label.text = mountain_name + "  " + str(elevation) + " m"
+		label.font_size = 32
+		label.pixel_size = 0.012
+		label.outline_size = 8
+		label.modulate = Color(1.0, 0.82, 0.45)
+		label.outline_modulate = Color(0.015, 0.025, 0.06)
+		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		label.position = _lat_lon_to_sphere(float(coordinates[1]), float(coordinates[0]), globe_radius + 2.0)
+		add_child(label)
+		count += 1
+	print("ZERO MERCY Earth: marked ", count, " major mountain peaks.")
 
 
 func _lat_lon_to_sphere(latitude: float, longitude: float, radius: float) -> Vector3:
