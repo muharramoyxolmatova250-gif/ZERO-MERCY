@@ -7,15 +7,19 @@ const RESCUE_SCENE := preload("res://scenes/world/rescue_zone.tscn")
 const ENEMY_SCENE := preload("res://scenes/combat/training_enemy.tscn")
 const REGION_SCENE := preload("res://scenes/world/osm_region.tscn")
 const STREAMER_SCRIPT := preload("res://scripts/world/region_streamer.gd")
+const EARTH_OVERVIEW_SCENE := preload("res://scenes/world/earth_overview.tscn")
+var _earth_overview: Node3D
+var _player: CharacterBody3D
 var rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
  rng.randomize()
  _build_environment()
  _build_city()
- var player := PLAYER_SCENE.instantiate()
+ var player := PLAYER_SCENE.instantiate() as CharacterBody3D
  player.name = "Dara"
  player.position = Vector3(0, 1.2, 12)
+ _player = player
  add_child(player)
  _start_region_streaming()
  add_child(HUD_SCENE.instantiate())
@@ -102,3 +106,23 @@ func _add_box(pos:Vector3,size:Vector3,color:Color,emissive:=false)->void:
  collision.shape=shape
  body.add_child(collision)
  add_child(body)
+
+func _unhandled_input(event: InputEvent) -> void:
+ if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_M:
+  if _earth_overview == null:
+   _earth_overview = EARTH_OVERVIEW_SCENE.instantiate()
+   _earth_overview.name = "EarthMapOverview"
+   add_child(_earth_overview)
+   if _player != null:
+    _player.set_physics_process(false)
+    var player_camera := _player.get_node_or_null("CameraPivot/Camera3D") as Camera3D
+    if player_camera != null:
+     player_camera.current = false
+  else:
+   _earth_overview.queue_free()
+   _earth_overview = null
+   if _player != null:
+    _player.set_physics_process(true)
+    var player_camera := _player.get_node_or_null("CameraPivot/Camera3D") as Camera3D
+    if player_camera != null:
+     player_camera.current = true
