@@ -9,6 +9,7 @@ const REGION_SCENE := preload("res://scenes/world/osm_region.tscn")
 const STREAMER_SCRIPT := preload("res://scripts/world/region_streamer.gd")
 const LIFE_SIM_SCRIPT := preload("res://scripts/world/world_life_sim.gd")
 const PHONE_UI_SCRIPT := preload("res://scripts/ui/phone_ui.gd")
+const MISSION_DIRECTOR_SCRIPT := preload("res://scripts/story/mission_objective_director.gd")
 const EARTH_OVERVIEW_SCENE := preload("res://scenes/world/earth_overview.tscn")
 var _earth_overview: Node3D
 var _player: CharacterBody3D
@@ -28,6 +29,7 @@ func _ready() -> void:
  _start_global_world_simulation()
  _start_society_simulation()
  _start_phone_ui()
+ _start_mission_objective_director()
  add_child(HUD_SCENE.instantiate())
  var beacon := BEACON_SCENE.instantiate()
  beacon.position = Vector3(0, 0, -8)
@@ -40,6 +42,13 @@ func _ready() -> void:
  add_child(enemy)
 
 
+
+
+func _start_mission_objective_director() -> void:
+ var director := Node3D.new()
+ director.name = "MissionObjectiveDirector"
+ director.set_script(MISSION_DIRECTOR_SCRIPT)
+ add_child(director)
 
 func _start_phone_ui() -> void:
  var phone := CanvasLayer.new()
