@@ -1,0 +1,31 @@
+{
+  "prologue_signal": {
+    "title": "01 — Lost Signal",
+    "chapter": "Prologue",
+    "description": "Neo-City markazidagi buzilgan signal manbasini top.",
+    "objectives": [
+      {
+        "id": "reach_market",
+        "title": "Eski bozorga yetib bor",
+        "event": "enter_old_market",
+        "target": 1
+      },
+      {
+        "id": "inspect_beacon",
+        "title": "Signal qurilmasini tekshir",
+        "event": "interact_beacon",
+        "target": 1
+      },
+      {
+        "id": "protect_family",
+        "title": "Oilani xavfsiz joyga olib bor",
+        "event": "escort_family_safe",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 250,
+      "story_flag": "family_saved"
+    }
+  }
+}
