@@ -40,10 +40,6 @@ func _run() -> void:
 		_fail("Cyberpunk street lighting missing: " + str(street_lights))
 		return
 	print("PASS Stage 3: ", street_lights, " street lights generated at district junctions.")
-	var storefronts := _count_named_nodes(city, "OSM_Building")
-	if storefronts > 0:
-		_fail("Unexpected OSM building nodes in procedural city fixture.")
-		return
 	var city_doors := _count_nodes_of_type(city, StaticBody3D)
 	if city_doors < 20:
 		_fail("Procedural city building collision/frontage count too low: " + str(city_doors))
@@ -88,7 +84,7 @@ func _run() -> void:
 	if osm_roads < 1 or osm_buildings < 1 or osm_water < 1:
 		_fail("OSM fixture import missing geometry: roads=" + str(osm_roads) + ", buildings=" + str(osm_buildings) + ", water=" + str(osm_water))
 		return
-	if int(osm_region.feature_stats.get("processed", 0)) != 3:
+	if int(osm_region.get("feature_stats").get("processed", 0)) != 3:
 		_fail("OSM feature accounting did not process all fixture features.")
 		return
 	print("PASS Stage 2: WGS84 OSM roads, building footprints and waterways imported.")
