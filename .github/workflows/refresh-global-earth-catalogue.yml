@@ -27,7 +27,7 @@ jobs:
       - name: Build and test country extract queue
         run: |
           python tools/geodata/build_global_country_queue.py
-          python -m unittest tests/test_global_country_queue.py
+          python tests/test_global_country_queue.py
       - name: Download public-domain world country boundaries (110m and 50m)
         run: python tools/geodata/download_natural_earth.py --scale all
       - name: Validate global boundary GeoJSON
