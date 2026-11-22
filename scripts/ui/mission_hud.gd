@@ -8,6 +8,7 @@ var health_label: Label
 var stamina_label: Label
 var ammo_label: Label
 var player_ref: Node
+var _last_failed_mission_id := ""
 
 
 func _ready() -> void:
@@ -21,7 +22,13 @@ func _ready() -> void:
 	if not players.is_empty():
 		_bind_player(players[0])
 	if MissionManager.active_mission_id == "":
-		MissionManager.start_mission("prologue_signal")
+		MissionManager.start_next_campaign_mission()
+	else:
+		var mission_data: Dictionary = MissionManager.get_current_mission_data()
+		_on_mission_started(MissionManager.active_mission_id, str(mission_data.get("title", MissionManager.active_mission_id)))
+		var objective: Dictionary = MissionManager.get_current_objective()
+		if not objective.is_empty():
+			_on_objective_updated(MissionManager.active_mission_id, str(objective.get("id", "")), int(objective.get("current", 0)), int(objective.get("target", 1)))
 
 
 func _build_ui() -> void:
@@ -116,9 +123,21 @@ func _on_objective_updated(mission_id: String, objective_id: String, current: in
 
 func _on_mission_completed(_mission_id: String) -> void:
 	objective_label.text = "MISSION COMPLETE"
-	status_label.text = "OBJECTIVES CLEARED"
+	status_label.text = "ENTER TO CONTINUE  //  NEXT CHAPTER"
 
 
-func _on_mission_failed(_mission_id: String) -> void:
+func _on_mission_failed(mission_id: String) -> void:
+	_last_failed_mission_id = mission_id
 	objective_label.text = "MISSION FAILED"
-	status_label.text = "MISSION DATA LOST"
+	status_label.text = "ENTER TO RETRY  //  MISSION DATA LOST"
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ENTER:
+		if MissionManager.active_mission_id == "":
+			if not _last_failed_mission_id.is_empty():
+				var retry_id := _last_failed_mission_id
+				_last_failed_mission_id = ""
+				MissionManager.start_mission(retry_id)
+			else:
+				MissionManager.start_next_campaign_mission()
+			get_viewport().set_input_as_handled()
