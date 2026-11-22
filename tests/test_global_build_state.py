@@ -1,4 +1,6 @@
-import unittest
+import unittest, sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools.geodata.select_global_country_batch import select_batch
 from tools.geodata.advance_global_country_batch import advance_state
 
