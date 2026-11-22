@@ -8,13 +8,14 @@ on:
       - "tools/geodata/plan_region_tiles.py"
       - "tools/geodata/process_region_tiles.py"
       - "scripts/world/region_streamer.gd"
+      - "scripts/world/osm_region.gd"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: zero-mercy-andijan-osm-tiles
+  group: zero-mercy-repository-data-build
   cancel-in-progress: false
 
 jobs:
@@ -37,12 +38,14 @@ jobs:
         run: python tools/geodata/build_global_manifest.py --region uzbekistan --download
       - name: Plan four adjacent Andijan and Asaka tiles
         run: |
+          rm -f data/world/region_tiles.json
           python tools/geodata/plan_region_tiles.py \
             --region andijan \
             --bbox 72.2 40.6 72.4 40.8 \
             --tile-deg 0.1 \
-            --tile-size-m 8000 \
+            --tile-size-m 11132 \
             --anchor 72.3 40.7 \
+            --global-grid \
             --index-output data/world/region_tiles.json
       - name: Clip and export real OSM streets, buildings and waterways
         run: |
