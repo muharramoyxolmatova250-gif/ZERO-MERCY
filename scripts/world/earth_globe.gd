@@ -178,7 +178,7 @@ func _add_surface_polygon(points: PackedVector2Array, surface_name: String, mate
 	land.name = surface_name.validate_node_name()
 	land.mesh = mesh
 	land.material_override = material
-	if surface_name.contains("_Water_"):
+	if surface_name.contains("_Water_") or surface_name.begins_with("Lake_"):
 		land.add_to_group("earth_inland_water")
 	add_child(land)
 
@@ -289,6 +289,7 @@ func _add_river_line(coordinates: Array, river_name: String) -> void:
 	var river := MeshInstance3D.new()
 	river.name = ("River_" + river_name).validate_node_name()
 	river.mesh = line
+	river.add_to_group("earth_river")
 	add_child(river)
 
 
