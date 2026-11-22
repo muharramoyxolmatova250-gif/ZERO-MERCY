@@ -157,6 +157,7 @@ func _run() -> void:
 	globe.set("geojson_path", "res://tests/fixtures/earth_smoke.geojson")
 	globe.set("rivers_geojson_path", "res://tests/fixtures/rivers_smoke.geojson")
 	globe.set("lakes_geojson_path", "res://tests/fixtures/lakes_smoke.geojson")
+	globe.set("elevation_points_geojson_path", "res://tests/fixtures/mountains_smoke.geojson")
 	root.add_child(globe)
 	await process_frame
 	var globe_meshes := _count_meshes(globe)
@@ -171,7 +172,11 @@ func _run() -> void:
 	if river_count < 1:
 		_fail("Earth globe did not render global river line geometry.")
 		return
-	print("PASS Stage 2: Earth globe generated ", globe_meshes, " meshes including ", inland_water_count, " lake/water surfaces and ", river_count, " river lines.")
+	var mountain_count := globe.get_tree().get_nodes_in_group("earth_mountain_peak").size()
+	if mountain_count < 1:
+		_fail("Earth globe did not render mountain peak markers.")
+		return
+	print("PASS Stage 2: Earth globe generated ", globe_meshes, " meshes, ", inland_water_count, " water surfaces, ", river_count, " river lines and ", mountain_count, " mountain peaks.")
 
 	var metadata_path := "user://zero_mercy_dem_smoke.json"
 	var heights_path := "user://zero_mercy_dem_smoke.f32"
