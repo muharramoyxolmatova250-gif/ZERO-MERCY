@@ -172,7 +172,15 @@ func _run() -> void:
 	if active_citizens.is_empty():
 		_fail("Cyberpunk city did not spawn life-simulated citizens.")
 		return
-	var citizen_snapshot: Dictionary = active_citizens[0].call("get_ai_snapshot")
+	var registered_citizen: Node3D = null
+	for candidate in active_citizens:
+		if not (candidate as Node3D).get("life_profile").is_empty():
+			registered_citizen = candidate as Node3D
+			break
+	if registered_citizen == null:
+		_fail("Streamed NPCs are not connected to persistent individual life profiles.")
+		return
+	var citizen_snapshot: Dictionary = registered_citizen.call("get_ai_snapshot")
 	if not citizen_snapshot.has("age_years") or not citizen_snapshot.has("life_stage"):
 		_fail("NPC does not expose persistent life-cycle data.")
 		return
