@@ -27,18 +27,30 @@ var life_profile: Dictionary = {}
 var _last_visual_age := -1
 var _age_refresh_timer := 0.0
 @export var citizen_id := ""
+@export var city_id := ""
 @export var occupation := "resident"
 
 func _ready() -> void:
 	_rng.seed = int(absf(position.x * 97.0 + position.z * 131.0)) + 20261122
 	_build_appearance()
 	if citizen_id.is_empty():
-		citizen_id = "citizen_" + str(abs(hash(str(position))))
+		citizen_id = "citizen_" + str(abs(hash(str(position) + ":" + city_id)))
+	_register_life_profile()
 	if route.size() < 2:
 		route = PackedVector3Array([Vector3(-5,0,-5), Vector3(5,0,-5), Vector3(5,0,5), Vector3(-5,0,5)])
 	_target_index = 1
 	personality = _rng.randi_range(1, 5)
 	_decide_goal()
+
+func _register_life_profile() -> void:
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	if life_sim == null or not life_sim.has_method("register_citizen"):
+		return
+	var resolved_city := city_id if not city_id.is_empty() else "UnmappedSettlement"
+	life_profile = life_sim.call("register_citizen", citizen_id, resolved_city, occupation)
+	occupation = str(life_profile.get("occupation", occupation))
+	_last_visual_age = -1
+
 
 func _physics_process(delta: float) -> void:
 	_age_refresh_timer += delta
