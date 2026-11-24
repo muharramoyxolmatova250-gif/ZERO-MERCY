@@ -162,6 +162,12 @@ func _run() -> void:
 	if int(life_snapshot.get("city_hubs", 0)) < 1:
 		_fail("World life simulation has no population hubs.")
 		return
+	life_sim.call("register_settlement_hub", "SmokeSettlement", "Smoke Settlement", 250000)
+	life_snapshot = life_sim.call("get_world_life_snapshot")
+	if int(life_snapshot.get("city_hubs", 0)) < 19 or int(life_snapshot.get("aggregate_population", 0)) < 2000000:
+		_fail("OSM settlement population was not added to the persistent global life simulation.")
+		return
+	print("PASS Global life: streamed settlements register population-sized persistent city hubs.")
 	var active_citizens: Array = get_nodes_in_group("city_citizen")
 	if active_citizens.is_empty():
 		_fail("Cyberpunk city did not spawn life-simulated citizens.")
