@@ -277,6 +277,7 @@ func _spawn_city_life() -> void:
 			var claimed_id := str(life_sim.call("claim_resident_id", str(name)))
 			if not claimed_id.is_empty():
 				citizen.set("citizen_id", claimed_id)
+		citizen.set("city_id", str(name))
 		citizen.add_to_group("city_citizen")
 		var lane := (float(i % blocks_per_side) - float(blocks_per_side - 1) * 0.5) * block_spacing
 		var side := -1.0 if i % 2 == 0 else 1.0
