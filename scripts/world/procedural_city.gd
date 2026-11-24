@@ -6,6 +6,7 @@ extends Node3D
 @export var block_spacing := 52.0
 @export var road_width := 14.0
 @export var seed_value := 20261122
+@export_range(1, 100000000, 1) var settlement_population := 100000
 @export var min_building_height := 16.0
 @export var max_building_height := 110.0
 @export var generate_collision := true
@@ -18,10 +19,18 @@ var _window_materials: Array[StandardMaterial3D] = []
 func _ready() -> void:
 	rng.seed = seed_value
 	_materials()
+	_register_settlement_hub()
 	_roads_and_blocks()
 	_spawn_street_furniture()
 	_spawn_city_life()
 	_spawn_interactive_props()
+
+
+func _register_settlement_hub() -> void:
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	if life_sim != null and life_sim.has_method("register_settlement_hub"):
+		life_sim.call("register_settlement_hub", str(name), str(name), settlement_population)
+
 
 func _materials() -> void:
 	for c in [Color(0.018, 0.028, 0.05), Color(0.035, 0.025, 0.065), Color(0.045, 0.055, 0.075), Color(0.065, 0.025, 0.055)]:
