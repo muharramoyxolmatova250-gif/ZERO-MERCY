@@ -5,6 +5,19 @@ func _initialize() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
+	var streamer_probe := Node3D.new()
+	streamer_probe.set_script(load("res://scripts/world/region_streamer.gd"))
+	if not bool(streamer_probe.call("should_spawn_settlement_district", "village", 0)):
+		_fail("Mapped villages are not included in the streamed cyberpunk world.")
+		return
+	if not bool(streamer_probe.call("should_spawn_settlement_district", "hamlet", 1000)):
+		_fail("Populated hamlets are not included in the streamed cyberpunk world.")
+		return
+	if bool(streamer_probe.call("should_spawn_settlement_district", "hamlet", 50)):
+		_fail("Tiny hamlets should not exceed the procedural city geometry budget.")
+		return
+	streamer_probe.free()
+	print("PASS Global settlements: villages and populated hamlets receive bounded cyberpunk districts.")
 	var city_scene: PackedScene = load("res://scenes/world/cyberpunk_district.tscn")
 	if city_scene == null:
 		_fail("Cyberpunk district scene failed to load.")
