@@ -36,15 +36,31 @@ func _process(delta: float) -> void:
         _elapsed = 0.0
         advance_month()
 
-func _ensure_hub(city_id: String) -> void:
+func _ensure_hub(city_id: String, population_hint: int = 100000) -> void:
     if hub_state.has(city_id):
+        var existing: Dictionary = hub_state[city_id]
+        existing["population"] = maxi(int(existing.get("population", 0)), maxi(1, population_hint))
+        hub_state[city_id] = existing
         return
+    var population := maxi(1, population_hint)
     hub_state[city_id] = {
-        "city": city_id, "population": 100000, "births": 0, "deaths": 0,
-        "students": 18000, "workers": 46000, "unemployed": 6000,
-        "married_families": 24000, "retired": 9000, "public_mood": 0.62,
-        "schools": SCHOOLS.duplicate(), "jobs": 0, "last_updated_day": simulation_day
+        "city": city_id, "population": population, "births": 0, "deaths": 0,
+        "students": int(round(population * 0.18)), "workers": int(round(population * 0.46)),
+        "unemployed": int(round(population * 0.06)),
+        "married_families": int(round(population * 0.24)), "retired": int(round(population * 0.09)),
+        "public_mood": 0.62, "schools": SCHOOLS.duplicate(),
+        "jobs": 0, "last_updated_day": simulation_day
     }
+
+
+func register_settlement_hub(city_id: String, display_name: String, population_hint: int) -> void:
+    if city_id.is_empty():
+        return
+    _ensure_hub(city_id, population_hint)
+    var hub: Dictionary = hub_state[city_id]
+    hub["display_name"] = display_name
+    hub["source"] = "openstreetmap_settlement"
+    hub_state[city_id] = hub
 
 func register_citizen(citizen_id: String, city_id: String, fallback_occupation: String = "resident") -> Dictionary:
     _ensure_hub(city_id)
