@@ -167,7 +167,9 @@ func _load_cyberpunk_districts(entry: Dictionary, nodes: Array[Node3D], terrain:
                 continue
             var place := str(settlement.get("place", ""))
             var population := int(settlement.get("population", 0))
-            if place != "city" and not (place == "town" and population >= 50000):
+            # Stream authored cyberpunk districts for major cities, populated towns
+            # and larger villages. Small hamlets remain lightweight settlement data.
+            if place != "city" and not (place == "town" and population >= 10000) and not (place == "village" and population >= 5000):
                 continue
             var latitude := float(settlement.get("lat", 0.0))
             var longitude := float(settlement.get("lon", 0.0))
@@ -184,13 +186,20 @@ func _load_cyberpunk_districts(entry: Dictionary, nodes: Array[Node3D], terrain:
                 district.set("max_building_height", 210.0 if population >= 1000000 else 150.0)
                 district.set("population_density", 0.4 if population >= 1000000 else 0.32)
                 district.set("traffic_density", 0.22 if population >= 1000000 else 0.18)
-            else:
+            elif place == "town":
                 district.set("blocks_per_side", 3)
                 district.set("block_spacing", 44.0)
                 district.set("min_building_height", 10.0)
                 district.set("max_building_height", 70.0)
-                district.set("population_density", 0.2)
-                district.set("traffic_density", 0.1)
+                district.set("population_density", 0.16)
+                district.set("traffic_density", 0.08)
+            else:
+                district.set("blocks_per_side", 2)
+                district.set("block_spacing", 34.0)
+                district.set("min_building_height", 6.0)
+                district.set("max_building_height", 32.0)
+                district.set("population_density", 0.08)
+                district.set("traffic_density", 0.04)
             district.set("seed_value", int(abs(hash(settlement_id))))
             district.name = ("Cyberpunk_" + str(settlement.get("name", place))).validate_node_name()
             district.position = Vector3(
