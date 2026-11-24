@@ -167,10 +167,14 @@ func _load_cyberpunk_districts(entry: Dictionary, nodes: Array[Node3D], terrain:
                 continue
             var place := str(settlement.get("place", ""))
             var population := int(settlement.get("population", 0))
-            # Stream authored cyberpunk districts for major cities, populated towns
-            # and larger villages. Small hamlets remain lightweight settlement data.
-            if place != "city" and not (place == "town" and population >= 10000) and not (place == "village" and population >= 5000):
+            # Every mapped village gets a small lived-in district. Towns and cities
+            # scale up by population; only larger hamlets receive a built-up cluster.
+            if not should_spawn_settlement_district(place, population):
                 continue
+            # Bound procedural geometry per loaded cell. The catalogue is sorted
+            # city -> town -> village -> hamlet, largest first within each class.
+            if spawned_in_cell.size() >= 8:
+                break
             var latitude := float(settlement.get("lat", 0.0))
             var longitude := float(settlement.get("lon", 0.0))
             var elevation := 0.0
@@ -193,13 +197,20 @@ func _load_cyberpunk_districts(entry: Dictionary, nodes: Array[Node3D], terrain:
                 district.set("max_building_height", 70.0)
                 district.set("population_density", 0.16)
                 district.set("traffic_density", 0.08)
-            else:
+            elif place == "village":
                 district.set("blocks_per_side", 2)
                 district.set("block_spacing", 34.0)
                 district.set("min_building_height", 6.0)
                 district.set("max_building_height", 32.0)
                 district.set("population_density", 0.08)
                 district.set("traffic_density", 0.04)
+            else: # hamlet
+                district.set("blocks_per_side", 2)
+                district.set("block_spacing", 28.0)
+                district.set("min_building_height", 4.0)
+                district.set("max_building_height", 18.0)
+                district.set("population_density", 0.05)
+                district.set("traffic_density", 0.02)
             district.set("seed_value", int(abs(hash(settlement_id))))
             district.name = ("Cyberpunk_" + str(settlement.get("name", place))).validate_node_name()
             district.position = Vector3(
@@ -211,6 +222,18 @@ func _load_cyberpunk_districts(entry: Dictionary, nodes: Array[Node3D], terrain:
             nodes.append(district)
             spawned_in_cell[settlement_id] = true
 
+
+
+func should_spawn_settlement_district(place: String, population: int) -> bool:
+    match place:
+        "city", "village":
+            return true
+        "town":
+            return population >= 10000
+        "hamlet":
+            return population >= 1000
+        _:
+            return false
 
 func _get_settlement_catalog(region_id: String) -> Dictionary:
     if _settlement_catalog_cache.has(region_id):
