@@ -168,6 +168,12 @@ func _run() -> void:
 		_fail("OSM settlement population was not added to the persistent global life simulation.")
 		return
 	print("PASS Global life: streamed settlements register population-sized persistent city hubs.")
+	var life_test_citizen := Node3D.new()
+	life_test_citizen.set_script(load("res://scripts/world/city_citizen.gd"))
+	life_test_citizen.set("citizen_id", "smoke_resident_lifecycle")
+	life_test_citizen.set("city_id", "SmokeSettlement")
+	main.add_child(life_test_citizen)
+	await process_frame
 	var active_citizens: Array = get_nodes_in_group("city_citizen")
 	if active_citizens.is_empty():
 		_fail("Cyberpunk city did not spawn life-simulated citizens.")
