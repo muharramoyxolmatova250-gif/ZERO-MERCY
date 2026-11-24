@@ -111,14 +111,40 @@ func _build_environment() -> void:
  add_child(sun)
 
 func _build_city() -> void:
- # Keep a starter cyberpunk district only until the Uzbekistan settlement catalogue
- # is present; once real OSM settlements stream, avoid stacking two city cores.
- if FileAccess.file_exists("res://data/osm/tiles/uzbekistan/723_407.geojson"):
+ # Use the actual global runtime index at the player's spawn cell. Do not hard-code
+ # a country or a tile ID: the same startup must work as the global build advances.
+ if _has_starting_world_tile():
   return
  var district := Node3D.new()
  district.name = "NeoCityDistrictFallback"
  district.set_script(load("res://scripts/world/procedural_city.gd"))
  add_child(district)
+
+
+func _has_starting_world_tile() -> bool:
+ var index_path := "res://data/world/region_tiles.json"
+ if not FileAccess.file_exists(index_path):
+  return false
+ var file := FileAccess.open(index_path, FileAccess.READ)
+ if file == null:
+  return false
+ var parsed: Variant = JSON.parse_string(file.get_as_text())
+ if typeof(parsed) != TYPE_DICTIONARY:
+  return false
+ var tile_size := maxf(100.0, float(parsed.get("_tile_size_m", 11132.0)))
+ # Dara's initial spawn is (0, 12) in the global equirectangular world frame.
+ var cell_x := floori(0.0 / tile_size)
+ var cell_z := floori(12.0 / tile_size)
+ var entry: Variant = parsed.get(str(cell_x) + "," + str(cell_z), {})
+ if typeof(entry) != TYPE_DICTIONARY:
+  return false
+ var paths: Array = entry.get("geojson_paths", [])
+ if paths.is_empty() and str(entry.get("geojson_path", "")) != "":
+  paths.append(str(entry["geojson_path"]))
+ for path in paths:
+  if FileAccess.file_exists(str(path)):
+   return true
+ return false
 func _add_windows(x:float,z:float,h:float,w:float,d:float)->void:
  for row in range(1,int(h/2.4)):
   for col in range(2):
