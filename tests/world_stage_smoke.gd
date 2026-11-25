@@ -262,6 +262,15 @@ func _run() -> void:
 		_fail("Cyber sidearm muzzle flash did not fade after firing.")
 		return
 	print("PASS Combat presentation: muzzle flash fades cleanly after the shot.")
+	var reserve_before_reload := int(player.get("reserve_ammo"))
+	player.call("_reload_weapon")
+	if int(player.get("ammo_in_magazine")) != int(player.get("magazine_size")):
+		_fail("Cyber sidearm reload did not refill its magazine.")
+		return
+	if int(player.get("reserve_ammo")) != reserve_before_reload - 1:
+		_fail("Cyber sidearm reload did not deduct the correct reserve ammunition.")
+		return
+	print("PASS Combat: weapon reload restores magazine ammunition and consumes reserve rounds.")
 	var life_sim := main.get_node_or_null("WorldLifeSimulation")
 	if life_sim == null:
 		_fail("Persistent world life simulation did not start.")
