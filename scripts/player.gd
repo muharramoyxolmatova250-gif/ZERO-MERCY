@@ -48,6 +48,7 @@ func _ready() -> void:
 	_hand_anchor.name = "HeldItemAnchor"
 	camera.add_child(_hand_anchor)
 	_hand_anchor.position = Vector3(0.48, -0.38, -1.15)
+	_build_dara_visual()
 	health = max_health
 	stamina = stamina_max
 	ammo_in_magazine = magazine_size
@@ -55,6 +56,89 @@ func _ready() -> void:
 	health_changed.emit(health, max_health)
 	stamina_changed.emit(stamina, stamina_max)
 	ammo_changed.emit(ammo_in_magazine, reserve_ammo)
+
+
+func _build_dara_visual() -> void:
+	# Detailed real-time 3D cyberpunk character proxy. Replace with the final
+	# scanned/sculpted hero asset when the licensed character art is integrated.
+	var old_body := get_node_or_null("BodyMesh") as MeshInstance3D
+	if old_body != null:
+		old_body.visible = false
+	var armor := StandardMaterial3D.new()
+	armor.albedo_color = Color(0.018, 0.027, 0.045)
+	armor.metallic = 0.82
+	armor.roughness = 0.24
+	armor.clearcoat_enabled = true
+	armor.clearcoat = 0.8
+	var dark_fabric := StandardMaterial3D.new()
+	dark_fabric.albedo_color = Color(0.035, 0.045, 0.065)
+	dark_fabric.roughness = 0.88
+	var cyan := StandardMaterial3D.new()
+	cyan.albedo_color = Color(0.0, 0.72, 0.95)
+	cyan.metallic = 0.25
+	cyan.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
+	cyan.emission_enabled = true
+	cyan.emission = Color(0.0, 0.52, 1.0)
+	cyan.emission_energy_multiplier = 1.5
+	var magenta := StandardMaterial3D.new()
+	magenta.albedo_color = Color(0.9, 0.035, 0.24)
+	magenta.emission_enabled = true
+	magenta.emission = Color(0.8, 0.015, 0.12)
+	magenta.emission_energy_multiplier = 0.8
+	_add_dara_capsule("TorsoArmor", Vector3(0.0, 1.05, 0.0), 0.34, 0.78, armor)
+	_add_dara_box("ChestPlate", Vector3(0.0, 1.22, -0.285), Vector3(0.43, 0.34, 0.12), armor)
+	_add_dara_box("ChestCore", Vector3(0.0, 1.24, -0.354), Vector3(0.12, 0.19, 0.025), cyan)
+	_add_dara_capsule("Neck", Vector3(0.0, 1.55, 0.0), 0.105, 0.2, dark_fabric)
+	_add_dara_sphere("Head", Vector3(0.0, 1.78, 0.0), Vector3(0.235, 0.29, 0.22), dark_fabric)
+	_add_dara_box("Visor", Vector3(0.0, 1.83, -0.205), Vector3(0.31, 0.075, 0.035), cyan)
+	for side in [-1.0, 1.0]:
+		_add_dara_capsule("Shoulder_%s" % side, Vector3(side * 0.39, 1.42, 0.0), 0.17, 0.32, armor)
+		_add_dara_capsule("UpperArm_%s" % side, Vector3(side * 0.43, 1.12, 0.0), 0.115, 0.48, dark_fabric)
+		_add_dara_capsule("Forearm_%s" % side, Vector3(side * 0.46, 0.78, -0.025), 0.105, 0.38, armor)
+		_add_dara_box("WristLight_%s" % side, Vector3(side * 0.46, 0.63, -0.12), Vector3(0.19, 0.045, 0.08), cyan)
+		_add_dara_capsule("Thigh_%s" % side, Vector3(side * 0.17, 0.48, 0.0), 0.16, 0.52, dark_fabric)
+		_add_dara_capsule("Shin_%s" % side, Vector3(side * 0.17, 0.16, -0.025), 0.115, 0.38, armor)
+		_add_dara_box("KneePlate_%s" % side, Vector3(side * 0.17, 0.34, -0.125), Vector3(0.22, 0.16, 0.07), magenta)
+		_add_dara_box("Boot_%s" % side, Vector3(side * 0.17, 0.055, -0.09), Vector3(0.24, 0.13, 0.38), armor)
+
+
+func _add_dara_capsule(part_name: String, part_position: Vector3, radius: float, height: float, material: Material) -> void:
+	var part := MeshInstance3D.new()
+	part.name = part_name
+	var mesh := CapsuleMesh.new()
+	mesh.radius = radius
+	mesh.height = height
+	mesh.radial_segments = 16
+	mesh.rings = 8
+	part.mesh = mesh
+	part.position = part_position
+	part.material_override = material
+	add_child(part)
+
+
+func _add_dara_sphere(part_name: String, part_position: Vector3, part_scale: Vector3, material: Material) -> void:
+	var part := MeshInstance3D.new()
+	part.name = part_name
+	var mesh := SphereMesh.new()
+	mesh.radial_segments = 24
+	mesh.rings = 12
+	part.mesh = mesh
+	part.position = part_position
+	part.scale = part_scale
+	part.material_override = material
+	add_child(part)
+
+
+func _add_dara_box(part_name: String, part_position: Vector3, part_size: Vector3, material: Material) -> void:
+	var part := MeshInstance3D.new()
+	part.name = part_name
+	var mesh := BoxMesh.new()
+	mesh.size = part_size
+	part.mesh = mesh
+	part.position = part_position
+	part.material_override = material
+	add_child(part)
+
 
 
 func _unhandled_input(event: InputEvent) -> void:
