@@ -253,6 +253,10 @@ func get_chapter_progress() -> Dictionary:
 
 
 func resolve_campaign_ending() -> String:
+    # Do not announce an ending during the middle of the campaign just because
+    # late-game flags have not been set yet.
+    if not completed_missions.has("reject_throne") and not completed_missions.has("golden_finger"):
+        return ""
     if bool(story_flags.get("throne_rejected", false)) and bool(story_flags.get("control_system_destroyed", false)):
         return "no_crown"
     if not bool(story_flags.get("throne_rejected", false)) and bool(story_flags.get("global_protocol_revealed", false)):
