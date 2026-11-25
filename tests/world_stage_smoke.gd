@@ -242,14 +242,16 @@ func _run() -> void:
 	if int(chapter_progress.get("total_chapters", 0)) != 12 or str(campaign_snapshot.get("ending_id", "")) != "":
 		_fail("Campaign chapter tracking or pre-finale ending gate is incorrect.")
 		return
-	mission_manager.set("completed_missions", ["reject_throne"])
-	mission_manager.set_story_flag("throne_rejected", true)
-	mission_manager.set_story_flag("control_system_destroyed", true)
+	mission_manager.completed_missions.clear()
+	mission_manager.completed_missions.append("reject_throne")
+	mission_manager.story_flags.clear()
+	mission_manager.story_flags["throne_rejected"] = true
+	mission_manager.story_flags["control_system_destroyed"] = true
 	if str(mission_manager.call("resolve_campaign_ending")) != "no_crown":
 		_fail("The no-crown ending does not resolve from its required choices.")
 		return
-	mission_manager.set_story_flag("throne_rejected", false)
-	mission_manager.set_story_flag("global_protocol_revealed", true)
+	mission_manager.story_flags["throne_rejected"] = false
+	mission_manager.story_flags["global_protocol_revealed"] = true
 	if str(mission_manager.call("resolve_campaign_ending")) != "sovereign":
 		_fail("The sovereign ending does not resolve from its required choices.")
 		return
