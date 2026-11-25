@@ -17,6 +17,8 @@ const EARTH_OVERVIEW_SCENE := preload("res://scenes/world/earth_overview.tscn")
 var _earth_overview: Node3D
 var _player: CharacterBody3D
 var rng := RandomNumberGenerator.new()
+var _autosave_elapsed := 0.0
+const AUTOSAVE_INTERVAL := 30.0
 
 func _ready() -> void:
  rng.randomize()
@@ -29,6 +31,7 @@ func _ready() -> void:
  player.position = Vector3(0, 1.2, 12)
  _player = player
  add_child(player)
+ SaveManager.restore_player_state(player)
  _start_region_streaming()
  _start_global_world_simulation()
  _start_society_simulation()
@@ -249,3 +252,30 @@ func _start_society_simulation() -> void:
  society.name = "WorldSocietySimulation"
  society.set_script(load("res://scripts/world/world_society_sim.gd"))
  add_child(society)
+
+
+func _process(delta: float) -> void:
+ if not is_instance_valid(_player):
+  return
+ _autosave_elapsed += delta
+ if _autosave_elapsed >= AUTOSAVE_INTERVAL:
+  _autosave_elapsed = 0.0
+  SaveManager.save_player_state(_player)
+
+
+func _notification(what: int) -> void:
+ if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
+  if is_instance_valid(_player):
+   SaveManager.save_player_state(_player)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+ if event is InputEventKey and event.pressed and not event.echo:
+  if event.keycode == KEY_F5:
+   if is_instance_valid(_player):
+    SaveManager.save_player_state(_player)
+   get_viewport().set_input_as_handled()
+  elif event.keycode == KEY_F9:
+   if is_instance_valid(_player):
+    SaveManager.restore_player_state(_player)
+   get_viewport().set_input_as_handled()
