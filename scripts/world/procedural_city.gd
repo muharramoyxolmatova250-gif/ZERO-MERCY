@@ -11,6 +11,10 @@ extends Node3D
 @export var max_building_height := 110.0
 @export var generate_collision := true
 @export var window_step := 3.2
+@export var distance_lod_enabled := true
+@export_range(100.0, 4000.0, 50.0) var building_visibility_range := 1400.0
+@export_range(50.0, 2000.0, 25.0) var detail_visibility_range := 420.0
+@export_range(25.0, 1000.0, 25.0) var neon_visibility_range := 220.0
 
 var rng := RandomNumberGenerator.new()
 var mats: Array[StandardMaterial3D] = []
@@ -184,6 +188,10 @@ func _facade_windows_instanced(base: Vector3, size: Vector3, accent_index: int) 
 		var instance := MultiMeshInstance3D.new()
 		instance.multimesh = mm
 		instance.material_override = _window_materials[category]
+		if distance_lod_enabled:
+			instance.visibility_range_end = detail_visibility_range * 1.5
+			instance.visibility_range_end_margin = 35.0
+			instance.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
 		add_child(instance)
 
 
@@ -218,8 +226,10 @@ func _box(pos: Vector3, size: Vector3, color: Color, glow: bool, collision: bool
 	instance.mesh = mesh
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
-	material.metallic = 0.62
-	material.roughness = 0.4
+	material.metallic = 0.72 if not glow else 0.28
+	material.roughness = 0.32 if not glow else 0.24
+	material.clearcoat_enabled = not glow
+	material.clearcoat = 0.35 if not glow else 0.0
 	if glow:
 		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		material.emission_enabled = true
@@ -227,6 +237,16 @@ func _box(pos: Vector3, size: Vector3, color: Color, glow: bool, collision: bool
 		material.emission_energy_multiplier = 2.2
 	instance.material_override = material
 	instance.position = pos
+	if distance_lod_enabled:
+		var largest_dimension := maxf(size.x, maxf(size.y, size.z))
+		if glow or largest_dimension < 1.5:
+			instance.visibility_range_end = neon_visibility_range if glow else detail_visibility_range
+		elif largest_dimension < 8.0:
+			instance.visibility_range_end = detail_visibility_range
+		else:
+			instance.visibility_range_end = building_visibility_range
+		instance.visibility_range_end_margin = 30.0
+		instance.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
 	add_child(instance)
 	if collision:
 		var body := StaticBody3D.new()
