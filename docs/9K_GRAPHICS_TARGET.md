@@ -2,9 +2,10 @@
 
 ## Current verified project baseline
 
-The checked-in `project.godot` currently declares Godot 4.3 and the
-`gl_compatibility` renderer. The project window viewport is 1920×1080.
-That is a compatibility-oriented baseline; it is **not** a 9K renderer setup.
+The checked-in `project.godot` declares Godot 4.3, the `forward_plus` desktop
+renderer and the `mobile` renderer fallback. The project window viewport is
+1920×1080. Forward+ unlocks more advanced 3D rendering features, but this is
+**not** a 9K renderer setup.
 
 ## What 9K means for this project
 
@@ -28,10 +29,10 @@ The manager checks whether each Viewport property exists before setting it.
 This matters because renderer capabilities differ. Unsupported settings are
 reported as warnings instead of causing a property access failure.
 
-The manager is intentionally not autoloaded or forced into the main scene yet:
-the current project uses GL Compatibility, and changing the renderer or
-attaching a global manager without inspecting the complete scene pipeline could
-break existing materials and scenes.
+The manager is attached by `scripts/main.gd` and applies the High preset at
+startup. The renderer was switched to Forward+ to enable the next lighting and
+material work. Existing scenes and shaders still require an in-editor runtime
+compatibility pass; no such pass is claimed by this commit.
 
 ## Required production work before calling the game 9K-ready
 
@@ -51,7 +52,9 @@ break existing materials and scenes.
 
 ## Important status
 
-This commit adds a safe, renderer-aware quality-profile foundation and its
-technical plan. It does not add 9K textures, finished cinematic assets, global
-streaming, ray tracing, or a verified 9K frame-rate. No Godot runtime test has
-been run as part of this change.
+These commits switch the project to Forward+, attach the runtime quality
+manager, and enable ambient occlusion, screen-space indirect lighting,
+volumetric fog and directional shadows in the startup environment. They do not
+add 9K textures, finished cinematic assets, ray tracing, or a verified 9K
+frame-rate. The project has not yet been launched in the Godot editor for a
+runtime compatibility or performance test.
