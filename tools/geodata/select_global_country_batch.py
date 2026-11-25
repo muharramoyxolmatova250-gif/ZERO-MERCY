@@ -24,11 +24,14 @@ def select_batch(queue: dict, state: dict, region_id: str = "",
         chosen = by_id[region_id]
         start = int(tile_start) if tile_start.strip() else int(offsets.get(region_id, 0))
     else:
-        current = state.get("current_region_id")
-        if current in by_id and current not in completed:
-            chosen = by_id[current]
-        else:
-            chosen = next((item for item in countries if item["id"] not in completed), None)
+        # Round-robin across the worldwide country queue: each verified batch
+        # moves to the next unfinished country instead of exhausting one country.
+        last_region = (state.get("last_batch") or {}).get("region_id")
+        start_index = next((i + 1 for i, item in enumerate(countries)
+                            if item["id"] == last_region), 0)
+        ordered = countries[start_index:] + countries[:start_index]
+        chosen = next((item for item in ordered
+                       if item["id"] not in completed), None)
         if chosen is None:
             return {"has_work": False}
         start = int(offsets.get(chosen["id"], 0))
