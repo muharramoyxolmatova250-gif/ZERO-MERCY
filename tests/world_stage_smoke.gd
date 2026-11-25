@@ -218,6 +218,15 @@ func _run() -> void:
 		_fail("Quick-load did not restore position, health and ammunition.")
 		return
 	print("PASS Save system: player position, health and ammunition persist across quick-save/load.")
+	player.call("_fire_weapon")
+	if int(player.get("ammo_in_magazine")) != 4:
+		_fail("Cyber sidearm did not consume one round when fired.")
+		return
+	var muzzle_flash := player.get_node_or_null("CameraPivot/Camera3D/HeldItemAnchor/SovereignSidearm/MuzzleFlash")
+	if muzzle_flash == null or not bool(muzzle_flash.get("visible")):
+		_fail("Cyber sidearm muzzle flash did not activate.")
+		return
+	print("PASS Combat presentation: sidearm fires, consumes ammunition and triggers a muzzle flash.")
 	var life_sim := main.get_node_or_null("WorldLifeSimulation")
 	if life_sim == null:
 		_fail("Persistent world life simulation did not start.")
