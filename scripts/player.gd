@@ -38,10 +38,12 @@ var stamina_regen_timer := 0.0
 var is_dead := false
 var _held_item: Node3D
 var _hand_anchor: Marker3D
+var _spawn_transform: Transform3D
 
 
 func _ready() -> void:
 	add_to_group("player")
+	_spawn_transform = global_transform
 	_hand_anchor = Marker3D.new()
 	_hand_anchor.name = "HeldItemAnchor"
 	camera.add_child(_hand_anchor)
@@ -123,6 +125,21 @@ func heal(amount: float) -> void:
 		return
 	health = minf(health + amount, max_health)
 	health_changed.emit(health, max_health)
+
+
+func respawn() -> void:
+	is_dead = false
+	global_transform = _spawn_transform
+	velocity = Vector3.ZERO
+	health = max_health
+	stamina = stamina_max
+	ammo_in_magazine = magazine_size
+	shot_cooldown = 0.0
+	stamina_regen_timer = 0.0
+	health_changed.emit(health, max_health)
+	stamina_changed.emit(stamina, stamina_max)
+	ammo_changed.emit(ammo_in_magazine, reserve_ammo)
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
 func _fire_weapon() -> void:
