@@ -183,16 +183,20 @@ func _run() -> void:
 	if int(player.get("ammo_in_magazine")) != int(player.get("magazine_size")):
 		_fail("Player checkpoint respawn did not restore the weapon magazine.")
 	print("PASS Player combat: lethal damage, death state and checkpoint respawn.")
+	var save_manager := root.get_node_or_null("SaveManager")
+	if save_manager == null:
+		_fail("SaveManager autoload is missing.")
+		return
 	player.global_position = Vector3(4.0, 2.0, 7.0)
 	player.set("health", 55.0)
 	player.set("ammo_in_magazine", 5)
-	if not bool(SaveManager.save_player_state(player)):
+	if not bool(save_manager.call("save_player_state", player)):
 		_fail("Quick-save could not persist player state.")
 		return
 	player.global_position = Vector3(-20.0, 1.0, -20.0)
 	player.set("health", 10.0)
 	player.set("ammo_in_magazine", 1)
-	if not bool(SaveManager.restore_player_state(player)):
+	if not bool(save_manager.call("restore_player_state", player)):
 		_fail("Quick-load could not restore player state.")
 		return
 	if player.global_position.distance_to(Vector3(4.0, 2.0, 7.0)) > 0.001 or absf(float(player.get("health")) - 55.0) > 0.001 or int(player.get("ammo_in_magazine")) != 5:
