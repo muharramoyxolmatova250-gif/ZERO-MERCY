@@ -58,3 +58,8 @@ volumetric fog and directional shadows in the startup environment. They do not
 add 9K textures, finished cinematic assets, ray tracing, or a verified 9K
 frame-rate. The project has not yet been launched in the Godot editor for a
 runtime compatibility or performance test.
+
+
+## District geometry LOD foundation
+
+The procedural district now assigns camera-distance visibility ranges to generated building geometry, facade details and neon accents. Small neon elements fade out at shorter distances; medium details and large building shells remain visible farther away. This reduces distant draw work without removing collision bodies. Procedural building materials also use stronger metallic response and a subtle clearcoat for polished cyberpunk surfaces. These are geometry-level visibility bands, not authored replacement meshes: dedicated low-poly LOD meshes and impostors are still required for a finished large-world production pipeline.
