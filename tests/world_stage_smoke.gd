@@ -168,6 +168,21 @@ func _run() -> void:
 	var main := main_scene.instantiate()
 	root.add_child(main)
 	await process_frame
+	var player := main.get_node_or_null("Dara")
+	if player == null:
+		_fail("Playable Dara character is missing from the main scene.")
+		return
+	player.call("take_damage", 1000.0)
+	if not bool(player.get("is_dead")) or float(player.get("health")) > 0.0:
+		_fail("Player lethal damage did not enter the death state.")
+		return
+	player.call("respawn")
+	if bool(player.get("is_dead")) or absf(float(player.get("health")) - float(player.get("max_health"))) > 0.001:
+		_fail("Player checkpoint respawn did not restore the living state and health.")
+		return
+	if int(player.get("ammo_in_magazine")) != int(player.get("magazine_size")):
+		_fail("Player checkpoint respawn did not restore the weapon magazine.")
+	print("PASS Player combat: lethal damage, death state and checkpoint respawn.")
 	var life_sim := main.get_node_or_null("WorldLifeSimulation")
 	if life_sim == null:
 		_fail("Persistent world life simulation did not start.")
