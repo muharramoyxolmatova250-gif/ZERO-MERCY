@@ -9,6 +9,8 @@ extends Node3D
 @export_range(0,8,1) var load_radius := 1
 @export_range(1,12,1) var unload_radius := 2
 @export_range(1,32,1) var max_operations_per_frame := 1
+@export_range(1,256,1) var max_loaded_tiles := 25
+@export_range(1,64,1) var max_load_attempts_per_frame := 4
 var _target: Node3D
 var _root: Node3D
 var _tiles: Dictionary = {}
@@ -71,6 +73,7 @@ func _refresh(center: Vector2i) -> void:
     candidates.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.distance_squared_to(center) < b.distance_squared_to(center))
     for candidate in candidates:
         _queue.append(candidate)
+    _queue.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.distance_squared_to(center) < b.distance_squared_to(center))
     for key in _loaded.keys():
         var coord: Vector2i = _loaded[key]["coord"]
         if maxi(abs(coord.x - center.x), abs(coord.y - center.y)) > unload_radius:
@@ -86,8 +89,12 @@ func _refresh(center: Vector2i) -> void:
 
 func _load_queue() -> void:
     var done := 0
-    while not _queue.is_empty() and done < max_operations_per_frame:
+    var attempts := 0
+    while not _queue.is_empty() and done < max_operations_per_frame and attempts < max_load_attempts_per_frame:
+        if _loaded.size() >= max_loaded_tiles:
+            break
         var coord: Vector2i = _queue.pop_front()
+        attempts += 1
         var key := _key(coord)
         if _loaded.has(key) or not _tiles.has(coord):
             continue
@@ -273,6 +280,16 @@ func _place_target_on_terrain(terrain: Node3D) -> void:
         var position := _target.global_position
         position.y = maxf(position.y, elevation + 1.5)
         _target.global_position = position
+
+func get_streaming_stats() -> Dictionary:
+    return {
+        "indexed_tiles": indexed_tile_count,
+        "loaded_tiles": _loaded.size(),
+        "queued_tiles": _queue.size(),
+        "tile_budget": max_loaded_tiles,
+        "load_radius": load_radius,
+        "unload_radius": unload_radius
+    }
 
 func _key(coord: Vector2i) -> String:
     return str(coord.x) + "," + str(coord.y)
