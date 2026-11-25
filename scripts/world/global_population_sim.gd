@@ -22,7 +22,7 @@ var active_socializing:=0
 var _timer:=0.0
 func _ready()->void:
  for hub in HUBS:
-  cohorts.append({"city":hub[0],"country":hub[1],"lat":hub[2],"lon":hub[3],"population_reference":0,"residents":residents_per_hub,"workers":int(residents_per_hub*0.46),"students":int(residents_per_hub*0.18),"families":int(residents_per_hub*0.24),"commuting":0,"socializing":0,"resting":0,"local_time":0})
+  cohorts.append({"id":str(hub[0]),"city":hub[0],"country":hub[1],"lat":hub[2],"lon":hub[3],"population_reference":0,"residents":residents_per_hub,"workers":int(residents_per_hub*0.46),"students":int(residents_per_hub*0.18),"families":int(residents_per_hub*0.24),"commuting":0,"socializing":0,"resting":0,"local_time":0})
   represented_residents+=residents_per_hub
  _simulate()
 func _process(delta:float)->void:
@@ -30,7 +30,43 @@ func _process(delta:float)->void:
  if _timer>=tick_seconds:
   _timer=0.0
   _simulate()
+func _sync_registered_hubs()->void:
+ var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+ if life_sim == null:
+  return
+ var registered: Dictionary = life_sim.get("hub_state")
+ var known: Dictionary = {}
+ for cohort in cohorts:
+  known[str(cohort.get("id", cohort.get("city", "")))] = true
+ for city_id in registered.keys():
+  var key := str(city_id)
+  if known.has(key):
+   continue
+  var hub: Dictionary = registered[city_id]
+  var population := maxi(1, int(hub.get("population", residents_per_hub)))
+  var latitude := float(hub.get("latitude", 0.0))
+  var longitude := float(hub.get("longitude", 0.0))
+  cohorts.append({
+   "id": key,
+   "city": str(hub.get("display_name", hub.get("city", key))),
+   "country": str(hub.get("country", "Unknown")),
+   "lat": latitude,
+   "lon": longitude,
+   "population_reference": population,
+   "residents": population,
+   "workers": int(population * 0.46),
+   "students": int(population * 0.18),
+   "families": int(population * 0.24),
+   "commuting": 0,
+   "socializing": 0,
+   "resting": 0,
+   "local_time": 0
+  })
+  represented_residents += population
+  known[key] = true
+
 func _simulate()->void:
+ _sync_registered_hubs()
  simulation_ticks+=1
  active_workers=0
  active_commuters=0
