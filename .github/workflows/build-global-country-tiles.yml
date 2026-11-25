@@ -41,7 +41,7 @@ on:
       tile_count:
         description: Tiles to process in this run
         required: false
-        default: "8"
+        default: "32"
         type: string
       tile_degrees:
         description: Global grid tile width in degrees
@@ -94,7 +94,7 @@ jobs:
         env:
           INPUT_REGION_ID: ${{ inputs.region_id || '' }}
           INPUT_TILE_START: ${{ inputs.tile_start || '' }}
-          INPUT_TILE_COUNT: ${{ inputs.tile_count || '8' }}
+          INPUT_TILE_COUNT: ${{ inputs.tile_count || '32' }}
         run: |
           python tools/geodata/select_global_country_batch.py \
             --region-id "$INPUT_REGION_ID" --tile-start "$INPUT_TILE_START" \
