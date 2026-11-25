@@ -147,6 +147,50 @@ func _make_plane(i:int)->Node3D:
  hull.mesh=hm
  hull.material_override=hull_mat
  plane.add_child(hull)
+ var nose:=MeshInstance3D.new()
+ var nose_mesh:=SphereMesh.new()
+ nose_mesh.radius=0.72
+ nose_mesh.height=2.4
+ nose.mesh=nose_mesh
+ nose.scale=Vector3(0.72,0.72,1.0)
+ nose.position=Vector3(0.0,0.0,-6.7)
+ nose.material_override=hull_mat
+ plane.add_child(nose)
+ var tail_fin:=MeshInstance3D.new()
+ var tail_mesh:=BoxMesh.new()
+ tail_mesh.size=Vector3(0.38,2.4,2.5)
+ tail_fin.mesh=tail_mesh
+ tail_fin.position=Vector3(0.0,1.1,5.0)
+ tail_fin.material_override=hull_mat
+ plane.add_child(tail_fin)
+ var tail_wing:=MeshInstance3D.new()
+ var tail_wing_mesh:=BoxMesh.new()
+ tail_wing_mesh.size=Vector3(7.0,0.28,1.8)
+ tail_wing.mesh=tail_wing_mesh
+ tail_wing.position=Vector3(0.0,0.25,5.0)
+ tail_wing.material_override=hull_mat
+ plane.add_child(tail_wing)
+ for engine_x in [-4.5,4.5]:
+  var engine:=MeshInstance3D.new()
+  var engine_mesh:=CylinderMesh.new()
+  engine_mesh.top_radius=0.48
+  engine_mesh.bottom_radius=0.62
+  engine_mesh.height=2.8
+  engine.mesh=engine_mesh
+  engine.rotation.x=PI*0.5
+  engine.position=Vector3(engine_x,-0.48,-0.15)
+  engine.material_override=hull_mat
+  plane.add_child(engine)
+  var exhaust:=MeshInstance3D.new()
+  var exhaust_mesh:=CylinderMesh.new()
+  exhaust_mesh.top_radius=0.28
+  exhaust_mesh.bottom_radius=0.28
+  exhaust_mesh.height=0.12
+  exhaust.mesh=exhaust_mesh
+  exhaust.rotation.x=PI*0.5
+  exhaust.position=Vector3(engine_x,-0.48,1.32)
+  exhaust.material_override=neon
+  plane.add_child(exhaust)
  var wings:=MeshInstance3D.new()
  var wm:=BoxMesh.new()
  wm.size=Vector3(17.0,0.35,3.0)
