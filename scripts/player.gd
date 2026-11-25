@@ -38,6 +38,8 @@ var stamina_regen_timer := 0.0
 var is_dead := false
 var _held_item: Node3D
 var _hand_anchor: Marker3D
+var _muzzle_flash: MeshInstance3D
+var _muzzle_light: OmniLight3D
 var _spawn_transform: Transform3D
 
 
@@ -49,6 +51,7 @@ func _ready() -> void:
 	camera.add_child(_hand_anchor)
 	_hand_anchor.position = Vector3(0.48, -0.38, -1.15)
 	_build_dara_visual()
+	_build_weapon_visual()
 	health = max_health
 	stamina = stamina_max
 	ammo_in_magazine = magazine_size
@@ -138,6 +141,76 @@ func _add_dara_box(part_name: String, part_position: Vector3, part_size: Vector3
 	part.position = part_position
 	part.material_override = material
 	add_child(part)
+
+
+func _build_weapon_visual() -> void:
+	var weapon := Node3D.new()
+	weapon.name = "SovereignSidearm"
+	_hand_anchor.add_child(weapon)
+	var armor := StandardMaterial3D.new()
+	armor.albedo_color = Color(0.018, 0.028, 0.045)
+	armor.metallic = 0.88
+	armor.roughness = 0.22
+	var edge := StandardMaterial3D.new()
+	edge.albedo_color = Color(0.12, 0.17, 0.22)
+	edge.metallic = 0.95
+	edge.roughness = 0.18
+	var cyan := StandardMaterial3D.new()
+	cyan.albedo_color = Color(0.0, 0.72, 1.0)
+	cyan.emission_enabled = true
+	cyan.emission = Color(0.0, 0.58, 1.0)
+	cyan.emission_energy_multiplier = 1.8
+	_add_weapon_box(weapon, "Slide", Vector3(0.0, 0.035, -0.22), Vector3(0.16, 0.14, 0.48), armor)
+	_add_weapon_box(weapon, "UpperRail", Vector3(0.0, 0.115, -0.23), Vector3(0.11, 0.035, 0.36), edge)
+	_add_weapon_box(weapon, "Grip", Vector3(0.0, -0.13, -0.02), Vector3(0.13, 0.29, 0.17), armor)
+	_add_weapon_box(weapon, "GripCore", Vector3(0.0, -0.13, -0.11), Vector3(0.075, 0.17, 0.025), cyan)
+	_add_weapon_box(weapon, "Barrel", Vector3(0.0, 0.035, -0.49), Vector3(0.085, 0.075, 0.16), edge)
+	_add_weapon_box(weapon, "Muzzle", Vector3(0.0, 0.035, -0.58), Vector3(0.105, 0.09, 0.045), armor)
+	_add_weapon_box(weapon, "SideDisplay", Vector3(0.086, 0.04, -0.24), Vector3(0.012, 0.055, 0.2), cyan)
+	_add_weapon_box(weapon, "TriggerGuard", Vector3(0.0, -0.07, -0.16), Vector3(0.1, 0.025, 0.11), edge)
+	_muzzle_flash = MeshInstance3D.new()
+	_muzzle_flash.name = "MuzzleFlash"
+	var flash_mesh := SphereMesh.new()
+	flash_mesh.radius = 0.075
+	flash_mesh.height = 0.15
+	_muzzle_flash.mesh = flash_mesh
+	_muzzle_flash.position = Vector3(0.0, 0.035, -0.66)
+	_muzzle_flash.material_override = cyan
+	_muzzle_flash.visible = false
+	weapon.add_child(_muzzle_flash)
+	_muzzle_light = OmniLight3D.new()
+	_muzzle_light.name = "MuzzleLight"
+	_muzzle_light.position = _muzzle_flash.position
+	_muzzle_light.light_color = Color(0.0, 0.72, 1.0)
+	_muzzle_light.light_energy = 0.0
+	_muzzle_light.omni_range = 5.0
+	_muzzle_light.visible = false
+	weapon.add_child(_muzzle_light)
+
+
+func _add_weapon_box(parent: Node3D, part_name: String, part_position: Vector3, part_size: Vector3, material: Material) -> void:
+	var part := MeshInstance3D.new()
+	part.name = part_name
+	var mesh := BoxMesh.new()
+	mesh.size = part_size
+	part.mesh = mesh
+	part.position = part_position
+	part.material_override = material
+	parent.add_child(part)
+
+
+func _trigger_muzzle_flash() -> void:
+	if _muzzle_flash == null or _muzzle_light == null:
+		return
+	_muzzle_flash.visible = true
+	_muzzle_light.visible = true
+	_muzzle_light.light_energy = 3.5
+	var flash_tween := create_tween()
+	flash_tween.tween_property(_muzzle_light, "light_energy", 0.0, 0.075)
+	flash_tween.tween_callback(func() -> void:
+		_muzzle_flash.visible = false
+		_muzzle_light.visible = false
+	)
 
 
 
@@ -232,6 +305,7 @@ func _fire_weapon() -> void:
 	if ammo_in_magazine <= 0:
 		return
 	shot_cooldown = shot_interval
+	_trigger_muzzle_flash()
 	ammo_in_magazine -= 1
 	ammo_changed.emit(ammo_in_magazine, reserve_ammo)
 	var origin := camera.global_position
