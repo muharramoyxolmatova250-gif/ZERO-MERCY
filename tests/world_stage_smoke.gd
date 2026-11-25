@@ -168,6 +168,20 @@ func _run() -> void:
 		_fail("OSM settlement population was not added to the persistent global life simulation.")
 		return
 	print("PASS Global life: streamed settlements register population-sized persistent city hubs.")
+	life_sim.call("register_settlement_hub", "SmokeSettlement", "Smoke Settlement", 1000)
+	var hub_state: Dictionary = life_sim.get("hub_state")
+	if int(hub_state["SmokeSettlement"].get("population", 0)) != 250000:
+		_fail("A later smaller tile hint incorrectly reduced the known settlement population.")
+		return
+	life_sim.call("register_citizen", "smoke_demographic_resident", "SmokeSettlement", "resident")
+	life_sim.call("_recount_all_hubs")
+	hub_state = life_sim.get("hub_state")
+	var settlement_counts: Dictionary = hub_state["SmokeSettlement"]
+	var sampled_residents := int(settlement_counts.get("sample_students", 0)) + int(settlement_counts.get("sample_workers", 0)) + int(settlement_counts.get("sample_retired", 0))
+	if sampled_residents != 1:
+		_fail("One-pass global demographic aggregation did not count the registered resident exactly once.")
+		return
+	print("PASS Global life: population hints are monotonic and resident demographics aggregate in one pass.")
 	var life_test_citizen := Node3D.new()
 	life_test_citizen.set_script(load("res://scripts/world/city_citizen.gd"))
 	life_test_citizen.set("citizen_id", "smoke_resident_lifecycle")
