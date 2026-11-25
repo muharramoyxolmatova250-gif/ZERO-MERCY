@@ -135,7 +135,7 @@ func get_world_population_snapshot() -> Dictionary:
 		"represented_residents": represented_residents,
 		"major_metro_cohorts": MAJOR_METROS.size(),
 		"all_other_urban_and_rural_residents": other_urban_and_rural_residents,
-		"city_hubs": _registered_visual_hubs.size(),
+		"city_hubs": MAJOR_METROS.size() + _registered_visual_hubs.size(),
 		"aggregate_cohorts": cohorts.size(),
 		"active_workers": active_workers,
 		"commuting": active_commuters,
