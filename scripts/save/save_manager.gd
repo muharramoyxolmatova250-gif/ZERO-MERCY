@@ -76,7 +76,7 @@ func restore_player_state(player: Node3D) -> bool:
 	player.set("stamina", clampf(float(state.get("stamina", player.get("stamina_max"))), 0.0, float(player.get("stamina_max"))))
 	player.set("ammo_in_magazine", clampi(int(state.get("ammo_in_magazine", player.get("magazine_size"))), 0, int(player.get("magazine_size"))))
 	player.set("reserve_ammo", maxi(0, int(state.get("reserve_ammo", 0))))
-	player.health_changed.emit(player.get("health"), player.get("max_health"))
-	player.stamina_changed.emit(player.get("stamina"), player.get("stamina_max"))
-	player.ammo_changed.emit(player.get("ammo_in_magazine"), player.get("reserve_ammo"))
+	player.emit_signal("health_changed", player.get("health"), player.get("max_health"))
+	player.emit_signal("stamina_changed", player.get("stamina"), player.get("stamina_max"))
+	player.emit_signal("ammo_changed", player.get("ammo_in_magazine"), player.get("reserve_ammo"))
 	return true
