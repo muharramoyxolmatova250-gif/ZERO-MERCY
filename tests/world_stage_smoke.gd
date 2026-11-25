@@ -397,6 +397,36 @@ func _run() -> void:
 		_fail("Dialogue interface did not close.")
 		return
 	print("PASS Stage 8: 70-hour campaign, interactive mission markers, branching dialogue and story saves.")
+
+	# Exercise a complete playable mission loop: objective order, reward, story flag and campaign unlock.
+	if str(mission_manager.get("active_mission_id")) != "prologue_signal":
+		if str(mission_manager.get("active_mission_id")) != "":
+			mission_manager.call("fail_active_mission")
+		mission_manager.set("completed_missions", [])
+		mission_manager.set("story_flags", {})
+		mission_manager.set("credits", 0)
+		if not bool(mission_manager.call("start_mission", "prologue_signal")):
+			_fail("Opening mission could not be restarted for the campaign progression test.")
+			return
+	mission_manager.call("report_event", "enter_old_market")
+	if str(mission_manager.call("get_current_objective").get("event", "")) != "interact_beacon":
+		_fail("Completing the first mission objective did not advance to the beacon interaction.")
+		return
+	mission_manager.call("report_event", "interact_beacon")
+	if str(mission_manager.call("get_current_objective").get("event", "")) != "escort_family_safe":
+		_fail("Completing the second mission objective did not advance to the family escort.")
+		return
+	mission_manager.call("report_event", "escort_family_safe")
+	if str(mission_manager.get("active_mission_id")) != "":
+		_fail("Completing all opening objectives did not finish the mission.")
+		return
+	if not mission_manager.get("completed_missions").has("prologue_signal") or int(mission_manager.get("credits")) != 250 or not bool(mission_manager.call("get_story_flag", "family_saved")):
+		_fail("Opening mission completion did not persist its reward and family_saved story flag.")
+		return
+	if not bool(mission_manager.call("start_next_campaign_mission")) or str(mission_manager.get("active_mission_id")) != "prologue_aftershock":
+		_fail("The completed opening mission did not unlock the next campaign mission.")
+		return
+	print("PASS Campaign progression: ordered objectives, mission reward, story flag and next-mission unlock.")
 	main.call("_unhandled_input", _map_key_event())
 	await process_frame
 	if main.get_node_or_null("EarthMapOverview") == null:
