@@ -319,10 +319,60 @@ func _ground_floor_frontage(base: Vector3, size: Vector3, accent: Color) -> void
 
 func _roof_detail(base: Vector3, size: Vector3, accent: Color) -> void:
 	var roof_y := size.y + 0.8
-	_box(base + Vector3(0, roof_y, 0), Vector3(size.x * 0.22, 1.4, size.z * 0.22), Color(0.025, 0.035, 0.055), false, false)
+	var roof_material := _facade_trim_material
+	# Raised roof parapet gives the tower a finished architectural silhouette.
+	_box(base + Vector3(0, size.y + 0.32, -size.z * 0.5), Vector3(size.x, 0.64, 0.24), Color(0.025, 0.035, 0.055), false, false)
+	_box(base + Vector3(0, size.y + 0.32, size.z * 0.5), Vector3(size.x, 0.64, 0.24), Color(0.025, 0.035, 0.055), false, false)
+	_box(base + Vector3(-size.x * 0.5, size.y + 0.32, 0), Vector3(0.24, 0.64, size.z), Color(0.025, 0.035, 0.055), false, false)
+	_box(base + Vector3(size.x * 0.5, size.y + 0.32, 0), Vector3(0.24, 0.64, size.z), Color(0.025, 0.035, 0.055), false, false)
+
+	# Central mechanical penthouse, exhaust stacks and antenna mast.
+	_box(base + Vector3(0, roof_y, 0), Vector3(size.x * 0.3, 1.4, size.z * 0.3), Color(0.025, 0.035, 0.055), false, false)
 	_box(base + Vector3(0, roof_y + 0.8, 0), Vector3(0.18, 1.6, 0.18), accent, true, false)
-	if rng.randf() > 0.5:
-		_box(base + Vector3(size.x * 0.3, roof_y + 0.35, 0), Vector3(1.4, 0.6, 1.4), Color(0.07, 0.09, 0.12), false, false)
+	var exhaust_positions: Array[Transform3D] = []
+	var equipment_positions: Array[Transform3D] = []
+	var solar_positions: Array[Transform3D] = []
+	for side_x in [-1.0, 1.0]:
+		for side_z in [-1.0, 1.0]:
+			exhaust_positions.append(Transform3D(Basis(), base + Vector3(side_x * size.x * 0.3, size.y + 1.25, side_z * size.z * 0.3)))
+	for unit in range(3):
+		var x := (float(unit) - 1.0) * size.x * 0.22
+		equipment_positions.append(Transform3D(Basis(), base + Vector3(x, size.y + 0.65, size.z * 0.28)))
+	for panel in range(3):
+		var x := (float(panel) - 1.0) * size.x * 0.2
+		var panel_basis := Basis(Vector3.RIGHT, deg_to_rad(-12.0))
+		solar_positions.append(Transform3D(panel_basis, base + Vector3(x, size.y + 0.92, -size.z * 0.28)))
+	var exhaust_mesh := CylinderMesh.new()
+	exhaust_mesh.top_radius = 0.18
+	exhaust_mesh.bottom_radius = 0.24
+	exhaust_mesh.height = 1.1
+	_add_roof_multimesh("RoofExhaustStacks", exhaust_mesh, exhaust_positions, roof_material)
+	var equipment_mesh := BoxMesh.new()
+	equipment_mesh.size = Vector3(1.7, 1.1, 1.25)
+	_add_roof_multimesh("RoofHVACUnits", equipment_mesh, equipment_positions, roof_material)
+	var solar_mesh := BoxMesh.new()
+	solar_mesh.size = Vector3(maxf(1.4, size.x * 0.16), 0.12, maxf(1.2, size.z * 0.22))
+	_add_roof_multimesh("RoofSolarPanels", solar_mesh, solar_positions, _glass_facade_material)
+
+
+func _add_roof_multimesh(label: String, mesh: Mesh, transforms: Array[Transform3D], material: Material) -> void:
+	if transforms.is_empty():
+		return
+	var multi_mesh := MultiMesh.new()
+	multi_mesh.transform_format = MultiMesh.TRANSFORM_3D
+	multi_mesh.mesh = mesh
+	multi_mesh.instance_count = transforms.size()
+	for index in range(transforms.size()):
+		multi_mesh.set_instance_transform(index, transforms[index])
+	var instance := MultiMeshInstance3D.new()
+	instance.name = label
+	instance.multimesh = multi_mesh
+	instance.material_override = material
+	if distance_lod_enabled:
+		instance.visibility_range_end = detail_visibility_range * 2.0
+		instance.visibility_range_end_margin = 40.0
+		instance.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+	add_child(instance)
 
 
 func _wet_road_box(pos: Vector3, size: Vector3) -> MeshInstance3D:
