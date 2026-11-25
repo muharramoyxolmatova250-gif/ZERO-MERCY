@@ -51,7 +51,11 @@ func _exit_tree() -> void:
 func _ensure_hub(city_id: String, population_hint: int = 100000) -> void:
     if hub_state.has(city_id):
         var existing: Dictionary = hub_state[city_id]
-        existing["population"] = maxi(int(existing.get("population", 0)), maxi(1, population_hint))
+        var previous_population := int(existing.get("population", 0))
+        var updated_population := maxi(previous_population, maxi(1, population_hint))
+        if updated_population != previous_population:
+            existing["population"] = updated_population
+            _dirty = true
         hub_state[city_id] = existing
         return
     var population := maxi(1, population_hint)
@@ -313,28 +317,47 @@ func _append_event(profile: Dictionary, event_name: String) -> void:
 
 func _sync_hub_demographics(city_id: String) -> void:
     var hub: Dictionary = hub_state.get(city_id, {})
-    var students := 0
-    var workers := 0
-    var retired := 0
-    var families := 0
+    var counts := {"sample_students": 0, "sample_workers": 0, "sample_retired": 0, "sample_families": 0}
     for profile in resident_profiles.values():
         if str(profile.get("city", "")) != city_id:
             continue
         match str(profile.get("life_stage", "")):
-            "student", "child": students += 1
-            "adult": workers += 1
-            "retired": retired += 1
+            "student", "child": counts["sample_students"] += 1
+            "adult": counts["sample_workers"] += 1
+            "retired": counts["sample_retired"] += 1
         if str(profile.get("marital_status", "")) == "married":
-            families += 1
-    hub["sample_students"] = students
-    hub["sample_workers"] = workers
-    hub["sample_retired"] = retired
-    hub["sample_families"] = families
+            counts["sample_families"] += 1
+    for key in counts:
+        hub[key] = counts[key]
     hub_state[city_id] = hub
 
+
 func _recount_all_hubs() -> void:
+    # One pass over all saved residents instead of scanning the entire resident
+    # table once per city. This keeps monthly updates practical as the world grows.
+    var counts_by_city: Dictionary = {}
     for city_id in hub_state.keys():
-        _sync_hub_demographics(str(city_id))
+        counts_by_city[str(city_id)] = {
+            "sample_students": 0, "sample_workers": 0,
+            "sample_retired": 0, "sample_families": 0
+        }
+    for profile in resident_profiles.values():
+        var city_id := str(profile.get("city", ""))
+        if not counts_by_city.has(city_id):
+            continue
+        var counts: Dictionary = counts_by_city[city_id]
+        match str(profile.get("life_stage", "")):
+            "student", "child": counts["sample_students"] += 1
+            "adult": counts["sample_workers"] += 1
+            "retired": counts["sample_retired"] += 1
+        if str(profile.get("marital_status", "")) == "married":
+            counts["sample_families"] += 1
+    for city_id in counts_by_city:
+        var hub: Dictionary = hub_state[city_id]
+        var counts: Dictionary = counts_by_city[city_id]
+        for key in counts:
+            hub[key] = counts[key]
+        hub_state[city_id] = hub
 
 func _prune_profiles_if_needed() -> void:
     if resident_profiles.size() <= max_saved_profiles:
