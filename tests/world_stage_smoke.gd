@@ -74,9 +74,9 @@ func _run() -> void:
 	var first_flight: Dictionary = air_node.get("flights")[0]
 	var original_origin := str(first_flight.get("origin", ""))
 	var original_destination := str(first_flight.get("destination", ""))
-	first_flight["progress"] = 0.999
-	air_node.get("flights")[0] = first_flight
-	air_node.call("_process", float(air_node.call("_duration", first_flight)) + 1.0)
+	if not bool(air_node.call("complete_flight", 0)):
+		_fail("Global airline arrival handler rejected a valid flight.")
+		return
 	var advanced_flight: Dictionary = air_node.get("flights")[0]
 	if int(air_node.get("completed_flights")) != 1:
 		_fail("Global airline timetable did not complete an arriving flight.")
