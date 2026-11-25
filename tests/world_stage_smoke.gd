@@ -187,10 +187,11 @@ func _run() -> void:
 	if player == null:
 		_fail("Playable Dara character is missing from the main scene.")
 		return
-	if str(MissionManager.get("active_mission_id")) == "":
+	var mission_manager := root.get_node_or_null("MissionManager")
+	if mission_manager == null or str(mission_manager.get("active_mission_id")) == "":
 		_fail("Campaign did not start its opening mission.")
 		return
-	var opening_objective: Dictionary = MissionManager.call("get_current_objective")
+	var opening_objective: Dictionary = mission_manager.call("get_current_objective")
 	if opening_objective.is_empty() or str(opening_objective.get("id", "")) == "":
 		_fail("Opening campaign mission has no active objective.")
 		return
