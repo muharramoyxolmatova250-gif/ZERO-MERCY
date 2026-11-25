@@ -91,12 +91,26 @@ func _duration(f:Dictionary)->float:
  var d:=a.distance_to(b)*111000.0
  return maxf(90.0,d/230.0)
 func _position_plane(i:int)->void:
+ if i < 0 or i >= flights.size() or i >= _planes.size():
+  return
  var f:Dictionary=flights[i]
- var p:=float(f.progress)
- var start:=Vector3(-190.0+float(i%4)*120.0,100.0+float(i%5)*16.0,-150.0+float(i/4)*100.0)
- var finish:=Vector3(190.0-float(i%4)*120.0,112.0+float(i%5)*16.0,150.0-float(i/4)*100.0)
- _planes[i].position=start.lerp(finish,p)+Vector3(0.0,sin(p*PI)*38.0,0.0)
- _planes[i].look_at(_planes[i].position+(finish-start),Vector3.UP)
+ var p:=clampf(float(f.progress),0.0,1.0)
+ var start:=_world_position(float(f.from_lat),float(f.from_lon),float(i))
+ var finish:=_world_position(float(f.to_lat),float(f.to_lon),float(i))
+ var route:=finish-start
+ var altitude:=maxf(18.0,route.length()*0.035)
+ var aircraft_position:=start.lerp(finish,p)+Vector3.UP*(sin(p*PI)*altitude)
+ _planes[i].global_position=aircraft_position
+ if route.length_squared()>0.001:
+  _planes[i].look_at(aircraft_position+route.normalized(),Vector3.UP)
+
+
+func _world_position(latitude:float,longitude:float,flight_index:float)->Vector3:
+ # Equirectangular world projection shared by streamed Earth regions.
+ var x:=longitude*111320.0*cos(deg_to_rad(latitude))
+ var z:=-latitude*111320.0
+ var altitude:=100.0+fposmod(flight_index,5.0)*16.0
+ return Vector3(x,altitude,z)
 func _make_plane(i:int)->Node3D:
  var plane:=Node3D.new()
  plane.name="Cyberliner_"+str(i)
