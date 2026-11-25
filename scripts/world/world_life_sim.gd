@@ -73,6 +73,7 @@ func register_settlement_hub(city_id: String, display_name: String, population_h
     hub["display_name"] = display_name
     hub["source"] = "openstreetmap_settlement"
     hub_state[city_id] = hub
+    _dirty = true
 
 func register_citizen(citizen_id: String, city_id: String, fallback_occupation: String = "resident") -> Dictionary:
     _ensure_hub(city_id)
@@ -81,6 +82,7 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         existing["active"] = true
         existing["last_seen_day"] = simulation_day
         resident_profiles[citizen_id] = existing
+        _dirty = true
         if _claim_cache.has(city_id):
             _claim_cache[city_id].erase(citizen_id)
         return existing
@@ -135,6 +137,7 @@ func claim_resident_id(city_id: String) -> String:
         selected["active"] = true
         selected["last_seen_day"] = simulation_day
         resident_profiles[selected_id] = selected
+        _dirty = true
         _claim_cache[city_id] = candidates
         return selected_id
     _claim_cache[city_id] = candidates
