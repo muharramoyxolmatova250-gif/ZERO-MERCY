@@ -40,6 +40,7 @@ var _held_item: Node3D
 var _hand_anchor: Marker3D
 var _muzzle_flash: MeshInstance3D
 var _muzzle_light: OmniLight3D
+var _muzzle_flash_timer := 0.0
 var _spawn_transform: Transform3D
 
 
@@ -205,12 +206,7 @@ func _trigger_muzzle_flash() -> void:
 	_muzzle_flash.visible = true
 	_muzzle_light.visible = true
 	_muzzle_light.light_energy = 3.5
-	var flash_tween := create_tween()
-	flash_tween.tween_property(_muzzle_light, "light_energy", 0.0, 0.075)
-	flash_tween.tween_callback(func() -> void:
-		_muzzle_flash.visible = false
-		_muzzle_light.visible = false
-	)
+	_muzzle_flash_timer = 0.075
 
 
 
@@ -232,6 +228,18 @@ func _unhandled_input(event: InputEvent) -> void:
 			_fire_weapon()
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_R:
 		_reload_weapon()
+
+
+func _process(delta: float) -> void:
+	if _muzzle_flash_timer <= 0.0:
+		return
+	_muzzle_flash_timer = maxf(0.0, _muzzle_flash_timer - delta)
+	if _muzzle_flash_timer <= 0.0:
+		if _muzzle_flash != null:
+			_muzzle_flash.visible = false
+		if _muzzle_light != null:
+			_muzzle_light.light_energy = 0.0
+			_muzzle_light.visible = false
 
 
 func _physics_process(delta: float) -> void:
