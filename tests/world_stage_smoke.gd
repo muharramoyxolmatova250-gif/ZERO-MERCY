@@ -71,6 +71,20 @@ func _run() -> void:
 		_fail("Global airline network did not initialize international flights.")
 		return
 	print("PASS Global aviation: ", air_snapshot.airport_count, " airports and ", air_snapshot.active_flights, " active cyberpunk flights.")
+	var first_flight: Dictionary = air_node.get("flights")[0]
+	var original_origin := str(first_flight.get("origin", ""))
+	var original_destination := str(first_flight.get("destination", ""))
+	first_flight["progress"] = 0.999
+	air_node.get("flights")[0] = first_flight
+	air_node.call("_process", 1.0)
+	var advanced_flight: Dictionary = air_node.get("flights")[0]
+	if int(air_node.get("completed_flights")) != 1:
+		_fail("Global airline timetable did not complete an arriving flight.")
+		return
+	if str(advanced_flight.get("origin", "")) != original_destination or str(advanced_flight.get("destination", "")) != original_origin:
+		_fail("Completed global flight did not reverse into its return journey.")
+		return
+	print("PASS Global aviation: completed flights reverse route and continue their return journey.")
 	var first_car := city.get_tree().get_first_node_in_group("city_traffic") as Node3D
 	var citizen_start := first_citizen.position
 	var car_start := first_car.position
