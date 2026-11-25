@@ -104,7 +104,7 @@ func _on_ammo_changed(magazine: int, reserve: int) -> void:
 
 func _on_player_died() -> void:
 	objective_label.text = "DARA DOWN"
-	status_label.text = "PLAYER VITALS DEPLETED"
+	status_label.text = "PRESS R TO RESPAWN  //  CHECKPOINT"
 
 
 func _on_mission_started(_mission_id: String, mission_title: String) -> void:
@@ -132,6 +132,13 @@ func _on_mission_failed(mission_id: String) -> void:
 	status_label.text = "ENTER TO RETRY  //  MISSION DATA LOST"
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_R:
+		if is_instance_valid(player_ref) and bool(player_ref.get("is_dead")) and player_ref.has_method("respawn"):
+			player_ref.call("respawn")
+			objective_label.text = "RETURN TO THE MISSION"
+			status_label.text = "WASD MOVE  //  SHIFT SPRINT  //  E INTERACT"
+			get_viewport().set_input_as_handled()
+			return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ENTER:
 		if MissionManager.active_mission_id == "":
 			if not _last_failed_mission_id.is_empty():
