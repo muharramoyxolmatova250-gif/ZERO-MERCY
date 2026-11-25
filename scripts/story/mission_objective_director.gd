@@ -23,8 +23,17 @@ func _on_objective_updated(_mission_id: String, objective_id: String, current: i
     elif is_instance_valid(_target):
         _target.call("set_progress", current, total)
 
-func _on_objective_completed(_mission_id: String, _objective_id: String) -> void:
-    var completed_objective: Dictionary = MissionManager.get_current_objective()
+func _on_objective_completed(mission_id: String, objective_id: String) -> void:
+    # MissionManager advances its objective index before emitting this signal.
+    # Resolve the completed objective by ID instead of reading the now-current one.
+    var completed_objective: Dictionary = {}
+    var mission_data: Dictionary = MissionManager.definitions.get(mission_id, {})
+    for objective_value in mission_data.get("objectives", []):
+        if typeof(objective_value) == TYPE_DICTIONARY:
+            var objective_data: Dictionary = objective_value
+            if str(objective_data.get("id", "")) == objective_id:
+                completed_objective = objective_data
+                break
     var event_id := str(completed_objective.get("event", ""))
     var dialogue_routes := {
         "meet_unknown_contact": ["intro", "res://data/story/dialogue_intro.json"],
