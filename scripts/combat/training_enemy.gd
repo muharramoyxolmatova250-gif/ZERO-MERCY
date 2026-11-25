@@ -31,7 +31,69 @@ func _ready() -> void:
 		_base_material.emission = Color(0.65, 0.025, 0.12)
 		_base_material.emission_energy_multiplier = 0.35
 		_body_mesh.material_override = _base_material
+	_build_enemy_visual()
 	_find_target()
+
+
+func _build_enemy_visual() -> void:
+	# Layered 3D hostile armor silhouette with emissive cybernetic details.
+	var armor := StandardMaterial3D.new()
+	armor.albedo_color = Color(0.035, 0.018, 0.03)
+	armor.metallic = 0.88
+	armor.roughness = 0.22
+	armor.clearcoat_enabled = true
+	armor.clearcoat = 0.9
+	var fabric := StandardMaterial3D.new()
+	fabric.albedo_color = Color(0.055, 0.045, 0.06)
+	fabric.roughness = 0.82
+	var red := StandardMaterial3D.new()
+	red.albedo_color = Color(0.95, 0.025, 0.08)
+	red.emission_enabled = true
+	red.emission = Color(1.0, 0.015, 0.045)
+	red.emission_energy_multiplier = 2.0
+	var amber := StandardMaterial3D.new()
+	amber.albedo_color = Color(1.0, 0.28, 0.035)
+	amber.emission_enabled = true
+	amber.emission = Color(1.0, 0.12, 0.01)
+	amber.emission_energy_multiplier = 1.1
+	_add_armor_capsule("Helmet", Vector3(0.0, 1.73, 0.0), 0.27, 0.38, armor)
+	_add_armor_box("FaceVisor", Vector3(0.0, 1.76, -0.245), Vector3(0.32, 0.075, 0.035), red)
+	_add_armor_box("ChestPlate", Vector3(0.0, 1.22, -0.29), Vector3(0.62, 0.38, 0.12), armor)
+	_add_armor_box("ChestEmblem", Vector3(0.0, 1.24, -0.36), Vector3(0.12, 0.22, 0.025), amber)
+	_add_armor_box("BackPowerCell", Vector3(0.0, 1.26, 0.25), Vector3(0.34, 0.42, 0.16), armor)
+	for side in [-1.0, 1.0]:
+		_add_armor_capsule("Shoulder_%s" % side, Vector3(side * 0.43, 1.43, 0.0), 0.19, 0.34, armor)
+		_add_armor_capsule("Arm_%s" % side, Vector3(side * 0.47, 1.04, 0.0), 0.13, 0.62, fabric)
+		_add_armor_box("ForearmPlate_%s" % side, Vector3(side * 0.48, 0.84, -0.1), Vector3(0.2, 0.32, 0.18), armor)
+		_add_armor_capsule("Leg_%s" % side, Vector3(side * 0.17, 0.31, 0.0), 0.15, 0.58, fabric)
+		_add_armor_box("Knee_%s" % side, Vector3(side * 0.17, 0.39, -0.13), Vector3(0.22, 0.17, 0.08), red)
+	_add_armor_box("ShoulderMark", Vector3(-0.44, 1.49, -0.13), Vector3(0.18, 0.1, 0.035), amber)
+
+
+func _add_armor_capsule(part_name: String, part_position: Vector3, radius: float, height: float, material: Material) -> void:
+	var part := MeshInstance3D.new()
+	part.name = part_name
+	var mesh := CapsuleMesh.new()
+	mesh.radius = radius
+	mesh.height = height
+	mesh.radial_segments = 20
+	mesh.rings = 10
+	part.mesh = mesh
+	part.position = part_position
+	part.material_override = material
+	add_child(part)
+
+
+func _add_armor_box(part_name: String, part_position: Vector3, part_size: Vector3, material: Material) -> void:
+	var part := MeshInstance3D.new()
+	part.name = part_name
+	var mesh := BoxMesh.new()
+	mesh.size = part_size
+	part.mesh = mesh
+	part.position = part_position
+	part.material_override = material
+	add_child(part)
+
 
 
 func _physics_process(delta: float) -> void:
