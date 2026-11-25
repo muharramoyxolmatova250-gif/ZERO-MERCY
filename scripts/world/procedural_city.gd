@@ -21,6 +21,7 @@ var mats: Array[StandardMaterial3D] = []
 var _window_materials: Array[StandardMaterial3D] = []
 var _wet_road_material: StandardMaterial3D
 var _facade_trim_material: StandardMaterial3D
+var _glass_facade_material: StandardMaterial3D
 @export var settlement_id := ""
 @export var settlement_display_name := ""
 
@@ -68,6 +69,13 @@ func _materials() -> void:
 	_facade_trim_material.roughness = 0.2
 	_facade_trim_material.clearcoat_enabled = true
 	_facade_trim_material.clearcoat = 0.7
+	_glass_facade_material = StandardMaterial3D.new()
+	_glass_facade_material.albedo_color = Color(0.018, 0.095, 0.14, 1.0)
+	_glass_facade_material.metallic = 0.82
+	_glass_facade_material.roughness = 0.12
+	_glass_facade_material.clearcoat_enabled = true
+	_glass_facade_material.clearcoat = 1.0
+	_glass_facade_material.clearcoat_roughness = 0.06
 	for c in [Color(0.0, 0.82, 1.0), Color(1.0, 0.08, 0.42), Color(0.95, 0.58, 0.2)]:
 		var m := StandardMaterial3D.new()
 		m.albedo_color = c
@@ -110,6 +118,7 @@ func _building(base: Vector3, size: Vector3) -> void:
 	_box(base + Vector3(0, size.y + 0.12, 0), Vector3(size.x + 0.4, 0.24, size.z + 0.4), accent, true, false)
 	_facade_windows_instanced(base, size, accent_index)
 	_architectural_facade_details(base, size, accent)
+	_glass_facade_panels(base, size)
 	_ground_floor_frontage(base, size, accent)
 	_roof_detail(base, size, accent)
 
@@ -240,6 +249,33 @@ func _architectural_facade_details(base: Vector3, size: Vector3, accent: Color) 
 	marker_material.emission = accent
 	marker_material.emission_energy_multiplier = 0.8
 	_add_facade_multimesh("FacadeCornerNeon", Vector3(0.09, size.y, 0.09), corner_transforms, marker_material)
+
+
+
+func _glass_facade_panels(base: Vector3, size: Vector3) -> void:
+	# Tinted reflective curtain-wall panels sit between the structural fins.
+	var front_back: Array[Transform3D] = []
+	var sides: Array[Transform3D] = []
+	var bays := maxi(2, int(size.x / 3.4))
+	var floors := maxi(1, int(size.y / 3.2))
+	for face in [-1.0, 1.0]:
+		var z := base.z + face * (size.z * 0.5 + 0.012)
+		for bay in range(bays):
+			var x := base.x - size.x * 0.5 + (float(bay) + 0.5) * size.x / float(bays)
+			for floor_index in range(floors):
+				var y := (float(floor_index) + 0.5) * 3.2
+				front_back.append(Transform3D(Basis(), Vector3(x, y, z)))
+	for face in [-1.0, 1.0]:
+		var x := base.x + face * (size.x * 0.5 + 0.012)
+		for bay in range(maxi(2, int(size.z / 3.4))):
+			var z := base.z - size.z * 0.5 + (float(bay) + 0.5) * size.z / float(maxi(2, int(size.z / 3.4)))
+			for floor_index in range(floors):
+				var y := (float(floor_index) + 0.5) * 3.2
+				var basis := Basis(Vector3.UP, PI * 0.5)
+				sides.append(Transform3D(basis, Vector3(x, y, z)))
+	_add_facade_multimesh("ReflectiveGlassFrontBack", Vector3(size.x / float(bays) - 0.42, 2.45, 0.045), front_back, _glass_facade_material)
+	_add_facade_multimesh("ReflectiveGlassSides", Vector3(size.z / float(maxi(2, int(size.z / 3.4))) - 0.42, 2.45, 0.045), sides, _glass_facade_material)
+
 
 
 func _add_facade_multimesh(label: String, mesh_size: Vector3, transforms: Array[Transform3D], material: Material) -> void:
