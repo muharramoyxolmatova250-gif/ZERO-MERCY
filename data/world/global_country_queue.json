@@ -2,7 +2,7 @@
   "schema_version": 4,
   "source_catalogue": "/home/runner/work/ZERO-MERCY/ZERO-MERCY/data/world/global_regions.json",
   "selection": "Priority country extracts plus continent PBF fallbacks clipped to uncovered country boundaries",
-  "extract_count": 195,
+  "extract_count": 194,
   "covered_iso3166_1_count": 204,
   "supplemental_parent_extract_count": 5,
   "countries": [
@@ -385,15 +385,15 @@
       "bboxes": [
         [
           44.93408,
-          38.24727,
-          51.7231,
-          42.67437
+          38.3854,
+          51.35558,
+          42.18784
         ],
         [
           44.75006,
           38.83258,
           46.15767,
-          39.81065
+          39.81117
         ]
       ],
       "extract_kind": "country"
@@ -3662,25 +3662,6 @@
           -22.44725,
           33.08541,
           -15.58707
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "ile-de-clipperton",
-      "name": "Île de Clipperton",
-      "iso3166_1": [
-        "PF"
-      ],
-      "parent": "australia-oceania",
-      "pbf_url": "https://download.geofabrik.de/australia-oceania/ile-de-clipperton/ile-de-clipperton-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          -110.1215,
-          9.595339,
-          -108.37459999999999,
-          11.15685
         ]
       ],
       "extract_kind": "country"
