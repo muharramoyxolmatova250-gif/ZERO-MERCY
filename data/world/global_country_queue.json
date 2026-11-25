@@ -45,6 +45,348 @@
       "extract_kind": "country"
     },
     {
+      "id": "andorra",
+      "name": "Andorra",
+      "iso3166_1": [
+        "AD"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/andorra/andorra-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          1.412368,
+          42.4276,
+          1.787481,
+          42.65717
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "austria",
+      "name": "Austria",
+      "iso3166_1": [
+        "AT"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/austria/austria-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          9.52678,
+          46.36979,
+          17.16408,
+          49.02403
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "belgium",
+      "name": "Belgium",
+      "iso3166_1": [
+        "BE"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/belgium/belgium-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          2.340725,
+          49.49489,
+          6.410265,
+          51.59839
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "czech-republic",
+      "name": "Czech Republic",
+      "iso3166_1": [
+        "CZ"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/czech-republic/czech-republic-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          12.08477,
+          48.54292,
+          18.86321,
+          51.06426
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "denmark",
+      "name": "Denmark",
+      "iso3166_1": [
+        "DK"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/denmark/denmark-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          7.7011,
+          54.44065,
+          15.65449,
+          58.06239
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "finland",
+      "name": "Finland",
+      "iso3166_1": [
+        "FI"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/finland/finland-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          19.02427,
+          59.28783,
+          31.6159,
+          70.09959
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "france",
+      "name": "France",
+      "iso3166_1": [
+        "FR"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/france/france-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -6.937207000000001,
+          41.23866,
+          9.9,
+          51.4288
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "germany",
+      "name": "Germany",
+      "iso3166_1": [
+        "DE"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/germany/germany-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          5.864417,
+          47.26543,
+          15.05078,
+          55.14777
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "italy",
+      "name": "Italy",
+      "iso3166_1": [
+        "IT"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/italy/italy-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          6.602696,
+          35.07638,
+          19.12499,
+          47.10005
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "netherlands",
+      "name": "Netherlands",
+      "iso3166_1": [
+        "NL"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/netherlands/netherlands-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          2.936095,
+          50.74753,
+          7.230455,
+          54.01786
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "norway",
+      "name": "Norway",
+      "iso3166_1": [
+        "NO"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/norway/norway-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -11.368010000000027,
+          57.55323,
+          35.52711,
+          81.05195
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "poland",
+      "name": "Poland",
+      "iso3166_1": [
+        "PL"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/poland/poland-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          13.99022,
+          48.98642,
+          24.16102,
+          55.22826
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "portugal",
+      "name": "Portugal",
+      "iso3166_1": [
+        "PT"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/portugal/portugal-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -31.600000000000023,
+          29.7,
+          -6.179512999999986,
+          42.1639
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "slovakia",
+      "name": "Slovakia",
+      "iso3166_1": [
+        "SK"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/slovakia/slovakia-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          16.83071,
+          47.72646,
+          22.57051,
+          49.6186
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "spain",
+      "name": "Spain",
+      "iso3166_1": [
+        "ES"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/spain/spain-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          -9.779014000000018,
+          35.26393,
+          5.098525,
+          44.14855
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "sweden",
+      "name": "Sweden",
+      "iso3166_1": [
+        "SE"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/sweden/sweden-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          10.54138,
+          55.02652,
+          24.22472,
+          69.06643
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "switzerland",
+      "name": "Switzerland",
+      "iso3166_1": [
+        "CH"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/switzerland/switzerland-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          5.954418,
+          45.81642,
+          10.49584,
+          47.81126
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
+      "id": "turkey",
+      "name": "Turkey",
+      "iso3166_1": [
+        "TR"
+      ],
+      "parent": "europe",
+      "pbf_url": "https://download.geofabrik.de/europe/turkey/turkey-latest.osm.pbf",
+      "estimated_size_bytes": null,
+      "bboxes": [
+        [
+          25.52398,
+          35.717,
+          44.85992,
+          43.07481
+        ]
+      ],
+      "extract_kind": "country"
+    },
+    {
       "id": "albania",
       "name": "Albania",
       "iso3166_1": [
@@ -78,25 +420,6 @@
           18.92874,
           12.03598,
           37.77284
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "andorra",
-      "name": "Andorra",
-      "iso3166_1": [
-        "AD"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/andorra/andorra-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          1.412368,
-          42.4276,
-          1.787481,
-          42.65717
         ]
       ],
       "extract_kind": "country"
@@ -197,25 +520,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "austria",
-      "name": "Austria",
-      "iso3166_1": [
-        "AT"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/austria/austria-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          9.52678,
-          46.36979,
-          17.16408,
-          49.02403
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "azerbaijan",
       "name": "Azerbaijan",
       "iso3166_1": [
@@ -293,25 +597,6 @@
           51.23441,
           32.76947,
           56.17385
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "belgium",
-      "name": "Belgium",
-      "iso3166_1": [
-        "BE"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/belgium/belgium-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          2.340725,
-          49.49489,
-          6.410265,
-          51.59839
         ]
       ],
       "extract_kind": "country"
@@ -792,44 +1077,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "czech-republic",
-      "name": "Czech Republic",
-      "iso3166_1": [
-        "CZ"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/czech-republic/czech-republic-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          12.08477,
-          48.54292,
-          18.86321,
-          51.06426
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "denmark",
-      "name": "Denmark",
-      "iso3166_1": [
-        "DK"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/denmark/denmark-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          7.7011,
-          54.44065,
-          15.65449,
-          58.06239
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "djibouti",
       "name": "Djibouti",
       "iso3166_1": [
@@ -1051,44 +1298,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "finland",
-      "name": "Finland",
-      "iso3166_1": [
-        "FI"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/finland/finland-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          19.02427,
-          59.28783,
-          31.6159,
-          70.09959
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "france",
-      "name": "France",
-      "iso3166_1": [
-        "FR"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/france/france-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          -6.937207000000001,
-          41.23866,
-          9.9,
-          51.4288
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "gabon",
       "name": "Gabon",
       "iso3166_1": [
@@ -1145,25 +1354,6 @@
           41.05117,
           46.73959,
           43.5899
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "germany",
-      "name": "Germany",
-      "iso3166_1": [
-        "DE"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/germany/germany-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          5.864417,
-          47.26543,
-          15.05078,
-          55.14777
         ]
       ],
       "extract_kind": "country"
@@ -1489,25 +1679,6 @@
           29.4396,
           35.91531,
           33.45436
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "italy",
-      "name": "Italy",
-      "iso3166_1": [
-        "IT"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/italy/italy-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          6.602696,
-          35.07638,
-          19.12499,
-          47.10005
         ]
       ],
       "extract_kind": "country"
@@ -2249,25 +2420,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "netherlands",
-      "name": "Netherlands",
-      "iso3166_1": [
-        "NL"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/netherlands/netherlands-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          2.936095,
-          50.74753,
-          7.230455,
-          54.01786
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "new-caledonia",
       "name": "New Caledonia",
       "iso3166_1": [
@@ -2402,25 +2554,6 @@
           37.61103,
           131.6447,
           43.02043
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "norway",
-      "name": "Norway",
-      "iso3166_1": [
-        "NO"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/norway/norway-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          -11.368010000000027,
-          57.55323,
-          35.52711,
-          81.05195
         ]
       ],
       "extract_kind": "country"
@@ -2578,25 +2711,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "poland",
-      "name": "Poland",
-      "iso3166_1": [
-        "PL"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/poland/poland-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          13.99022,
-          48.98642,
-          24.16102,
-          55.22826
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "polynesie-francaise",
       "name": "Polynésie française (French Polynesia)",
       "iso3166_1": [
@@ -2611,25 +2725,6 @@
           -31.54105,
           -132.5391,
           -4.915789
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "portugal",
-      "name": "Portugal",
-      "iso3166_1": [
-        "PT"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/portugal/portugal-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          -31.600000000000023,
-          29.7,
-          -6.179512999999986,
-          42.1639
         ]
       ],
       "extract_kind": "country"
@@ -2857,25 +2952,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "slovakia",
-      "name": "Slovakia",
-      "iso3166_1": [
-        "SK"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/slovakia/slovakia-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          16.83071,
-          47.72646,
-          22.57051,
-          49.6186
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "slovenia",
       "name": "Slovenia",
       "iso3166_1": [
@@ -2971,25 +3047,6 @@
       "extract_kind": "country"
     },
     {
-      "id": "spain",
-      "name": "Spain",
-      "iso3166_1": [
-        "ES"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/spain/spain-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          -9.779014000000018,
-          35.26393,
-          5.098525,
-          44.14855
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
       "id": "sri-lanka",
       "name": "Sri Lanka",
       "iso3166_1": [
@@ -3061,44 +3118,6 @@
           -27.31826,
           32.13698,
           -25.71781
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "sweden",
-      "name": "Sweden",
-      "iso3166_1": [
-        "SE"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/sweden/sweden-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          10.54138,
-          55.02652,
-          24.22472,
-          69.06643
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "switzerland",
-      "name": "Switzerland",
-      "iso3166_1": [
-        "CH"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/switzerland/switzerland-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          5.954418,
-          45.81642,
-          10.49584,
-          47.81126
         ]
       ],
       "extract_kind": "country"
@@ -3270,25 +3289,6 @@
           30.20864,
           12.068,
           37.77474
-        ]
-      ],
-      "extract_kind": "country"
-    },
-    {
-      "id": "turkey",
-      "name": "Turkey",
-      "iso3166_1": [
-        "TR"
-      ],
-      "parent": "europe",
-      "pbf_url": "https://download.geofabrik.de/europe/turkey/turkey-latest.osm.pbf",
-      "estimated_size_bytes": null,
-      "bboxes": [
-        [
-          25.52398,
-          35.717,
-          44.85992,
-          43.07481
         ]
       ],
       "extract_kind": "country"
