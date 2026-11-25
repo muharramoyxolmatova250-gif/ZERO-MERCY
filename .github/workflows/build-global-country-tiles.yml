@@ -85,7 +85,7 @@ jobs:
           python-version: "3.12"
       - name: Refresh worldwide catalogue and country queue
         run: |
-          python tools/geodata/build_global_manifest.py
+          python tools/geodata/build_global_manifest.py --offline-catalog
           python tools/geodata/build_global_country_queue.py
           python tests/test_global_country_queue.py
           python tests/test_global_tile_grid.py
@@ -113,7 +113,7 @@ jobs:
         env:
           REGION_ID: ${{ steps.select.outputs.region_id }}
         run: |
-          python tools/geodata/build_global_manifest.py --region "$REGION_ID" --download
+          python tools/geodata/build_global_manifest.py --offline-catalog --region "$REGION_ID" --download
       - name: Cache country PBF for following batches
         if: steps.select.outputs.has_work == 'true'
         continue-on-error: true
