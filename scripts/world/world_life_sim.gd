@@ -19,6 +19,9 @@ var deaths_total := 0
 var marriages_total := 0
 var graduations_total := 0
 var _elapsed := 0.0
+var _save_elapsed := 0.0
+var _dirty := false
+const SAVE_INTERVAL_SECONDS := 30.0
 var _rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
@@ -32,9 +35,18 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
     _elapsed += delta
+    _save_elapsed += delta
     if _elapsed >= month_seconds:
         _elapsed = 0.0
         advance_month()
+    if _dirty and _save_elapsed >= SAVE_INTERVAL_SECONDS:
+        _save_elapsed = 0.0
+        _save_state()
+
+
+func _exit_tree() -> void:
+    if _dirty:
+        _save_state()
 
 func _ensure_hub(city_id: String, population_hint: int = 100000) -> void:
     if hub_state.has(city_id):
@@ -105,6 +117,7 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
     }
     resident_profiles[citizen_id] = profile
     _prune_profiles_if_needed()
+    _dirty = true
     return profile
 
 func claim_resident_id(city_id: String) -> String:
@@ -134,6 +147,7 @@ func unregister_citizen(citizen_id: String) -> void:
     profile["active"] = false
     profile["last_seen_day"] = simulation_day
     resident_profiles[citizen_id] = profile
+    _dirty = true
     var city_id := str(profile.get("city", ""))
     if not _claim_cache.has(city_id):
         _claim_cache[city_id] = []
@@ -150,6 +164,7 @@ func record_activity(citizen_id: String, activity: String) -> void:
     elif activity == "work":
         profile["money"] = int(profile.get("money", 0)) + 1
     resident_profiles[citizen_id] = profile
+    _dirty = true
 
 func record_event(citizen_id: String, event_name: String) -> void:
     if not resident_profiles.has(citizen_id):
@@ -161,6 +176,7 @@ func record_event(citizen_id: String, event_name: String) -> void:
         events.pop_front()
     profile["life_events"] = events
     resident_profiles[citizen_id] = profile
+    _dirty = true
 
 func advance_month() -> void:
     simulation_day += 30
@@ -387,3 +403,5 @@ func _save_state() -> void:
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file != null:
         file.store_string(JSON.stringify(data))
+        _dirty = false
+        _save_elapsed = 0.0
