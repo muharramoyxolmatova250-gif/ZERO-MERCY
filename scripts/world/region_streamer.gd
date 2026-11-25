@@ -11,6 +11,7 @@ extends Node3D
 @export_range(1,32,1) var max_operations_per_frame := 1
 @export_range(1,256,1) var max_loaded_tiles := 25
 @export_range(1,64,1) var max_load_attempts_per_frame := 4
+@export_range(1,512,1) var max_queued_tiles := 64
 var _target: Node3D
 var _root: Node3D
 var _tiles: Dictionary = {}
@@ -74,6 +75,8 @@ func _refresh(center: Vector2i) -> void:
     for candidate in candidates:
         _queue.append(candidate)
     _queue.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.distance_squared_to(center) < b.distance_squared_to(center))
+    if _queue.size() > max_queued_tiles:
+        _queue.resize(max_queued_tiles)
     for key in _loaded.keys():
         var coord: Vector2i = _loaded[key]["coord"]
         if maxi(abs(coord.x - center.x), abs(coord.y - center.y)) > unload_radius:
@@ -286,7 +289,9 @@ func get_streaming_stats() -> Dictionary:
         "indexed_tiles": indexed_tile_count,
         "loaded_tiles": _loaded.size(),
         "queued_tiles": _queue.size(),
+        "queue_budget": max_queued_tiles,
         "tile_budget": max_loaded_tiles,
+        "load_attempt_budget_per_frame": max_load_attempts_per_frame,
         "load_radius": load_radius,
         "unload_radius": unload_radius
     }
