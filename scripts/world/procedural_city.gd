@@ -19,7 +19,7 @@ extends Node3D
 var rng := RandomNumberGenerator.new()
 var mats: Array[StandardMaterial3D] = []
 var _window_materials: Array[StandardMaterial3D] = []
-var _wet_road_material: StandardMaterial3D
+var _wet_road_material: Material
 var _facade_trim_material: StandardMaterial3D
 var _glass_facade_material: StandardMaterial3D
 @export var settlement_id := ""
@@ -56,7 +56,6 @@ func _materials() -> void:
 		m.metallic = 0.72
 		m.roughness = 0.34
 		mats.append(m)
-	_wet_road_material = StandardMaterial3D.new()
 	var asphalt_shader := load("res://shaders/wet_asphalt.gdshader") as Shader
 	if asphalt_shader != null:
 		var asphalt_shader_material := ShaderMaterial.new()
@@ -66,12 +65,14 @@ func _materials() -> void:
 		_wet_road_material = asphalt_shader_material
 	else:
 		push_warning("Wet asphalt shader missing; using StandardMaterial fallback.")
-		_wet_road_material.albedo_color = Color(0.012, 0.022, 0.038)
-		_wet_road_material.metallic = 0.48
-		_wet_road_material.roughness = 0.16
-		_wet_road_material.clearcoat_enabled = true
-		_wet_road_material.clearcoat = 1.0
-		_wet_road_material.clearcoat_roughness = 0.08
+		var asphalt_fallback := StandardMaterial3D.new()
+		asphalt_fallback.albedo_color = Color(0.012, 0.022, 0.038)
+		asphalt_fallback.metallic = 0.48
+		asphalt_fallback.roughness = 0.16
+		asphalt_fallback.clearcoat_enabled = true
+		asphalt_fallback.clearcoat = 1.0
+		asphalt_fallback.clearcoat_roughness = 0.08
+		_wet_road_material = asphalt_fallback
 	_facade_trim_material = StandardMaterial3D.new()
 	_facade_trim_material.albedo_color = Color(0.035, 0.055, 0.085)
 	_facade_trim_material.metallic = 0.88
