@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "current_region_id": "uzbekistan",
+  "current_region_id": null,
   "next_tile_by_region": {
     "uzbekistan": 168,
     "afghanistan": 0
