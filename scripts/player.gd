@@ -158,21 +158,30 @@ func _interact_with_world() -> void:
 	if is_instance_valid(_held_item):
 		_drop_held_item()
 		return
+	# Mission markers are placed ahead of Dara while the third-person camera
+	# sits behind her. Use a longer ray for objective interaction only.
 	var origin := camera.global_position
-	var end := origin + (-camera.global_transform.basis.z * 3.5)
-	var query := PhysicsRayQueryParameters3D.create(origin, end)
-	query.exclude = [get_rid()]
-	query.collide_with_areas = false
-	var hit := get_world_3d().direct_space_state.intersect_ray(query)
-	if hit.is_empty():
+	var objective_end := origin + (-camera.global_transform.basis.z * 12.0)
+	var objective_query := PhysicsRayQueryParameters3D.create(origin, objective_end)
+	objective_query.exclude = [get_rid()]
+	objective_query.collide_with_areas = false
+	var objective_hit := get_world_3d().direct_space_state.intersect_ray(objective_query)
+	if not objective_hit.is_empty():
+		var objective_collider: Object = objective_hit.get("collider")
+		if objective_collider is StaticBody3D and objective_collider.is_in_group("mission_objective") and objective_collider.has_method("interact"):
+			objective_collider.call("interact")
+			return
+	# Keep ordinary pickups close to the player.
+	var pickup_end := origin + (-camera.global_transform.basis.z * 3.5)
+	var pickup_query := PhysicsRayQueryParameters3D.create(origin, pickup_end)
+	pickup_query.exclude = [get_rid()]
+	pickup_query.collide_with_areas = false
+	var pickup_hit := get_world_3d().direct_space_state.intersect_ray(pickup_query)
+	if pickup_hit.is_empty():
 		return
-	var collider: Object = hit.get("collider")
-	if collider is StaticBody3D and collider.is_in_group("mission_objective") and collider.has_method("interact"):
-		collider.call("interact")
-		return
-	if collider is StaticBody3D and collider.is_in_group("world_pickup"):
-		_pick_up_item(collider as Node3D)
-
+	var pickup_collider: Object = pickup_hit.get("collider")
+	if pickup_collider is StaticBody3D and pickup_collider.is_in_group("world_pickup"):
+		_pick_up_item(pickup_collider as Node3D)
 
 func _pick_up_item(item: Node3D) -> void:
 	if not is_instance_valid(item) or _held_item != null:
