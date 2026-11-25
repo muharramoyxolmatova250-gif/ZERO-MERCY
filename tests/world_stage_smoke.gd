@@ -227,6 +227,27 @@ func _run() -> void:
 		_fail("Quick-load did not restore position, health and ammunition.")
 		return
 	print("PASS Save system: player position, health and ammunition persist across quick-save/load.")
+	var invalid_save_payload := {
+		"player_state": {
+			"position": [999.0, 2.0],
+			"rotation": [0.0, 0.0, 0.0],
+			"health": 100.0,
+			"stamina": 100.0,
+			"ammo_in_magazine": 5,
+			"reserve_ammo": 30
+		}
+	}
+	if not bool(save_manager.call("save_game", invalid_save_payload)):
+		_fail("Could not write malformed-save fixture.")
+		return
+	var position_before_invalid_load: Vector3 = player.global_position
+	if bool(save_manager.call("restore_player_state", player)):
+		_fail("Quick-load accepted malformed position data.")
+		return
+	if player.global_position.distance_to(position_before_invalid_load) > 0.001:
+		_fail("Malformed quick-load changed the live player position.")
+		return
+	print("PASS Save safety: malformed player state is rejected without changing gameplay.")
 	player.call("_fire_weapon")
 	if int(player.get("ammo_in_magazine")) != 4:
 		_fail("Cyber sidearm did not consume one round when fired.")
