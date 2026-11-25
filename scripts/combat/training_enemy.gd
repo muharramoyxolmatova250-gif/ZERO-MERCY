@@ -16,6 +16,9 @@ var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var _body_mesh: MeshInstance3D
 var _base_material: StandardMaterial3D
 var _flash_time := 0.0
+var _attack_windup_remaining := 0.0
+var _attack_pending := false
+var _visor_material: StandardMaterial3D
 
 
 func _ready() -> void:
@@ -51,6 +54,7 @@ func _build_enemy_visual() -> void:
 	red.emission_enabled = true
 	red.emission = Color(1.0, 0.015, 0.045)
 	red.emission_energy_multiplier = 2.0
+	_visor_material = red
 	var amber := StandardMaterial3D.new()
 	amber.albedo_color = Color(1.0, 0.28, 0.035)
 	amber.emission_enabled = true
@@ -101,6 +105,15 @@ func _physics_process(delta: float) -> void:
 	_flash_time = maxf(0.0, _flash_time - delta)
 	if _body_mesh != null and _base_material != null and _flash_time <= 0.0:
 		_body_mesh.material_override = _base_material
+	if _attack_pending:
+		_attack_windup_remaining = maxf(0.0, _attack_windup_remaining - delta)
+		if _visor_material != null:
+			_visor_material.emission_energy_multiplier = 3.8 if fmod(_attack_windup_remaining * 8.0, 1.0) > 0.5 else 1.4
+		if _attack_windup_remaining <= 0.0:
+			_attack_pending = false
+			if _visor_material != null:
+				_visor_material.emission_energy_multiplier = 2.0
+			_resolve_attack()
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
 	if not is_instance_valid(_target):
@@ -133,8 +146,8 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.x = move_toward(velocity.x, 0.0, move_speed * delta * 5.0)
 		velocity.z = move_toward(velocity.z, 0.0, move_speed * delta * 5.0)
-		if _attack_cooldown <= 0.0:
-			_attack()
+		if _attack_cooldown <= 0.0 and not _attack_pending:
+			_start_attack()
 	move_and_slide()
 
 
@@ -144,9 +157,17 @@ func _find_target() -> void:
 		_target = players[0] as Node3D
 
 
-func _attack() -> void:
+func _start_attack() -> void:
+	# A short readable wind-up gives the player time to dodge or interrupt.
+	_attack_pending = true
+	_attack_windup_remaining = 0.42
 	_attack_cooldown = attack_interval
+
+
+func _resolve_attack() -> void:
 	if not is_instance_valid(_target) or not _target.has_method("take_damage"):
+		return
+	if bool(_target.get("is_dead")):
 		return
 	var target_position := _target.global_position + Vector3.UP * 0.9
 	var attack_origin := global_position + Vector3.UP * 1.0
@@ -163,7 +184,6 @@ func _attack() -> void:
 	var hit_collider: Object = hit.get("collider")
 	if hit_collider == _target:
 		_target.call("take_damage", attack_damage, self)
-
 
 func take_damage(amount: float, _source: Node = null) -> void:
 	if amount <= 0.0 or health <= 0.0:
