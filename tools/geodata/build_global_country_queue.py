@@ -25,7 +25,7 @@ FALLBACK_PARENT_BY_ISO = {
 COUNTRY_PRIORITY = {
     "UZ": 0, "AF": 1,
     "US": 500, "CN": 501, "JP": 502, "IN": 503,
-    "KR": 504, "GB": 505, "DE": 506, "FR": 507,
+    "KR": 504, "GB": 505,
 }
 
 def _iso_codes(region: dict) -> list[str]:
