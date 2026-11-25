@@ -57,12 +57,21 @@ func _materials() -> void:
 		m.roughness = 0.34
 		mats.append(m)
 	_wet_road_material = StandardMaterial3D.new()
-	_wet_road_material.albedo_color = Color(0.012, 0.022, 0.038)
-	_wet_road_material.metallic = 0.48
-	_wet_road_material.roughness = 0.16
-	_wet_road_material.clearcoat_enabled = true
-	_wet_road_material.clearcoat = 1.0
-	_wet_road_material.clearcoat_roughness = 0.08
+	var asphalt_shader := load("res://shaders/wet_asphalt.gdshader") as Shader
+	if asphalt_shader != null:
+		var asphalt_shader_material := ShaderMaterial.new()
+		asphalt_shader_material.shader = asphalt_shader
+		asphalt_shader_material.set_shader_parameter("asphalt_tint", Color(0.012, 0.022, 0.038))
+		asphalt_shader_material.set_shader_parameter("wetness", 0.82)
+		_wet_road_material = asphalt_shader_material
+	else:
+		push_warning("Wet asphalt shader missing; using StandardMaterial fallback.")
+		_wet_road_material.albedo_color = Color(0.012, 0.022, 0.038)
+		_wet_road_material.metallic = 0.48
+		_wet_road_material.roughness = 0.16
+		_wet_road_material.clearcoat_enabled = true
+		_wet_road_material.clearcoat = 1.0
+		_wet_road_material.clearcoat_roughness = 0.08
 	_facade_trim_material = StandardMaterial3D.new()
 	_facade_trim_material.albedo_color = Color(0.035, 0.055, 0.085)
 	_facade_trim_material.metallic = 0.88
