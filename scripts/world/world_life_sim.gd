@@ -69,12 +69,14 @@ func _ensure_hub(city_id: String, population_hint: int = 100000) -> void:
     }
 
 
-func register_settlement_hub(city_id: String, display_name: String, population_hint: int) -> void:
+func register_settlement_hub(city_id: String, display_name: String, population_hint: int, latitude: float = 0.0, longitude: float = 0.0) -> void:
     if city_id.is_empty():
         return
     _ensure_hub(city_id, population_hint)
     var hub: Dictionary = hub_state[city_id]
     hub["display_name"] = display_name
+    hub["latitude"] = latitude
+    hub["longitude"] = longitude
     hub["source"] = "openstreetmap_settlement"
     hub_state[city_id] = hub
     _dirty = true
