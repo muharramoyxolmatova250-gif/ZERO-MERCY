@@ -217,6 +217,17 @@ func _add_box(pos:Vector3,size:Vector3,color:Color,emissive:=false)->void:
  add_child(body)
 
 func _unhandled_input(event: InputEvent) -> void:
+ if event is InputEventKey and event.pressed and not event.echo:
+  if event.keycode == KEY_F5:
+   if is_instance_valid(_player):
+    SaveManager.save_player_state(_player)
+   get_viewport().set_input_as_handled()
+   return
+  elif event.keycode == KEY_F9:
+   if is_instance_valid(_player):
+    SaveManager.restore_player_state(_player)
+   get_viewport().set_input_as_handled()
+   return
  if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_M:
   if _earth_overview == null:
    _earth_overview = EARTH_OVERVIEW_SCENE.instantiate()
@@ -267,15 +278,3 @@ func _notification(what: int) -> void:
  if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
   if is_instance_valid(_player):
    SaveManager.save_player_state(_player)
-
-
-func _unhandled_input(event: InputEvent) -> void:
- if event is InputEventKey and event.pressed and not event.echo:
-  if event.keycode == KEY_F5:
-   if is_instance_valid(_player):
-    SaveManager.save_player_state(_player)
-   get_viewport().set_input_as_handled()
-  elif event.keycode == KEY_F9:
-   if is_instance_valid(_player):
-    SaveManager.restore_player_state(_player)
-   get_viewport().set_input_as_handled()
