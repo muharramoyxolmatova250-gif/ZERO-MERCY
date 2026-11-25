@@ -123,8 +123,8 @@ func _position_plane(i:int)->void:
  var aircraft_position:=start.lerp(finish,p)+Vector3.UP*(sin(p*PI)*altitude)
  _planes[i].global_position=aircraft_position
  if route.length_squared()>0.001:
-  # Large offset avoids float precision collapse at Earth-scale coordinates.
-  _planes[i].look_at(aircraft_position+route.normalized()*10000.0,Vector3.UP)
+  # Set the heading basis directly; a distant global look_at target loses precision.
+  _planes[i].global_basis=Basis.looking_at(route.normalized(),Vector3.UP)
 
 
 func _load_world_anchor()->void:
