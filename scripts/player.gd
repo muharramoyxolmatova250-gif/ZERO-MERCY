@@ -42,6 +42,8 @@ var _muzzle_flash: MeshInstance3D
 var _muzzle_light: OmniLight3D
 var _muzzle_flash_timer := 0.0
 var _spawn_transform: Transform3D
+var _dara_animation_time := 0.0
+var _dara_visual_nodes: Dictionary = {}
 
 
 func _ready() -> void:
@@ -104,6 +106,8 @@ func _build_dara_visual() -> void:
 		_add_dara_capsule("Shin_%s" % side, Vector3(side * 0.17, 0.16, -0.025), 0.115, 0.38, armor)
 		_add_dara_box("KneePlate_%s" % side, Vector3(side * 0.17, 0.34, -0.125), Vector3(0.22, 0.16, 0.07), magenta)
 		_add_dara_box("Boot_%s" % side, Vector3(side * 0.17, 0.055, -0.09), Vector3(0.24, 0.13, 0.38), armor)
+	for part_name in ["TorsoArmor", "Head", "UpperArm_-1.0", "UpperArm_1.0", "Forearm_-1.0", "Forearm_1.0", "Thigh_-1.0", "Thigh_1.0", "Shin_-1.0", "Shin_1.0"]:
+		_dara_visual_nodes[part_name] = get_node_or_null(part_name)
 
 
 func _add_dara_capsule(part_name: String, part_position: Vector3, radius: float, height: float, material: Material) -> void:
@@ -231,6 +235,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
+	_animate_dara_visual(delta)
 	if _muzzle_flash_timer <= 0.0:
 		return
 	_muzzle_flash_timer = maxf(0.0, _muzzle_flash_timer - delta)
@@ -240,6 +245,32 @@ func _process(delta: float) -> void:
 		if _muzzle_light != null:
 			_muzzle_light.light_energy = 0.0
 			_muzzle_light.visible = false
+
+
+func _animate_dara_visual(delta: float) -> void:
+	var horizontal_speed := Vector2(velocity.x, velocity.z).length()
+	var movement_weight := clampf(horizontal_speed / maxf(sprint_speed, 0.01), 0.0, 1.0)
+	if is_dead:
+		movement_weight = 0.0
+	_dara_animation_time += delta * lerpf(1.0, 2.0, movement_weight)
+	var stride := sin(_dara_animation_time * 8.5) * movement_weight
+	var idle_breath := sin(_dara_animation_time * 2.1) * 0.018
+	var targets := {
+		"TorsoArmor": Vector3(idle_breath + absf(stride) * 0.035, 0.0, 0.0),
+		"Head": Vector3(-idle_breath * 0.6, 0.0, 0.0),
+		"UpperArm_-1.0": Vector3(-stride * 0.48, 0.0, 0.0),
+		"UpperArm_1.0": Vector3(stride * 0.48, 0.0, 0.0),
+		"Forearm_-1.0": Vector3(-0.12 - maxf(0.0, stride) * 0.12, 0.0, 0.0),
+		"Forearm_1.0": Vector3(-0.12 - maxf(0.0, -stride) * 0.12, 0.0, 0.0),
+		"Thigh_-1.0": Vector3(stride * 0.62, 0.0, 0.0),
+		"Thigh_1.0": Vector3(-stride * 0.62, 0.0, 0.0),
+		"Shin_-1.0": Vector3(maxf(0.0, -stride) * 0.55, 0.0, 0.0),
+		"Shin_1.0": Vector3(maxf(0.0, stride) * 0.55, 0.0, 0.0)
+	}
+	for part_name in targets:
+		var part: Node3D = _dara_visual_nodes.get(part_name) as Node3D
+		if part != null:
+			part.rotation = part.rotation.lerp(targets[part_name], clampf(delta * 12.0, 0.0, 1.0))
 
 
 func _physics_process(delta: float) -> void:
