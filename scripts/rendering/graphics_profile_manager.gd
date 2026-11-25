@@ -83,11 +83,20 @@ func get_preset_name(preset: int = -1) -> String:
 			return "Unknown"
 
 func get_9k_target_resolution() -> Vector2i:
-	# 9K-class target (9216 x 5184); do not force this on the player's display.
-	return Vector2i(9216, 5184)
+	# 9K-class target (9216 x 5120); do not force this on the player's display.
+	return Vector2i(9216, 5120)
 
 func _has_property(object: Object, property_name: String) -> bool:
 	for property_info in object.get_property_list():
 		if String(property_info.name) == property_name:
 			return true
 	return false
+
+
+func get_active_profile_report() -> Dictionary:
+	var report: Dictionary = PROFILES.get(active_preset, {}).duplicate(true)
+	report["name"] = get_preset_name()
+	report["target_resolution_9k"] = get_9k_target_resolution()
+	report["is_native_9k"] = false
+	report["renderer"] = str(ProjectSettings.get_setting("rendering/renderer/rendering_method", "unknown"))
+	return report
