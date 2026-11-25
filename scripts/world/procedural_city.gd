@@ -22,6 +22,7 @@ var _window_materials: Array[StandardMaterial3D] = []
 var _wet_road_material: Material
 var _facade_trim_material: StandardMaterial3D
 var _glass_facade_material: StandardMaterial3D
+var _building_shell_shader: Shader
 @export var settlement_id := ""
 @export var settlement_display_name := ""
 
@@ -79,6 +80,7 @@ func _materials() -> void:
 	_facade_trim_material.roughness = 0.2
 	_facade_trim_material.clearcoat_enabled = true
 	_facade_trim_material.clearcoat = 0.7
+	_building_shell_shader = load("res://shaders/cyberpunk_concrete.gdshader") as Shader
 	_glass_facade_material = StandardMaterial3D.new()
 	_glass_facade_material.albedo_color = Color(0.018, 0.095, 0.14, 1.0)
 	_glass_facade_material.metallic = 0.82
@@ -135,6 +137,18 @@ func _building(base: Vector3, size: Vector3) -> void:
 
 
 func _building_visual_shell(base: Vector3, size: Vector3, wall_color: Color) -> void:
+	var shell_material: Material
+	if _building_shell_shader != null:
+		var concrete := ShaderMaterial.new()
+		concrete.shader = _building_shell_shader
+		concrete.set_shader_parameter("wall_tint", wall_color)
+		shell_material = concrete
+	else:
+		var fallback := StandardMaterial3D.new()
+		fallback.albedo_color = wall_color
+		fallback.metallic = 0.12
+		fallback.roughness = 0.78
+		shell_material = fallback
 	var wall := 0.45
 	var door_width := minf(2.2, size.x * 0.24)
 	var front_z := base.z - size.z * 0.5
@@ -149,8 +163,10 @@ func _building_visual_shell(base: Vector3, size: Vector3, wall_color: Color) -> 
 	]
 	for piece in pieces:
 		var wall_mesh := _box(piece[0], piece[1], wall_color, false, false)
+		wall_mesh.material_override = shell_material
 		wall_mesh.add_to_group("building_shell_visual")
 	var roof_mesh := _box(base + Vector3(0.0, size.y, 0.0), Vector3(size.x, wall, size.z), wall_color, false, false)
+	roof_mesh.material_override = shell_material
 	roof_mesh.add_to_group("building_shell_visual")
 
 
