@@ -120,8 +120,24 @@ func _build_environment() -> void:
  environment.ssil_enabled = true
  environment.ssil_radius = 4.0
  environment.ssil_intensity = 0.7
+ # Screen-space reflections add readable reflections to wet roads and glass.
+ environment.ssr_enabled = true
+ environment.ssr_max_steps = 64
+ environment.ssr_fade_in = 0.15
+ environment.ssr_fade_out = 2.0
+ environment.ssr_depth_tolerance = 0.2
+ # Cinematic bloom is restrained so emissive signs retain texture and shape.
+ environment.glow_bloom = 0.12
+ environment.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+ # Filmic exposure and saturation preserve detail in bright neon and dark streets.
+ environment.adjustment_enabled = true
+ environment.adjustment_brightness = 1.0
+ environment.adjustment_contrast = 1.08
+ environment.adjustment_saturation = 1.12
  environment.volumetric_fog_enabled = true
- environment.volumetric_fog_density = 0.008
+ environment.volumetric_fog_density = 0.006
+ environment.volumetric_fog_length = 180.0
+ environment.volumetric_fog_detail_spread = 2.0
  world_env.environment = environment
  add_child(world_env)
  var sun := DirectionalLight3D.new()
