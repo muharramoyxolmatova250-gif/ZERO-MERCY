@@ -224,6 +224,23 @@ jobs:
             # Remove untracked extraction scratch; staged game tiles remain staged.
             git clean -fd
             git commit -m "Build verified global OSM tiles for $SAFE_REGION"
-            git pull --rebase origin "${GITHUB_REF_NAME:-main}"
-            git push origin "HEAD:${GITHUB_REF_NAME:-main}"
+            branch="${GITHUB_REF_NAME:-main}"
+            # A code/config commit can land while this batch is processing.
+            # Rebase against the newest branch tip and retry the push instead
+            # of discarding an already validated tile batch.
+            pushed=false
+            for attempt in 1 2 3 4 5; do
+              git fetch origin "$branch"
+              git rebase "origin/$branch"
+              if git push origin "HEAD:$branch"; then
+                pushed=true
+                break
+              fi
+              echo "Push raced with another commit (attempt $attempt); retrying..."
+              sleep $((attempt * 3))
+            done
+            if [ "$pushed" != true ]; then
+              echo "Could not push validated tile batch after 5 attempts." >&2
+              exit 1
+            fi
           fi
