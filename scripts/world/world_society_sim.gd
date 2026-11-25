@@ -2,7 +2,8 @@ extends Node
 ## Background world institutions and social feed. Aggregate simulation, not individual human cognition.
 @export_range(1.0, 120.0, 1.0) var update_interval := 5.0
 @export_range(1, 100, 1) var posts_per_update := 8
-const CITY_NAMES := ["Neo-Tashkent","Neo-Tokyo","Neo-Seoul","Neo-Shanghai","Neo-Singapore","Neo-Dubai","Neo-Istanbul","Neo-London","Neo-Paris","Neo-New York","Neo-Los Angeles","Neo-Sao Paulo","Neo-Sydney","Neo-Cairo","Neo-Mumbai","Neo-Mexico City","Neo-Johannesburg","Neo-Toronto"]
+const FALLBACK_CITIES := ["Neo-Tashkent","Neo-Tokyo","Neo-Seoul","Neo-Shanghai","Neo-Singapore","Neo-Dubai","Neo-Istanbul","Neo-London","Neo-Paris","Neo-New York","Neo-Los Angeles","Neo-Sao Paulo","Neo-Sydney","Neo-Cairo","Neo-Mumbai","Neo-Mexico City","Neo-Johannesburg","Neo-Toronto"]
+var city_names: Array[String] = []
 const INSTITUTIONS := ["government","police","hospital","school","university","transit","energy","media","commerce","emergency"]
 const FEED_TOPICS := ["night_market","transit_delay","neon_festival","public_safety","school_event","weather_alert","new_product","community_meetup","city_council","music_release","street_art","power_grid"]
 var city_state: Array[Dictionary] = []
@@ -16,7 +17,18 @@ var total_generated_posts := 0
 func _ready() -> void:
  add_to_group("world_society_sim")
  _rng.randomize()
- for city in CITY_NAMES:
+ # Populate social hubs from settlements registered by the global life simulation.
+ # Starter cities are only a fallback when map data has not registered any hubs.
+ var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+ if life_sim != null:
+  var hubs: Dictionary = life_sim.get("hub_state")
+  for city_id in hubs.keys():
+   var hub: Dictionary = hubs[city_id]
+   city_names.append(str(hub.get("display_name", city_id)))
+ if city_names.is_empty():
+  city_names.assign(FALLBACK_CITIES)
+ city_names.sort()
+ for city in city_names:
   city_state.append({"city":city,"population_cohort":100000,"employment":_rng.randf_range(0.82,0.97),"public_mood":_rng.randf_range(0.35,0.75),"crime_pressure":_rng.randf_range(0.03,0.18),"infrastructure":_rng.randf_range(0.65,0.98),"active_events":[]})
  for institution in INSTITUTIONS:
   institution_activity[institution] = {"staff_on_duty":_rng.randi_range(120,12000),"service_load":_rng.randf_range(0.1,0.8),"budget_health":_rng.randf_range(0.55,1.0),"active":true}
@@ -48,7 +60,7 @@ func _generate_social_posts() -> void:
  var profiles: Dictionary = life_sim.get("resident_profiles") if life_sim != null else {}
  var profile_ids: Array = profiles.keys()
  for i in range(posts_per_update):
-  var city_index := _rng.randi_range(0,CITY_NAMES.size()-1)
+  var city_index := _rng.randi_range(0,city_names.size()-1)
   var city: Dictionary = city_state[city_index]
   var topic: String = FEED_TOPICS[_rng.randi_range(0,FEED_TOPICS.size()-1)]
   var author_id := "resident_" + str(_rng.randi_range(100000,999999))
