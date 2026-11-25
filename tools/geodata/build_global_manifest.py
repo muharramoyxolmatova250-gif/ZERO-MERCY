@@ -180,19 +180,36 @@ def download(entry: dict, force: bool = False, attempts: int = 5) -> Path:
     if target.exists() and target.stat().st_size > 1024 and not force:
         print(f"Already present: {target}")
         return target
-    request = urllib.request.Request(entry["pbf_url"], headers={"User-Agent": USER_AGENT})
     temporary = target.with_suffix(target.suffix + ".part")
     print(f"Downloading {entry['name']} ({entry['id']})")
     print(f"Source: {entry['pbf_url']}")
     last_error = None
     for attempt in range(attempts):
         try:
-            with urllib.request.urlopen(request, timeout=180) as response, temporary.open("wb") as out:
-                while True:
-                    chunk = response.read(1024 * 1024)
-                    if not chunk:
-                        break
-                    out.write(chunk)
+            # Resume interrupted downloads instead of deleting gigabytes on retry.
+            offset = temporary.stat().st_size if temporary.exists() and not force else 0
+            headers = {"User-Agent": USER_AGENT}
+            if offset:
+                headers["Range"] = f"bytes={offset}-"
+            request = urllib.request.Request(entry["pbf_url"], headers=headers)
+            with urllib.request.urlopen(request, timeout=300) as response:
+                # Some servers ignore Range; in that case restart cleanly.
+                append = offset > 0 and getattr(response, "status", 200) == 206
+                if offset and not append:
+                    offset = 0
+                mode = "ab" if append else "wb"
+                with temporary.open(mode) as out:
+                    downloaded = offset
+                    last_report = downloaded
+                    while True:
+                        chunk = response.read(4 * 1024 * 1024)
+                        if not chunk:
+                            break
+                        out.write(chunk)
+                        downloaded += len(chunk)
+                        if downloaded - last_report >= 64 * 1024 * 1024:
+                            print(f"Download progress: {downloaded / (1024 * 1024):.0f} MiB", flush=True)
+                            last_report = downloaded
             if temporary.stat().st_size < 1024:
                 raise RuntimeError("Downloaded PBF is unexpectedly small.")
             temporary.replace(target)
@@ -200,10 +217,10 @@ def download(entry: dict, force: bool = False, attempts: int = 5) -> Path:
             return target
         except Exception as exc:
             last_error = exc
-            temporary.unlink(missing_ok=True)
+            partial = temporary.stat().st_size if temporary.exists() else 0
             if attempt + 1 < attempts:
-                delay = min(60, 5 * (2 ** attempt))
-                print(f"PBF download failed ({exc}); retrying in {delay}s...", file=sys.stderr)
+                delay = min(30, 3 * (2 ** attempt))
+                print(f"PBF download interrupted ({exc}); keeping {partial:,} bytes and resuming in {delay}s...", file=sys.stderr, flush=True)
                 time.sleep(delay)
     raise RuntimeError(f"Could not download {entry['id']} after {attempts} attempts: {last_error}")
 
