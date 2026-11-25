@@ -37,8 +37,7 @@ def build_queue(catalog: dict, natural_earth_path: Path = NATURAL_EARTH) -> list
     region_by_id = {str(item.get("id", "")): item for item in catalog.get("regions", [])}
     for region in catalog.get("regions", []):
         region_id = str(region.get("id", "")).strip()
-        codes = _iso_codes(region)
-        bboxes = region.get("bboxes") or ([region["bbox"]] if isinstance(region.get("bbox"), list) else [])
+        # A catalogue can contain overlapping/duplicate ISO assignments (for example\n        # disputed or offshore features). Keep each ISO code in exactly one queue\n        # entry so coverage totals cannot double-count a country/territory.\n        codes = [code for code in _iso_codes(region) if code not in covered]\n        bboxes = region.get("bboxes") or ([region["bbox"]] if isinstance(region.get("bbox"), list) else [])
         if not region_id or region_id in seen or not codes or not isinstance(bboxes, list):
             continue
         valid = []
