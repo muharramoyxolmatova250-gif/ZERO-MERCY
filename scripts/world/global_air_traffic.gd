@@ -21,7 +21,10 @@ var flights:Array[Dictionary]=[]
 var _planes:Array[Node3D]=[]
 var _rng:=RandomNumberGenerator.new()
 var completed_flights:=0
+var _anchor_lat:=40.7
+var _anchor_lon:=72.3
 func _ready()->void:
+ _load_world_anchor()
  _rng.randomize()
  for i in range(visible_aircraft_count):
   var a:=i%AIRPORTS.size()
@@ -105,10 +108,23 @@ func _position_plane(i:int)->void:
   _planes[i].look_at(aircraft_position+route.normalized(),Vector3.UP)
 
 
+func _load_world_anchor()->void:
+ var path:="res://data/world/region_tiles.json"
+ if not FileAccess.file_exists(path):
+  return
+ var file:=FileAccess.open(path,FileAccess.READ)
+ if file==null:
+  return
+ var data:Variant=JSON.parse_string(file.get_as_text())
+ if typeof(data)==TYPE_DICTIONARY:
+  _anchor_lat=float(data.get("_anchor_lat",_anchor_lat))
+  _anchor_lon=float(data.get("_anchor_lon",_anchor_lon))
+
+
 func _world_position(latitude:float,longitude:float,flight_index:float)->Vector3:
- # Equirectangular world projection shared by streamed Earth regions.
- var x:=longitude*111320.0*cos(deg_to_rad(latitude))
- var z:=-latitude*111320.0
+ # Match RegionStreamer global_equirectangular projection exactly.
+ var x:=(longitude-_anchor_lon)*111320.0
+ var z:=-(latitude-_anchor_lat)*111320.0
  var altitude:=100.0+fposmod(flight_index,5.0)*16.0
  return Vector3(x,altitude,z)
 func _make_plane(i:int)->Node3D:
