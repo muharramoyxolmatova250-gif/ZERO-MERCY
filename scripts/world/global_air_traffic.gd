@@ -39,29 +39,54 @@ func _process(delta:float)->void:
   var duration:=_duration(f)
   var p:=float(f.progress)+delta/duration
   if p>=1.0:
+   _complete_flight(i)
+   f=flights[i]
    p=0.0
-   completed_flights+=1
-   var old_origin:=str(f.origin)
-   var old_destination:=str(f.destination)
-   var old_from_lat:=float(f.from_lat)
-   var old_from_lon:=float(f.from_lon)
-   var old_origin_city:=str(f.origin_city)
-   var old_destination_city:=str(f.destination_city)
-   var old_origin_country:=str(f.origin_country)
-   var old_destination_country:=str(f.destination_country)
-   f.origin=old_destination
-   f.destination=old_origin
-   f.origin_city=old_destination_city
-   f.destination_city=old_origin_city
-   f.origin_country=old_destination_country
-   f.destination_country=old_origin_country
-   f.from_lat=float(f.to_lat)
-   f.from_lon=float(f.to_lon)
-   f.to_lat=old_from_lat
-   f.to_lon=old_from_lon
   f.progress=p
   flights[i]=f
   _position_plane(i)
+func complete_flight(flight_index: int) -> bool:
+ if flight_index < 0 or flight_index >= flights.size():
+  return false
+ _complete_flight(flight_index)
+ return true
+
+
+func _complete_flight(flight_index: int) -> void:
+ var f: Dictionary = flights[flight_index]
+ var old_origin := str(f.origin)
+ var old_destination := str(f.destination)
+ var old_from_lat := float(f.from_lat)
+ var old_from_lon := float(f.from_lon)
+ f.origin = old_destination
+ f.destination = old_origin
+ f.origin_city = str(f.destination_city)
+ f.destination_city = str(f.origin_city) if false else str(f.get("origin_city", ""))
+ # Keep the route endpoints and airport metadata in sync for the return leg.
+ var origin_airport: Dictionary = _airport_by_code(str(f.origin))
+ var destination_airport: Dictionary = _airport_by_code(str(f.destination))
+ f.origin_city = str(origin_airport.get("city", f.origin))
+ f.destination_city = str(destination_airport.get("city", f.destination))
+ f.origin_country = str(origin_airport.get("country", ""))
+ f.destination_country = str(destination_airport.get("country", ""))
+ f.from_lat = float(f.to_lat)
+ f.from_lon = float(f.to_lon)
+ f.to_lat = old_from_lat
+ f.to_lon = old_from_lon
+ f.progress = 0.0
+ f.status = "returning"
+ flights[flight_index] = f
+ completed_flights += 1
+ _position_plane(flight_index)
+
+
+func _airport_by_code(code: String) -> Dictionary:
+ for airport in AIRPORTS:
+  if str(airport.get("code", "")) == code:
+   return airport
+ return {}
+
+
 func _duration(f:Dictionary)->float:
  var a:=Vector2(float(f.from_lon),float(f.from_lat))
  var b:=Vector2(float(f.to_lon),float(f.to_lat))
