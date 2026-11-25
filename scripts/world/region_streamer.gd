@@ -167,6 +167,13 @@ func _load_cyberpunk_districts(entry: Dictionary, nodes: Array[Node3D], terrain:
                 continue
             var place := str(settlement.get("place", ""))
             var population := int(settlement.get("population", 0))
+            # Register every mapped settlement with the persistent world-life system,
+            # even when its visual district is below the procedural rendering threshold.
+            var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+            if life_sim != null and life_sim.has_method("register_settlement_hub"):
+                var settlement_name := str(settlement.get("name", place.capitalize()))
+                var global_settlement_id := str(source_region) + ":" + settlement_id
+                life_sim.call("register_settlement_hub", global_settlement_id, settlement_name, maxi(1, population))
             # Every mapped village gets a small lived-in district. Towns and cities
             # scale up by population; only larger hamlets receive a built-up cluster.
             if not should_spawn_settlement_district(place, population):
