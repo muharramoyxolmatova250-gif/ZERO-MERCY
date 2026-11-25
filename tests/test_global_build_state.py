@@ -11,11 +11,11 @@ class GlobalBuildStateTests(unittest.TestCase):
         first = select_batch(queue, state, tile_count=2)
         self.assertEqual((first["region_id"], first["tile_start"]), ("country_a", 0))
         state = advance_state(state, "country_a", 0, 2, 5)
-        next_a = select_batch(queue, state, tile_count=2)
-        self.assertEqual((next_a["region_id"], next_a["tile_start"]), ("country_a", 2))
-        state = advance_state(state, "country_a", 2, 3, 5)
         next_b = select_batch(queue, state, tile_count=2)
         self.assertEqual((next_b["region_id"], next_b["tile_start"]), ("country_b", 0))
+        state = advance_state(state, "country_b", 0, 2, 4)
+        next_a = select_batch(queue, state, tile_count=2)
+        self.assertEqual((next_a["region_id"], next_a["tile_start"]), ("country_a", 2))
 
     def test_finished_queue_returns_no_work(self):
         queue = {"countries": [{"id": "country_a"}]}
