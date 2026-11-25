@@ -65,12 +65,22 @@ func restore_player_state(player: Node3D) -> bool:
 	var state: Variant = payload.get("player_state", {})
 	if typeof(state) != TYPE_DICTIONARY:
 		return false
-	var position_data: Array = state.get("position", [])
-	var rotation_data: Array = state.get("rotation", [])
+	var position_data: Variant = state.get("position", [])
+	var rotation_data: Variant = state.get("rotation", [])
+	if typeof(position_data) != TYPE_ARRAY or typeof(rotation_data) != TYPE_ARRAY:
+		return false
 	if position_data.size() != 3 or rotation_data.size() != 3:
 		return false
+	for value in position_data + rotation_data:
+		if typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT:
+			return false
+		if not is_finite(float(value)):
+			return false
+	if bool(player.get("is_dead")):
+		player.call("respawn")
 	player.global_position = Vector3(float(position_data[0]), float(position_data[1]), float(position_data[2]))
 	player.global_rotation = Vector3(float(rotation_data[0]), float(rotation_data[1]), float(rotation_data[2]))
+	player.set("velocity", Vector3.ZERO)
 	player.set("_spawn_transform", player.global_transform)
 	player.set("health", clampf(float(state.get("health", player.get("max_health"))), 1.0, float(player.get("max_health"))))
 	player.set("stamina", clampf(float(state.get("stamina", player.get("stamina_max"))), 0.0, float(player.get("stamina_max"))))
