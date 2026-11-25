@@ -15,7 +15,9 @@ def advance_state(state: dict, region_id: str, tile_start: int,
     completed = set(state.setdefault("completed_regions", []))
     next_tile = min(total_tiles, tile_start + processed_count)
     offsets[region_id] = next_tile
-    state["current_region_id"] = region_id if next_tile < total_tiles else None
+    # Clear the active region after every batch so the selector advances
+    # round-robin to another country on the next run.
+    state["current_region_id"] = None
     if next_tile >= total_tiles:
         completed.add(region_id)
         offsets.pop(region_id, None)
