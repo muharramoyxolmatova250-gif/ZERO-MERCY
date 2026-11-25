@@ -253,7 +253,7 @@ func _architectural_facade_details(base: Vector3, size: Vector3, accent: Color) 
 	var band_transforms: Array[Transform3D] = []
 	var fin_count := maxi(3, int(size.x / 3.6))
 	for side in [-1.0, 1.0]:
-		var facade_z := base.z + side * (size.z * 0.5 + 0.16)
+		var facade_z: float = base.z + float(side) * (size.z * 0.5 + 0.16)
 		for fin in range(fin_count + 1):
 			var x := base.x - size.x * 0.5 + float(fin) * size.x / float(fin_count)
 			fin_transforms.append(Transform3D(Basis(), Vector3(x, size.y * 0.5, facade_z)))
@@ -285,14 +285,14 @@ func _glass_facade_panels(base: Vector3, size: Vector3) -> void:
 	var bays := maxi(2, int(size.x / 3.4))
 	var floors := maxi(1, int(size.y / 3.2))
 	for face in [-1.0, 1.0]:
-		var z := base.z + face * (size.z * 0.5 + 0.012)
+		var z: float = base.z + float(face) * (size.z * 0.5 + 0.012)
 		for bay in range(bays):
 			var x := base.x - size.x * 0.5 + (float(bay) + 0.5) * size.x / float(bays)
 			for floor_index in range(floors):
 				var y := (float(floor_index) + 0.5) * 3.2
 				front_back.append(Transform3D(Basis(), Vector3(x, y, z)))
 	for face in [-1.0, 1.0]:
-		var x := base.x + face * (size.x * 0.5 + 0.012)
+		var x: float = base.x + float(face) * (size.x * 0.5 + 0.012)
 		for bay in range(maxi(2, int(size.z / 3.4))):
 			var z := base.z - size.z * 0.5 + (float(bay) + 0.5) * size.z / float(maxi(2, int(size.z / 3.4)))
 			for floor_index in range(floors):
