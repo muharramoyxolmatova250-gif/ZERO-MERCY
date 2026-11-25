@@ -37,12 +37,14 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 	_flash_time = maxf(0.0, _flash_time - delta)
-	if _body_mesh != null and _base_material != null:
+	if _body_mesh != null and _base_material != null and _flash_time <= 0.0:
 		_body_mesh.material_override = _base_material
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
 	if not is_instance_valid(_target):
 		_find_target()
+	if is_instance_valid(_target) and bool(_target.get("is_dead")):
+		_target = null
 	if not is_instance_valid(_target):
 		velocity.x = move_toward(velocity.x, 0.0, move_speed * delta * 3.0)
 		velocity.z = move_toward(velocity.z, 0.0, move_speed * delta * 3.0)
