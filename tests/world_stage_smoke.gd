@@ -238,6 +238,24 @@ func _run() -> void:
 	if int(campaign_snapshot.get("estimated_total_hours", 0)) != 70:
 		_fail("The 70-hour campaign structure is missing.")
 		return
+	var chapter_progress: Dictionary = mission_manager.call("get_chapter_progress")
+	if int(chapter_progress.get("total_chapters", 0)) != 12 or str(campaign_snapshot.get("ending_id", "")) != "":
+		_fail("Campaign chapter tracking or pre-finale ending gate is incorrect.")
+		return
+	mission_manager.set("completed_missions", ["reject_throne"])
+	mission_manager.set_story_flag("throne_rejected", true)
+	mission_manager.set_story_flag("control_system_destroyed", true)
+	if str(mission_manager.call("resolve_campaign_ending")) != "no_crown":
+		_fail("The no-crown ending does not resolve from its required choices.")
+		return
+	mission_manager.set_story_flag("throne_rejected", false)
+	mission_manager.set_story_flag("global_protocol_revealed", true)
+	if str(mission_manager.call("resolve_campaign_ending")) != "sovereign":
+		_fail("The sovereign ending does not resolve from its required choices.")
+		return
+	mission_manager.set("completed_missions", [])
+	mission_manager.set("story_flags", {})
+	print("PASS Stage 8: 12 chapter tracker and choice-dependent endings resolve only at campaign finale.")
 	if str(mission_manager.get("active_mission_id")) == "" and not bool(mission_manager.call("start_next_campaign_mission")):
 		_fail("The campaign could not start its next main mission.")
 		return
