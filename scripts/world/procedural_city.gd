@@ -19,6 +19,7 @@ extends Node3D
 var rng := RandomNumberGenerator.new()
 var mats: Array[StandardMaterial3D] = []
 var _window_materials: Array[StandardMaterial3D] = []
+var _wet_road_material: StandardMaterial3D
 @export var settlement_id := ""
 @export var settlement_display_name := ""
 
@@ -53,6 +54,13 @@ func _materials() -> void:
 		m.metallic = 0.72
 		m.roughness = 0.34
 		mats.append(m)
+	_wet_road_material = StandardMaterial3D.new()
+	_wet_road_material.albedo_color = Color(0.012, 0.022, 0.038)
+	_wet_road_material.metallic = 0.48
+	_wet_road_material.roughness = 0.16
+	_wet_road_material.clearcoat_enabled = true
+	_wet_road_material.clearcoat = 1.0
+	_wet_road_material.clearcoat_roughness = 0.08
 	for c in [Color(0.0, 0.82, 1.0), Color(1.0, 0.08, 0.42), Color(0.95, 0.58, 0.2)]:
 		var m := StandardMaterial3D.new()
 		m.albedo_color = c
@@ -64,11 +72,11 @@ func _materials() -> void:
 
 func _roads_and_blocks() -> void:
 	var extent := blocks_per_side * block_spacing
-	_box(Vector3(0, -0.3, 0), Vector3(extent + road_width, 0.5, extent + road_width), Color(0.012, 0.018, 0.028), false, false)
+	_wet_road_box(Vector3(0, -0.3, 0), Vector3(extent + road_width, 0.5, extent + road_width))
 	for i in range(blocks_per_side + 1):
 		var p := (float(i) - float(blocks_per_side) * 0.5) * block_spacing
-		_box(Vector3(p, 0.0, 0), Vector3(road_width, 0.08, extent + road_width), Color(0.02, 0.028, 0.045), false, false)
-		_box(Vector3(0, 0.0, p), Vector3(extent + road_width, 0.08, road_width), Color(0.02, 0.028, 0.045), false, false)
+		_wet_road_box(Vector3(p, 0.0, 0), Vector3(road_width, 0.08, extent + road_width))
+		_wet_road_box(Vector3(0, 0.0, p), Vector3(extent + road_width, 0.08, road_width))
 		_box(Vector3(p, 0.07, 0), Vector3(0.16, 0.035, extent), Color(0.0, 0.7, 0.95), true, false)
 		_box(Vector3(0, 0.07, p), Vector3(extent, 0.035, 0.16), Color(1.0, 0.08, 0.38), true, false)
 	for x in range(blocks_per_side):
@@ -218,6 +226,13 @@ func _roof_detail(base: Vector3, size: Vector3, accent: Color) -> void:
 	_box(base + Vector3(0, roof_y + 0.8, 0), Vector3(0.18, 1.6, 0.18), accent, true, false)
 	if rng.randf() > 0.5:
 		_box(base + Vector3(size.x * 0.3, roof_y + 0.35, 0), Vector3(1.4, 0.6, 1.4), Color(0.07, 0.09, 0.12), false, false)
+
+
+func _wet_road_box(pos: Vector3, size: Vector3) -> MeshInstance3D:
+	var road := _box(pos, size, Color(0.012, 0.022, 0.038), false, false)
+	road.material_override = _wet_road_material
+	return road
+
 
 func _box(pos: Vector3, size: Vector3, color: Color, glow: bool, collision: bool) -> MeshInstance3D:
 	var mesh := BoxMesh.new()
