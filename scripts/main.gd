@@ -11,6 +11,8 @@ const LIFE_SIM_SCRIPT := preload("res://scripts/world/world_life_sim.gd")
 const PHONE_UI_SCRIPT := preload("res://scripts/ui/phone_ui.gd")
 const MISSION_DIRECTOR_SCRIPT := preload("res://scripts/story/mission_objective_director.gd")
 const DIALOGUE_UI_SCRIPT := preload("res://scripts/ui/dialogue_ui.gd")
+const GRAPHICS_PROFILE_SCRIPT := preload("res://scripts/rendering/graphics_profile_manager.gd")
+var _graphics_profile: Node
 const EARTH_OVERVIEW_SCENE := preload("res://scenes/world/earth_overview.tscn")
 var _earth_overview: Node3D
 var _player: CharacterBody3D
@@ -18,6 +20,7 @@ var rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
  rng.randomize()
+ _start_graphics_profile()
  _build_environment()
  _start_world_life_simulation()
  _build_city()
@@ -84,6 +87,13 @@ func _start_region_streaming() -> void:
  streamer.set("max_operations_per_frame", 1)
  add_child(streamer)
 
+func _start_graphics_profile() -> void:
+ _graphics_profile = Node.new()
+ _graphics_profile.name = "GraphicsProfileManager"
+ _graphics_profile.set_script(GRAPHICS_PROFILE_SCRIPT)
+ add_child(_graphics_profile)
+ _graphics_profile.call("apply_preset", 1) # High is the safe default; 9K remains opt-in.
+
 func _build_environment() -> void:
  var world_env := WorldEnvironment.new()
  var environment := Environment.new()
@@ -102,12 +112,24 @@ func _build_environment() -> void:
  environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
  environment.glow_enabled = true
  environment.glow_intensity = 0.45
+ # Forward+ cinematic lighting features. Keep expensive GI disabled until
+ # authored world geometry and performance budgets are ready.
+ environment.ssao_enabled = true
+ environment.ssao_radius = 2.0
+ environment.ssao_intensity = 1.1
+ environment.ssil_enabled = true
+ environment.ssil_radius = 4.0
+ environment.ssil_intensity = 0.7
+ environment.volumetric_fog_enabled = true
+ environment.volumetric_fog_density = 0.008
  world_env.environment = environment
  add_child(world_env)
  var sun := DirectionalLight3D.new()
  sun.rotation_degrees = Vector3(-48, -28, 0)
  sun.light_color = Color(0.35, 0.42, 0.8)
  sun.light_energy = 0.25
+ sun.shadow_enabled = true
+ sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
  add_child(sun)
 
 func _build_city() -> void:
