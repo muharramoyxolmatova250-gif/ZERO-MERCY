@@ -2,7 +2,7 @@ name: Build global ZERO MERCY country tiles
 
 on:
   push:
-    branches: [main]
+    branches: [main, world-build]
     paths:
       - ".github/workflows/build-global-country-tiles.yml"
       - "tools/geodata/plan_region_tiles.py"
@@ -60,7 +60,7 @@ permissions:
 concurrency:
   # Shared lock with the Earth catalogue workflow; only one world-data writer runs at a time.
   # The saved cursor resumes the Andijan-priority Uzbekistan cells first, then all world regions.
-  group: zero-mercy-country-tiles-recovery-v2
+  group: zero-mercy-country-tiles-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
