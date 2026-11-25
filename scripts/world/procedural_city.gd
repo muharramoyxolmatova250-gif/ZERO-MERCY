@@ -254,6 +254,24 @@ func _spawn_street_furniture() -> void:
 			if (ix + iz) % 2 == 0:
 				_street_light(Vector3(x + road_width * 0.62, 0.0, z + road_width * 0.62))
 				_street_light(Vector3(x - road_width * 0.62, 0.0, z - road_width * 0.62))
+	_spawn_traffic_signals()
+
+func _spawn_traffic_signals() -> void:
+	var signal_script := load("res://scripts/world/cyberpunk_traffic_signal.gd")
+	if signal_script == null:
+		push_warning("Traffic signal script is missing; intersections remain uncontrolled.")
+		return
+	var first := -float(blocks_per_side) * block_spacing * 0.5
+	for ix in range(blocks_per_side + 1):
+		for iz in range(blocks_per_side + 1):
+			if (ix + iz) % 2 != 0:
+				continue
+			var traffic_signal := Node3D.new()
+			traffic_signal.name = "TrafficSignal_%d_%d" % [ix, iz]
+			traffic_signal.set_script(signal_script)
+			traffic_signal.set("phase_offset", float((ix * 3 + iz * 5) % 10) / 10.0)
+			traffic_signal.position = Vector3(first + float(ix) * block_spacing + road_width * 0.58, 0.0, first + float(iz) * block_spacing + road_width * 0.58)
+			add_child(traffic_signal)
 
 func _crosswalk(center: Vector3, along_x: bool) -> void:
 	for stripe in range(6):
