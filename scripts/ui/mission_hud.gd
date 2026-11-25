@@ -54,7 +54,7 @@ func _build_ui() -> void:
 	objective_label = _make_label("Loading objective...", 17, Color(0.9, 0.94, 1.0))
 	objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(objective_label)
-	status_label = _make_label("WASD MOVE  //  SHIFT SPRINT  //  E INTERACT", 10, Color(0.45, 0.62, 0.72))
+	status_label = _make_label("WASD MOVE  //  SHIFT SPRINT  //  E INTERACT  //  F5 SAVE  //  F9 LOAD", 10, Color(0.45, 0.62, 0.72))
 	column.add_child(status_label)
 	var separator := HSeparator.new()
 	column.add_child(separator)
@@ -136,7 +136,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if is_instance_valid(player_ref) and bool(player_ref.get("is_dead")) and player_ref.has_method("respawn"):
 			player_ref.call("respawn")
 			objective_label.text = "RETURN TO THE MISSION"
-			status_label.text = "WASD MOVE  //  SHIFT SPRINT  //  E INTERACT"
+			status_label.text = "WASD MOVE  //  SHIFT SPRINT  //  E INTERACT  //  F5 SAVE  //  F9 LOAD"
 			get_viewport().set_input_as_handled()
 			return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ENTER:
