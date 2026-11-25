@@ -67,7 +67,7 @@ func _run() -> void:
 	root.add_child(air_node)
 	await process_frame
 	var air_snapshot: Dictionary = air_node.get_flight_snapshot()
-	if int(air_snapshot.get("airport_count", 0)) < 12 or int(air_snapshot.get("active_flights", 0)) < 8:
+	if int(air_snapshot.get("airport_count", 0)) < 30 or int(air_snapshot.get("active_flights", 0)) < 8:
 		_fail("Global airline network did not initialize international flights.")
 		return
 	print("PASS Global aviation: ", air_snapshot.airport_count, " airports and ", air_snapshot.active_flights, " active cyberpunk flights.")
