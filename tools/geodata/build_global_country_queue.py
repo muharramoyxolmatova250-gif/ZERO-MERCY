@@ -18,11 +18,14 @@ FALLBACK_PARENT_BY_ISO = {
     "EH": "africa", "TF": "africa", "FK": "south-america",
     "SA": "asia", "XK": "europe", "TT": "central-america",
 }
-# Keep the current Afghanistan cursor resumable, then prioritize the player's
-# Uzbekistan starting region before other major world hubs.
+# Keep the saved Uzbekistan/Afghanistan cursor resumable, then cycle through
+# ordinary country extracts alphabetically before attempting very large hubs.
+# This increases the number of distinct countries reached early and avoids
+# blocking the global build behind multi-gigabyte planet-scale country files.
 COUNTRY_PRIORITY = {
-    "UZ": 0, "AF": 1, "US": 2, "CN": 3, "JP": 4,
-    "IN": 5, "KR": 6, "GB": 7, "DE": 8, "FR": 9,
+    "UZ": 0, "AF": 1,
+    "US": 500, "CN": 501, "JP": 502, "IN": 503,
+    "KR": 504, "GB": 505, "DE": 506, "FR": 507,
 }
 
 def _iso_codes(region: dict) -> list[str]:
