@@ -15,6 +15,8 @@ extends Node3D
 var rng := RandomNumberGenerator.new()
 var mats: Array[StandardMaterial3D] = []
 var _window_materials: Array[StandardMaterial3D] = []
+@export var settlement_id := ""
+@export var settlement_display_name := ""
 
 func _ready() -> void:
 	rng.seed = seed_value
@@ -26,10 +28,18 @@ func _ready() -> void:
 	_spawn_interactive_props()
 
 
+func _resolved_settlement_id() -> String:
+	return settlement_id if not settlement_id.is_empty() else str(name)
+
+
+func _resolved_settlement_name() -> String:
+	return settlement_display_name if not settlement_display_name.is_empty() else str(name)
+
+
 func _register_settlement_hub() -> void:
 	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
 	if life_sim != null and life_sim.has_method("register_settlement_hub"):
-		life_sim.call("register_settlement_hub", str(name), str(name), settlement_population)
+		life_sim.call("register_settlement_hub", _resolved_settlement_id(), _resolved_settlement_name(), settlement_population)
 
 
 func _materials() -> void:
@@ -274,10 +284,10 @@ func _spawn_city_life() -> void:
 		var citizen := Node3D.new()
 		citizen.set_script(citizen_script)
 		if life_sim != null:
-			var claimed_id := str(life_sim.call("claim_resident_id", str(name)))
+			var claimed_id := str(life_sim.call("claim_resident_id", _resolved_settlement_id()))
 			if not claimed_id.is_empty():
 				citizen.set("citizen_id", claimed_id)
-		citizen.set("city_id", str(name))
+		citizen.set("city_id", _resolved_settlement_id())
 		citizen.add_to_group("city_citizen")
 		var lane := (float(i % blocks_per_side) - float(blocks_per_side - 1) * 0.5) * block_spacing
 		var side := -1.0 if i % 2 == 0 else 1.0
