@@ -227,7 +227,7 @@ func _run() -> void:
 		_fail("Cyber sidearm muzzle flash did not activate.")
 		return
 	print("PASS Combat presentation: sidearm fires, consumes ammunition and triggers a muzzle flash.")
-	await create_timer(0.12).timeout
+	player.call("_process", 0.1)
 	if bool(muzzle_flash.get("visible")):
 		_fail("Cyber sidearm muzzle flash did not fade after firing.")
 		return
