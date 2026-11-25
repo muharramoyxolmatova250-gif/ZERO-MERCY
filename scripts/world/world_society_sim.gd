@@ -38,7 +38,20 @@ func _process(delta: float) -> void:
  if _elapsed >= update_interval:
   _elapsed = 0.0
   _advance_world()
+func _sync_settlement_hubs() -> void:
+ var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+ if life_sim == null:
+  return
+ var hubs: Dictionary = life_sim.get("hub_state")
+ for city_id in hubs.keys():
+  var hub: Dictionary = hubs[city_id]
+  var display_name := str(hub.get("display_name", city_id))
+  if not city_names.has(display_name):
+   city_names.append(display_name)
+   city_state.append({"city":display_name,"population_cohort":int(hub.get("population",100000)),"employment":0.9,"public_mood":0.6,"crime_pressure":0.08,"infrastructure":0.75,"active_events":[]})
+
 func _advance_world() -> void:
+ _sync_settlement_hubs()
  simulation_hour += 1
  if simulation_hour >= 24:
   simulation_hour = 0
