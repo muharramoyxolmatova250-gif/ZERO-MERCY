@@ -74,8 +74,11 @@ func _spawn_current_objective() -> void:
         return
     var forward := -player.global_transform.basis.z.normalized()
     var right := player.global_transform.basis.x.normalized()
-    var distance := 24.0 + float(_spawn_serial % 3) * 7.0
-    var side_offset := float((_spawn_serial % 3) - 1) * 5.0
+    # Keep the objective in the player's forward path and within the interaction ray.
+    # The third-person camera sits behind Dara, so a short player-relative offset
+    # still leaves a clear, reachable marker in front of the camera.
+    var distance := 5.0
+    var side_offset := 0.0
     _spawn_serial += 1
     var marker := TARGET_SCRIPT.new() as StaticBody3D
     marker.set("event_id", str(objective.get("event", "")))
