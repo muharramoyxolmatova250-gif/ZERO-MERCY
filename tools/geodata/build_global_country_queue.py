@@ -24,6 +24,11 @@ FALLBACK_PARENT_BY_ISO = {
 # blocking the global build behind multi-gigabyte planet-scale country files.
 COUNTRY_PRIORITY = {
     "UZ": 0, "AF": 1,
+    # Start with countries confirmed in the OpenStreetMap France mirror so
+    # the worker can make progress even while Geofabrik is unreachable.
+    "AD": 2, "AT": 3, "BE": 4, "CZ": 5, "DK": 6, "FI": 7,
+    "FR": 8, "DE": 9, "IT": 10, "NL": 11, "NO": 12, "PL": 13,
+    "PT": 14, "SK": 15, "ES": 16, "SE": 17, "CH": 18, "TR": 19, "GB": 20,
     "US": 500, "CN": 501, "JP": 502, "IN": 503,
     "KR": 504, "GB": 505,
 }
