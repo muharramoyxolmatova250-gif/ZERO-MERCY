@@ -183,6 +183,22 @@ func _run() -> void:
 	if int(player.get("ammo_in_magazine")) != int(player.get("magazine_size")):
 		_fail("Player checkpoint respawn did not restore the weapon magazine.")
 	print("PASS Player combat: lethal damage, death state and checkpoint respawn.")
+	player.global_position = Vector3(4.0, 2.0, 7.0)
+	player.set("health", 55.0)
+	player.set("ammo_in_magazine", 5)
+	if not bool(SaveManager.save_player_state(player)):
+		_fail("Quick-save could not persist player state.")
+		return
+	player.global_position = Vector3(-20.0, 1.0, -20.0)
+	player.set("health", 10.0)
+	player.set("ammo_in_magazine", 1)
+	if not bool(SaveManager.restore_player_state(player)):
+		_fail("Quick-load could not restore player state.")
+		return
+	if player.global_position.distance_to(Vector3(4.0, 2.0, 7.0)) > 0.001 or absf(float(player.get("health")) - 55.0) > 0.001 or int(player.get("ammo_in_magazine")) != 5:
+		_fail("Quick-load did not restore position, health and ammunition.")
+		return
+	print("PASS Save system: player position, health and ammunition persist across quick-save/load.")
 	var life_sim := main.get_node_or_null("WorldLifeSimulation")
 	if life_sim == null:
 		_fail("Persistent world life simulation did not start.")
