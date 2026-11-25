@@ -31,6 +31,7 @@ var _age_refresh_timer := 0.0
 @export var occupation := "resident"
 
 func _ready() -> void:
+	add_to_group("city_citizen")
 	_rng.seed = int(absf(position.x * 97.0 + position.z * 131.0)) + 20261122
 	_build_appearance()
 	if citizen_id.is_empty():
