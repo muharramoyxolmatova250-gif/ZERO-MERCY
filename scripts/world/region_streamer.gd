@@ -219,6 +219,8 @@ func _load_cyberpunk_districts(entry: Dictionary, nodes: Array[Node3D], terrain:
                 district.set("population_density", 0.05)
                 district.set("traffic_density", 0.02)
             district.set("settlement_population", maxi(1, population))
+            district.set("settlement_id", str(source_region) + ":" + settlement_id)
+            district.set("settlement_display_name", str(settlement.get("name", place.capitalize())))
             district.set("seed_value", int(abs(hash(settlement_id))))
             district.name = ("Cyberpunk_" + str(settlement.get("name", place))).validate_node_name()
             district.position = Vector3(
