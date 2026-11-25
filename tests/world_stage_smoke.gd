@@ -85,6 +85,21 @@ func _run() -> void:
 		_fail("Completed global flight did not reverse into its return journey.")
 		return
 	print("PASS Global aviation: completed flights reverse route and continue their return journey.")
+	var world_index_file := FileAccess.open("res://data/world/region_tiles.json", FileAccess.READ)
+	if world_index_file == null:
+		_fail("Global world tile index is unavailable for aviation projection test.")
+		return
+	var world_index: Variant = JSON.parse_string(world_index_file.get_as_text())
+	if typeof(world_index) != TYPE_DICTIONARY:
+		_fail("Global world tile index is invalid.")
+		return
+	var anchor_latitude := float(world_index.get("_anchor_lat", 40.7))
+	var anchor_longitude := float(world_index.get("_anchor_lon", 72.3))
+	var projected_anchor: Vector3 = air_node.call("_world_position", anchor_latitude, anchor_longitude, 0.0)
+	if projected_anchor.distance_to(Vector3(0.0, 100.0, 0.0)) > 0.001:
+		_fail("Global aircraft projection does not match the streamed Earth anchor.")
+		return
+	print("PASS Global aviation: aircraft coordinates align with the streamed Earth map projection.")
 	var first_car := city.get_tree().get_first_node_in_group("city_traffic") as Node3D
 	var citizen_start := first_citizen.position
 	var car_start := first_car.position
