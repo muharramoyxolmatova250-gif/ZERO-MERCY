@@ -92,7 +92,7 @@ func _start_graphics_profile() -> void:
  _graphics_profile.name = "GraphicsProfileManager"
  _graphics_profile.set_script(GRAPHICS_PROFILE_SCRIPT)
  add_child(_graphics_profile)
- _graphics_profile.call("apply_preset", 1) # High is the safe default; 9K remains opt-in.
+ _graphics_profile.call("apply_preset", 2) # Ultra quality; 9K target remains an explicit hardware-dependent mode.
 
 func _build_environment() -> void:
  var world_env := WorldEnvironment.new()
