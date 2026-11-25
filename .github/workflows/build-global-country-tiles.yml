@@ -60,7 +60,7 @@ permissions:
 concurrency:
   # Shared lock with the Earth catalogue workflow; only one world-data writer runs at a time.
   # The saved cursor resumes the Andijan-priority Uzbekistan cells first, then all world regions.
-  group: zero-mercy-repository-data-build
+  group: zero-mercy-country-tiles-recovery-v2
   cancel-in-progress: true
 
 jobs:
