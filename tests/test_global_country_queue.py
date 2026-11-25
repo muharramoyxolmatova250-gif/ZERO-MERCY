@@ -18,6 +18,17 @@ class GlobalCountryQueueTests(unittest.TestCase):
         self.assertEqual([x["id"] for x in queue], ["germany", "israel-and-palestine"])
         self.assertEqual(queue[1]["iso3166_1"], ["IL", "PS"])
 
+    def test_duplicate_iso_codes_are_not_counted_twice(self):
+        queue = build_queue({"regions": [
+            {"id": "french-polynesia", "name": "French Polynesia", "iso3166_1": ["PF"],
+             "bboxes": [[-155,-25,-130,-5]]},
+            {"id": "clipperton", "name": "Clipperton", "iso3166_1": ["PF"],
+             "bboxes": [[-110,9,-109,11]]},
+        ]})
+        codes = [code for item in queue for code in item["iso3166_1"]]
+        self.assertEqual(codes, ["PF"])
+        self.assertEqual(len(queue), 1)
+
     def test_starting_region_is_prioritized(self):
         queue = build_queue({"regions": [
             {"id": "germany", "name": "Germany", "iso3166_1": ["DE"], "bboxes": [[5,47,15,55]]},
