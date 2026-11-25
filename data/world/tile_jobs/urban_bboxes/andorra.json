@@ -1,0 +1,804 @@
+{
+  "schema_version": 4,
+  "region_id": "andorra",
+  "tile_deg": 0.1,
+  "priority_anchor": {
+    "lon": 72.3,
+    "lat": 40.7
+  },
+  "source_pbf": "andorra.osm.pbf",
+  "place_feature_count": 77,
+  "selected_place_counts": {
+    "town": 8,
+    "hamlet": 32,
+    "village": 34
+  },
+  "tile_cell_count": 7,
+  "settlement_count": 74,
+  "bboxes": [
+    [
+      1.7000000000000002,
+      42.5,
+      1.8,
+      42.6
+    ],
+    [
+      1.6,
+      42.5,
+      1.7000000000000002,
+      42.6
+    ],
+    [
+      1.5,
+      42.400000000000006,
+      1.6,
+      42.5
+    ],
+    [
+      1.5,
+      42.5,
+      1.6,
+      42.6
+    ],
+    [
+      1.4000000000000001,
+      42.400000000000006,
+      1.5,
+      42.5
+    ],
+    [
+      1.5,
+      42.6,
+      1.6,
+      42.7
+    ],
+    [
+      1.4000000000000001,
+      42.5,
+      1.5,
+      42.6
+    ]
+  ],
+  "settlements": [
+    {
+      "id": "town:42.50694:1.52125",
+      "name": "Andorra la Vella",
+      "place": "town",
+      "population": 24678,
+      "lon": 1.5212467,
+      "lat": 42.5069391,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "town:42.5442:1.51638",
+      "name": "La Massana",
+      "place": "town",
+      "population": 11591,
+      "lon": 1.5163754,
+      "lat": 42.5442014,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "town:42.46685:1.49233",
+      "name": "Sant Julià de Lòria",
+      "place": "town",
+      "population": 9207,
+      "lon": 1.4923277,
+      "lat": 42.4668541,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "town:42.56683:1.59776",
+      "name": "Canillo",
+      "place": "town",
+      "population": 0,
+      "lon": 1.5977647,
+      "lat": 42.5668305,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "town:42.53604:1.58361",
+      "name": "Encamp",
+      "place": "town",
+      "population": 0,
+      "lon": 1.5836096,
+      "lat": 42.5360425,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "town:42.509:1.54041",
+      "name": "les Escaldes",
+      "place": "town",
+      "population": 0,
+      "lon": 1.5404067,
+      "lat": 42.5090019,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "town:42.55615:1.53349",
+      "name": "Ordino",
+      "place": "town",
+      "population": 0,
+      "lon": 1.5334945,
+      "lat": 42.55615,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "town:42.56483:1.52754",
+      "name": "Sornàs",
+      "place": "town",
+      "population": 0,
+      "lon": 1.5275424555555555,
+      "lat": 42.5648329,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.54471:1.73349",
+      "name": "Pas de la Casa",
+      "place": "village",
+      "population": 2996,
+      "lon": 1.733494,
+      "lat": 42.5447098,
+      "home_tile_id": "17_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.462:1.50162",
+      "name": "Aixirivall",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5016173,
+      "lat": 42.4620002,
+      "home_tile_id": "15_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.47698:1.48875",
+      "name": "Aixovall",
+      "place": "village",
+      "population": 0,
+      "lon": 1.4887515,
+      "lat": 42.4769809,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.56902:1.52215",
+      "name": "Ansalonga",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5221532,
+      "lat": 42.5690218,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.58253:1.51807",
+      "name": "Arans",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5180695,
+      "lat": 42.5825312,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.57208:1.4844",
+      "name": "Arinsal",
+      "place": "village",
+      "population": 0,
+      "lon": 1.4844029,
+      "lat": 42.5720821,
+      "home_tile_id": "14_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.45368:1.49214",
+      "name": "Aubinyà",
+      "place": "village",
+      "population": 0,
+      "lon": 1.4921448,
+      "lat": 42.45368,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.48363:1.45668",
+      "name": "Bixessarri",
+      "place": "village",
+      "population": 0,
+      "lon": 1.4566808,
+      "lat": 42.4836288,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.47608:1.50615",
+      "name": "Certers",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5061537,
+      "lat": 42.4760797,
+      "home_tile_id": "15_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.61958:1.5389",
+      "name": "el Serrat",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5388976,
+      "lat": 42.6195784,
+      "home_tile_id": "15_426",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.58033:1.6497",
+      "name": "el Tarter",
+      "place": "village",
+      "population": 0,
+      "lon": 1.6496963,
+      "lat": 42.5803334,
+      "home_tile_id": "16_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.51051:1.55923",
+      "name": "Engolasters",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5592332,
+      "lat": 42.5105107,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.51205:1.54189",
+      "name": "Engordany",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5418913,
+      "lat": 42.5120512,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.56149:1.49659",
+      "name": "Erts",
+      "place": "village",
+      "population": 0,
+      "lon": 1.4965904,
+      "lat": 42.5614863,
+      "home_tile_id": "14_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.45431:1.46402",
+      "name": "Fontaneda",
+      "place": "village",
+      "population": 0,
+      "lon": 1.4640242,
+      "lat": 42.4543091,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.5369:1.70179",
+      "name": "Grau Roig",
+      "place": "village",
+      "population": 0,
+      "lon": 1.7017913,
+      "lat": 42.5368991,
+      "home_tile_id": "17_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.43917:1.49178",
+      "name": "Juberri",
+      "place": "village",
+      "population": 0,
+      "lon": 1.4917822,
+      "lat": 42.4391742,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.57557:1.51934",
+      "name": "la Cortinada",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5193446,
+      "lat": 42.5755678,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.48701:1.4914",
+      "name": "la Margineda",
+      "place": "village",
+      "population": 0,
+      "lon": 1.4913963,
+      "lat": 42.4870099,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.55997:1.6849",
+      "name": "les Bordes d'Envalira",
+      "place": "village",
+      "population": 0,
+      "lon": 1.6848967,
+      "lat": 42.5599673,
+      "home_tile_id": "16_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.59626:1.52618",
+      "name": "Llorts",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5261846,
+      "lat": 42.5962642,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.47215:1.51168",
+      "name": "Llumeneres",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5116811,
+      "lat": 42.4721545,
+      "home_tile_id": "15_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.55363:1.59064",
+      "name": "Meritxell",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5906405,
+      "lat": 42.5536332,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.47051:1.49959",
+      "name": "Nagol",
+      "place": "village",
+      "population": 0,
+      "lon": 1.499592,
+      "lat": 42.4705142,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.5458:1.47598",
+      "name": "Pal",
+      "place": "village",
+      "population": 0,
+      "lon": 1.4759787,
+      "lat": 42.5457992,
+      "home_tile_id": "14_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.56056:1.59366",
+      "name": "Prats",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5936564,
+      "lat": 42.5605597,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.58168:1.63748",
+      "name": "Ransol",
+      "place": "village",
+      "population": 0,
+      "lon": 1.6374847,
+      "lat": 42.5816768,
+      "home_tile_id": "16_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.5785:1.65316",
+      "name": "Sant Pere",
+      "place": "village",
+      "population": 0,
+      "lon": 1.6531626,
+      "lat": 42.5785035,
+      "home_tile_id": "16_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.495:1.49971",
+      "name": "Santa Coloma",
+      "place": "village",
+      "population": 0,
+      "lon": 1.4997052,
+      "lat": 42.4949956,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.55706:1.53806",
+      "name": "Segudet",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5380568,
+      "lat": 42.5570637,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.57678:1.66784",
+      "name": "Soldeu",
+      "place": "village",
+      "population": 0,
+      "lon": 1.6678394,
+      "lat": 42.5767806,
+      "home_tile_id": "16_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.56493:1.5274",
+      "name": "Sornàs",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5274027,
+      "lat": 42.5649323,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.53185:1.56662",
+      "name": "Vila",
+      "place": "village",
+      "population": 0,
+      "lon": 1.5666248,
+      "lat": 42.5318538,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "village:42.55312:1.48787",
+      "name": "Xixerella",
+      "place": "village",
+      "population": 0,
+      "lon": 1.4878668,
+      "lat": 42.5531204,
+      "home_tile_id": "14_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.43556:1.44708",
+      "name": "Argolell",
+      "place": "hamlet",
+      "population": 30,
+      "lon": 1.4470849,
+      "lat": 42.435555,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.43032:1.48292",
+      "name": "Arcavell",
+      "place": "hamlet",
+      "population": 23,
+      "lon": 1.482918,
+      "lat": 42.4303248,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.44494:1.44121",
+      "name": "Arduix",
+      "place": "hamlet",
+      "population": 5,
+      "lon": 1.4412123,
+      "lat": 42.4449426,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.46616:1.51164",
+      "name": "",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5116395545454544,
+      "lat": 42.466164240909094,
+      "home_tile_id": "15_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.4826:1.46415",
+      "name": "Aixàs",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.4641485,
+      "lat": 42.4826042,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.53436:1.52548",
+      "name": "Anyós",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5254826,
+      "lat": 42.534361,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.51185:1.56333",
+      "name": "Bordes d'Engolasters",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5633317,
+      "lat": 42.5118459,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.54216:1.46177",
+      "name": "Bordes de Cardameller",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.461772,
+      "lat": 42.5421591,
+      "home_tile_id": "14_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.51224:1.5574",
+      "name": "Bordes del Vilar",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.557395,
+      "lat": 42.5122374,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.53896:1.52638",
+      "name": "el Cortalet",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.526383,
+      "lat": 42.5389647,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.56212:1.60285",
+      "name": "el Forn",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.6028493,
+      "lat": 42.5621207,
+      "home_tile_id": "16_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.5477:1.51555",
+      "name": "el Pui",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.515555,
+      "lat": 42.5476987,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.57225:1.60806",
+      "name": "el Vilar",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.6080639,
+      "lat": 42.572248776923075,
+      "home_tile_id": "16_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.57455:1.5193",
+      "name": "el Vilar",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5193017,
+      "lat": 42.5745545,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.58215:1.63298",
+      "name": "els Plans",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.6329828,
+      "lat": 42.5821459,
+      "home_tile_id": "16_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.51683:1.54138",
+      "name": "Els Vilars",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5413834,
+      "lat": 42.5168287,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.49818:1.56013",
+      "name": "Entremesaigües",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5601251,
+      "lat": 42.4981805,
+      "home_tile_id": "15_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.54686:1.509",
+      "name": "Escàs",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5089987,
+      "lat": 42.5468617,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.54368:1.52282",
+      "name": "l'Aldosa de la Massana",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5228165,
+      "lat": 42.5436783,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.50078:1.52898",
+      "name": "La Comella",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.528981,
+      "lat": 42.5007842,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.53852:1.58447",
+      "name": "les Bons",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5844704,
+      "lat": 42.5385245,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.5093:1.55989",
+      "name": "Les Cases del Vilar",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5598934,
+      "lat": 42.5093027,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.61033:1.53669",
+      "name": "les Salines",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5366914,
+      "lat": 42.610325,
+      "home_tile_id": "15_426",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.57956:1.62781",
+      "name": "l’Aldosa de Canillo",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.6278149,
+      "lat": 42.5795551,
+      "home_tile_id": "16_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.57761:1.51801",
+      "name": "Mas d'en Soler",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5180111,
+      "lat": 42.5776121,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.57077:1.49304",
+      "name": "Mas de Ribafeta",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.493038,
+      "lat": 42.570774,
+      "home_tile_id": "14_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.44137:1.44945",
+      "name": "Mas d’Alins",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.4494549,
+      "lat": 42.4413704,
+      "home_tile_id": "14_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.56555:1.49199",
+      "name": "Puiol del Piu",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.4919908,
+      "lat": 42.5655548,
+      "home_tile_id": "14_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.49746:1.57251",
+      "name": "Ràmio",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.5725141,
+      "lat": 42.4974646,
+      "home_tile_id": "15_424",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.5711:1.61632",
+      "name": "Sant Joan de Caselles",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.6163247,
+      "lat": 42.5710971,
+      "home_tile_id": "16_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.53387:1.51563",
+      "name": "Sispony",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.515627,
+      "lat": 42.5338717,
+      "home_tile_id": "15_425",
+      "region_id": "andorra"
+    },
+    {
+      "id": "hamlet:42.54295:1.47349",
+      "name": "Super Pal",
+      "place": "hamlet",
+      "population": 0,
+      "lon": 1.4734913,
+      "lat": 42.5429513,
+      "home_tile_id": "14_425",
+      "region_id": "andorra"
+    }
+  ]
+}

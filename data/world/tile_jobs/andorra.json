@@ -1,0 +1,161 @@
+{
+  "schema_version": 3,
+  "region": "andorra",
+  "created_utc": "2026-11-25T14:57:02.394162+00:00",
+  "source_bboxes": null,
+  "tile_degrees": 0.1,
+  "tile_size_m": 11132.0,
+  "anchor_lon": 72.3,
+  "anchor_lat": 40.7,
+  "projection": "global_equirectangular",
+  "tile_count": 7,
+  "tiles": [
+    {
+      "id": "17_425",
+      "bbox": [
+        1.7,
+        42.5,
+        1.8,
+        42.6
+      ],
+      "center_lat": 42.55,
+      "center_lon": 1.75,
+      "origin_x": -7853626.0,
+      "origin_z": -205942.0,
+      "pbf_output": "data/osm/tmp/andorra/17_425.osm.pbf",
+      "geojson_output": "data/osm/tiles/andorra/17_425.geojson",
+      "godot_geojson_path": "res://data/osm/tiles/andorra/17_425.geojson",
+      "dem_height_path": "data/terrain/tiles/global/17_425.f32",
+      "dem_metadata_path": "data/terrain/tiles/global/17_425.json",
+      "godot_dem_height_path": "res://data/terrain/tiles/global/17_425.f32",
+      "godot_dem_metadata_path": "res://data/terrain/tiles/global/17_425.json",
+      "region_size_m": 12022.56
+    },
+    {
+      "id": "16_425",
+      "bbox": [
+        1.6,
+        42.5,
+        1.7,
+        42.6
+      ],
+      "center_lat": 42.55,
+      "center_lon": 1.6500000000000001,
+      "origin_x": -7864758.0,
+      "origin_z": -205942.0,
+      "pbf_output": "data/osm/tmp/andorra/16_425.osm.pbf",
+      "geojson_output": "data/osm/tiles/andorra/16_425.geojson",
+      "godot_geojson_path": "res://data/osm/tiles/andorra/16_425.geojson",
+      "dem_height_path": "data/terrain/tiles/global/16_425.f32",
+      "dem_metadata_path": "data/terrain/tiles/global/16_425.json",
+      "godot_dem_height_path": "res://data/terrain/tiles/global/16_425.f32",
+      "godot_dem_metadata_path": "res://data/terrain/tiles/global/16_425.json",
+      "region_size_m": 12022.56
+    },
+    {
+      "id": "15_424",
+      "bbox": [
+        1.5,
+        42.4,
+        1.6,
+        42.5
+      ],
+      "center_lat": 42.45,
+      "center_lon": 1.55,
+      "origin_x": -7875890.0,
+      "origin_z": -194810.0,
+      "pbf_output": "data/osm/tmp/andorra/15_424.osm.pbf",
+      "geojson_output": "data/osm/tiles/andorra/15_424.geojson",
+      "godot_geojson_path": "res://data/osm/tiles/andorra/15_424.geojson",
+      "dem_height_path": "data/terrain/tiles/global/15_424.f32",
+      "dem_metadata_path": "data/terrain/tiles/global/15_424.json",
+      "godot_dem_height_path": "res://data/terrain/tiles/global/15_424.f32",
+      "godot_dem_metadata_path": "res://data/terrain/tiles/global/15_424.json",
+      "region_size_m": 12022.56
+    },
+    {
+      "id": "15_425",
+      "bbox": [
+        1.5,
+        42.5,
+        1.6,
+        42.6
+      ],
+      "center_lat": 42.55,
+      "center_lon": 1.55,
+      "origin_x": -7875890.0,
+      "origin_z": -205942.0,
+      "pbf_output": "data/osm/tmp/andorra/15_425.osm.pbf",
+      "geojson_output": "data/osm/tiles/andorra/15_425.geojson",
+      "godot_geojson_path": "res://data/osm/tiles/andorra/15_425.geojson",
+      "dem_height_path": "data/terrain/tiles/global/15_425.f32",
+      "dem_metadata_path": "data/terrain/tiles/global/15_425.json",
+      "godot_dem_height_path": "res://data/terrain/tiles/global/15_425.f32",
+      "godot_dem_metadata_path": "res://data/terrain/tiles/global/15_425.json",
+      "region_size_m": 12022.56
+    },
+    {
+      "id": "14_424",
+      "bbox": [
+        1.4,
+        42.4,
+        1.5,
+        42.5
+      ],
+      "center_lat": 42.45,
+      "center_lon": 1.4500000000000002,
+      "origin_x": -7887022.0,
+      "origin_z": -194810.0,
+      "pbf_output": "data/osm/tmp/andorra/14_424.osm.pbf",
+      "geojson_output": "data/osm/tiles/andorra/14_424.geojson",
+      "godot_geojson_path": "res://data/osm/tiles/andorra/14_424.geojson",
+      "dem_height_path": "data/terrain/tiles/global/14_424.f32",
+      "dem_metadata_path": "data/terrain/tiles/global/14_424.json",
+      "godot_dem_height_path": "res://data/terrain/tiles/global/14_424.f32",
+      "godot_dem_metadata_path": "res://data/terrain/tiles/global/14_424.json",
+      "region_size_m": 12022.56
+    },
+    {
+      "id": "15_426",
+      "bbox": [
+        1.5,
+        42.6,
+        1.6,
+        42.7
+      ],
+      "center_lat": 42.650000000000006,
+      "center_lon": 1.55,
+      "origin_x": -7875890.0,
+      "origin_z": -217074.0,
+      "pbf_output": "data/osm/tmp/andorra/15_426.osm.pbf",
+      "geojson_output": "data/osm/tiles/andorra/15_426.geojson",
+      "godot_geojson_path": "res://data/osm/tiles/andorra/15_426.geojson",
+      "dem_height_path": "data/terrain/tiles/global/15_426.f32",
+      "dem_metadata_path": "data/terrain/tiles/global/15_426.json",
+      "godot_dem_height_path": "res://data/terrain/tiles/global/15_426.f32",
+      "godot_dem_metadata_path": "res://data/terrain/tiles/global/15_426.json",
+      "region_size_m": 12022.56
+    },
+    {
+      "id": "14_425",
+      "bbox": [
+        1.4,
+        42.5,
+        1.5,
+        42.6
+      ],
+      "center_lat": 42.55,
+      "center_lon": 1.4500000000000002,
+      "origin_x": -7887022.0,
+      "origin_z": -205942.0,
+      "pbf_output": "data/osm/tmp/andorra/14_425.osm.pbf",
+      "geojson_output": "data/osm/tiles/andorra/14_425.geojson",
+      "godot_geojson_path": "res://data/osm/tiles/andorra/14_425.geojson",
+      "dem_height_path": "data/terrain/tiles/global/14_425.f32",
+      "dem_metadata_path": "data/terrain/tiles/global/14_425.json",
+      "godot_dem_height_path": "res://data/terrain/tiles/global/14_425.f32",
+      "godot_dem_metadata_path": "res://data/terrain/tiles/global/14_425.json",
+      "region_size_m": 12022.56
+    }
+  ]
+}

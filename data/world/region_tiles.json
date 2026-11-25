@@ -43466,6 +43466,139 @@
     "dem_height_path": "res://data/terrain/tiles/global/723_407.f32",
     "dem_metadata_path": "res://data/terrain/tiles/global/723_407.json"
   },
+  "-706,-19": {
+    "geojson_path": "res://data/osm/tiles/andorra/17_425.geojson",
+    "geojson_paths": [
+      "res://data/osm/tiles/andorra/17_425.geojson"
+    ],
+    "source_regions": [
+      "andorra"
+    ],
+    "center_lat": 42.55,
+    "center_lon": 1.75,
+    "origin_x": -7853626.0,
+    "origin_z": -205942.0,
+    "region_size_m": 12022.56,
+    "tile_id": "17_425",
+    "region": "andorra",
+    "projection": "global_equirectangular",
+    "dem_height_path": "res://data/terrain/tiles/global/17_425.f32",
+    "dem_metadata_path": "res://data/terrain/tiles/global/17_425.json"
+  },
+  "-707,-19": {
+    "geojson_path": "res://data/osm/tiles/andorra/16_425.geojson",
+    "geojson_paths": [
+      "res://data/osm/tiles/andorra/16_425.geojson"
+    ],
+    "source_regions": [
+      "andorra"
+    ],
+    "center_lat": 42.55,
+    "center_lon": 1.6500000000000001,
+    "origin_x": -7864758.0,
+    "origin_z": -205942.0,
+    "region_size_m": 12022.56,
+    "tile_id": "16_425",
+    "region": "andorra",
+    "projection": "global_equirectangular",
+    "dem_height_path": "res://data/terrain/tiles/global/16_425.f32",
+    "dem_metadata_path": "res://data/terrain/tiles/global/16_425.json"
+  },
+  "-708,-18": {
+    "geojson_path": "res://data/osm/tiles/andorra/15_424.geojson",
+    "geojson_paths": [
+      "res://data/osm/tiles/andorra/15_424.geojson"
+    ],
+    "source_regions": [
+      "andorra"
+    ],
+    "center_lat": 42.45,
+    "center_lon": 1.55,
+    "origin_x": -7875890.0,
+    "origin_z": -194810.0,
+    "region_size_m": 12022.56,
+    "tile_id": "15_424",
+    "region": "andorra",
+    "projection": "global_equirectangular",
+    "dem_height_path": "res://data/terrain/tiles/global/15_424.f32",
+    "dem_metadata_path": "res://data/terrain/tiles/global/15_424.json"
+  },
+  "-708,-19": {
+    "geojson_path": "res://data/osm/tiles/andorra/15_425.geojson",
+    "geojson_paths": [
+      "res://data/osm/tiles/andorra/15_425.geojson"
+    ],
+    "source_regions": [
+      "andorra"
+    ],
+    "center_lat": 42.55,
+    "center_lon": 1.55,
+    "origin_x": -7875890.0,
+    "origin_z": -205942.0,
+    "region_size_m": 12022.56,
+    "tile_id": "15_425",
+    "region": "andorra",
+    "projection": "global_equirectangular",
+    "dem_height_path": "res://data/terrain/tiles/global/15_425.f32",
+    "dem_metadata_path": "res://data/terrain/tiles/global/15_425.json"
+  },
+  "-709,-18": {
+    "geojson_path": "res://data/osm/tiles/andorra/14_424.geojson",
+    "geojson_paths": [
+      "res://data/osm/tiles/andorra/14_424.geojson"
+    ],
+    "source_regions": [
+      "andorra"
+    ],
+    "center_lat": 42.45,
+    "center_lon": 1.4500000000000002,
+    "origin_x": -7887022.0,
+    "origin_z": -194810.0,
+    "region_size_m": 12022.56,
+    "tile_id": "14_424",
+    "region": "andorra",
+    "projection": "global_equirectangular",
+    "dem_height_path": "res://data/terrain/tiles/global/14_424.f32",
+    "dem_metadata_path": "res://data/terrain/tiles/global/14_424.json"
+  },
+  "-708,-20": {
+    "geojson_path": "res://data/osm/tiles/andorra/15_426.geojson",
+    "geojson_paths": [
+      "res://data/osm/tiles/andorra/15_426.geojson"
+    ],
+    "source_regions": [
+      "andorra"
+    ],
+    "center_lat": 42.650000000000006,
+    "center_lon": 1.55,
+    "origin_x": -7875890.0,
+    "origin_z": -217074.0,
+    "region_size_m": 12022.56,
+    "tile_id": "15_426",
+    "region": "andorra",
+    "projection": "global_equirectangular",
+    "dem_height_path": "res://data/terrain/tiles/global/15_426.f32",
+    "dem_metadata_path": "res://data/terrain/tiles/global/15_426.json"
+  },
+  "-709,-19": {
+    "geojson_path": "res://data/osm/tiles/andorra/14_425.geojson",
+    "geojson_paths": [
+      "res://data/osm/tiles/andorra/14_425.geojson"
+    ],
+    "source_regions": [
+      "andorra"
+    ],
+    "center_lat": 42.55,
+    "center_lon": 1.4500000000000002,
+    "origin_x": -7887022.0,
+    "origin_z": -205942.0,
+    "region_size_m": 12022.56,
+    "tile_id": "14_425",
+    "region": "andorra",
+    "projection": "global_equirectangular",
+    "dem_height_path": "res://data/terrain/tiles/global/14_425.f32",
+    "dem_metadata_path": "res://data/terrain/tiles/global/14_425.json"
+  },
   "-1,1": {
     "geojson_path": "res://data/osm/tiles/uzbekistan/722_405.geojson",
     "geojson_paths": [
