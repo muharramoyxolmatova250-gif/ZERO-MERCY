@@ -20,6 +20,7 @@ var rng := RandomNumberGenerator.new()
 var mats: Array[StandardMaterial3D] = []
 var _window_materials: Array[StandardMaterial3D] = []
 var _wet_road_material: StandardMaterial3D
+var _facade_trim_material: StandardMaterial3D
 @export var settlement_id := ""
 @export var settlement_display_name := ""
 
@@ -61,6 +62,12 @@ func _materials() -> void:
 	_wet_road_material.clearcoat_enabled = true
 	_wet_road_material.clearcoat = 1.0
 	_wet_road_material.clearcoat_roughness = 0.08
+	_facade_trim_material = StandardMaterial3D.new()
+	_facade_trim_material.albedo_color = Color(0.035, 0.055, 0.085)
+	_facade_trim_material.metallic = 0.88
+	_facade_trim_material.roughness = 0.2
+	_facade_trim_material.clearcoat_enabled = true
+	_facade_trim_material.clearcoat = 0.7
 	for c in [Color(0.0, 0.82, 1.0), Color(1.0, 0.08, 0.42), Color(0.95, 0.58, 0.2)]:
 		var m := StandardMaterial3D.new()
 		m.albedo_color = c
@@ -102,6 +109,7 @@ func _building(base: Vector3, size: Vector3) -> void:
 	var accent: Color = _window_materials[accent_index].albedo_color
 	_box(base + Vector3(0, size.y + 0.12, 0), Vector3(size.x + 0.4, 0.24, size.z + 0.4), accent, true, false)
 	_facade_windows_instanced(base, size, accent_index)
+	_architectural_facade_details(base, size, accent)
 	_ground_floor_frontage(base, size, accent)
 	_roof_detail(base, size, accent)
 
@@ -201,6 +209,59 @@ func _facade_windows_instanced(base: Vector3, size: Vector3, accent_index: int) 
 			instance.visibility_range_end_margin = 35.0
 			instance.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
 		add_child(instance)
+
+
+
+func _architectural_facade_details(base: Vector3, size: Vector3, accent: Color) -> void:
+	# Repeated metal fins and floor bands add architectural depth without one node per detail.
+	var fin_transforms: Array[Transform3D] = []
+	var band_transforms: Array[Transform3D] = []
+	var fin_count := maxi(3, int(size.x / 3.6))
+	for side in [-1.0, 1.0]:
+		var facade_z := base.z + side * (size.z * 0.5 + 0.16)
+		for fin in range(fin_count + 1):
+			var x := base.x - size.x * 0.5 + float(fin) * size.x / float(fin_count)
+			fin_transforms.append(Transform3D(Basis(), Vector3(x, size.y * 0.5, facade_z)))
+		for floor_index in range(1, int(size.y / 3.2)):
+			var y := float(floor_index) * 3.2
+			band_transforms.append(Transform3D(Basis(), Vector3(base.x, y, facade_z + side * 0.035)))
+	_add_facade_multimesh("FacadeVerticalFins", Vector3(0.16, maxf(4.0, size.y - 0.5), 0.28), fin_transforms, _facade_trim_material)
+	_add_facade_multimesh("FacadeFloorBands", Vector3(size.x + 0.12, 0.11, 0.34), band_transforms, _facade_trim_material)
+
+	# Four illuminated corner markers provide a readable silhouette at night.
+	var corner_transforms: Array[Transform3D] = []
+	for side_x in [-1.0, 1.0]:
+		for side_z in [-1.0, 1.0]:
+			corner_transforms.append(Transform3D(Basis(), base + Vector3(side_x * (size.x * 0.5 + 0.09), size.y * 0.5, side_z * (size.z * 0.5 + 0.09))))
+	var marker_material := StandardMaterial3D.new()
+	marker_material.albedo_color = accent
+	marker_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	marker_material.emission_enabled = true
+	marker_material.emission = accent
+	marker_material.emission_energy_multiplier = 0.8
+	_add_facade_multimesh("FacadeCornerNeon", Vector3(0.09, size.y, 0.09), corner_transforms, marker_material)
+
+
+func _add_facade_multimesh(label: String, mesh_size: Vector3, transforms: Array[Transform3D], material: Material) -> void:
+	if transforms.is_empty():
+		return
+	var mesh := BoxMesh.new()
+	mesh.size = mesh_size
+	var multi_mesh := MultiMesh.new()
+	multi_mesh.transform_format = MultiMesh.TRANSFORM_3D
+	multi_mesh.mesh = mesh
+	multi_mesh.instance_count = transforms.size()
+	for index in range(transforms.size()):
+		multi_mesh.set_instance_transform(index, transforms[index])
+	var instance := MultiMeshInstance3D.new()
+	instance.name = label
+	instance.multimesh = multi_mesh
+	instance.material_override = material
+	if distance_lod_enabled:
+		instance.visibility_range_end = detail_visibility_range * 2.0
+		instance.visibility_range_end_margin = 40.0
+		instance.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+	add_child(instance)
 
 
 func _ground_floor_frontage(base: Vector3, size: Vector3, accent: Color) -> void:
