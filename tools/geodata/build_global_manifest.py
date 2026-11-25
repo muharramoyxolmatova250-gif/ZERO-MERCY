@@ -183,46 +183,68 @@ def download(entry: dict, force: bool = False, attempts: int = 5) -> Path:
     temporary = target.with_suffix(target.suffix + ".part")
     print(f"Downloading {entry['name']} ({entry['id']})")
     print(f"Source: {entry['pbf_url']}")
+    # OpenStreetMap France mirrors daily PBF extracts for many countries.
+    # Prefer its flat continent directory where the country file is known to exist,
+    # then fall back to the catalogue's Geofabrik URL.
+    mirror_ids = {
+        "andorra", "austria", "belgium", "czech-republic", "denmark",
+        "finland", "france", "germany", "gibraltar", "guernesey", "ireland",
+        "italy", "jersey", "luxembourg", "monaco", "netherlands", "norway",
+        "poland", "portugal", "san-marino", "slovakia", "spain", "sweden",
+        "switzerland", "turkey", "united-kingdom", "vatican-city",
+    }
+    sources = []
+    region_id = entry["id"]
+    if region_id in mirror_ids and entry.get("parent"):
+        mirror_id = region_id.replace("-", "_")
+        sources.append(f"https://download.openstreetmap.fr/extracts/{entry['parent']}/{mirror_id}-latest.osm.pbf")
+    if entry["pbf_url"] not in sources:
+        sources.append(entry["pbf_url"])
     last_error = None
-    for attempt in range(attempts):
-        try:
-            # Resume interrupted downloads instead of deleting gigabytes on retry.
-            offset = temporary.stat().st_size if temporary.exists() and not force else 0
-            headers = {"User-Agent": USER_AGENT}
-            if offset:
-                headers["Range"] = f"bytes={offset}-"
-            request = urllib.request.Request(entry["pbf_url"], headers=headers)
-            with urllib.request.urlopen(request, timeout=300) as response:
-                # Some servers ignore Range; in that case restart cleanly.
-                append = offset > 0 and getattr(response, "status", 200) == 206
-                if offset and not append:
-                    offset = 0
-                mode = "ab" if append else "wb"
-                with temporary.open(mode) as out:
-                    downloaded = offset
-                    last_report = downloaded
-                    while True:
-                        chunk = response.read(4 * 1024 * 1024)
-                        if not chunk:
-                            break
-                        out.write(chunk)
-                        downloaded += len(chunk)
-                        if downloaded - last_report >= 64 * 1024 * 1024:
-                            print(f"Download progress: {downloaded / (1024 * 1024):.0f} MiB", flush=True)
-                            last_report = downloaded
-            if temporary.stat().st_size < 1024:
-                raise RuntimeError("Downloaded PBF is unexpectedly small.")
-            temporary.replace(target)
-            print(f"Saved {target} ({target.stat().st_size:,} bytes)")
-            return target
-        except Exception as exc:
-            last_error = exc
-            partial = temporary.stat().st_size if temporary.exists() else 0
-            if attempt + 1 < attempts:
-                delay = min(30, 3 * (2 ** attempt))
-                print(f"PBF download interrupted ({exc}); keeping {partial:,} bytes and resuming in {delay}s...", file=sys.stderr, flush=True)
-                time.sleep(delay)
-    raise RuntimeError(f"Could not download {entry['id']} after {attempts} attempts: {last_error}")
+    for source_index, source_url in enumerate(sources):
+        if source_index and temporary.exists():
+            temporary.unlink()
+        print(f"Trying PBF source: {source_url}")
+        for attempt in range(attempts):
+            try:
+                # Resume interrupted downloads instead of deleting gigabytes on retry.
+                offset = temporary.stat().st_size if temporary.exists() and not force else 0
+                headers = {"User-Agent": USER_AGENT}
+                if offset:
+                    headers["Range"] = f"bytes={offset}-"
+                request = urllib.request.Request(source_url, headers=headers)
+                with urllib.request.urlopen(request, timeout=300) as response:
+                    append = offset > 0 and getattr(response, "status", 200) == 206
+                    if offset and not append:
+                        offset = 0
+                    mode = "ab" if append else "wb"
+                    with temporary.open(mode) as out:
+                        downloaded = offset
+                        last_report = downloaded
+                        while True:
+                            chunk = response.read(4 * 1024 * 1024)
+                            if not chunk:
+                                break
+                            out.write(chunk)
+                            downloaded += len(chunk)
+                            if downloaded - last_report >= 64 * 1024 * 1024:
+                                print(f"Download progress: {downloaded / (1024 * 1024):.0f} MiB", flush=True)
+                                last_report = downloaded
+                if temporary.stat().st_size < 1024:
+                    raise RuntimeError("Downloaded PBF is unexpectedly small.")
+                temporary.replace(target)
+                print(f"Saved {target} ({target.stat().st_size:,} bytes) from {source_url}")
+                return target
+            except Exception as exc:
+                last_error = exc
+                partial = temporary.stat().st_size if temporary.exists() else 0
+                if attempt + 1 < attempts:
+                    delay = min(30, 3 * (2 ** attempt))
+                    print(f"PBF download interrupted from {source_url} ({exc}); keeping {partial:,} bytes and resuming in {delay}s...", file=sys.stderr, flush=True)
+                    time.sleep(delay)
+                else:
+                    print(f"PBF source failed: {source_url}: {exc}", file=sys.stderr, flush=True)
+    raise RuntimeError(f"Could not download {entry['id']} from {len(sources)} sources after {attempts} attempts each: {last_error}")
 
 
 def main() -> int:
