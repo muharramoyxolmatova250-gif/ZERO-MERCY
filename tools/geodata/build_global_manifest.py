@@ -232,14 +232,19 @@ def main() -> int:
     parser.add_argument("--region", action="append", default=[], help="Exact Geofabrik region ID; repeatable")
     parser.add_argument("--download", action="store_true", help="Download the selected --region entries")
     parser.add_argument("--force", action="store_true", help="Replace existing PBF files")
+    parser.add_argument("--offline-catalog", action="store_true", help="Reuse the committed Geofabrik catalogue and enrich it with offline boundaries; do not request the live index")
     args = parser.parse_args()
 
-    print("Fetching Geofabrik global extract index...")
-    try:
-        catalog = build_catalog(read_json(INDEX_URL))
-    except Exception as exc:
-        print(f"Geofabrik index unavailable: {exc}", file=sys.stderr)
+    if args.offline_catalog:
+        print("Using committed Geofabrik catalogue; skipping live index request.")
         catalog = build_offline_catalog(args.output)
+    else:
+        print("Fetching Geofabrik global extract index...")
+        try:
+            catalog = build_catalog(read_json(INDEX_URL))
+        except Exception as exc:
+            print(f"Geofabrik index unavailable: {exc}", file=sys.stderr)
+            catalog = build_offline_catalog(args.output)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Catalogue saved: {args.output} ({len(catalog['regions'])} downloadable entries)")
