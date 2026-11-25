@@ -41,3 +41,42 @@ func delete_save() -> bool:
 	if not FileAccess.file_exists(SAVE_PATH):
 		return true
 	return DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH)) == OK
+
+
+func save_player_state(player: Node3D) -> bool:
+	if not is_instance_valid(player):
+		return false
+	var payload := load_game()
+	payload["player_state"] = {
+		"position": [player.global_position.x, player.global_position.y, player.global_position.z],
+		"rotation": [player.global_rotation.x, player.global_rotation.y, player.global_rotation.z],
+		"health": float(player.get("health")),
+		"stamina": float(player.get("stamina")),
+		"ammo_in_magazine": int(player.get("ammo_in_magazine")),
+		"reserve_ammo": int(player.get("reserve_ammo"))
+	}
+	return save_game(payload)
+
+
+func restore_player_state(player: Node3D) -> bool:
+	if not is_instance_valid(player):
+		return false
+	var payload := load_game()
+	var state: Variant = payload.get("player_state", {})
+	if typeof(state) != TYPE_DICTIONARY:
+		return false
+	var position_data: Array = state.get("position", [])
+	var rotation_data: Array = state.get("rotation", [])
+	if position_data.size() != 3 or rotation_data.size() != 3:
+		return false
+	player.global_position = Vector3(float(position_data[0]), float(position_data[1]), float(position_data[2]))
+	player.global_rotation = Vector3(float(rotation_data[0]), float(rotation_data[1]), float(rotation_data[2]))
+	player.set("_spawn_transform", player.global_transform)
+	player.set("health", clampf(float(state.get("health", player.get("max_health"))), 1.0, float(player.get("max_health"))))
+	player.set("stamina", clampf(float(state.get("stamina", player.get("stamina_max"))), 0.0, float(player.get("stamina_max"))))
+	player.set("ammo_in_magazine", clampi(int(state.get("ammo_in_magazine", player.get("magazine_size"))), 0, int(player.get("magazine_size"))))
+	player.set("reserve_ammo", maxi(0, int(state.get("reserve_ammo", 0))))
+	player.health_changed.emit(player.get("health"), player.get("max_health"))
+	player.stamina_changed.emit(player.get("stamina"), player.get("stamina_max"))
+	player.ammo_changed.emit(player.get("ammo_in_magazine"), player.get("reserve_ammo"))
+	return true
