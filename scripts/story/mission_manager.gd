@@ -198,18 +198,68 @@ func get_campaign_snapshot() -> Dictionary:
             completed_main += 1
         elif side_mission_ids.has(mission_id):
             completed_side += 1
+    var chapter_progress := get_chapter_progress()
     return {
         "title": str(campaign.get("title", "ZERO MERCY")),
         "estimated_total_hours": int(campaign.get("estimated_total_hours", 70)),
+        "playtime_breakdown": campaign.get("playtime_breakdown", {}).duplicate(true),
         "main_completed": completed_main,
         "main_total": campaign_order.size(),
         "side_completed": completed_side,
         "side_total": side_mission_ids.size(),
+        "chapter_progress": chapter_progress,
+        "current_chapter": str(chapter_progress.get("current_chapter_id", "")),
         "credits": credits,
         "active_mission_id": active_mission_id,
+        "ending_id": resolve_campaign_ending(),
         "story_flags": story_flags.duplicate(true),
         "choices": story_choices.duplicate(true)
     }
+
+
+func get_chapter_progress() -> Dictionary:
+    var chapters: Array = campaign.get("chapters", [])
+    var result: Array[Dictionary] = []
+    var current_chapter_id := ""
+    var current_chapter_title := ""
+    for chapter_value in chapters:
+        if typeof(chapter_value) != TYPE_DICTIONARY:
+            continue
+        var chapter: Dictionary = chapter_value
+        var chapter_missions: Array = chapter.get("missions", [])
+        var completed := 0
+        for mission_value in chapter_missions:
+            if completed_missions.has(str(mission_value)):
+                completed += 1
+        var total := chapter_missions.size()
+        var is_complete := total > 0 and completed >= total
+        result.append({
+            "id": str(chapter.get("id", "")),
+            "title": str(chapter.get("title", "")),
+            "completed": completed,
+            "total": total,
+            "is_complete": is_complete
+        })
+        if current_chapter_id.is_empty() and not is_complete:
+            current_chapter_id = str(chapter.get("id", ""))
+            current_chapter_title = str(chapter.get("title", ""))
+    return {
+        "chapters": result,
+        "current_chapter_id": current_chapter_id,
+        "current_chapter_title": current_chapter_title,
+        "completed_chapters": result.filter(func(item: Dictionary) -> bool: return bool(item.get("is_complete", false))).size(),
+        "total_chapters": result.size()
+    }
+
+
+func resolve_campaign_ending() -> String:
+    if bool(story_flags.get("throne_rejected", false)) and bool(story_flags.get("control_system_destroyed", false)):
+        return "no_crown"
+    if not bool(story_flags.get("throne_rejected", false)) and bool(story_flags.get("global_protocol_revealed", false)):
+        return "sovereign"
+    if not bool(story_flags.get("world_protocol_activated", false)) or not bool(story_flags.get("network_stabilized", false)):
+        return "fractured_world"
+    return ""
 
 func _prerequisites_met(data: Dictionary) -> bool:
     for flag_id in data.get("required_flags", []):
