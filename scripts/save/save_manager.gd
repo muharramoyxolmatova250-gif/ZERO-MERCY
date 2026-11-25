@@ -76,16 +76,25 @@ func restore_player_state(player: Node3D) -> bool:
 			return false
 		if not is_finite(float(value)):
 			return false
+	var saved_health: Variant = state.get("health", player.get("max_health"))
+	var saved_stamina: Variant = state.get("stamina", player.get("stamina_max"))
+	var saved_magazine: Variant = state.get("ammo_in_magazine", player.get("magazine_size"))
+	var saved_reserve: Variant = state.get("reserve_ammo", 0)
+	for value in [saved_health, saved_stamina, saved_magazine, saved_reserve]:
+		if typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT:
+			return false
+		if not is_finite(float(value)):
+			return false
 	if bool(player.get("is_dead")):
 		player.call("respawn")
 	player.global_position = Vector3(float(position_data[0]), float(position_data[1]), float(position_data[2]))
 	player.global_rotation = Vector3(float(rotation_data[0]), float(rotation_data[1]), float(rotation_data[2]))
 	player.set("velocity", Vector3.ZERO)
 	player.set("_spawn_transform", player.global_transform)
-	player.set("health", clampf(float(state.get("health", player.get("max_health"))), 1.0, float(player.get("max_health"))))
-	player.set("stamina", clampf(float(state.get("stamina", player.get("stamina_max"))), 0.0, float(player.get("stamina_max"))))
-	player.set("ammo_in_magazine", clampi(int(state.get("ammo_in_magazine", player.get("magazine_size"))), 0, int(player.get("magazine_size"))))
-	player.set("reserve_ammo", maxi(0, int(state.get("reserve_ammo", 0))))
+	player.set("health", clampf(float(saved_health), 1.0, float(player.get("max_health"))))
+	player.set("stamina", clampf(float(saved_stamina), 0.0, float(player.get("stamina_max"))))
+	player.set("ammo_in_magazine", clampi(int(saved_magazine), 0, int(player.get("magazine_size"))))
+	player.set("reserve_ammo", maxi(0, int(saved_reserve)))
 	player.emit_signal("health_changed", player.get("health"), player.get("max_health"))
 	player.emit_signal("stamina_changed", player.get("stamina"), player.get("stamina_max"))
 	player.emit_signal("ammo_changed", player.get("ammo_in_magazine"), player.get("reserve_ammo"))
