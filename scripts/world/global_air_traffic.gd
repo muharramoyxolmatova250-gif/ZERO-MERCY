@@ -15,7 +15,25 @@ const AIRPORTS:= [
  {"code":"GRU","city":"Sao Paulo","country":"Brazil","lat":-23.4356,"lon":-46.4731},
  {"code":"SYD","city":"Sydney","country":"Australia","lat":-33.9399,"lon":151.1753},
  {"code":"CAI","city":"Cairo","country":"Egypt","lat":30.1219,"lon":31.4056},
- {"code":"BOM","city":"Mumbai","country":"India","lat":19.0896,"lon":72.8656}
+ {"code":"BOM","city":"Mumbai","country":"India","lat":19.0896,"lon":72.8656},
+ {"code":"DOH","city":"Doha","country":"Qatar","lat":25.2731,"lon":51.6081},
+ {"code":"DEL","city":"New Delhi","country":"India","lat":28.5562,"lon":77.1000},
+ {"code":"BKK","city":"Bangkok","country":"Thailand","lat":13.6900,"lon":100.7501},
+ {"code":"HKG","city":"Hong Kong","country":"China","lat":22.3080,"lon":113.9185},
+ {"code":"MEX","city":"Mexico City","country":"Mexico","lat":19.4363,"lon":-99.0721},
+ {"code":"YYZ","city":"Toronto","country":"Canada","lat":43.6777,"lon":-79.6248},
+ {"code":"ORD","city":"Chicago","country":"USA","lat":41.9742,"lon":-87.9073},
+ {"code":"SFO","city":"San Francisco","country":"USA","lat":37.6213,"lon":-122.3790},
+ {"code":"MAD","city":"Madrid","country":"Spain","lat":40.4983,"lon":-3.5676},
+ {"code":"FRA","city":"Frankfurt","country":"Germany","lat":50.0379,"lon":8.5622},
+ {"code":"JNB","city":"Johannesburg","country":"South Africa","lat":-26.1367,"lon":28.2410},
+ {"code":"NBO","city":"Nairobi","country":"Kenya","lat":-1.3192,"lon":36.9278},
+ {"code":"AKL","city":"Auckland","country":"New Zealand","lat":-37.0082,"lon":174.7850},
+ {"code":"PER","city":"Perth","country":"Australia","lat":-31.9403,"lon":115.9670},
+ {"code":"RUH","city":"Riyadh","country":"Saudi Arabia","lat":24.9576,"lon":46.6988},
+ {"code":"ALA","city":"Almaty","country":"Kazakhstan","lat":43.3521,"lon":77.0405},
+ {"code":"SKD","city":"Samarkand","country":"Uzbekistan","lat":39.7005,"lon":66.9838},
+ {"code":"AZN","city":"Andijan","country":"Uzbekistan","lat":40.7277,"lon":72.2947}
 ]
 var flights:Array[Dictionary]=[]
 var _planes:Array[Node3D]=[]
