@@ -2,6 +2,7 @@
 """Batch-extract OSM tiles in one Osmium pass, then export each tile to GeoJSON."""
 from __future__ import annotations
 import argparse, json, subprocess
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -59,24 +60,32 @@ def main() -> int:
         finally:
             config_path.unlink(missing_ok=True)
 
-    completed = 0
-    for item in pending:
+    def export_one(item: dict) -> tuple[str, Path, int]:
         tile, pbf, geo, temp_pbf = item["tile"], item["pbf"], item["geo"], item["temp_pbf"]
         if not temp_pbf.is_file() or temp_pbf.stat().st_size < 2:
             raise RuntimeError(f"Osmium did not create tile extract: {temp_pbf}")
         temp_pbf.replace(pbf)
         geo_tmp = geo.with_name(geo.stem + ".part.geojson")
-        run(["osmium", "export", str(pbf), "-o", str(geo_tmp), "--overwrite"])
+        subprocess.run(["osmium", "export", str(pbf), "-o", str(geo_tmp), "--overwrite"], check=True)
         if not geo_tmp.is_file() or geo_tmp.stat().st_size < 2:
             raise RuntimeError(f"Empty GeoJSON export: {geo_tmp}")
-        # Validate JSON structure here; empty FeatureCollections are legitimate
-        # for uninhabited land cells and are checked by the batch validator.
+        # Empty FeatureCollections are legitimate for uninhabited land cells.
         data = json.loads(geo_tmp.read_text(encoding="utf-8"))
         if data.get("type") != "FeatureCollection" or not isinstance(data.get("features"), list):
             raise RuntimeError(f"Invalid GeoJSON FeatureCollection: {geo_tmp}")
         geo_tmp.replace(geo)
-        completed += 1
-        print(f"[{completed}/{len(pending)}] {tile['id']} -> {geo} ({len(data['features'])} features)")
+        return str(tile["id"]), geo, len(data["features"])
+
+    completed = 0
+    if pending:
+        # The expensive PBF extraction remains a single Osmium pass; independent
+        # GeoJSON conversions run concurrently to reduce per-tile overhead.
+        with ThreadPoolExecutor(max_workers=min(4, len(pending))) as pool:
+            futures = [pool.submit(export_one, item) for item in pending]
+            for future in as_completed(futures):
+                tile_id, geo, feature_count = future.result()
+                completed += 1
+                print(f"[{completed}/{len(pending)}] {tile_id} -> {geo} ({feature_count} features)")
     print(f"Batch complete: {completed} new tiles; {len(selected) - len(pending)} already present.")
     return 0
 
