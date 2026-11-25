@@ -41,7 +41,7 @@ on:
       tile_count:
         description: Tiles to process in this run
         required: false
-        default: "128"
+        default: "8"
         type: string
       tile_degrees:
         description: Global grid tile width in degrees
@@ -61,7 +61,7 @@ concurrency:
   # Shared lock with the Earth catalogue workflow; only one world-data writer runs at a time.
   # The saved cursor resumes the Andijan-priority Uzbekistan cells first, then all world regions.
   group: zero-mercy-repository-data-build
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-country-batch:
