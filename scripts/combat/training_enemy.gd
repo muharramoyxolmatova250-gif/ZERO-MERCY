@@ -86,8 +86,20 @@ func _attack() -> void:
 	_attack_cooldown = attack_interval
 	if not is_instance_valid(_target) or not _target.has_method("take_damage"):
 		return
+	var target_position := _target.global_position + Vector3.UP * 0.9
+	var attack_origin := global_position + Vector3.UP * 1.0
 	var distance := global_position.distance_to(_target.global_position)
-	if distance <= attack_range + 0.5:
+	if distance > attack_range + 0.5:
+		return
+	# Do not damage Dara through solid architecture.
+	var query := PhysicsRayQueryParameters3D.create(attack_origin, target_position)
+	query.exclude = [get_rid()]
+	query.collide_with_areas = false
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return
+	var hit_collider: Object = hit.get("collider")
+	if hit_collider == _target:
 		_target.call("take_damage", attack_damage, self)
 
 
