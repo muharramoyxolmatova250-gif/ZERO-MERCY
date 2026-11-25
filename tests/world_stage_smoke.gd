@@ -227,6 +227,11 @@ func _run() -> void:
 		_fail("Cyber sidearm muzzle flash did not activate.")
 		return
 	print("PASS Combat presentation: sidearm fires, consumes ammunition and triggers a muzzle flash.")
+	await create_timer(0.12).timeout
+	if bool(muzzle_flash.get("visible")):
+		_fail("Cyber sidearm muzzle flash did not fade after firing.")
+		return
+	print("PASS Combat presentation: muzzle flash fades cleanly after the shot.")
 	var life_sim := main.get_node_or_null("WorldLifeSimulation")
 	if life_sim == null:
 		_fail("Persistent world life simulation did not start.")
