@@ -127,8 +127,27 @@ func _physics_process(delta: float) -> void:
 		if _phone != null: _phone.visible = is_using_phone
 		return
 	var speed_factor := 1.3 if current_goal == "commute" else (0.65 if current_goal in ["rest", "leisure", "family"] else (1.12 if current_goal in ["food", "school", "play"] else 1.0))
-	position += direction.normalized() * walk_speed * speed_factor * delta
-	if direction.length_squared() > 0.001: look_at(position + direction, Vector3.UP)
+	var steering := direction.normalized() + _get_crowd_separation() * 1.25
+	if steering.length_squared() > 0.001:
+		steering = steering.normalized()
+		position += steering * walk_speed * speed_factor * delta
+		look_at(position + steering, Vector3.UP)
+
+func _get_crowd_separation() -> Vector3:
+	var separation := Vector3.ZERO
+	var nearby_count := 0
+	for candidate in get_tree().get_nodes_in_group("city_citizen"):
+		if candidate == self or not is_instance_valid(candidate):
+			continue
+		var offset: Vector3 = global_position - candidate.global_position
+		offset.y = 0.0
+		var distance := offset.length()
+		if distance > 0.01 and distance < 1.6:
+			separation += offset.normalized() / distance
+			nearby_count += 1
+	if nearby_count > 0:
+		separation /= float(nearby_count)
+	return separation
 
 func _update_needs() -> void:
 	_energy = clampf(_energy - 0.002, 0.0, 1.0)
@@ -206,7 +225,7 @@ func _scan_social_context() -> void:
 			_social_target = candidate
 
 func get_ai_snapshot() -> Dictionary:
-	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"memories":_memory.size(),"decisions":ai_decision_count,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
+	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"crowd_avoidance":true,"memories":_memory.size(),"decisions":ai_decision_count,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
 
 func remember_event(event_name: String) -> void:
 	_memory.append(event_name)
