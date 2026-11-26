@@ -18,7 +18,10 @@ var _claim_cache: Dictionary = {}
 var births_total := 0
 var deaths_total := 0
 var marriages_total := 0
+var separations_total := 0
 var graduations_total := 0
+var career_promotions_total := 0
+var independent_households_total := 0
 var _elapsed := 0.0
 var _save_elapsed := 0.0
 var _dirty := false
@@ -142,9 +145,8 @@ func _try_form_household(citizen_id: String) -> void:
     var age := int(profile.get("age_years", 0))
     if age < 20 or age > 60 or str(profile.get("marital_status", "single")) != "single":
         return
-    var local_rng := RandomNumberGenerator.new()
-    local_rng.seed = int(abs(hash(citizen_id + ":household")))
-    if local_rng.randf() > 0.22:
+    # Retry with a fresh world RNG roll each month; failed attempts are not permanent.
+    if _rng.randf() > 0.22:
         return
     var candidates: Array[String] = []
     for other_id in resident_profiles.keys():
@@ -162,7 +164,7 @@ func _try_form_household(citizen_id: String) -> void:
     if candidates.is_empty():
         return
     candidates.sort()
-    var partner_id := candidates[local_rng.randi_range(0, candidates.size() - 1)]
+    var partner_id := candidates[_rng.randi_range(0, candidates.size() - 1)]
     var family_id := "family_" + str(abs(hash(citizen_id + "::" + partner_id)))
     profile["marital_status"] = "partnered"
     profile["partner_id"] = partner_id
@@ -326,7 +328,8 @@ func separate_partners(citizen_id: String, reason: String = "mutual_separation")
     partner["family_id"] = retained_family
     resident_profiles[citizen_id] = profile
     resident_profiles[partner_id] = partner
-    marriages_total = maxi(0, marriages_total - 1)
+    # Lifetime marriage count stays cumulative; separations are separate statistics.
+    separations_total += 1
     _dirty = true
     return true
 
@@ -523,6 +526,10 @@ func advance_month() -> void:
             _append_event(profile, "new_child_born")
             _create_child_profile(profile, str(profile.get("partner_id", "")))
             profile = resident_profiles.get(citizen_id, profile)
+        if new_stage == "adult" and old_stage == "student":
+            _start_independent_life(profile)
+        if new_stage == "adult":
+            _advance_career_month(profile)
         if new_age >= 82 and _rng.randf() < 0.006:
             profile["life_stage"] = "deceased"
             profile["active"] = false
@@ -617,6 +624,8 @@ func _apply_stage_transition(profile: Dictionary, old_stage: String, new_stage: 
         profile["occupation"] = JOBS[_rng.randi_range(0, JOBS.size() - 1)]
         profile["school"] = ""
         profile["education"] = "graduated"
+        profile["career_level"] = maxi(1, int(profile.get("career_level", 0)))
+        profile["career_progress"] = 0.0
         graduations_total += 1
         _append_event(profile, "graduated_and_started_work")
     elif new_stage == "retired":
@@ -625,6 +634,43 @@ func _apply_stage_transition(profile: Dictionary, old_stage: String, new_stage: 
     elif new_stage == "child":
         profile["occupation"] = "child"
         _append_event(profile, "born_into_world")
+
+func _start_independent_life(profile: Dictionary) -> void:
+    var citizen_id := str(profile.get("id", ""))
+    if citizen_id.is_empty() or bool(profile.get("living_independently", false)):
+        return
+    # Preserve family links but give the adult a distinct household identity.
+    var household_id := "household_" + str(abs(hash(citizen_id + ":adult:" + str(simulation_day))))
+    profile["household_id"] = household_id
+    profile["living_independently"] = true
+    profile["moved_out_day"] = simulation_day
+    profile["money"] = maxi(100, int(profile.get("money", 0)))
+    independent_households_total += 1
+    _append_event(profile, "started_independent_household")
+    var parent_ids: Array = profile.get("parents", [])
+    for parent_id in parent_ids:
+        if resident_profiles.has(str(parent_id)):
+            var parent: Dictionary = resident_profiles[str(parent_id)]
+            _append_event(parent, "adult_child_moved_out:" + citizen_id)
+            resident_profiles[str(parent_id)] = parent
+
+
+func _advance_career_month(profile: Dictionary) -> void:
+    var occupation := str(profile.get("occupation", ""))
+    if occupation in ["", "unemployed", "retired", "student", "child"]:
+        return
+    var progress := float(profile.get("career_progress", 0.0))
+    var education := str(profile.get("education", "secondary"))
+    var education_bonus := 0.12 if education in ["university", "postgraduate", "graduated"] else 0.0
+    progress += _rng.randf_range(0.015, 0.045) + education_bonus * 0.1
+    if progress >= 1.0:
+        progress -= 1.0
+        profile["career_level"] = int(profile.get("career_level", 1)) + 1
+        profile["money"] = int(profile.get("money", 0)) + 250
+        career_promotions_total += 1
+        _append_event(profile, "career_promotion:" + str(profile["career_level"]))
+    profile["career_progress"] = progress
+
 
 func _append_event(profile: Dictionary, event_name: String) -> void:
     var events: Array = profile.get("life_events", [])
@@ -714,7 +760,9 @@ func get_world_life_snapshot() -> Dictionary:
         "aggregate_population": population, "individual_profiles": resident_profiles.size(),
         "active_residents": active, "sample_students": students, "sample_workers": workers,
         "sample_retired": retired, "births_total": births_total, "deaths_total": deaths_total,
-        "marriages_total": marriages_total, "graduations_total": graduations_total
+        "marriages_total": marriages_total, "separations_total": separations_total,
+        "graduations_total": graduations_total, "career_promotions_total": career_promotions_total,
+        "independent_households_total": independent_households_total
     }
 
 func _load_state() -> void:
@@ -735,7 +783,10 @@ func _load_state() -> void:
     births_total = int(parsed.get("births_total", 0))
     deaths_total = int(parsed.get("deaths_total", 0))
     marriages_total = int(parsed.get("marriages_total", 0))
+    separations_total = int(parsed.get("separations_total", 0))
     graduations_total = int(parsed.get("graduations_total", 0))
+    career_promotions_total = int(parsed.get("career_promotions_total", 0))
+    independent_households_total = int(parsed.get("independent_households_total", 0))
 
 func _save_state() -> void:
     var data := {
@@ -743,7 +794,9 @@ func _save_state() -> void:
         "simulation_year": simulation_year, "hub_state": hub_state,
         "resident_profiles": resident_profiles, "social_bonds": social_bonds, "births_total": births_total,
         "deaths_total": deaths_total, "marriages_total": marriages_total,
-        "graduations_total": graduations_total
+        "separations_total": separations_total, "graduations_total": graduations_total,
+        "career_promotions_total": career_promotions_total,
+        "independent_households_total": independent_households_total
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
     if file != null:
