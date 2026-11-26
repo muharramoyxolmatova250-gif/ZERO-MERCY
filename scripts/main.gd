@@ -52,6 +52,18 @@ func _ready() -> void:
   coupe.name = "SovereignCyberCoupe"
   coupe.position = Vector3(5.0, 0.15, 5.0)
   add_child(coupe)
+ # A second drivable vehicle: cyber motorcycle.
+ var bike_scene := load("res://scenes/vehicles/cyber_bike.tscn") as PackedScene
+ if bike_scene != null:
+  var bike := bike_scene.instantiate()
+  bike.name = "DaraCyberBike"
+  bike.position = Vector3(-5.0, 0.15, 5.0)
+  add_child(bike)
+ # Ambient traffic proxies animate along the distant boulevard.
+ var traffic := Node3D.new()
+ traffic.name = "AmbientTrafficSimulation"
+ traffic.set_script(load("res://scripts/vehicles/ambient_traffic.gd"))
+ add_child(traffic)
  # Initial hostile patrol: three enemies enter from a loose formation.
  # Each unit runs its own perception, pursuit and attack logic.
  var patrol_positions := [
