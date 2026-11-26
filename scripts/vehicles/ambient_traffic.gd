@@ -92,6 +92,15 @@ func _make_traffic_car(index: int) -> Node3D:
  lights.position = Vector3(0, 0.68, -1.82)
  lights.material_override = lamp
  root.add_child(lights)
+ var traffic_body := StaticBody3D.new()
+ traffic_body.name = "TrafficCollision"
+ var traffic_shape := CollisionShape3D.new()
+ var traffic_box := BoxShape3D.new()
+ traffic_box.size = Vector3(1.8, 1.0, 3.6)
+ traffic_shape.shape = traffic_box
+ traffic_shape.position.y = 0.62
+ traffic_body.add_child(traffic_shape)
+ root.add_child(traffic_body)
  return root
 
 func _make_pedestrian(index: int) -> Node3D:
@@ -130,6 +139,16 @@ func _make_pedestrian(index: int) -> Node3D:
   leg.material_override = leg_material
   leg.name = "Leg_%s" % side
   root.add_child(leg)
+ var pedestrian_body := StaticBody3D.new()
+ pedestrian_body.name = "PedestrianCollision"
+ var pedestrian_shape := CollisionShape3D.new()
+ var pedestrian_capsule := CapsuleShape3D.new()
+ pedestrian_capsule.radius = 0.24
+ pedestrian_capsule.height = 1.75
+ pedestrian_shape.shape = pedestrian_capsule
+ pedestrian_shape.position.y = 0.88
+ pedestrian_body.add_child(pedestrian_shape)
+ root.add_child(pedestrian_body)
  return root
 
 func _process(delta: float) -> void:
