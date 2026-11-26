@@ -5,6 +5,7 @@ extends Node3D
 @export var vehicle_color := Color(0.02, 0.12, 0.2)
 @export_range(2.0, 12.0, 0.5) var braking_distance := 7.0
 @export_range(1.0, 8.0, 0.5) var acceleration := 3.0
+@export_range(2.0, 14.0, 0.5) var following_distance := 6.5
 var _target_index := 0
 var _current_speed := 0.0
 
@@ -24,10 +25,28 @@ func _process(delta: float) -> void:
         _target_index = (_target_index + 1) % route.size()
         return
     var desired_speed := speed if _has_green_path(direction) else 0.0
+    desired_speed = minf(desired_speed, _safe_follow_speed(direction))
+    if direction.length() < braking_distance:
+        desired_speed *= clampf(direction.length() / braking_distance, 0.15, 1.0)
     _current_speed = move_toward(_current_speed, desired_speed, acceleration * delta)
     position += direction.normalized() * _current_speed * delta
     if direction.length_squared() > 0.001:
         look_at(position + direction, Vector3.UP)
+
+func _safe_follow_speed(direction: Vector3) -> float:
+    var safe_speed := speed
+    for group_name in ["city_traffic", "city_transit_vehicles"]:
+        for other in get_tree().get_nodes_in_group(group_name):
+            if other == self or not is_instance_valid(other):
+                continue
+            var offset: Vector3 = other.global_position - global_position
+            offset.y = 0.0
+            var distance := offset.length()
+            if distance < following_distance and distance > 0.01:
+                if direction.normalized().dot(offset.normalized()) > 0.72:
+                    safe_speed = minf(safe_speed, speed * clampf((distance - 1.8) / maxf(1.0, following_distance - 1.8), 0.0, 1.0))
+    return safe_speed
+
 
 func _has_green_path(direction: Vector3) -> bool:
     var signals := get_tree().get_nodes_in_group("traffic_signals")
