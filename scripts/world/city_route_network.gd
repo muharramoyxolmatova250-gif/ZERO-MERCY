@@ -39,6 +39,18 @@ func build_grid(blocks_per_side: int, spacing: float, road_width: float) -> void
 				pool.append(index)
 		_destinations[category] = pool
 
+func register_destination(category: String, position: Vector3) -> void:
+	if _points.is_empty():
+		return
+	var node_id := _nearest_point(position)
+	var pool: Array = _destinations.get(category, [])
+	if pool.is_empty():
+		pool = []
+		_destinations[category] = pool
+	if not pool.has(node_id):
+		pool.append(node_id)
+	_destinations[category] = pool
+
 func request_activity_route(start_world: Vector3, activity: String, citizen_id: String) -> PackedVector3Array:
 	if _points.is_empty():
 		return PackedVector3Array()
