@@ -803,6 +803,17 @@ func _consider_business_startup(profile: Dictionary) -> void:
     _append_event(profile, "founded_business:" + business_id)
 
 
+func _measure_business_competition(city_id: String, own_business_id: String) -> float:
+    var competitors := 0
+    for resident in resident_profiles.values():
+        if str(resident.get("business_city", resident.get("city", ""))) != city_id:
+            continue
+        var other_id := str(resident.get("business_id", ""))
+        if not other_id.is_empty() and other_id != own_business_id:
+            competitors += 1
+    return clampf(float(competitors) / 12.0, 0.0, 0.85)
+
+
 func _hire_business_workers(owner: Dictionary) -> void:
     var capacity := int(owner.get("business_capacity", 2))
     var workers := int(owner.get("business_workers", 0))
