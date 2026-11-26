@@ -244,7 +244,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		_restart_round()
 
 func _set_aiming(enabled: bool) -> void:
-	 aiming = enabled
+	aiming = enabled
 	camera.fov = 48.0 if aiming else 75.0
 	if weapon_pivot != null:
 		weapon_pivot.position.x = 0.18 if aiming else 0.32
@@ -378,6 +378,14 @@ func _restart_round() -> void:
 	camera.rotation = Vector3.ZERO
 	camera.fov = 75.0
 	aiming = false
+	crouched = false
+	var capsule := player.get_node("CollisionShape3D").shape as CapsuleShape3D
+	capsule.height = 1.8
+	camera.position.y = 0.62
+	if crosshair != null:
+		crosshair.visible = true
+	if weapon_pivot != null:
+		weapon_pivot.position = Vector3(0.32, -0.28, -0.58)
 	round_finished = false
 	_build_bots()
 
