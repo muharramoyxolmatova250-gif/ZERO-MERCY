@@ -7,6 +7,7 @@ run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 
 [autoload]
+GameSession="*res://scripts/core/game_session.gd"
 MissionManager="*res://scripts/story/mission_manager.gd"
 DialogueManager="*res://scripts/story/dialogue_manager.gd"
 SaveManager="*res://scripts/save/save_manager.gd"
