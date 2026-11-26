@@ -840,7 +840,9 @@ func _operate_personal_business(profile: Dictionary) -> void:
     var months := int(profile.get("business_months", 0)) + 1
     var capital := int(profile.get("business_capital", 0))
     _hire_business_workers(profile)
-    var revenue := _rng.randi_range(1800, 6200) + int(profile.get("business_workers", 0)) * 650
+    var competition := _measure_business_competition(str(profile.get("business_city", profile.get("city", ""))), str(profile.get("business_id", "")))
+    profile["business_competition_pressure"] = competition
+    var revenue := int(float(_rng.randi_range(1800, 6200) + int(profile.get("business_workers", 0)) * 650) * (1.0 - competition * 0.22))
     var operating_cost := _rng.randi_range(1200, 3600) + int(profile.get("business_workers", 0)) * 420
     var profit := revenue - operating_cost
     capital = maxi(0, capital + profit)
