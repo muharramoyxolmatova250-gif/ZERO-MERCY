@@ -1506,6 +1506,7 @@ func _load_state() -> void:
     hub_state = parsed.get("hub_state", {})
     resident_profiles = parsed.get("resident_profiles", {})
     social_bonds = parsed.get("social_bonds", {})
+    _social_feed = parsed.get("social_feed", [])
     births_total = int(parsed.get("births_total", 0))
     deaths_total = int(parsed.get("deaths_total", 0))
     marriages_total = int(parsed.get("marriages_total", 0))
@@ -1520,7 +1521,7 @@ func _save_state() -> void:
     var data := {
         "simulation_day": simulation_day, "simulation_month": simulation_month,
         "simulation_year": simulation_year, "hub_state": hub_state,
-        "resident_profiles": resident_profiles, "social_bonds": social_bonds, "births_total": births_total,
+        "resident_profiles": resident_profiles, "social_bonds": social_bonds, "social_feed": _social_feed, "births_total": births_total,
         "deaths_total": deaths_total, "marriages_total": marriages_total,
         "separations_total": separations_total, "graduations_total": graduations_total,
         "career_promotions_total": career_promotions_total,
