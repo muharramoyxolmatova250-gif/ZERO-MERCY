@@ -38,10 +38,10 @@ func _process(delta: float) -> void:
 		var phase := gait * side
 		var target := Vector3(-0.10 - phase * 0.34 * gait_weight + breathing, 0.0, side * 0.035 * gait_weight)
 		pivot.rotation = pivot.rotation.lerp(target, clampf(delta * 12.0, 0.0, 1.0))
-\tfor hinge_index in range(_finger_hinges.size()):
-\t\tvar curl := 0.08 + sprint_weight * 0.22 + sin(_clock * 3.0 + float(hinge_index) * 0.45) * 0.025
-\t\tvar hinge := _finger_hinges[hinge_index]
-\t\thinge.rotation.x = lerpf(hinge.rotation.x, curl, clampf(delta * 9.0, 0.0, 1.0))
+	for hinge_index in range(_finger_hinges.size()):
+		var curl := 0.08 + sprint_weight * 0.22 + sin(_clock * 3.0 + float(hinge_index) * 0.45) * 0.025
+		var hinge := _finger_hinges[hinge_index]
+		hinge.rotation.x = lerpf(hinge.rotation.x, curl, clampf(delta * 9.0, 0.0, 1.0))
 
 func _build_arm(side: float, right_hand: bool) -> void:
 	var arm := Node3D.new()
