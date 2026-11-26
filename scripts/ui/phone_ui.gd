@@ -90,14 +90,19 @@ func _build_phone() -> void:
     status.add_theme_font_size_override("font_size", 10)
     outer.add_child(status)
 
+    var tab_scroll := ScrollContainer.new()
+    tab_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+    tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+    tab_scroll.custom_minimum_size.y = 38
+    outer.add_child(tab_scroll)
     var tabs := HBoxContainer.new()
     tabs.add_theme_constant_override("separation", 4)
-    outer.add_child(tabs)
+    tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    tab_scroll.add_child(tabs)
     for tab in ["feed", "media", "games", "news", "contacts", "life", "missions", "map"]:
         var button := Button.new()
         button.text = tab.to_upper()
-        button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-        button.custom_minimum_size = Vector2(0, 34)
+        button.custom_minimum_size = Vector2(76, 34)
         button.pressed.connect(_set_tab.bind(tab))
         tabs.add_child(button)
 
