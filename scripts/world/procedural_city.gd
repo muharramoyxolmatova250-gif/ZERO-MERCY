@@ -592,7 +592,13 @@ func _build_public_transit_network() -> void:
 		var start_index := bus_index * 4
 		for point_index in range(stop_points.size()):
 			bus_route.append(stop_points[(start_index + point_index) % stop_points.size()])
+		var bus_stop_ids: Array[String] = []
+		for point_index in range(stop_ids.size()):
+			bus_stop_ids.append(stop_ids[(start_index + point_index) % stop_ids.size()])
 		bus.set("route", bus_route)
+		bus.set("route_id", _resolved_settlement_id() + "_bus_loop")
+		bus.set("stop_ids", bus_stop_ids)
+		bus.set("transit_network", network)
 		bus.set("cruise_speed", rng.randf_range(7.0, 9.5))
 		bus.position = bus_route[0]
 		add_child(bus)
