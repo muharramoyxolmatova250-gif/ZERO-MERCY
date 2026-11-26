@@ -119,7 +119,7 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         "life_stage": stage, "occupation": job,
         "education": _education_for_age(age, local_rng),
         "school": SCHOOLS[local_rng.randi_range(0, SCHOOLS.size() - 1)] if stage == "student" else "",
-        "marital_status": "married" if married else "single",
+        "marital_status": "single",
         "partner_id": "family_" + str(abs(hash(citizen_id))) if married else "",
         "children_count": local_rng.randi_range(0, 3) if married and age >= 25 else 0,
         "family_id": "family_" + str(abs(hash(citizen_id))) if married else "",
@@ -457,7 +457,7 @@ func advance_daily_routines(hour: int) -> void:
         elif hour >= 15 and hour < 18:
             activity = "commute" if stage == "adult" else "play"
         elif hour >= 18 and hour < 22:
-            activity = "family" if str(profile.get("marital_status", "single")) == "married" else "social"
+            activity = "family" if str(profile.get("marital_status", "single")) == "partnered" or not Array(profile.get("children_ids", [])).is_empty() else "social"
         profile["last_activity"] = activity
         profile["schedule_hour"] = hour
         if activity in ["family", "social", "play", "leisure"]:
