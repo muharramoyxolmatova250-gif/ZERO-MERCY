@@ -66,3 +66,18 @@ func _attach_system(parent: Node, node_name: String, script_resource: Script) ->
 	system.set_script(script_resource)
 	parent.add_child(system)
 	return system
+
+func get_inventory_snapshot() -> Dictionary:
+	if not is_instance_valid(inventory):
+		return {}
+	return inventory.call("get_snapshot")
+
+func restore_inventory_snapshot(snapshot: Dictionary) -> bool:
+	if not is_instance_valid(inventory):
+		return false
+	return bool(inventory.call("restore_snapshot", snapshot))
+
+func get_item_count(item_id: String) -> int:
+	if not is_instance_valid(inventory):
+		return 0
+	return int(inventory.call("get_item_count", item_id))
