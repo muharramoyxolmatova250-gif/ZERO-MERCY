@@ -1560,3 +1560,81 @@ func _ensure_phone_profile(citizen_id: String) -> Dictionary:
         resident_profiles[citizen_id] = profile
         _dirty = true
     return profile
+
+
+func get_phone_snapshot(citizen_id: String) -> Dictionary:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return {}
+    return {
+        "phone_id": str(profile.get("phone_id", "")),
+        "model": str(profile.get("phone_model", "Neon One")),
+        "number": str(profile.get("phone_number", "")),
+        "contacts": (profile.get("phone_contacts", []) as Array).duplicate(true),
+        "inbox": (profile.get("phone_inbox", []) as Array).duplicate(true),
+        "outbox": (profile.get("phone_outbox", []) as Array).duplicate(true),
+        "calls": (profile.get("phone_call_history", []) as Array).duplicate(true),
+        "notifications": (profile.get("phone_notifications", []) as Array).duplicate(true),
+        "battery": float(profile.get("phone_battery", 100.0))
+    }
+
+
+func send_phone_message(sender_id: String, recipient_id: String, message_text: String, message_kind: String = "text") -> bool:
+    if sender_id == recipient_id or message_text.strip_edges().is_empty():
+        return false
+    if not resident_profiles.has(sender_id) or not resident_profiles.has(recipient_id):
+        return false
+    var sender := _ensure_phone_profile(sender_id)
+    var recipient := _ensure_phone_profile(recipient_id)
+    var message := {
+        "id": "msg_" + str(Time.get_unix_time_from_system()) + "_" + str(_rng.randi()),
+        "from": sender_id, "to": recipient_id, "text": message_text,
+        "kind": message_kind, "day": simulation_day, "read": false
+    }
+    var inbox: Array = recipient.get("phone_inbox", [])
+    inbox.append(message.duplicate(true))
+    while inbox.size() > 80:
+        inbox.pop_front()
+    recipient["phone_inbox"] = inbox
+    var outbox: Array = sender.get("phone_outbox", [])
+    outbox.append(message.duplicate(true))
+    while outbox.size() > 80:
+        outbox.pop_front()
+    sender["phone_outbox"] = outbox
+    _add_phone_contact(sender_id, recipient_id)
+    _add_phone_contact(recipient_id, sender_id)
+    _add_phone_notification(recipient_id, "message", "New message from " + str(sender.get("name", sender_id)))
+    sender["phone_last_used_day"] = simulation_day
+    recipient["phone_last_used_day"] = simulation_day
+    resident_profiles[sender_id] = sender
+    resident_profiles[recipient_id] = recipient
+    record_event(sender_id, "sent_phone_message:" + recipient_id)
+    record_event(recipient_id, "received_phone_message:" + sender_id)
+    _dirty = true
+    return true
+
+
+func _add_phone_contact(owner_id: String, contact_id: String) -> void:
+    var owner := _ensure_phone_profile(owner_id)
+    if owner.is_empty():
+        return
+    var contacts: Array = owner.get("phone_contacts", [])
+    for contact in contacts:
+        if str(contact.get("id", "")) == contact_id:
+            return
+    var contact_profile: Dictionary = resident_profiles.get(contact_id, {})
+    contacts.append({"id": contact_id, "name": str(contact_profile.get("name", contact_id)), "number": str(contact_profile.get("phone_number", ""))})
+    owner["phone_contacts"] = contacts
+    resident_profiles[owner_id] = owner
+
+
+func _add_phone_notification(citizen_id: String, kind: String, title: String) -> void:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return
+    var notifications: Array = profile.get("phone_notifications", [])
+    notifications.append({"kind": kind, "title": title, "day": simulation_day, "read": false})
+    while notifications.size() > 40:
+        notifications.pop_front()
+    profile["phone_notifications"] = notifications
+    resident_profiles[citizen_id] = profile
