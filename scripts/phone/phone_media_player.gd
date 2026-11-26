@@ -4,6 +4,7 @@ extends Control
 @onready var image: TextureRect = $Layout/MediaFrame/Image
 @onready var status: Label = $Layout/Status
 @onready var source_path: LineEdit = $Layout/SourcePath
+@onready var feed_list: VBoxContainer = $Layout/FeedScroll/FeedList
 
 func _ready() -> void:
 	video.finished.connect(_on_video_finished)
@@ -11,6 +12,23 @@ func _ready() -> void:
 	$Layout/Actions/Stop.pressed.connect(_on_stop_pressed)
 	status.text = "Choose an imported video (.ogv) or image asset."
 	image.hide()
+
+func load_feed(items: Array) -> void:
+	for child in feed_list.get_children():
+		child.queue_free()
+	for item in items:
+		if not item is Dictionary:
+			continue
+		var record: Dictionary = item
+		var title := str(record.get("title", record.get("caption", "Untitled media")))
+		var path := str(record.get("asset_path", record.get("file_path", "")))
+		var entry := Button.new()
+		entry.text = title + ("  •  " + path.get_file() if not path.is_empty() else "  •  Media file unavailable")
+		entry.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		entry.pressed.connect(func() -> void: open_media(record))
+		feed_list.add_child(entry)
+	if items.is_empty():
+		status.text = "No media items in this feed yet."
 
 func open_media(media: Dictionary) -> bool:
 	var path := str(media.get("asset_path", media.get("file_path", ""))).strip_edges()
