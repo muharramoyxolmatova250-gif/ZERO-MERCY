@@ -4,6 +4,7 @@ extends Node
 var _points: Array[Vector3] = []
 var _adjacency: Array[Array] = []
 var _destinations: Dictionary = {}
+var _registered_categories: Dictionary = {}
 
 func _ready() -> void:
 	add_to_group("pedestrian_route_network")
@@ -12,6 +13,7 @@ func build_grid(blocks_per_side: int, spacing: float, road_width: float) -> void
 	_points.clear()
 	_adjacency.clear()
 	_destinations.clear()
+	_registered_categories.clear()
 	var side_offset := road_width * 0.5 + 1.8
 	var first := -float(blocks_per_side) * spacing * 0.5
 	var grid_size := blocks_per_side + 1
@@ -43,10 +45,11 @@ func register_destination(category: String, position: Vector3) -> void:
 	if _points.is_empty():
 		return
 	var node_id := _nearest_point(position)
+	# Prefer actual generated building entrances over synthetic fallback nodes.
+	if not bool(_registered_categories.get(category, false)):
+		_destinations[category] = []
+		_registered_categories[category] = true
 	var pool: Array = _destinations.get(category, [])
-	if pool.is_empty():
-		pool = []
-		_destinations[category] = pool
 	if not pool.has(node_id):
 		pool.append(node_id)
 	_destinations[category] = pool
@@ -69,7 +72,7 @@ func request_activity_route(start_world: Vector3, activity: String, citizen_id: 
 	return result
 
 func get_network_snapshot() -> Dictionary:
-	return {"nodes": _points.size(), "edges": _count_edges(), "destination_categories": _destinations.size()}
+	return {"nodes": _points.size(), "edges": _count_edges(), "destination_categories": _destinations.size(), "registered_building_categories": _registered_categories.size(), "destination_counts": _destination_counts()}
 
 func _add_point(point: Vector3) -> int:
 	var index := _points.size()
@@ -146,3 +149,9 @@ func _count_edges() -> int:
 	for links in _adjacency:
 		total += links.size()
 	return int(total / 2)
+
+func _destination_counts() -> Dictionary:
+	var counts: Dictionary = {}
+	for category in _destinations:
+		counts[str(category)] = (_destinations[category] as Array).size()
+	return counts
