@@ -68,7 +68,7 @@ func _spawn_police_vehicle() -> void:
 func _spawn_roadblock() -> void:
  var block := StaticBody3D.new()
  block.name = "PoliceRoadblock"
- block.position = _player.global_position + Vector3(0.0, 0.0, -13.0)
+ block.global_position = _player.global_position - _player.global_transform.basis.z * 13.0
  block.rotation.y = _player.rotation.y
  block.set_script(load("res://scripts/police/police_roadblock.gd"))
  get_tree().current_scene.add_child(block)
