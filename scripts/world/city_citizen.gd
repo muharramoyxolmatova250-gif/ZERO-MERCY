@@ -99,6 +99,8 @@ func _physics_process(delta: float) -> void:
 		var spatial_index := get_tree().get_first_node_in_group("citizen_spatial_index")
 		if spatial_index != null:
 			spatial_index.call("update_citizen", self)
+	if _taxi_riding:
+		return
 	if _crime_flee_timer > 0.0:
 		_crime_flee_timer = maxf(0.0, _crime_flee_timer - delta)
 		position += _crime_flee_direction * walk_speed * 2.1 * delta
