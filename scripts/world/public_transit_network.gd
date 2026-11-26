@@ -2,11 +2,15 @@ extends Node
 ## Lightweight public transport route registry and stop-to-stop trip planner.
 var _stops: Dictionary = {}
 var _routes: Dictionary = {}
+var _waiting_passengers: Dictionary = {}
+var _total_boardings := 0
+var _total_generated_passengers := 0
 
 func register_stop(stop_id: String, position: Vector3, name: String = "") -> bool:
 	if stop_id.is_empty():
 		return false
 	_stops[stop_id] = {"id": stop_id, "name": name if not name.is_empty() else stop_id, "position": position}
+	_waiting_passengers[stop_id] = 0
 	return true
 
 func register_route(route_id: String, stop_ids: Array[String], vehicle_type: String = "bus", interval_minutes: int = 12) -> bool:
@@ -62,6 +66,33 @@ func get_stop_snapshot() -> Array[Dictionary]:
 		result.append(_stops[stop_id].duplicate(true))
 	return result
 
+func add_waiting_passengers(stop_id: String, amount: int) -> int:
+	if not _stops.has(stop_id):
+		return 0
+	var current := int(_waiting_passengers.get(stop_id, 0))
+	var added := mini(maxi(0, amount), 60 - current)
+	_waiting_passengers[stop_id] = current + added
+	_total_generated_passengers += added
+	return added
+
+func board_waiting_passengers(stop_id: String, available_seats: int) -> int:
+	if not _stops.has(stop_id):
+		return 0
+	var waiting := int(_waiting_passengers.get(stop_id, 0))
+	var boarded := mini(waiting, maxi(0, available_seats))
+	_waiting_passengers[stop_id] = waiting - boarded
+	_total_boardings += boarded
+	return boarded
+
+func get_waiting_passengers(stop_id: String) -> int:
+	return int(_waiting_passengers.get(stop_id, 0))
+
+func get_passenger_statistics() -> Dictionary:
+	var waiting_total := 0
+	for count in _waiting_passengers.values():
+		waiting_total += int(count)
+	return {"waiting": waiting_total, "boardings": _total_boardings, "generated": _total_generated_passengers}
+
 func report_vehicle_stop(route_id: String, stop_id: String, passengers: int) -> void:
 	if not _routes.has(route_id) or not _stops.has(stop_id):
 		return
@@ -97,4 +128,4 @@ func get_transit_snapshot() -> Dictionary:
 	for route in _routes.values():
 		if bool(route.get("active", true)):
 			active_routes += 1
-	return {"stops": _stops.size(), "routes": _routes.size(), "active_routes": active_routes}
+	return {"stops": _stops.size(), "routes": _routes.size(), "active_routes": active_routes, "passengers_waiting": get_passenger_statistics().get("waiting", 0), "total_boardings": _total_boardings}
