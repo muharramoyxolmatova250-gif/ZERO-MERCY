@@ -1,4 +1,6 @@
 extends Node3D
+
+signal game_exited
 ## Standalone playable tactical FPS foundation: movement, aiming, hits, bots and round objective.
 const BOT_COUNT := 5
 const ROUND_SECONDS := 240.0
@@ -220,6 +222,20 @@ func _build_hud() -> void:
 	crosshair.add_theme_font_size_override("font_size", 28)
 	layer.add_child(crosshair)
 	_update_hud()
+	var exit_button := Button.new()
+	exit_button.text = "EXIT TO PHONE"
+	exit_button.anchor_left = 1.0
+	exit_button.anchor_right = 1.0
+	exit_button.offset_left = -190.0
+	exit_button.offset_right = -24.0
+	exit_button.offset_top = 22.0
+	exit_button.offset_bottom = 66.0
+	exit_button.pressed.connect(_exit_to_phone)
+	layer.add_child(exit_button)
+
+func _exit_to_phone() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	game_exited.emit()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and not mouse_captured:
