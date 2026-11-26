@@ -561,6 +561,7 @@ func advance_month() -> void:
             _start_independent_life(profile)
         if new_stage == "adult":
             _advance_career_month(profile)
+            _process_job_interview(profile)
         if new_age >= 82 and _rng.randf() < 0.006:
             profile["life_stage"] = "deceased"
             profile["active"] = false
@@ -716,6 +717,30 @@ func _career_specialization(education: String, performance: float, rng: RandomNu
     elif performance < 0.45:
         fields = ["courier", "merchant", "artist", "mechanic"]
     return str(fields[rng.randi_range(0, fields.size() - 1)])
+
+
+func _process_job_interview(profile: Dictionary) -> void:
+    if str(profile.get("life_stage", "")) != "adult":
+        return
+    var occupation := str(profile.get("occupation", "unemployed"))
+    if occupation not in ["unemployed", "resident"]:
+        return
+    var education := str(profile.get("education", "secondary"))
+    var chance := 0.16 + float(profile.get("academic_performance", 0.5)) * 0.22
+    if education in ["university", "postgraduate", "graduated"]:
+        chance += 0.2
+    if _rng.randf() > clampf(chance, 0.05, 0.7):
+        profile["job_search_status"] = "application_rejected"
+        _append_event(profile, "job_interview_rejected")
+        return
+    var preferred := str(profile.get("career_field", ""))
+    if preferred.is_empty() or preferred not in JOBS:
+        preferred = _career_specialization(education, float(profile.get("academic_performance", 0.5)), _rng)
+    profile["occupation"] = preferred
+    profile["career_field"] = preferred
+    profile["job_search_status"] = "employed"
+    profile["career_satisfaction"] = maxf(0.45, float(profile.get("career_satisfaction", 0.5)))
+    _append_event(profile, "job_interview_passed:" + preferred)
 
 
 func _advance_career_month(profile: Dictionary) -> void:
