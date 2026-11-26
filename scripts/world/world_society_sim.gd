@@ -14,6 +14,8 @@ var simulation_hour := 8
 var _elapsed := 0.0
 var _rng := RandomNumberGenerator.new()
 var total_generated_posts := 0
+var crime_events_total := 0
+var current_wanted_level := 0
 func _ready() -> void:
  add_to_group("world_society_sim")
  _rng.randomize()
@@ -32,7 +34,35 @@ func _ready() -> void:
   city_state.append({"city":city,"population_cohort":100000,"employment":_rng.randf_range(0.82,0.97),"public_mood":_rng.randf_range(0.35,0.75),"crime_pressure":_rng.randf_range(0.03,0.18),"infrastructure":_rng.randf_range(0.65,0.98),"active_events":[]})
  for institution in INSTITUTIONS:
   institution_activity[institution] = {"staff_on_duty":_rng.randi_range(120,12000),"service_load":_rng.randf_range(0.1,0.8),"budget_health":_rng.randf_range(0.55,1.0),"active":true}
+ if has_node("/root/GameSession"):
+  GameSession.session_clock_changed.connect(_on_session_clock_changed)
+  GameSession.crime_reported.connect(_on_crime_reported)
+  GameSession.wanted_level_changed.connect(_on_wanted_level_changed)
+  simulation_hour = floori(GameSession.day_time_hours)
  _advance_world()
+func _on_session_clock_changed(hour: float) -> void:
+ simulation_hour = floori(hour)
+
+func _on_wanted_level_changed(level: int, _reason: String) -> void:
+ current_wanted_level = clampi(level, 0, 5)
+ if institution_activity.has("police"):
+  var police: Dictionary = institution_activity["police"]
+  police["service_load"] = clampf(0.2 + float(current_wanted_level) * 0.15, 0.0, 1.0)
+  institution_activity["police"] = police
+
+func _on_crime_reported(crime_id: String, _world_position: Vector3, severity: int) -> void:
+ crime_events_total += 1
+ if not city_state.is_empty():
+  var state: Dictionary = city_state[0]
+  state["crime_pressure"] = clampf(float(state.get("crime_pressure", 0.08)) + 0.025 * float(severity), 0.0, 1.0)
+  state["public_mood"] = clampf(float(state.get("public_mood", 0.6)) - 0.015 * float(severity), 0.0, 1.0)
+  city_state[0] = state
+ var post := {"post_id":"ZM-CRIME-"+str(crime_events_total),"city":"Current District","author_id":"city_alert","author_name":"City Safety Network","topic":"public_safety","likes":0,"comments":0,"created_day":simulation_day,"created_hour":simulation_hour,"caption":"Public safety alert: incident reported ("+crime_id+"). Emergency services have been notified.","video":false}
+ social_feed.push_front(post)
+ total_generated_posts += 1
+ while social_feed.size() > 300:
+  social_feed.pop_back()
+
 func _process(delta: float) -> void:
  _elapsed += delta
  if _elapsed >= update_interval:
@@ -52,10 +82,6 @@ func _sync_settlement_hubs() -> void:
 
 func _advance_world() -> void:
  _sync_settlement_hubs()
- simulation_hour += 1
- if simulation_hour >= 24:
-  simulation_hour = 0
-  simulation_day += 1
  for i in range(city_state.size()):
   var state: Dictionary = city_state[i]
   state["employment"] = clampf(float(state.employment) + _rng.randf_range(-0.004,0.004),0.55,0.99)
@@ -128,7 +154,7 @@ func _caption_for(topic: String, city: String) -> String:
   "street_art": return "Fresh street art spotted in "+city+"."
   _: return "Live update from "+city+"."
 func get_world_society_snapshot() -> Dictionary:
- return {"cities":city_state.size(),"institutions":institution_activity.size(),"feed_posts_cached":social_feed.size(),"posts_generated":total_generated_posts,"simulation_day":simulation_day,"simulation_hour":simulation_hour}
+ return {"cities":city_state.size(),"institutions":institution_activity.size(),"feed_posts_cached":social_feed.size(),"posts_generated":total_generated_posts,"simulation_day":simulation_day,"simulation_hour":simulation_hour,"crime_events":crime_events_total,"wanted_level":current_wanted_level}
 func get_social_feed(limit: int = 20) -> Array[Dictionary]:
  var result: Array[Dictionary] = []
  for i in range(mini(limit,social_feed.size())):
