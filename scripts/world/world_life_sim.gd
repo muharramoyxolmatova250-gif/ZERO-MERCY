@@ -38,6 +38,7 @@ func _ready() -> void:
     if has_node("/root/GameSession"):
         GameSession.session_clock_changed.connect(_on_session_clock_changed)
     _load_state()
+    _build_phone_media_catalog()
     _rebuild_claim_cache()
     for city_id in START_HUBS:
         _ensure_hub(city_id)
@@ -1720,3 +1721,124 @@ func react_to_phone_post(citizen_id: String, post_id: String) -> bool:
         _dirty = true
         return true
     return false
+
+
+const PHONE_VIDEO_TOPICS := ["street_racing", "cyberpunk_music", "wildlife", "space_exploration", "cooking", "sports", "fashion", "comedy", "technology", "travel", "mystery", "parkour", "cars", "dance", "documentary", "gaming"]
+const PHONE_IMAGE_TOPICS := ["night_city", "neon_architecture", "supercars", "street_food", "wildlife", "fashion", "space", "sports", "landscapes", "gadgets", "street_art", "portraits"]
+
+
+func _build_phone_media_catalog() -> void:
+    if not _social_feed.is_empty():
+        return
+    var creators := ["NovaLens", "CyberNomad", "PixelRider", "MiraVox", "UrbanGhost", "KaitoLive", "LunaFrame", "ZeroByte", "NeonChef", "WildEarth"]
+    for index in range(240):
+        var topic: String = PHONE_VIDEO_TOPICS[index % PHONE_VIDEO_TOPICS.size()]
+        var creator: String = creators[index % creators.size()]
+        var media := {
+            "id": "video_%04d" % index, "type": "video",
+            "title": _phone_video_title(topic, index),
+            "creator": creator, "topic": topic,
+            "duration_seconds": 15 + (index * 17) % 420,
+            "views": 1200 + (index * 7919) % 9000000,
+            "likes": 40 + (index * 137) % 500000,
+            "asset_key": "phone_video_" + topic + "_" + str(index % 12),
+            "day": simulation_day, "is_seeded": true
+        }
+        _social_feed.append(media)
+    for index in range(180):
+        var topic: String = PHONE_IMAGE_TOPICS[index % PHONE_IMAGE_TOPICS.size()]
+        _social_feed.append({
+            "id": "image_%04d" % index, "type": "image",
+            "title": _phone_image_title(topic, index),
+            "creator": creators[(index * 3) % creators.size()],
+            "topic": topic, "likes": 25 + (index * 97) % 80000,
+            "asset_key": "phone_image_" + topic + "_" + str(index % 15),
+            "day": simulation_day, "is_seeded": true
+        })
+    _dirty = true
+
+
+func _phone_video_title(topic: String, index: int) -> String:
+    var titles := {
+        "street_racing": ["Neon tunnel night run", "Electric hypercar launch", "Rainy highway drift"],
+        "cyberpunk_music": ["Midnight synthwave session", "Underground club live set", "Rooftop music mix"],
+        "wildlife": ["Rare animals of Earth", "Wild forest camera", "Ocean life in 4K"],
+        "space_exploration": ["Beyond the lunar frontier", "Mars colony update", "Deep space discoveries"],
+        "cooking": ["Street food masterclass", "Five-minute night noodles", "Chef's secret recipe"],
+        "sports": ["Championship final highlights", "Rooftop basketball challenge", "Extreme athlete training"],
+        "fashion": ["Neo-Tokyo streetwear", "Future style runway", "Custom cybernetic accessories"],
+        "comedy": ["Unexpected city moments", "Stand-up from District 9", "Prank in the neon market"],
+        "technology": ["Next-gen cybernetics explained", "AI lab behind the scenes", "Future gadgets review"],
+        "travel": ["24 hours in Neo-Seoul", "Hidden places of Earth", "Across the megacity"],
+        "mystery": ["Unsolved signal from Sector 7", "Abandoned station exploration", "The midnight mystery"],
+        "parkour": ["Rooftop freerun compilation", "Impossible wall run", "Urban movement training"],
+        "cars": ["Hypercar sound showcase", "Classic engine restoration", "Autonomous car test"],
+        "dance": ["Neon street dance battle", "Zero-gravity dance routine", "Dance crew showcase"],
+        "documentary": ["People of the megacity", "Earth's changing climate", "Inside a robotics factory"],
+        "gaming": ["Ranked arena clutch", "Squad survival highlights", "Tactical team play"]
+    }
+    var choices: Array = titles.get(topic, ["Daily creator video"])
+    return str(choices[index % choices.size()])
+
+
+func _phone_image_title(topic: String, index: int) -> String:
+    return topic.replace("_", " ").capitalize() + " photo #" + str(index + 1)
+
+
+func get_phone_media_feed(media_type: String = "all", limit: int = 60) -> Array:
+    var result: Array = []
+    for item in _social_feed:
+        if media_type == "all" or str(item.get("type", "post")) == media_type:
+            result.append(item.duplicate(true))
+    var start := maxi(0, result.size() - maxi(1, limit))
+    result.reverse()
+    return result.slice(0, maxi(1, limit))
+
+
+func record_phone_media_view(citizen_id: String, media_id: String, watch_seconds: float) -> bool:
+    if not resident_profiles.has(citizen_id):
+        return false
+    var profile := _ensure_phone_profile(citizen_id)
+    var history: Array = profile.get("phone_watch_history", [])
+    history.append({"media_id": media_id, "day": simulation_day, "watch_seconds": maxf(0.0, watch_seconds)})
+    while history.size() > 100:
+        history.pop_front()
+    profile["phone_watch_history"] = history
+    profile["phone_battery"] = maxf(0.0, float(profile.get("phone_battery", 100.0)) - maxf(0.01, watch_seconds * 0.0008))
+    profile["phone_last_used_day"] = simulation_day
+    resident_profiles[citizen_id] = profile
+    for index in range(_social_feed.size() - 1, -1, -1):
+        var media: Dictionary = _social_feed[index]
+        if str(media.get("id", "")) == media_id:
+            media["views"] = int(media.get("views", 0)) + 1
+            _social_feed[index] = media
+            break
+    _dirty = true
+    return true
+
+
+func publish_phone_media(citizen_id: String, media_type: String, title: String, topic: String, caption: String = "") -> bool:
+    if not resident_profiles.has(citizen_id) or media_type not in ["video", "image", "post"]:
+        return false
+    var profile := _ensure_phone_profile(citizen_id)
+    var media_id := "ugc_" + str(Time.get_unix_time_from_system()) + "_" + str(_rng.randi())
+    var item := {
+        "id": media_id, "type": media_type,
+        "title": title, "caption": caption,
+        "creator": str(profile.get("name", citizen_id)),
+        "author_id": citizen_id, "topic": topic,
+        "views": 0, "likes": 0, "day": simulation_day,
+        "asset_key": "ugc_" + media_type + "_" + topic
+    }
+    _social_feed.append(item)
+    var personal: Array = profile.get("phone_social_posts", [])
+    personal.append(item.duplicate(true))
+    while personal.size() > 60:
+        personal.pop_front()
+    profile["phone_social_posts"] = personal
+    resident_profiles[citizen_id] = profile
+    while _social_feed.size() > 1000:
+        _social_feed.pop_front()
+    record_event(citizen_id, "uploaded_phone_" + media_type)
+    _dirty = true
+    return true
