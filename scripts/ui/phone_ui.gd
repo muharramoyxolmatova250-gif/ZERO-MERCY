@@ -90,7 +90,7 @@ func _build_phone() -> void:
     var tabs := HBoxContainer.new()
     tabs.add_theme_constant_override("separation", 4)
     outer.add_child(tabs)
-    for tab in ["feed", "news", "contacts", "life", "missions", "map"]:
+    for tab in ["feed", "media", "games", "news", "contacts", "life", "missions", "map"]:
         var button := Button.new()
         button.text = tab.to_upper()
         button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -130,6 +130,10 @@ func _refresh_content() -> void:
     match _active_tab:
         "feed":
             _build_feed()
+        "media":
+            _build_media_hub()
+        "games":
+            _build_games_hub()
         "news":
             _build_news()
         "contacts":
@@ -325,3 +329,83 @@ func _format_number(value: int) -> String:
             result += ","
         result += source[index]
     return result
+
+
+func _build_media_hub() -> void:
+    _add_section_title("ZERO MEDIA // REAL ASSETS")
+    _add_body("Open the media library. Only imported video and image files can play; feed entries without licensed local assets remain metadata.")
+    var open := Button.new()
+    open.text = "OPEN MEDIA PLAYER"
+    open.custom_minimum_size = Vector2(0, 46)
+    open.pressed.connect(_open_media_player)
+    _content.add_child(open)
+    if _life != null and _life.has_method("get_phone_media_feed"):
+        var items: Array = _life.call("get_phone_media_feed", "all", 24)
+        _add_stat("FEED ITEMS", str(items.size()))
+        var playable := 0
+        for item in items:
+            var path := str(item.get("asset_path", item.get("file_path", "")))
+            if not path.is_empty() and ResourceLoader.exists(path):
+                playable += 1
+        _add_stat("INSTALLED MEDIA ASSETS", str(playable))
+    else:
+        _add_body("Media feed is connecting…")
+
+func _open_media_player() -> void:
+    var layer := CanvasLayer.new()
+    layer.name = "PhoneMediaPlayerLayer"
+    layer.layer = 45
+    var scene := load("res://scenes/ui/phone_media_player.tscn") as PackedScene
+    if scene == null:
+        _add_body("Media player scene could not be loaded.")
+        return
+    var player_ui := scene.instantiate()
+    layer.add_child(player_ui)
+    get_tree().root.add_child(layer)
+    if _life != null and _life.has_method("get_phone_media_feed"):
+        player_ui.call("load_feed", _life.call("get_phone_media_feed", "all", 60))
+    if player_ui.has_signal("close_requested"):
+        player_ui.close_requested.connect(func() -> void:
+            layer.queue_free()
+            set_phone_open(true)
+        )
+    set_phone_open(false)
+
+func _build_games_hub() -> void:
+    _add_section_title("ZERO PLAY // GAME CENTER")
+    _add_body("Tactical Breach is the first playable in-world phone game prototype. It is a local single-player match, not online PUBG or Counter-Strike multiplayer.")
+    var game := Button.new()
+    game.text = "LAUNCH TACTICAL BREACH"
+    game.custom_minimum_size = Vector2(0, 48)
+    game.pressed.connect(_launch_tactical_breach)
+    _content.add_child(game)
+    _add_body("Controls: WASD / touch joystick, mouse or touch aim, fire, reload, sprint, crouch. Five training opponents.")
+    if _life != null and _life.has_method("get_phone_game_stats"):
+        var stats: Dictionary = _life.call("get_phone_game_stats", "player")
+        _add_stat("MATCHES PLAYED", str(stats.get("matches", 0)))
+
+func _launch_tactical_breach() -> void:
+    var scene := load("res://scenes/games/tactical_fps_match.tscn") as PackedScene
+    if scene == null:
+        _add_body("Tactical Breach scene could not be loaded.")
+        return
+    var game := scene.instantiate()
+    var player := get_parent().get_node_or_null("Dara") as CharacterBody3D
+    if player != null:
+        player.set_physics_process(false)
+        var player_camera := player.get_node_or_null("CameraPivot/Camera3D") as Camera3D
+        if player_camera != null:
+            player_camera.current = false
+    game.name = "PhoneTacticalBreach"
+    if game.has_signal("game_exited"):
+        game.game_exited.connect(func() -> void:
+            if is_instance_valid(player):
+                player.set_physics_process(true)
+                var player_camera := player.get_node_or_null("CameraPivot/Camera3D") as Camera3D
+                if player_camera != null:
+                    player_camera.current = true
+            game.queue_free()
+            set_phone_open(true)
+        )
+    get_parent().add_child(game)
+    set_phone_open(false)
