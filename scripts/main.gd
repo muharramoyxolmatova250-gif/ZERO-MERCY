@@ -13,10 +13,12 @@ const PHONE_UI_SCRIPT := preload("res://scripts/ui/phone_ui.gd")
 const MISSION_DIRECTOR_SCRIPT := preload("res://scripts/story/mission_objective_director.gd")
 const DIALOGUE_UI_SCRIPT := preload("res://scripts/ui/dialogue_ui.gd")
 const GRAPHICS_PROFILE_SCRIPT := preload("res://scripts/rendering/graphics_profile_manager.gd")
+const GAMEPLAY_BRIDGE_SCRIPT := preload("res://scripts/core/gameplay_system_bridge.gd")
 var _graphics_profile: Node
 const EARTH_OVERVIEW_SCENE := preload("res://scenes/world/earth_overview.tscn")
 var _earth_overview: Node3D
 var _player: CharacterBody3D
+var _gameplay_bridge: Node
 var rng := RandomNumberGenerator.new()
 var _autosave_elapsed := 0.0
 const AUTOSAVE_INTERVAL := 30.0
@@ -33,6 +35,7 @@ func _ready() -> void:
  player.position = Vector3(0, 1.2, 12)
  _player = player
  add_child(player)
+ _start_gameplay_system_bridge(player)
  SaveManager.restore_player_state(player)
  _start_region_streaming()
  _start_global_world_simulation()
@@ -324,3 +327,12 @@ func _notification(what: int) -> void:
  if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_PREDELETE:
   if is_instance_valid(_player):
    SaveManager.save_player_state(_player)
+
+
+func _start_gameplay_system_bridge(player: Node) -> void:
+	_gameplay_bridge = Node.new()
+	_gameplay_bridge.name = "GameplaySystemBridge"
+	_gameplay_bridge.set_script(GAMEPLAY_BRIDGE_SCRIPT)
+	add_child(_gameplay_bridge)
+	_gameplay_bridge.call("bind_player", player)
+	_gameplay_bridge.call("bind_world", self)
