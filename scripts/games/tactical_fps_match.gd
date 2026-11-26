@@ -14,13 +14,17 @@ var reloading := false
 var reload_left := 0.0
 var bots: Array[CharacterBody3D] = []
 var mouse_captured := false
+var touch_move := Vector2.ZERO
+var touch_controls: Control
 
 func _ready() -> void:
 	_build_arena()
 	_build_player()
 	_build_bots()
 	_build_hud()
-	_capture_mouse()
+	_build_touch_controls()
+	if not OS.has_feature("mobile"):
+		_capture_mouse()
 	for action in ["fps_forward", "fps_back", "fps_left", "fps_right", "fps_jump"]:
 		if not InputMap.has_action(action):
 			InputMap.add_action(action)
@@ -29,6 +33,27 @@ func _ready() -> void:
 	_bind_key("fps_left", KEY_A)
 	_bind_key("fps_right", KEY_D)
 	_bind_key("fps_jump", KEY_SPACE)
+
+func _build_touch_controls() -> void:
+	var touch_script := load("res://scripts/games/fps_touch_controls.gd")
+	touch_controls = Control.new()
+	touch_controls.set_script(touch_script)
+	touch_controls.name = "MobileControls"
+	$".".add_child(touch_controls)
+	touch_controls.movement_changed.connect(func(direction: Vector2) -> void: touch_move = direction)
+	touch_controls.aim_changed.connect(_on_touch_aim)
+	touch_controls.fire_pressed.connect(_fire)
+	touch_controls.reload_pressed.connect(_start_reload)
+	touch_controls.jump_pressed.connect(_jump)
+
+func _on_touch_aim(delta: Vector2) -> void:
+	player.rotate_y(-delta.x * 0.003)
+	camera.rotate_x(-delta.y * 0.003)
+	camera.rotation.x = clampf(camera.rotation.x, -1.45, 1.45)
+
+func _jump() -> void:
+	if player.is_on_floor():
+		player.velocity.y = 5.0
 
 func _bind_key(action: String, key: Key) -> void:
 	var event := InputEventKey.new()
@@ -158,7 +183,7 @@ func _physics_process(delta: float) -> void:
 			ammo += loaded
 			reserve_ammo -= loaded
 			reloading = false
-	var input := Vector2(Input.get_action_strength("fps_right") - Input.get_action_strength("fps_left"), Input.get_action_strength("fps_back") - Input.get_action_strength("fps_forward"))
+	var input := Vector2(Input.get_action_strength("fps_right") - Input.get_action_strength("fps_left"), Input.get_action_strength("fps_back") - Input.get_action_strength("fps_forward")) + touch_move
 	var wish := (player.transform.basis * Vector3(input.x, 0, input.y)).normalized()
 	player.velocity.x = wish.x * 5.2
 	player.velocity.z = wish.z * 5.2
