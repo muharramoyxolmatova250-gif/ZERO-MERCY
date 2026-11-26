@@ -177,12 +177,17 @@ func _build_environment() -> void:
  world_env.environment = environment
  add_child(world_env)
  var sun := DirectionalLight3D.new()
+ sun.name = "GlobalSun"
  sun.rotation_degrees = Vector3(-48, -28, 0)
  sun.light_color = Color(0.35, 0.42, 0.8)
  sun.light_energy = 0.25
  sun.shadow_enabled = true
  sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
  add_child(sun)
+ var day_night := Node.new()
+ day_night.name = "DayNightController"
+ day_night.set_script(load("res://scripts/world/day_night_controller.gd"))
+ add_child(day_night)
 
 func _build_city() -> void:
  # Use the actual global runtime index at the player's spawn cell. Do not hard-code
