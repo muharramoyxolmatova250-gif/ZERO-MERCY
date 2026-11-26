@@ -135,6 +135,7 @@ func _build_dara_visual() -> void:
 				feature.reparent(head_pivot, true)
 	for side in [-1.0, 1.0]:
 		var suffix := "-1.0" if side < 0.0 else "1.0"
+		_dara_visual_nodes["Shoulder_%s" % suffix] = _create_visual_joint("Shoulder_%s" % suffix, Vector3(side * 0.39, 1.42, 0.0))
 		_dara_visual_nodes["UpperArm_%s" % suffix] = _create_visual_joint("UpperArm_%s" % suffix, Vector3(side * 0.39, 1.36, 0.0))
 		_dara_visual_nodes["Forearm_%s" % suffix] = _create_visual_joint("Forearm_%s" % suffix, Vector3(side * 0.46, 0.97, -0.025))
 		_dara_visual_nodes["Thigh_%s" % suffix] = _create_visual_joint("Thigh_%s" % suffix, Vector3(side * 0.17, 0.74, 0.0))
