@@ -22,6 +22,8 @@ var crouched := false
 var sprinting := false
 var rounds_won := 0
 var rounds_lost := 0
+var aiming := false
+var crosshair: Label
 
 func _ready() -> void:
 	_build_arena()
@@ -165,6 +167,12 @@ func _build_hud() -> void:
 	hud.position = Vector2(24, 20)
 	hud.add_theme_font_size_override("font_size", 22)
 	layer.add_child(hud)
+	crosshair = Label.new()
+	crosshair.text = "＋"
+	crosshair.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	crosshair.position = Vector2(-10, -17)
+	crosshair.add_theme_font_size_override("font_size", 28)
+	layer.add_child(crosshair)
 	_update_hud()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -174,15 +182,24 @@ func _unhandled_input(event: InputEvent) -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		mouse_captured = false
 	elif event is InputEventMouseMotion and mouse_captured:
-		player.rotate_y(-event.relative.x * 0.0025)
-		camera.rotate_x(-event.relative.y * 0.0025)
+		var sensitivity := 0.00135 if aiming else 0.0025
+		player.rotate_y(-event.relative.x * sensitivity)
+		camera.rotate_x(-event.relative.y * sensitivity)
 		camera.rotation.x = clampf(camera.rotation.x, -1.45, 1.45)
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		_set_aiming(event.pressed)
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		_fire()
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_R:
 		_start_reload()
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_C:
 		_toggle_crouch()
+
+func _set_aiming(enabled: bool) -> void:
+	 aiming = enabled
+	camera.fov = 48.0 if aiming else 75.0
+	if crosshair != null:
+		crosshair.visible = not aiming
 
 func _capture_mouse() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -280,4 +297,4 @@ func _update_hud() -> void:
 		return
 	var state := ("RELOADING %.1fs" % reload_left) if reloading else ("AMMO %d / %d" % [ammo, reserve_ammo])
 	var outcome := " • YOU ARE DOWN" if health <= 0.0 else (" • TIME EXPIRED" if time_left <= 0.0 else "")
-	hud.text = "ZERO MERCY // TACTICAL BREACH\nHP %.0f   %s\nENEMIES %d   ELIMINATIONS %d\nTIME %03d:%02d%s\nWASD move • Shift sprint • C crouch • Mouse aim/fire • R reload • Space jump • Esc release mouse" % [health, state, bots.size(), score, int(time_left) / 60, int(time_left) % 60, outcome]
+	hud.text = "ZERO MERCY // TACTICAL BREACH\nHP %.0f   %s\nENEMIES %d   ELIMINATIONS %d\nTIME %03d:%02d%s\nWASD move • Shift sprint • C crouch • Right-click ADS • Mouse aim/fire • R reload • Space jump • Esc release mouse" % [health, state, bots.size(), score, int(time_left) / 60, int(time_left) % 60, outcome]
