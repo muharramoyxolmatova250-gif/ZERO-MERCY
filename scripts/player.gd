@@ -48,6 +48,9 @@ var _dara_was_airborne := false
 var _landing_compression := 0.0
 var _damage_reaction_timer := 0.0
 var _damage_reaction_strength := 0.0
+var _aiming := false
+var _weapon_tween: Tween
+var _hand_anchor_home := Vector3(0.48, -0.38, -1.15)
 
 
 func _ready() -> void:
@@ -56,7 +59,7 @@ func _ready() -> void:
 	_hand_anchor = Marker3D.new()
 	_hand_anchor.name = "HeldItemAnchor"
 	camera.add_child(_hand_anchor)
-	_hand_anchor.position = Vector3(0.48, -0.38, -1.15)
+	_hand_anchor.position = _hand_anchor_home
 	_build_dara_visual()
 	_build_weapon_visual()
 	health = max_health
@@ -240,6 +243,48 @@ func _add_weapon_box(parent: Node3D, part_name: String, part_position: Vector3, 
 	parent.add_child(part)
 
 
+func _set_aiming(enabled: bool) -> void:
+	if _aiming == enabled:
+		return
+	_aiming = enabled
+	if _weapon_tween != null and _weapon_tween.is_running():
+		_weapon_tween.kill()
+	_weapon_tween = create_tween()
+	_weapon_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	var target_position := Vector3(0.22, -0.29, -0.92) if _aiming else _hand_anchor_home
+	_weapon_tween.tween_property(_hand_anchor, "position", target_position, 0.18)
+	_weapon_tween.parallel().tween_property(camera, "fov",  fifty_five_fov(), 0.18)
+
+
+func fifty_five_fov() -> float:
+	return 55.0 if _aiming else 75.0
+
+
+func _play_weapon_recoil() -> void:
+	if _weapon_tween != null and _weapon_tween.is_running():
+		_weapon_tween.kill()
+	var home := Vector3(0.22, -0.29, -0.92) if _aiming else _hand_anchor_home
+	_weapon_tween = create_tween()
+	_weapon_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_weapon_tween.tween_property(_hand_anchor, "position", home + Vector3(0.0, 0.025, 0.16), 0.045)
+	_weapon_tween.parallel().tween_property(_hand_anchor, "rotation", Vector3(-0.11, 0.0, 0.0), 0.045)
+	_weapon_tween.tween_property(_hand_anchor, "position", home, 0.13)
+	_weapon_tween.parallel().tween_property(_hand_anchor, "rotation", Vector3.ZERO, 0.13)
+
+
+func _play_reload_animation() -> void:
+	if _weapon_tween != null and _weapon_tween.is_running():
+		_weapon_tween.kill()
+	var home := Vector3(0.22, -0.29, -0.92) if _aiming else _hand_anchor_home
+	_weapon_tween = create_tween()
+	_weapon_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	_weapon_tween.tween_property(_hand_anchor, "position", home + Vector3(0.0, -0.19, 0.08), 0.24)
+	_weapon_tween.parallel().tween_property(_hand_anchor, "rotation", Vector3(0.18, 0.0, 0.12), 0.24)
+	_weapon_tween.tween_interval(0.18)
+	_weapon_tween.tween_property(_hand_anchor, "position", home, 0.32)
+	_weapon_tween.parallel().tween_property(_hand_anchor, "rotation", Vector3.ZERO, 0.32)
+
+
 func _trigger_muzzle_flash() -> void:
 	if _muzzle_flash == null or _muzzle_light == null:
 		return
@@ -263,6 +308,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if event is InputEventMouseButton and event.pressed and Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		_set_aiming(event.pressed and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED)
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			_fire_weapon()
@@ -410,6 +457,7 @@ func _fire_weapon() -> void:
 	if ammo_in_magazine <= 0:
 		return
 	shot_cooldown = shot_interval
+	_play_weapon_recoil()
 	_trigger_muzzle_flash()
 	ammo_in_magazine -= 1
 	ammo_changed.emit(ammo_in_magazine, reserve_ammo)
@@ -430,6 +478,7 @@ func _reload_weapon() -> void:
 		return
 	var needed := magazine_size - ammo_in_magazine
 	var loaded := mini(needed, reserve_ammo)
+	_play_reload_animation()
 	ammo_in_magazine += loaded
 	reserve_ammo -= loaded
 	ammo_changed.emit(ammo_in_magazine, reserve_ammo)
