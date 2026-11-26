@@ -45,6 +45,13 @@ func _ready() -> void:
  var rescue_zone := RESCUE_SCENE.instantiate()
  rescue_zone.position = Vector3(15, 0, -25)
  add_child(rescue_zone)
+ # A parked prototype coupe provides the first drivable vehicle.
+ var coupe_scene := load("res://scenes/vehicles/cyber_coupe.tscn") as PackedScene
+ if coupe_scene != null:
+  var coupe := coupe_scene.instantiate()
+  coupe.name = "SovereignCyberCoupe"
+  coupe.position = Vector3(5.0, 0.15, 5.0)
+  add_child(coupe)
  # Initial hostile patrol: three enemies enter from a loose formation.
  # Each unit runs its own perception, pursuit and attack logic.
  var patrol_positions := [
