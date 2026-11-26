@@ -115,6 +115,9 @@ func cancel_passenger_request(passenger_id: String) -> bool:
 			continue
 		report_trip_cancelled(str(request_id))
 		var taxi_id := str(request.get("taxi_id", ""))
+		var passenger := _find_passenger(passenger_id)
+		if passenger != null and passenger.has_method("cancel_taxi_ride"):
+			passenger.call("cancel_taxi_ride", str(request_id))
 		if _taxis.has(taxi_id):
 			var taxi: Dictionary = _taxis[taxi_id]
 			var vehicle: Node3D = taxi.get("vehicle")
