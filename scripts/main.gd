@@ -64,6 +64,12 @@ func _ready() -> void:
  traffic.name = "AmbientTrafficSimulation"
  traffic.set_script(load("res://scripts/vehicles/ambient_traffic.gd"))
  add_child(traffic)
+ # Police response unit reacts to recent firearm offences.
+ var police := CharacterBody3D.new()
+ police.name = "CyberPoliceInterceptor"
+ police.position = Vector3(0, 0, -52)
+ police.set_script(load("res://scripts/police/police_interceptor.gd"))
+ add_child(police)
  # Initial hostile patrol: three enemies enter from a loose formation.
  # Each unit runs its own perception, pursuit and attack logic.
  var patrol_positions := [
