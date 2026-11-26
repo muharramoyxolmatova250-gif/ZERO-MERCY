@@ -108,8 +108,27 @@ func _build_dara_visual() -> void:
 		_add_dara_capsule("Shin_%s" % side, Vector3(side * 0.17, 0.16, -0.025), 0.115, 0.38, armor)
 		_add_dara_box("KneePlate_%s" % side, Vector3(side * 0.17, 0.34, -0.125), Vector3(0.22, 0.16, 0.07), magenta)
 		_add_dara_box("Boot_%s" % side, Vector3(side * 0.17, 0.055, -0.09), Vector3(0.24, 0.13, 0.38), armor)
-	for part_name in ["TorsoArmor", "Head", "UpperArm_-1.0", "UpperArm_1.0", "Forearm_-1.0", "Forearm_1.0", "Thigh_-1.0", "Thigh_1.0", "Shin_-1.0", "Shin_1.0", "Shoulder_-1.0", "Shoulder_1.0", "Boot_-1.0", "Boot_1.0"]:
-		_dara_visual_nodes[part_name] = get_node_or_null(part_name)
+	_dara_visual_nodes["TorsoArmor"] = get_node_or_null("TorsoArmor")
+	_dara_visual_nodes["Head"] = get_node_or_null("Head")
+	for side in [-1.0, 1.0]:
+		var suffix := str(side)
+		_dara_visual_nodes["UpperArm_%s" % suffix] = _create_visual_joint("UpperArm_%s" % suffix, Vector3(side * 0.39, 1.36, 0.0))
+		_dara_visual_nodes["Forearm_%s" % suffix] = _create_visual_joint("Forearm_%s" % suffix, Vector3(side * 0.46, 0.97, -0.025))
+		_dara_visual_nodes["Thigh_%s" % suffix] = _create_visual_joint("Thigh_%s" % suffix, Vector3(side * 0.17, 0.74, 0.0))
+		_dara_visual_nodes["Shin_%s" % suffix] = _create_visual_joint("Shin_%s" % suffix, Vector3(side * 0.17, 0.35, -0.025))
+		_dara_visual_nodes["Boot_%s" % suffix] = _create_visual_joint("Boot_%s" % suffix, Vector3(side * 0.17, 0.12, -0.09))
+
+
+func _create_visual_joint(part_name: String, joint_position: Vector3) -> Node3D:
+	var part := get_node_or_null(part_name) as Node3D
+	if part == null:
+		return null
+	var joint := Node3D.new()
+	joint.name = "%s_Pivot" % part_name
+	joint.position = joint_position
+	add_child(joint)
+	part.reparent(joint, true)
+	return joint
 
 
 func _add_dara_capsule(part_name: String, part_position: Vector3, radius: float, height: float, material: Material) -> void:
