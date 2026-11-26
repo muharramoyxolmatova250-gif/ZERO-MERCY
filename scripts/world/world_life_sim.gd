@@ -126,6 +126,7 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         "partner_id": "family_" + str(abs(hash(citizen_id))) if married else "",
         "children_count": local_rng.randi_range(0, 3) if married and age >= 25 else 0,
         "family_id": "family_" + str(abs(hash(citizen_id))) if married else "",
+        "household_id": "household_" + str(abs(hash(citizen_id))),
         "money": local_rng.randi_range(50, 250000), "health": local_rng.randf_range(0.65, 1.0),
         "happiness": local_rng.randf_range(0.35, 0.9), "active": true,
         "born_day": simulation_day - age * 365, "last_seen_day": simulation_day,
@@ -169,11 +170,13 @@ func _try_form_household(citizen_id: String) -> void:
     profile["marital_status"] = "partnered"
     profile["partner_id"] = partner_id
     profile["family_id"] = family_id
+    profile["household_id"] = family_id
     _append_event(profile, "formed_household_with:" + partner_id)
     var partner: Dictionary = resident_profiles[partner_id]
     partner["marital_status"] = "partnered"
     partner["partner_id"] = citizen_id
     partner["family_id"] = family_id
+    partner["household_id"] = family_id
     _append_event(partner, "formed_household_with:" + citizen_id)
     resident_profiles[citizen_id] = profile
     resident_profiles[partner_id] = partner
@@ -326,6 +329,8 @@ func separate_partners(citizen_id: String, reason: String = "mutual_separation")
         retained_family = str(partner.get("family_id", ""))
     profile["family_id"] = retained_family
     partner["family_id"] = retained_family
+    profile["household_id"] = "household_" + str(abs(hash(citizen_id + ":separated:" + str(simulation_day))))
+    partner["household_id"] = "household_" + str(abs(hash(partner_id + ":separated:" + str(simulation_day))))
     resident_profiles[citizen_id] = profile
     resident_profiles[partner_id] = partner
     # Lifetime marriage count stays cumulative; separations are separate statistics.
@@ -566,6 +571,7 @@ func _create_child_profile(parent: Dictionary, second_parent_id: String = "") ->
         "occupation": "child", "education": "early_childhood", "school": "",
         "marital_status": "single", "partner_id": "",
         "children_count": 0, "family_id": str(parent.get("family_id", "")) if not str(parent.get("family_id", "")).is_empty() else "family_" + str(abs(hash(parent_id))),
+        "household_id": str(parent.get("household_id", parent.get("family_id", ""))),
         "parent_id": parent_id, "second_parent_id": second_parent_id,
         "parents": [parent_id, second_parent_id] if not second_parent_id.is_empty() else [parent_id],
         "money": 0, "health": 0.98,
