@@ -19,6 +19,8 @@ var _flash_time := 0.0
 var _attack_windup_remaining := 0.0
 var _attack_pending := false
 var _visor_material: StandardMaterial3D
+var _animation_time := 0.0
+var _visual_parts: Dictionary = {}
 
 
 func _ready() -> void:
@@ -86,6 +88,7 @@ func _add_armor_capsule(part_name: String, part_position: Vector3, radius: float
 	part.position = part_position
 	part.material_override = material
 	add_child(part)
+	_visual_parts[part_name] = part
 
 
 func _add_armor_box(part_name: String, part_position: Vector3, part_size: Vector3, material: Material) -> void:
@@ -97,7 +100,7 @@ func _add_armor_box(part_name: String, part_position: Vector3, part_size: Vector
 	part.position = part_position
 	part.material_override = material
 	add_child(part)
-
+	_visual_parts[part_name] = part
 
 
 func _physics_process(delta: float) -> void:
@@ -148,7 +151,32 @@ func _physics_process(delta: float) -> void:
 		velocity.z = move_toward(velocity.z, 0.0, move_speed * delta * 5.0)
 		if _attack_cooldown <= 0.0 and not _attack_pending:
 			_start_attack()
+	_animate_enemy(delta)
 	move_and_slide()
+
+
+func _animate_enemy(delta: float) -> void:
+	_animation_time += delta
+	var planar_speed := Vector2(velocity.x, velocity.z).length()
+	var gait := _animation_time * 8.5
+	var moving_weight := clampf(planar_speed / maxf(move_speed, 0.01), 0.0, 1.0)
+	var attack_weight := 1.0 if _attack_pending else 0.0
+	for side in [-1.0, 1.0]:
+		var arm_name := "Arm_%s" % side
+		var leg_name := "Leg_%s" % side
+		var arm := _visual_parts.get(arm_name) as MeshInstance3D
+		var leg := _visual_parts.get(leg_name) as MeshInstance3D
+		var phase := sin(gait + (PI if side > 0.0 else 0.0))
+		if arm != null:
+			arm.rotation.x = phase * 0.48 * moving_weight - attack_weight * 0.72
+		if leg != null:
+			leg.rotation.x = -phase * 0.62 * moving_weight
+	var chest := _visual_parts.get("ChestPlate") as MeshInstance3D
+	if chest != null:
+		chest.rotation.x = -0.12 * moving_weight + 0.22 * attack_weight
+	var helmet := _visual_parts.get("Helmet") as MeshInstance3D
+	if helmet != null:
+		helmet.rotation.z = sin(_animation_time * 1.7) * 0.025
 
 
 func _find_target() -> void:
