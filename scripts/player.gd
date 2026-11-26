@@ -562,6 +562,25 @@ func _interact_with_world() -> void:
 func _pick_up_item(item: Node3D) -> void:
 	if not is_instance_valid(item) or _held_item != null:
 		return
+	# Collectible pickups enter the stack inventory; physical props remain carryable.
+	if str(item.get_meta("pickup_mode", "")) == "collect":
+		var item_id := str(item.get_meta("item_id", ""))
+		var amount := maxi(1, int(item.get_meta("item_amount", 1)))
+		if item_id.is_empty():
+			return
+		var bridge := _get_gameplay_bridge()
+		if bridge == null or not bridge.has_method("give_item"):
+			return
+		var remaining := int(bridge.call("give_item", item_id, amount))
+		var collected := amount - remaining
+		if collected <= 0:
+			return
+		if remaining > 0:
+			item.set_meta("item_amount", remaining)
+		else:
+			item.queue_free()
+		_award_gameplay_xp("crafting", 1.0)
+		return
 	_held_item = item
 	item.set_meta("original_collision_layer", item.collision_layer if item is CollisionObject3D else 1)
 	if item is CollisionObject3D:
