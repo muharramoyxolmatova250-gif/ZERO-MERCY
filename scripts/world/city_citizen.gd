@@ -344,6 +344,15 @@ func begin_taxi_ride(request_id: String) -> void:
 	visible = false
 	remember_event("boarded_taxi:" + request_id)
 
+func cancel_taxi_ride(request_id: String) -> void:
+	if request_id != _taxi_request_id:
+		return
+	visible = true
+	_taxi_riding = false
+	_taxi_request_id = ""
+	_transport_cooldown = 60.0
+	remember_event("taxi_trip_cancelled:" + request_id)
+
 func finish_taxi_ride(request_id: String, destination: Vector3) -> void:
 	if request_id != _taxi_request_id or not _taxi_riding:
 		return
