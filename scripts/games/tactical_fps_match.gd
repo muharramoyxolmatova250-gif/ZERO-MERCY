@@ -18,6 +18,7 @@ var bots: Array[CharacterBody3D] = []
 var mouse_captured := false
 var touch_move := Vector2.ZERO
 var touch_fire_held := false
+var touch_sprinting := false
 var touch_controls: Control
 var fire_cooldown := 0.0
 var recoil_recovery := 0.0
@@ -62,6 +63,7 @@ func _build_touch_controls() -> void:
 	touch_controls.aim_changed.connect(_on_touch_aim)
 	touch_controls.fire_pressed.connect(_fire)
 	touch_controls.fire_held_changed.connect(func(held: bool) -> void: touch_fire_held = held)
+	touch_controls.sprint_held_changed.connect(func(held: bool) -> void: touch_sprinting = held)
 	touch_controls.reload_pressed.connect(_start_reload)
 	touch_controls.jump_pressed.connect(_jump)
 
@@ -295,7 +297,7 @@ func _physics_process(delta: float) -> void:
 			reloading = false
 	var input := Vector2(Input.get_action_strength("fps_right") - Input.get_action_strength("fps_left"), Input.get_action_strength("fps_back") - Input.get_action_strength("fps_forward")) + touch_move
 	var wish := (player.transform.basis * Vector3(input.x, 0, input.y)).normalized()
-	sprinting = Input.is_key_pressed(KEY_SHIFT) and input.length() > 0.1 and not crouched
+	sprinting = (Input.is_key_pressed(KEY_SHIFT) or touch_sprinting) and input.length() > 0.1 and not crouched
 	var move_speed := 7.2 if sprinting else (2.8 if crouched else 5.2)
 	player.velocity.x = wish.x * move_speed
 	player.velocity.z = wish.z * move_speed
@@ -408,6 +410,8 @@ func _restart_round() -> void:
 		weapon_pivot.position = Vector3(0.32, -0.28, -0.58)
 	round_finished = false
 	touch_fire_held = false
+	touch_sprinting = false
+	touch_move = Vector2.ZERO
 	_build_bots()
 
 func _update_hud() -> void:
