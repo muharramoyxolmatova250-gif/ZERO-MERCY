@@ -44,6 +44,10 @@ func _draw() -> void:
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
+		if event.canceled:
+			_reset_touches()
+			accept_event()
+			return
 		if event.pressed:
 			if event.position.distance_to(_sprint_center()) <= 38.0 and _sprint_touch == -1:
 				_sprint_touch = event.index
