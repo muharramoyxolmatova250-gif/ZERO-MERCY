@@ -1842,3 +1842,62 @@ func publish_phone_media(citizen_id: String, media_type: String, title: String, 
     record_event(citizen_id, "uploaded_phone_" + media_type)
     _dirty = true
     return true
+
+
+const PHONE_GAMES := ["Last Circle", "Counter Sector", "Neon Strike", "Dropzone Royale", "Tactical Breach", "Cyber Ops"]
+
+
+func get_phone_games_catalog() -> Array:
+    return [
+        {"id":"last_circle","title":"Last Circle","genre":"battle_royale","mode":"solo_duo_squad","max_players":100,"description":"A last-team-standing survival arena."},
+        {"id":"counter_sector","title":"Counter Sector","genre":"tactical_shooter","mode":"5v5_objective","max_players":10,"description":"Round-based tactical team combat."},
+        {"id":"neon_strike","title":"Neon Strike","genre":"arena_shooter","mode":"team_deathmatch","max_players":12,"description":"Fast futuristic arena matches."},
+        {"id":"dropzone_royale","title":"Dropzone Royale","genre":"battle_royale","mode":"squad","max_players":60,"description":"Squad survival across a shrinking zone."},
+        {"id":"tactical_breach","title":"Tactical Breach","genre":"tactical_shooter","mode":"5v5_objective","max_players":10,"description":"Coordinated attack and defense rounds."},
+        {"id":"cyber_ops","title":"Cyber Ops","genre":"strategy_action","mode":"ranked_team","max_players":8,"description":"Team tactics and objective control."}
+    ]
+
+
+func play_phone_game(citizen_id: String, game_id: String, match_minutes: int = 12) -> Dictionary:
+    if not resident_profiles.has(citizen_id):
+        return {}
+    var game_found := false
+    var game_title := ""
+    var game_genre := ""
+    for game in get_phone_games_catalog():
+        if str(game.get("id", "")) == game_id:
+            game_found = true
+            game_title = str(game.get("title", ""))
+            game_genre = str(game.get("genre", ""))
+            break
+    if not game_found:
+        return {}
+    var profile := _ensure_phone_profile(citizen_id)
+    var stats: Dictionary = profile.get("phone_game_stats", {})
+    var game_stats: Dictionary = stats.get(game_id, {"matches":0,"wins":0,"losses":0,"rank_points":0,"minutes":0})
+    var personality_skill := float(profile.get("gaming_skill", 0.35))
+    if not profile.has("gaming_skill"):
+        var skill_rng := RandomNumberGenerator.new()
+        skill_rng.seed = int(abs(hash(citizen_id + ":gaming")))
+        personality_skill = skill_rng.randf_range(0.2, 0.92)
+        profile["gaming_skill"] = personality_skill
+    var score := clampf(personality_skill + _rng.randf_range(-0.25, 0.25), 0.05, 0.98)
+    var won := score > 0.56
+    game_stats["matches"] = int(game_stats.get("matches", 0)) + 1
+    game_stats["wins"] = int(game_stats.get("wins", 0)) + (1 if won else 0)
+    game_stats["losses"] = int(game_stats.get("losses", 0)) + (0 if won else 1)
+    game_stats["rank_points"] = maxi(0, int(game_stats.get("rank_points", 0)) + (18 if won else -7))
+    game_stats["minutes"] = int(game_stats.get("minutes", 0)) + maxi(1, match_minutes)
+    stats[game_id] = game_stats
+    profile["phone_game_stats"] = stats
+    profile["phone_battery"] = maxf(0.0, float(profile.get("phone_battery", 100.0)) - float(match_minutes) * 0.45)
+    profile["phone_last_used_day"] = simulation_day
+    resident_profiles[citizen_id] = profile
+    record_event(citizen_id, "played_" + game_id + (":won" if won else ":lost"))
+    _dirty = true
+    return {"game_id":game_id,"game_title":game_title,"genre":game_genre,"won":won,"score":snappedf(score,0.01),"stats":game_stats.duplicate(true),"match_minutes":match_minutes}
+
+
+func get_phone_game_stats(citizen_id: String) -> Dictionary:
+    var profile := _ensure_phone_profile(citizen_id)
+    return (profile.get("phone_game_stats", {}) as Dictionary).duplicate(true)
