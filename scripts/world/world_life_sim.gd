@@ -809,7 +809,9 @@ func _operate_personal_business(profile: Dictionary) -> void:
     capital = maxi(0, capital + profit)
     profile["business_months"] = months
     profile["business_revenue"] = revenue
+    profile["business_last_profit"] = profit
     profile["business_capital"] = capital
+    profile["business_health"] = clampf(float(capital) / 60000.0, 0.0, 1.0)
     profile["money"] = int(profile.get("money", 0)) + maxi(0, profit / 2)
     if capital < 500 and months > 2:
         profile["business_id"] = ""
