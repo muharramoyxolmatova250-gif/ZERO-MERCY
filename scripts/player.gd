@@ -421,7 +421,8 @@ func _physics_process(delta: float) -> void:
 		stamina_regen_timer = maxf(stamina_regen_timer - delta, 0.0)
 		if stamina_regen_timer <= 0.0:
 			stamina = minf(stamina + stamina_regen_per_second * delta, stamina_max)
-	var speed := sprint_speed if sprinting else walk_speed
+	var performance := _get_gameplay_performance()
+	var speed := (sprint_speed if sprinting else walk_speed) * performance
 	var direction := (transform.basis * Vector3(input_vector.x, 0.0, input_vector.y)).normalized()
 	if direction.length_squared() > 0.0:
 		velocity.x = direction.x * speed
@@ -485,6 +486,7 @@ func _melee_attack() -> void:
 	var collider: Object = hit.get("collider")
 	if collider is Node and collider.is_in_group("damageable") and collider.has_method("take_damage"):
 		collider.call("take_damage", melee_damage, self)
+		_award_gameplay_xp("combat", 12.0)
 
 
 func _fire_weapon() -> void:
@@ -512,6 +514,7 @@ func _fire_weapon() -> void:
 		var collider: Object = hit.get("collider")
 		if collider is Node and collider.is_in_group("damageable") and collider.has_method("take_damage"):
 			collider.call("take_damage", weapon_damage, self)
+			_award_gameplay_xp("combat", 10.0)
 
 
 func _reload_weapon() -> void:
@@ -598,3 +601,23 @@ func _drop_held_item() -> void:
 	tween.tween_property(item, "global_position", destination, 0.32)
 	if item.has_method("set_being_held"):
 		item.call("set_being_held", false)
+
+
+func _get_gameplay_bridge() -> Node:
+	var parent := get_parent()
+	if parent == null:
+		return null
+	return parent.get_node_or_null("GameplaySystemBridge")
+
+
+func _get_gameplay_performance() -> float:
+	var bridge := _get_gameplay_bridge()
+	if bridge != null and bridge.has_method("get_player_performance"):
+		return clampf(float(bridge.call("get_player_performance")), 0.35, 1.0)
+	return 1.0
+
+
+func _award_gameplay_xp(skill_id: String, amount: float) -> void:
+	var bridge := _get_gameplay_bridge()
+	if bridge != null and bridge.has_method("award_skill_xp"):
+		bridge.call("award_skill_xp", skill_id, amount)
