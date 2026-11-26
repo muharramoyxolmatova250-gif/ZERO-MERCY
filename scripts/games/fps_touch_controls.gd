@@ -80,13 +80,29 @@ func _is_near(point: Vector2, center: Vector2, radius: float) -> bool:
 
 
 func _move_center() -> Vector2:
-    return Vector2(clampf(size.x * 0.22, 88.0, 132.0), size.y - 132.0)
+	return Vector2(clampf(size.x * 0.22, 88.0, 132.0), size.y - 132.0)
 
 func _fire_center() -> Vector2:
-    return Vector2(size.x - 92.0, size.y - 142.0)
+	return Vector2(size.x - 92.0, size.y - 142.0)
 
 func _reload_center() -> Vector2:
-    return Vector2(size.x - 190.0, size.y - 74.0)
+	return Vector2(size.x - 190.0, size.y - 74.0)
 
 func _jump_center() -> Vector2:
-    return Vector2(size.x - 88.0, size.y - 292.0)
+	return Vector2(size.x - 88.0, size.y - 292.0)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		_reset_touches()
+
+func _reset_touches() -> void:
+	var was_firing := _fire_touch != -1
+	_move_touch = -1
+	_aim_touch = -1
+	_fire_touch = -1
+	_move_vector = Vector2.ZERO
+	movement_changed.emit(Vector2.ZERO)
+	if was_firing:
+		fire_held_changed.emit(false)
+	queue_redraw()
