@@ -317,6 +317,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera_pivot.rotation.x = camera_pitch
 	if event.is_action_pressed("interact"):
 		_interact_with_world()
+	if event is InputEventKey and event.pressed and not event.echo:
+		var bridge := _get_gameplay_bridge()
+		if bridge != null:
+			if event.keycode == KEY_1:
+				bridge.call("use_inventory_item", "food_ration")
+			elif event.keycode == KEY_2:
+				bridge.call("use_inventory_item", "water_bottle")
+			elif event.keycode == KEY_H:
+				bridge.call("use_inventory_item", "medkit")
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F:
 		_melee_attack()
 	if event.is_action_pressed("ui_cancel"):
