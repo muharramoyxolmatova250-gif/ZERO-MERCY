@@ -119,6 +119,12 @@ func _build_dara_visual() -> void:
 		_add_dara_box("Boot_%s" % side, Vector3(side * 0.17, 0.055, -0.09), Vector3(0.24, 0.13, 0.38), armor)
 	_dara_visual_nodes["TorsoArmor"] = get_node_or_null("TorsoArmor")
 	_dara_visual_nodes["Head"] = _create_visual_joint("Head", Vector3(0.0, 1.78, 0.0))
+	var head_pivot := _dara_visual_nodes["Head"] as Node3D
+	if head_pivot != null:
+		for face_part in ["FacePlate", "Visor", "Eye_-1.0", "Eye_1.0", "Brow_-1.0", "Brow_1.0", "JawSeam", "CheekLight_L", "CheekLight_R"]:
+			var feature := get_node_or_null(face_part) as Node3D
+			if feature != null:
+				feature.reparent(head_pivot, true)
 	for side in [-1.0, 1.0]:
 		var suffix := "-1.0" if side < 0.0 else "1.0"
 		_dara_visual_nodes["UpperArm_%s" % suffix] = _create_visual_joint("UpperArm_%s" % suffix, Vector3(side * 0.39, 1.36, 0.0))
