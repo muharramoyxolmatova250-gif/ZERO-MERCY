@@ -26,6 +26,7 @@ func _ready() -> void:
  _start_graphics_profile()
  _build_environment()
  _start_world_life_simulation()
+ _start_citizen_spatial_index()
  _build_city()
  var player := PLAYER_SCENE.instantiate() as CharacterBody3D
  player.name = "Dara"
@@ -110,6 +111,12 @@ func _start_world_life_simulation() -> void:
  life_sim.name = "WorldLifeSimulation"
  life_sim.set_script(LIFE_SIM_SCRIPT)
  add_child(life_sim)
+
+func _start_citizen_spatial_index() -> void:
+ var spatial_index := Node.new()
+ spatial_index.name = "CitizenSpatialIndex"
+ spatial_index.set_script(CITIZEN_SPATIAL_INDEX_SCRIPT)
+ add_child(spatial_index)
 
 func _start_region_streaming() -> void:
  var streamer := Node3D.new()
