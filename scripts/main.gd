@@ -330,9 +330,9 @@ func _notification(what: int) -> void:
 
 
 func _start_gameplay_system_bridge(player: Node) -> void:
-	_gameplay_bridge = Node.new()
-	_gameplay_bridge.name = "GameplaySystemBridge"
-	_gameplay_bridge.set_script(GAMEPLAY_BRIDGE_SCRIPT)
-	add_child(_gameplay_bridge)
-	_gameplay_bridge.call("bind_player", player)
-	_gameplay_bridge.call("bind_world", self)
+ _gameplay_bridge = Node.new()
+ _gameplay_bridge.name = "GameplaySystemBridge"
+ _gameplay_bridge.set_script(GAMEPLAY_BRIDGE_SCRIPT)
+ add_child(_gameplay_bridge)
+ _gameplay_bridge.call("bind_player", player)
+ _gameplay_bridge.call("bind_world", self)
