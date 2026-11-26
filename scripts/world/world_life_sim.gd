@@ -761,6 +761,25 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     _append_event(profile, "monthly_finances:" + str(balance))
 
 
+func _manage_credit_and_debt(profile: Dictionary) -> void:
+    var debt := int(profile.get("debt", 0))
+    var money := int(profile.get("money", 0))
+    var credit := int(profile.get("credit_score", 600))
+    if debt > 0:
+        var payment := mini(debt, maxi(0, int(float(money) * 0.08)))
+        profile["money"] = money - payment
+        profile["debt"] = debt - payment
+        credit = mini(850, credit + (3 if payment > 0 else -2))
+    elif money < 250 and int(profile.get("savings", 0)) < 300 and _rng.randf() < 0.015:
+        var loan := 1200 if credit >= 620 else 400
+        profile["debt"] = loan
+        profile["money"] = money + loan
+        _append_event(profile, "took_emergency_loan:" + str(loan))
+    if int(profile.get("debt", 0)) > 5000:
+        credit = maxi(300, credit - 5)
+    profile["credit_score"] = clampi(credit, 300, 850)
+
+
 func _consider_business_startup(profile: Dictionary) -> void:
     if not str(profile.get("business_id", "")).is_empty():
         return
