@@ -15,7 +15,7 @@ func register_route(route_id: String, stop_ids: Array[String], vehicle_type: Str
 	for stop_id in stop_ids:
 		if not _stops.has(stop_id):
 			return false
-	_routes[route_id] = {"id": route_id, "stops": stop_ids.duplicate(), "vehicle_type": vehicle_type, "interval_minutes": maxi(1, interval_minutes), "active": true}
+	_routes[route_id] = {"id": route_id, "stops": stop_ids.duplicate(), "vehicle_type": vehicle_type, "interval_minutes": maxi(1, interval_minutes), "active": true, "vehicles_serving": 0, "stops_served": 0, "passenger_boardings": 0}
 	return true
 
 func find_route_between(start_stop: String, destination_stop: String) -> Dictionary:
@@ -61,6 +61,30 @@ func get_stop_snapshot() -> Array[Dictionary]:
 	for stop_id in _stops:
 		result.append(_stops[stop_id].duplicate(true))
 	return result
+
+func report_vehicle_stop(route_id: String, stop_id: String, passengers: int) -> void:
+	if not _routes.has(route_id) or not _stops.has(stop_id):
+		return
+	var route: Dictionary = _routes[route_id]
+	var stops: Array = route.get("stops", [])
+	if not stops.has(stop_id):
+		return
+	route["stops_served"] = int(route.get("stops_served", 0)) + 1
+	route["passenger_boardings"] = int(route.get("passenger_boardings", 0)) + maxi(0, passengers)
+	_routes[route_id] = route
+
+func report_vehicle_active(route_id: String, active: bool) -> void:
+	if not _routes.has(route_id):
+		return
+	var route: Dictionary = _routes[route_id]
+	route["vehicles_serving"] = maxi(0, int(route.get("vehicles_serving", 0)) + (1 if active else -1))
+	_routes[route_id] = route
+
+func get_route_snapshot(route_id: String) -> Dictionary:
+	if not _routes.has(route_id):
+		return {}
+	return _routes[route_id].duplicate(true)
+
 
 func set_route_active(route_id: String, active: bool) -> void:
 	if _routes.has(route_id):
