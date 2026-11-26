@@ -23,10 +23,13 @@ var _save_elapsed := 0.0
 var _dirty := false
 const SAVE_INTERVAL_SECONDS := 30.0
 var _rng := RandomNumberGenerator.new()
+var _last_routine_hour := -1
 
 func _ready() -> void:
     add_to_group("world_life_sim")
     _rng.randomize()
+    if has_node("/root/GameSession"):
+        GameSession.session_clock_changed.connect(_on_session_clock_changed)
     _load_state()
     _rebuild_claim_cache()
     for city_id in START_HUBS:
@@ -186,6 +189,55 @@ func record_event(citizen_id: String, event_name: String) -> void:
     profile["life_events"] = events
     resident_profiles[citizen_id] = profile
     _dirty = true
+
+
+func _on_session_clock_changed(hour: float) -> void:
+    var current_hour := floori(hour)
+    if current_hour == _last_routine_hour:
+        return
+    _last_routine_hour = current_hour
+    advance_daily_routines(current_hour)
+
+
+func advance_daily_routines(hour: int) -> void:
+    var changed_count := 0
+    for citizen_id in resident_profiles.keys():
+        var profile: Dictionary = resident_profiles[citizen_id]
+        if str(profile.get("life_stage", "")) == "deceased":
+            continue
+        var stage := str(profile.get("life_stage", "adult"))
+        var occupation := str(profile.get("occupation", "resident"))
+        var activity := "sleep"
+        if hour >= 6 and hour < 8:
+            activity = "commute"
+        elif hour >= 8 and hour < 15 and stage == "student":
+            activity = "school"
+        elif hour >= 8 and hour < 17 and stage == "adult" and occupation not in ["unemployed", "retired", "child", "student"]:
+            activity = "work"
+        elif hour >= 9 and hour < 16 and stage == "retired":
+            activity = "leisure"
+        elif hour >= 15 and hour < 18:
+            activity = "commute" if stage == "adult" else "play"
+        elif hour >= 18 and hour < 22:
+            activity = "family" if str(profile.get("marital_status", "single")) == "married" else "social"
+        profile["last_activity"] = activity
+        profile["schedule_hour"] = hour
+        if activity in ["family", "social", "play", "leisure"]:
+            profile["happiness"] = clampf(float(profile.get("happiness", 0.5)) + 0.001, 0.0, 1.0)
+        elif activity == "work":
+            profile["money"] = int(profile.get("money", 0)) + 5
+        elif activity == "school":
+            profile["education"] = str(profile.get("education", "school"))
+        resident_profiles[citizen_id] = profile
+        changed_count += 1
+    if changed_count > 0:
+        _dirty = true
+        publish_event_if_available("daily_routine_updated", {"hour": hour, "citizens_updated": changed_count})
+
+
+func publish_event_if_available(event_id: String, payload: Dictionary) -> void:
+    if has_node("/root/GameSession"):
+        GameSession.publish_world_event(event_id, payload)
 
 func advance_month() -> void:
     simulation_day += 30
