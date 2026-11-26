@@ -3,11 +3,13 @@ extends Control
 signal movement_changed(direction: Vector2)
 signal aim_changed(delta: Vector2)
 signal fire_pressed
+signal fire_held_changed(held: bool)
 signal reload_pressed
 signal jump_pressed
 
 var _move_touch := -1
 var _aim_touch := -1
+var _fire_touch := -1
 var _move_origin := Vector2.ZERO
 var _move_vector := Vector2.ZERO
 var _fire_rect := Rect2()
@@ -46,6 +48,8 @@ func _gui_input(event: InputEvent) -> void:
 			elif event.position.x >= size.x * 0.42 and _aim_touch == -1:
 				_aim_touch = event.index
 				if _is_near(event.position, _fire_center(), 52.0):
+					_fire_touch = event.index
+					fire_held_changed.emit(true)
 					fire_pressed.emit()
 				elif _is_near(event.position, _reload_center(), 38.0):
 					reload_pressed.emit()
@@ -59,6 +63,9 @@ func _gui_input(event: InputEvent) -> void:
 				movement_changed.emit(Vector2.ZERO)
 				queue_redraw()
 			elif event.index == _aim_touch:
+				if event.index == _fire_touch:
+					_fire_touch = -1
+					fire_held_changed.emit(false)
 				_aim_touch = -1
 	elif event is InputEventScreenDrag:
 		if event.index == _move_touch:
