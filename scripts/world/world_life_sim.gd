@@ -695,6 +695,7 @@ func _advance_career_month(profile: Dictionary) -> void:
     var occupation := str(profile.get("occupation", ""))
     if occupation in ["", "unemployed", "retired", "student", "child"]:
         return
+    var satisfaction := float(profile.get("career_satisfaction", 0.5))
     var progress := float(profile.get("career_progress", 0.0))
     var education := str(profile.get("education", "secondary"))
     var education_bonus := 0.12 if education in ["university", "postgraduate", "graduated"] else 0.0
@@ -706,6 +707,23 @@ func _advance_career_month(profile: Dictionary) -> void:
         career_promotions_total += 1
         _append_event(profile, "career_promotion:" + str(profile["career_level"]))
     profile["career_progress"] = progress
+    # Work satisfaction reacts to growth and gradually drifts, allowing rare career changes.
+    satisfaction = clampf(satisfaction + (0.003 if progress > 0.35 else -0.002) + _rng.randf_range(-0.012, 0.01), 0.0, 1.0)
+    if satisfaction < 0.18 and _rng.randf() < 0.08:
+        var next_job := occupation
+        for attempt in range(4):
+            next_job = JOBS[_rng.randi_range(0, JOBS.size() - 1)]
+            if next_job != occupation:
+                break
+        if next_job != occupation:
+            profile["occupation"] = next_job
+            profile["career_field"] = next_job
+            profile["career_progress"] = 0.0
+            satisfaction = 0.48
+            _append_event(profile, "changed_career_to:" + next_job)
+    profile["career_satisfaction"] = satisfaction
+    if str(profile.get("career_field", "")).is_empty():
+        profile["career_field"] = occupation
 
 
 func _append_event(profile: Dictionary, event_name: String) -> void:
