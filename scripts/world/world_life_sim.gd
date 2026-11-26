@@ -744,6 +744,7 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     profile["monthly_housing_cost"] = rent
     profile["monthly_living_cost"] = food_and_services
     profile["money"] = maxi(0, int(profile.get("money", 0)) + balance)
+    _consider_home_purchase(profile)
     profile["financial_stability"] = clampf(float(profile.get("money", 0)) / 12000.0, 0.0, 1.0)
     if int(profile.get("money", 0)) < 500:
         profile["housing_status"] = "shared_or_family_home"
