@@ -756,6 +756,8 @@ func _process_monthly_finances(profile: Dictionary) -> void:
         profile["housing_status"] = "independent_rental"
     else:
         profile["housing_status"] = "family_or_shared_home"
+    if bool(profile.get("owns_home", false)):
+        profile["housing_status"] = "home_owner"
     _append_event(profile, "monthly_finances:" + str(balance))
 
 
