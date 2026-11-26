@@ -1,0 +1,64 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/phone/phone_media_player.gd" id="1"]
+
+[node name="PhoneMediaPlayer" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Layout" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 24.0
+offset_right = -28.0
+offset_bottom = -24.0
+theme_override_constants/separation = 12
+
+[node name="Heading" type="Label" parent="Layout"]
+layout_mode = 2
+text = "ZERO MERCY • MEDIA"
+
+[node name="MediaFrame" type="PanelContainer" parent="Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Video" type="VideoStreamPlayer" parent="Layout/MediaFrame"]
+visible = false
+custom_minimum_size = Vector2(640, 360)
+layout_mode = 2
+expand = true
+loop = false
+
+[node name="Image" type="TextureRect" parent="Layout/MediaFrame"]
+visible = false
+custom_minimum_size = Vector2(640, 360)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="SourcePath" type="LineEdit" parent="Layout"]
+layout_mode = 2
+placeholder_text = "res://media/videos/example.ogv yoki res://media/photos/photo.png"
+
+[node name="Actions" type="HBoxContainer" parent="Layout"]
+layout_mode = 2
+
+[node name="Open" type="Button" parent="Layout/Actions"]
+layout_mode = 2
+text = "OPEN MEDIA"
+
+[node name="Stop" type="Button" parent="Layout/Actions"]
+layout_mode = 2
+text = "STOP"
+
+[node name="Status" type="Label" parent="Layout"]
+layout_mode = 2
+text = "Ready"
