@@ -865,7 +865,26 @@ func _process_npc_transport(profile: Dictionary) -> int:
     var monthly_km := _rng.randi_range(180, 1100) if job in JOBS else _rng.randi_range(60, 260)
     var fuel_used := float(monthly_km) * 0.085
     var fuel := maxf(0.0, float(profile.get("vehicle_fuel", 0.0)) - fuel_used)
-    var fuel_cost := int(fuel_used * 1.4)
+    var fuel_cost := 0
+    if fuel < 18.0:
+        var fuel_needed := 45.0 - fuel
+        var city_id := str(profile.get("city", ""))
+        var fuel_price := 1.4
+        var purchased_fuel := fuel_needed
+        if hub_state.has(city_id):
+            var city_hub: Dictionary = hub_state[city_id]
+            var city_market: Dictionary = city_hub.get("market", {})
+            if city_market.has("fuel"):
+                var fuel_good: Dictionary = city_market["fuel"]
+                fuel_price = float(fuel_good.get("price", 1.4))
+                purchased_fuel = minf(fuel_needed, float(fuel_good.get("stock", 0)))
+                fuel_good["stock"] = maxi(0, int(fuel_good.get("stock", 0)) - int(ceil(purchased_fuel)))
+                fuel_good["npc_vehicle_fuel_sales"] = int(fuel_good.get("npc_vehicle_fuel_sales", 0)) + int(ceil(purchased_fuel))
+                city_market["fuel"] = fuel_good
+                city_hub["market"] = city_market
+                hub_state[city_id] = city_hub
+        fuel += purchased_fuel
+        fuel_cost = int(ceil(purchased_fuel * fuel_price))
     var wear := float(monthly_km) / 180000.0
     var condition := clampf(float(profile.get("vehicle_condition", 1.0)) - wear, 0.0, 1.0)
     var maintenance := 0
