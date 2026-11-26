@@ -107,7 +107,7 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
     var stage := _stage_for_age(age)
     var sex := "female" if local_rng.randf() < 0.5 else "male"
     var job := fallback_occupation
-    if stage == "student":
+    if stage in ["student", "university"]:
         job = "student"
     elif stage == "child":
         job = "child"
@@ -123,7 +123,7 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         "age_days": age * 365 + local_rng.randi_range(0, 364), "age_years": age,
         "life_stage": stage, "occupation": job,
         "education": _education_for_age(age, local_rng),
-        "school": SCHOOLS[local_rng.randi_range(0, SCHOOLS.size() - 1)] if stage in ["student", "university"] else "",
+        "school": _choose_school(stage, local_rng.randf_range(0.35, 0.95), local_rng) if stage in ["student", "university"] else "",
         "education_progress": local_rng.randf_range(0.0, 0.85),
         "school_grade": maxi(0, age - 5),
         "academic_performance": local_rng.randf_range(0.35, 0.95),
@@ -643,6 +643,18 @@ func _stage_for_age(age: int) -> String:
     if age < 23: return "university"
     if age < 65: return "adult"
     return "retired"
+
+func _choose_school(stage: String, performance: float, rng: RandomNumberGenerator) -> String:
+    if stage == "university":
+        if performance >= 0.82:
+            return "Global Science Institute"
+        if performance >= 0.65:
+            return "Cybernetics Academy"
+        return "District Technical School"
+    if performance >= 0.8:
+        return "Cybernetics Academy"
+    return "Neo Primary School" if rng.randf() < 0.7 else "District Technical School"
+
 
 func _education_for_age(age: int, rng: RandomNumberGenerator) -> String:
     if age < 6: return "early_childhood"
