@@ -6,6 +6,8 @@ var _waiting_passengers: Dictionary = {}
 var _waiting_manifests: Dictionary = {}
 var _total_boardings := 0
 var _total_generated_passengers := 0
+var _total_completed_trips := 0
+var _total_alighted_passengers := 0
 var _demand_timer := 0.0
 var _rng := RandomNumberGenerator.new()
 @export_range(5.0, 120.0, 1.0) var demand_interval_seconds := 28.0
@@ -153,7 +155,7 @@ func get_passenger_statistics() -> Dictionary:
 		waiting_total += int(count)
 	return {"waiting": waiting_total, "boardings": _total_boardings, "generated": _total_generated_passengers}
 
-func report_vehicle_stop(route_id: String, stop_id: String, passengers: int) -> void:
+func report_vehicle_stop(route_id: String, stop_id: String, passengers: int, alighted: int = 0) -> void:
 	if not _routes.has(route_id) or not _stops.has(stop_id):
 		return
 	var route: Dictionary = _routes[route_id]
@@ -162,6 +164,9 @@ func report_vehicle_stop(route_id: String, stop_id: String, passengers: int) -> 
 		return
 	route["stops_served"] = int(route.get("stops_served", 0)) + 1
 	route["passenger_boardings"] = int(route.get("passenger_boardings", 0)) + maxi(0, passengers)
+	route["passenger_alightings"] = int(route.get("passenger_alightings", 0)) + maxi(0, alighted)
+	_total_alighted_passengers += maxi(0, alighted)
+	_total_completed_trips += maxi(0, alighted)
 	_routes[route_id] = route
 
 func report_vehicle_active(route_id: String, active: bool) -> void:
@@ -188,4 +193,4 @@ func get_transit_snapshot() -> Dictionary:
 	for route in _routes.values():
 		if bool(route.get("active", true)):
 			active_routes += 1
-	return {"stops": _stops.size(), "routes": _routes.size(), "active_routes": active_routes, "passengers_waiting": get_passenger_statistics().get("waiting", 0), "total_boardings": _total_boardings}
+	return {"stops": _stops.size(), "routes": _routes.size(), "active_routes": active_routes, "passengers_waiting": get_passenger_statistics().get("waiting", 0), "total_boardings": _total_boardings, "completed_trips": _total_completed_trips, "total_alightings": _total_alighted_passengers}
