@@ -1795,6 +1795,74 @@ func get_phone_media_feed(media_type: String = "all", limit: int = 60) -> Array:
     return result.slice(0, maxi(1, limit))
 
 
+func get_phone_recommended_feed(citizen_id: String, media_type: String = "all", limit: int = 40) -> Array:
+    var profile := _ensure_phone_profile(citizen_id)
+    var interests: Dictionary = profile.get("phone_topic_interests", {})
+    var watched: Dictionary = {}
+    for entry in profile.get("phone_watch_history", []):
+        watched[str(entry.get("media_id", ""))] = true
+    var ranked: Array = []
+    for item in _social_feed:
+        var kind := str(item.get("type", "post"))
+        if media_type != "all" and kind != media_type:
+            continue
+        var topic := str(item.get("topic", "general"))
+        var interest := float(interests.get(topic, 0.0))
+        var freshness := float(item.get("day", simulation_day)) * 0.001
+        var popularity := log(float(int(item.get("views", 0)) + int(item.get("likes", 0)) + 1)) * 0.08
+        var score := interest + freshness + popularity + _rng.randf() * 0.04
+        if watched.has(str(item.get("id", ""))):
+            score -= 0.35
+        ranked.append({"score":score,"item":item})
+    ranked.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.score) > float(b.score))
+    var output: Array = []
+    for entry in ranked.slice(0, mini(ranked.size(), maxi(1, limit))):
+        output.append(entry.item.duplicate(true))
+    return output
+
+
+func react_to_phone_media(citizen_id: String, media_id: String, reaction: String = "like") -> bool:
+    if not resident_profiles.has(citizen_id):
+        return false
+    for index in range(_social_feed.size() - 1, -1, -1):
+        var item: Dictionary = _social_feed[index]
+        if str(item.get("id", "")) != media_id:
+            continue
+        item["likes"] = int(item.get("likes", 0)) + 1
+        if reaction == "save":
+            var profile := _ensure_phone_profile(citizen_id)
+            var saved: Array = profile.get("phone_saved_media", [])
+            if not saved.has(media_id):
+                saved.append(media_id)
+            profile["phone_saved_media"] = saved
+            resident_profiles[citizen_id] = profile
+        _social_feed[index] = item
+        var author_id := str(item.get("author_id", ""))
+        if not author_id.is_empty() and author_id != citizen_id:
+            record_social_interaction(citizen_id, author_id, "phone_media_" + reaction)
+        _dirty = true
+        return true
+    return false
+
+
+func add_phone_media_comment(citizen_id: String, media_id: String, comment_text: String) -> bool:
+    if comment_text.strip_edges().is_empty():
+        return false
+    for index in range(_social_feed.size() - 1, -1, -1):
+        var item: Dictionary = _social_feed[index]
+        if str(item.get("id", "")) == media_id:
+            var comments: Array = item.get("comment_list", [])
+            comments.append({"author_id":citizen_id,"text":comment_text,"day":simulation_day})
+            while comments.size() > 50:
+                comments.pop_front()
+            item["comment_list"] = comments
+            item["comments"] = int(item.get("comments", 0)) + 1
+            _social_feed[index] = item
+            _dirty = true
+            return true
+    return false
+
+
 func record_phone_media_view(citizen_id: String, media_id: String, watch_seconds: float) -> bool:
     if not resident_profiles.has(citizen_id):
         return false
