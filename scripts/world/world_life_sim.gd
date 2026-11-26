@@ -74,7 +74,15 @@ func _ensure_hub(city_id: String, population_hint: int = 100000) -> void:
         "unemployed": int(round(population * 0.06)),
         "married_families": int(round(population * 0.24)), "retired": int(round(population * 0.09)),
         "public_mood": 0.62, "schools": SCHOOLS.duplicate(),
-        "jobs": 0, "last_updated_day": simulation_day
+        "jobs": 0, "last_updated_day": simulation_day,
+        "market": {
+            "food": {"price": 8.0, "base_price": 8.0, "stock": 12000, "demand": 9000},
+            "water": {"price": 2.0, "base_price": 2.0, "stock": 18000, "demand": 11000},
+            "medicine": {"price": 24.0, "base_price": 24.0, "stock": 1800, "demand": 1200},
+            "electronics": {"price": 95.0, "base_price": 95.0, "stock": 900, "demand": 650},
+            "clothing": {"price": 32.0, "base_price": 32.0, "stock": 2600, "demand": 1800},
+            "fuel": {"price": 5.0, "base_price": 5.0, "stock": 7000, "demand": 5200}
+        }
     }
 
 
@@ -582,6 +590,7 @@ func advance_month() -> void:
         if str(candidate.get("marital_status", "single")) == "single":
             _try_form_household(str(citizen_id))
     _simulate_household_month()
+    _simulate_city_markets()
     _recount_businesses_by_city()
     _recount_all_hubs()
     _save_state()
@@ -1027,6 +1036,41 @@ func _sync_hub_demographics(city_id: String) -> void:
     for key in counts:
         hub[key] = counts[key]
     hub_state[city_id] = hub
+
+
+func _simulate_city_markets() -> void:
+    for city_id in hub_state.keys():
+        var hub: Dictionary = hub_state[city_id]
+        var market: Dictionary = hub.get("market", {})
+        if market.is_empty():
+            market = {
+                "food": {"price": 8.0, "base_price": 8.0, "stock": 12000, "demand": 9000},
+                "water": {"price": 2.0, "base_price": 2.0, "stock": 18000, "demand": 11000},
+                "medicine": {"price": 24.0, "base_price": 24.0, "stock": 1800, "demand": 1200},
+                "electronics": {"price": 95.0, "base_price": 95.0, "stock": 900, "demand": 650},
+                "clothing": {"price": 32.0, "base_price": 32.0, "stock": 2600, "demand": 1800},
+                "fuel": {"price": 5.0, "base_price": 5.0, "stock": 7000, "demand": 5200}
+            }
+        var population_factor := clampf(float(hub.get("population", 100000)) / 100000.0, 0.25, 8.0)
+        for good_id in market.keys():
+            var good: Dictionary = market[good_id]
+            var base_price := float(good.get("base_price", good.get("price", 10.0)))
+            var stock := int(good.get("stock", 0))
+            var demand := maxi(1, int(float(good.get("demand", 1000)) * population_factor))
+            var sold := mini(stock, demand)
+            var shortage := 1.0 - float(sold) / float(demand)
+            var restock := maxi(1, int(float(demand) * _rng.randf_range(0.72, 1.08)))
+            stock = maxi(0, stock - sold + restock)
+            var pressure := clampf(float(demand) / float(maxi(1, stock)), 0.45, 2.4)
+            var price := clampf(base_price * (0.72 + pressure * 0.28 + shortage * 0.35), base_price * 0.55, base_price * 2.8)
+            good["stock"] = stock
+            good["demand"] = demand
+            good["last_month_sales"] = sold
+            good["price"] = snappedf(price, 0.01)
+            market[good_id] = good
+        hub["market"] = market
+        hub_state[city_id] = hub
+    _dirty = true
 
 
 func _recount_businesses_by_city() -> void:
