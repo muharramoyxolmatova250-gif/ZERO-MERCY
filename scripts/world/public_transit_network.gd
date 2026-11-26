@@ -92,6 +92,11 @@ func get_nearest_stop(position: Vector3, max_distance: float = 120.0) -> Diction
 			nearest = stop.duplicate(true)
 			nearest["distance"] = distance
 			nearest["waiting_passengers"] = get_waiting_passengers(str(stop_id))
+			var destinations: Dictionary = {}
+			for destination in _waiting_manifests.get(stop_id, []):
+				var key := str(destination) if not str(destination).is_empty() else "unspecified"
+				destinations[key] = int(destinations.get(key, 0)) + 1
+			nearest["waiting_destinations"] = destinations
 	return nearest
 
 func get_stop_snapshot() -> Array[Dictionary]:
@@ -99,6 +104,11 @@ func get_stop_snapshot() -> Array[Dictionary]:
 	for stop_id in _stops:
 		var stop: Dictionary = _stops[stop_id].duplicate(true)
 		stop["waiting_passengers"] = get_waiting_passengers(str(stop_id))
+		var destinations: Dictionary = {}
+		for destination in _waiting_manifests.get(stop_id, []):
+			var key := str(destination) if not str(destination).is_empty() else "unspecified"
+			destinations[key] = int(destinations.get(key, 0)) + 1
+		stop["waiting_destinations"] = destinations
 		result.append(stop)
 	return result
 
@@ -193,4 +203,4 @@ func get_transit_snapshot() -> Dictionary:
 	for route in _routes.values():
 		if bool(route.get("active", true)):
 			active_routes += 1
-	return {"stops": _stops.size(), "routes": _routes.size(), "active_routes": active_routes, "passengers_waiting": get_passenger_statistics().get("waiting", 0), "total_boardings": _total_boardings, "completed_trips": _total_completed_trips, "total_alightings": _total_alighted_passengers}
+	return {"stops": _stops.size(), "routes": _routes.size(), "active_routes": active_routes, "passengers_waiting": get_passenger_statistics().get("waiting", 0), "total_boardings": _total_boardings, "completed_trips": _total_completed_trips, "total_alightings": _total_alighted_passengers, "destination_aware": true}
