@@ -1,0 +1,49 @@
+name: Build fast global land grid
+
+on:
+  push:
+    branches: [world-build, main]
+    paths:
+      - ".github/workflows/build-fast-global-grid.yml"
+      - "tools/geodata/build_fast_global_grid.py"
+      - "tools/geodata/download_natural_earth.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: zero-mercy-fast-global-grid
+  cancel-in-progress: false
+
+jobs:
+  build-fast-grid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install geometry dependency
+        run: python -m pip install --disable-pip-version-check shapely
+      - name: Ensure Natural Earth base polygons exist
+        run: |
+          if [ ! -s data/geodata/world-110m.geojson ]; then
+            python tools/geodata/download_natural_earth.py --scale 110m --reuse-existing
+          fi
+      - name: Build 405,000-cell coarse global land mask
+        run: python tools/geodata/build_fast_global_grid.py
+      - name: Commit fast global grid
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/world/fast_global_grid.json data/world/fast_global_land_mask.bin
+          if git diff --cached --quiet; then
+            echo "Fast global grid is already current."
+          else
+            git commit -m "Build fast coarse global land grid"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
