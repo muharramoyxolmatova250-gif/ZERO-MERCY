@@ -519,7 +519,7 @@ func _scan_social_context() -> void:
 			_social_target = candidate
 
 func get_ai_snapshot() -> Dictionary:
-	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"crowd_avoidance":true,"memories":_memory.size(),"decisions":ai_decision_count,"personality_traits":_personality_traits.duplicate(true),"long_term_goal":_long_term_goal,"decision_reason":_decision_reason,"route_nodes":route.size(),"route_target_index":_target_index,"route_goal":_last_routed_goal,"route_active":not _last_routed_goal.is_empty(),"building_visit_phase":_building_visit_phase,"indoor_activity":_indoor_activity,"indoor_activity_time":_indoor_activity_time,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
+	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"crowd_avoidance":true,"memories":_memory.size(),"decisions":ai_decision_count,"personality_traits":_personality_traits.duplicate(true),"long_term_goal":_long_term_goal,"decision_reason":_decision_reason,"route_nodes":route.size(),"route_target_index":_target_index,"route_goal":_last_routed_goal,"route_active":not _last_routed_goal.is_empty(),"building_visit_phase":_building_visit_phase,"indoor_activity":_indoor_activity,"indoor_activity_time":_indoor_activity_time,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0)),"phone_visible":is_using_phone,"phone_interactions":phone_interaction_count,"phone_battery":_phone_battery_visual,"phone_action_cooldown":_phone_action_cooldown}
 
 func remember_event(event_name: String) -> void:
 	_memory.append(event_name)
@@ -584,6 +584,8 @@ func _build_appearance() -> void:
 	phone_material.emission_energy_multiplier = 2.0
 	_phone.material_override = phone_material
 	_phone.visible = false
+	_phone.position = Vector3(0.34, 1.05, -0.12)
+	_phone.scale = Vector3.ONE
 	add_child(_phone)
 
 
