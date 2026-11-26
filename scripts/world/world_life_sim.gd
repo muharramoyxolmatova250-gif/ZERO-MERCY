@@ -530,6 +530,8 @@ func advance_month() -> void:
         simulation_year += 1
     for city_id in hub_state.keys():
         var hub: Dictionary = hub_state[city_id]
+        hub["monthly_business_revenue"] = 0
+        hub["monthly_business_profit"] = 0
         var population := int(hub.get("population", 100000))
         var births := maxi(1, int(round(float(population) * 0.0011)))
         var deaths := maxi(1, int(round(float(population) * 0.00065)))
@@ -580,6 +582,7 @@ func advance_month() -> void:
         if str(candidate.get("marital_status", "single")) == "single":
             _try_form_household(str(citizen_id))
     _simulate_household_month()
+    _recount_businesses_by_city()
     _recount_all_hubs()
     _save_state()
     print("ZERO MERCY life month ", simulation_year, "-", simulation_month,
@@ -1024,6 +1027,23 @@ func _sync_hub_demographics(city_id: String) -> void:
     for key in counts:
         hub[key] = counts[key]
     hub_state[city_id] = hub
+
+
+func _recount_businesses_by_city() -> void:
+    var counts: Dictionary = {}
+    for city_id in hub_state.keys():
+        counts[str(city_id)] = 0
+    for profile in resident_profiles.values():
+        if str(profile.get("business_id", "")).is_empty():
+            continue
+        var city_id := str(profile.get("business_city", profile.get("city", "")))
+        if counts.has(city_id):
+            counts[city_id] = int(counts[city_id]) + 1
+    for city_id in counts:
+        var hub: Dictionary = hub_state[str(city_id)]
+        hub["business_count"] = int(counts[city_id])
+        hub_state[str(city_id)] = hub
+    _dirty = true
 
 
 func _recount_all_hubs() -> void:
