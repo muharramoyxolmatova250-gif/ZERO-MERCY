@@ -39,7 +39,8 @@ func _build_touch_controls() -> void:
 	touch_controls = Control.new()
 	touch_controls.set_script(touch_script)
 	touch_controls.name = "MobileControls"
-	$".".add_child(touch_controls)
+	touch_controls.visible = OS.has_feature("mobile")
+	add_child(touch_controls)
 	touch_controls.movement_changed.connect(func(direction: Vector2) -> void: touch_move = direction)
 	touch_controls.aim_changed.connect(_on_touch_aim)
 	touch_controls.fire_pressed.connect(_fire)
@@ -238,7 +239,13 @@ func _update_bots(delta: float) -> void:
 			bot.velocity = Vector3.ZERO
 		var wait := float(bot.get_meta("fire_wait", 1.0)) - delta
 		if wait <= 0.0 and distance < 24.0:
-			health = maxf(0.0, health - 4.0)
+			var eye := bot.global_position + Vector3.UP * 0.55
+			var target := camera.global_position
+			var sight := PhysicsRayQueryParameters3D.create(eye, target)
+			sight.exclude = [bot.get_rid()]
+			var obstruction := get_world_3d().direct_space_state.intersect_ray(sight)
+			if not obstruction.is_empty() and obstruction.get("collider") == player:
+				health = maxf(0.0, health - 4.0)
 			wait = 1.5 + float(bot.get_instance_id() % 10) * 0.08
 		bot.set_meta("fire_wait", wait)
 
