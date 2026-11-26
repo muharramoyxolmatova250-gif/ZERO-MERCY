@@ -1547,19 +1547,23 @@ func _ensure_phone_profile(citizen_id: String) -> Dictionary:
     if not resident_profiles.has(citizen_id):
         return {}
     var profile: Dictionary = resident_profiles[citizen_id]
-    if not profile.has("phone_id"):
-        profile["phone_id"] = "phone_" + str(abs(hash(citizen_id)))
-        profile["phone_model"] = "Neon One"
-        profile["phone_number"] = _generate_phone_number(citizen_id)
-        profile["phone_contacts"] = []
-        profile["phone_inbox"] = []
-        profile["phone_outbox"] = []
-        profile["phone_call_history"] = []
-        profile["phone_notifications"] = []
-        profile["phone_social_posts"] = []
-        profile["phone_last_used_day"] = simulation_day
-        profile["phone_battery"] = 100.0
-        profile["phone_privacy"] = "friends"
+    var changed := false
+    var defaults := {
+        "phone_id":"phone_" + str(abs(hash(citizen_id))),
+        "phone_model":"Neon One",
+        "phone_number":_generate_phone_number(citizen_id),
+        "phone_contacts":[], "phone_inbox":[], "phone_outbox":[],
+        "phone_call_history":[], "phone_notifications":[],
+        "phone_social_posts":[], "phone_watch_history":[],
+        "phone_game_stats":{}, "phone_topic_interests":{},
+        "phone_saved_media":[], "phone_last_used_day":simulation_day,
+        "phone_battery":100.0, "phone_privacy":"friends"
+    }
+    for key in defaults:
+        if not profile.has(key):
+            profile[key] = defaults[key]
+            changed = true
+    if changed:
         resident_profiles[citizen_id] = profile
         _dirty = true
     return profile
@@ -1578,7 +1582,10 @@ func get_phone_snapshot(citizen_id: String) -> Dictionary:
         "outbox": (profile.get("phone_outbox", []) as Array).duplicate(true),
         "calls": (profile.get("phone_call_history", []) as Array).duplicate(true),
         "notifications": (profile.get("phone_notifications", []) as Array).duplicate(true),
-        "battery": float(profile.get("phone_battery", 100.0))
+        "battery": float(profile.get("phone_battery", 100.0)),
+        "watch_history": (profile.get("phone_watch_history", []) as Array).duplicate(true),
+        "game_stats": (profile.get("phone_game_stats", {}) as Dictionary).duplicate(true),
+        "saved_media": (profile.get("phone_saved_media", []) as Array).duplicate(true)
     }
 
 
@@ -1872,6 +1879,13 @@ func record_phone_media_view(citizen_id: String, media_id: String, watch_seconds
     while history.size() > 100:
         history.pop_front()
     profile["phone_watch_history"] = history
+    var interests: Dictionary = profile.get("phone_topic_interests", {})
+    for item in _social_feed:
+        if str(item.get("id", "")) == media_id:
+            var topic := str(item.get("topic", "general"))
+            interests[topic] = float(interests.get(topic, 0.0)) + minf(1.0, watch_seconds / 90.0)
+            break
+    profile["phone_topic_interests"] = interests
     profile["phone_battery"] = maxf(0.0, float(profile.get("phone_battery", 100.0)) - maxf(0.01, watch_seconds * 0.0008))
     profile["phone_last_used_day"] = simulation_day
     resident_profiles[citizen_id] = profile
