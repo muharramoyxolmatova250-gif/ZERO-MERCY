@@ -29,6 +29,7 @@ var relationship_score := 0.0
 var life_profile: Dictionary = {}
 var _last_visual_age := -1
 var _age_refresh_timer := 0.0
+var _spatial_update_timer := 0.0
 @export var citizen_id := ""
 @export var city_id := ""
 @export var occupation := "resident"
@@ -40,6 +41,9 @@ func _ready() -> void:
 	if citizen_id.is_empty():
 		citizen_id = "citizen_" + str(abs(hash(str(position) + ":" + city_id)))
 	_register_life_profile()
+	var spatial_index := get_tree().get_first_node_in_group("citizen_spatial_index")
+	if spatial_index != null:
+		spatial_index.call("register_citizen", self)
 	if has_node("/root/GameSession"):
 		GameSession.crime_reported.connect(_on_crime_reported)
 	if route.size() < 2:
@@ -74,6 +78,12 @@ func _on_crime_reported(crime_id: String, crime_position: Vector3, severity: int
 	remember_event("witnessed_crime:" + crime_id)
 
 func _physics_process(delta: float) -> void:
+	_spatial_update_timer += delta
+	if _spatial_update_timer >= 0.2:
+		_spatial_update_timer = 0.0
+		var spatial_index := get_tree().get_first_node_in_group("citizen_spatial_index")
+		if spatial_index != null:
+			spatial_index.call("update_citizen", self)
 	if _crime_flee_timer > 0.0:
 		_crime_flee_timer = maxf(0.0, _crime_flee_timer - delta)
 		position += _crime_flee_direction * walk_speed * 2.1 * delta
@@ -133,16 +143,26 @@ func _physics_process(delta: float) -> void:
 		position += steering * walk_speed * speed_factor * delta
 		look_at(position + steering, Vector3.UP)
 
+func _get_nearby_citizens(radius: float) -> Array:
+	var spatial_index := get_tree().get_first_node_in_group("citizen_spatial_index")
+	if spatial_index != null:
+		return spatial_index.call("get_nearby_citizens", global_position, radius)
+	var nearby: Array = []
+	for candidate in get_tree().get_nodes_in_group("city_citizen"):
+		if candidate != self and is_instance_valid(candidate) and global_position.distance_to(candidate.global_position) <= radius:
+			nearby.append(candidate)
+	return nearby
+
 func _get_crowd_separation() -> Vector3:
 	var separation := Vector3.ZERO
 	var nearby_count := 0
-	for candidate in get_tree().get_nodes_in_group("city_citizen"):
-		if candidate == self or not is_instance_valid(candidate):
+	for candidate in _get_nearby_citizens(1.6):
+		if candidate == self:
 			continue
 		var offset: Vector3 = global_position - candidate.global_position
 		offset.y = 0.0
 		var distance := offset.length()
-		if distance > 0.01 and distance < 1.6:
+		if distance > 0.01:
 			separation += offset.normalized() / distance
 			nearby_count += 1
 	if nearby_count > 0:
@@ -217,8 +237,8 @@ func _pause_for_goal() -> float:
 func _scan_social_context() -> void:
 	_social_target = null
 	var nearest_distance := 11.0
-	for candidate in get_tree().get_nodes_in_group("city_citizen"):
-		if candidate == self or not is_instance_valid(candidate): continue
+	for candidate in _get_nearby_citizens(nearest_distance):
+		if candidate == self: continue
 		var distance := global_position.distance_to(candidate.global_position)
 		if distance < nearest_distance:
 			nearest_distance = distance
@@ -280,6 +300,9 @@ func _build_appearance() -> void:
 
 
 func _exit_tree() -> void:
+	var spatial_index := get_tree().get_first_node_in_group("citizen_spatial_index")
+	if spatial_index != null:
+		spatial_index.call("unregister_citizen", self)
 	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
 	if life_sim != null and not citizen_id.is_empty():
 		life_sim.call("unregister_citizen", citizen_id)
