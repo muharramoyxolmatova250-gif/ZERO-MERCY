@@ -235,10 +235,10 @@ func _process(delta: float) -> void:
    routine_speed = 1.6
   var walk_speed := 2.8 if _panic_timer > 0.0 else routine_speed
   pedestrian.position.x += direction * walk_speed * delta
-  if absf(pedestrian.position.x) > 24.0:
+  if walk_speed > 0.0 and absf(pedestrian.position.x) > 24.0:
    pedestrian.set_meta("walk_direction", -direction)
   pedestrian.rotation.y = PI if direction < 0.0 else 0.0
-  var gait := sin(Time.get_ticks_msec() * 0.008 + float(pedestrian.get_instance_id() % 17))
+  var gait := sin(Time.get_ticks_msec() * 0.008 + float(pedestrian.get_instance_id() % 17)) if walk_speed > 0.0 else 0.0
   var left_leg := pedestrian.get_node_or_null("Leg_-1.0") as Node3D
   var right_leg := pedestrian.get_node_or_null("Leg_1.0") as Node3D
   if left_leg != null:
