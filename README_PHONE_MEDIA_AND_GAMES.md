@@ -18,3 +18,15 @@ This is an early single-player prototype, not a finished Counter-Strike/PUBG-sca
 
 ## Important
 Only use video, photo, sound and other media assets that ZERO MERCY has permission to distribute. A video player does not grant rights to third-party content.
+
+## Phone integration (November 2026)
+
+The in-world phone UI now exposes **MEDIA** and **GAMES** tabs:
+- Press **P** in the main world, then choose MEDIA or GAMES.
+- MEDIA opens the dedicated player overlay. Choose a feed item with an installed asset, or enter a project path such as `res://media/videos/sample.ogv`; use **BACK TO PHONE** to return.
+- Supported local assets are Godot `VideoStream` resources (for example imported OGV) and `Texture2D` images (PNG/JPEG).
+- GAMES launches the standalone Tactical Breach training match. Use **EXIT TO PHONE** to leave; Dara's player camera and movement are restored.
+- The current social feed contains metadata unless a real local asset path is supplied. No copyrighted video/photo library is bundled.
+- Tactical Breach remains an offline single-player prototype. It is not online PUBG/Counter-Strike, and has no matchmaking or network multiplayer.
+
+These phone launch flows are code-integrated but still require Godot 4 runtime validation on desktop and Android.
