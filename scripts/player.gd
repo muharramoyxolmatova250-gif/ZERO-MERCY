@@ -24,6 +24,9 @@ signal player_died
 @export var magazine_size := 12
 @export var reserve_ammo := 60
 @export var shot_interval := 0.18
+@export var melee_damage := 42.0
+@export var melee_range := 2.4
+@export var melee_cooldown := 0.55
 
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var camera: Camera3D = $CameraPivot/Camera3D
@@ -34,6 +37,8 @@ var health: float
 var stamina: float
 var ammo_in_magazine: int
 var shot_cooldown := 0.0
+var melee_cooldown_timer := 0.0
+var _melee_animation := 0.0
 var stamina_regen_timer := 0.0
 var is_dead := false
 var _held_item: Node3D
@@ -304,6 +309,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera_pivot.rotation.x = camera_pitch
 	if event.is_action_pressed("interact"):
 		_interact_with_world()
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F:
+		_melee_attack()
 	if event.is_action_pressed("ui_cancel"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if event is InputEventMouseButton and event.pressed and Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
@@ -366,9 +373,9 @@ func _animate_dara_visual(delta: float) -> void:
 		"Head": Vector3(0.035 * movement_weight - breath * 0.5 - air_pose * 0.06 + _damage_reaction_strength * 0.16, 0.0, strafe * 0.045 + _damage_reaction_strength * 0.12),
 		"Shoulder_-1.0": Vector3(-left_phase * 0.22 * movement_weight, 0.0, 0.0),
 		"Shoulder_1.0": Vector3(-right_phase * 0.22 * movement_weight, 0.0, 0.0),
-		"UpperArm_-1.0": Vector3(-left_phase * 0.48 * movement_weight - 0.12 - (0.52 if _aiming else 0.0), 0.0, -strafe * 0.08),
+		"UpperArm_-1.0": Vector3(-left_phase * 0.48 * movement_weight - 0.12 - (0.52 if _aiming else 0.0) - _melee_animation * 0.9, 0.0, -strafe * 0.08 - _melee_animation * 0.22),
 		"UpperArm_1.0": Vector3(-right_phase * 0.48 * movement_weight - 0.12 - (0.52 if _aiming else 0.0), 0.0, -strafe * 0.08),
-		"Forearm_-1.0": Vector3(-0.18 - maxf(0.0, left_phase) * 0.16 * movement_weight - (0.62 if _aiming else 0.0), 0.0, 0.0),
+		"Forearm_-1.0": Vector3(-0.18 - maxf(0.0, left_phase) * 0.16 * movement_weight - (0.62 if _aiming else 0.0) - _melee_animation * 0.55, 0.0, 0.0),
 		"Forearm_1.0": Vector3(-0.18 - maxf(0.0, right_phase) * 0.16 * movement_weight - (0.62 if _aiming else 0.0), 0.0, 0.0),
 		"Thigh_-1.0": Vector3(left_phase * lerpf(0.42, 0.68, sprint_weight) * movement_weight - air_pose * 0.28, 0.0, 0.0),
 		"Thigh_1.0": Vector3(right_phase * lerpf(0.42, 0.68, sprint_weight) * movement_weight - air_pose * 0.28, 0.0, 0.0),
@@ -389,6 +396,8 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector3.ZERO
 		return
 	shot_cooldown = maxf(shot_cooldown - delta, 0.0)
+	melee_cooldown_timer = maxf(melee_cooldown_timer - delta, 0.0)
+	_melee_animation = move_toward(_melee_animation, 0.0, delta * 3.6)
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 	if Input.is_action_just_pressed("jump") and is_on_floor():
@@ -449,6 +458,25 @@ func respawn() -> void:
 	stamina_changed.emit(stamina, stamina_max)
 	ammo_changed.emit(ammo_in_magazine, reserve_ammo)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+func _melee_attack() -> void:
+	if is_dead or melee_cooldown_timer > 0.0:
+		return
+	melee_cooldown_timer = melee_cooldown
+	_melee_animation = 1.0
+	_aiming = false
+	var origin := camera.global_position
+	var end := origin + (-camera.global_transform.basis.z * melee_range)
+	var query := PhysicsRayQueryParameters3D.create(origin, end)
+	query.exclude = [get_rid()]
+	query.collide_with_areas = false
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return
+	var collider: Object = hit.get("collider")
+	if collider is Node and collider.is_in_group("damageable") and collider.has_method("take_damage"):
+		collider.call("take_damage", melee_damage, self)
 
 
 func _fire_weapon() -> void:
