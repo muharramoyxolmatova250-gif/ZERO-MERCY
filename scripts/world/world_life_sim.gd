@@ -756,6 +756,31 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     _append_event(profile, "monthly_finances:" + str(balance))
 
 
+func _manage_personal_savings(profile: Dictionary, monthly_balance: int) -> void:
+    var money := int(profile.get("money", 0))
+    var savings := int(profile.get("savings", 0))
+    var goal := str(profile.get("financial_goal", "build_savings"))
+    var reserve_target := 1800 + int(profile.get("monthly_living_cost", 300)) * 3
+    var contribution := 0
+    if monthly_balance > 0 and money > reserve_target:
+        contribution = mini(int(float(monthly_balance) * 0.35), money - reserve_target)
+    elif monthly_balance < 0 and savings > 0:
+        var withdrawal := mini(savings, absi(monthly_balance))
+        savings -= withdrawal
+        money += withdrawal
+        profile["money"] = money
+        _append_event(profile, "used_savings_for_living_costs")
+    savings += maxi(0, contribution)
+    if savings >= 15000 and goal == "build_savings":
+        profile["financial_goal"] = "save_for_home"
+        _append_event(profile, "financial_goal_changed:save_for_home")
+    elif savings >= 50000 and goal == "save_for_home":
+        profile["financial_goal"] = "start_business"
+        _append_event(profile, "financial_goal_changed:start_business")
+    profile["savings"] = savings
+    profile["monthly_savings_contribution"] = contribution
+
+
 func _consider_home_purchase(profile: Dictionary) -> void:
     if bool(profile.get("owns_home", false)) or not bool(profile.get("living_independently", false)):
         return
