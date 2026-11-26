@@ -10,8 +10,12 @@ var _signal_elapsed := 0.0
 var _green_for_eastbound := true
 var _signal_lamp: MeshInstance3D
 var _signal_material: StandardMaterial3D
+var _panic_timer := 0.0
+var _panic_origin := Vector3.ZERO
 
 func _ready() -> void:
+ if has_node("/root/GameSession"):
+  GameSession.crime_reported.connect(_on_crime_reported)
  _build_traffic_signal()
  for index in range(vehicle_count):
   var car := _make_traffic_car(index)
@@ -24,6 +28,15 @@ func _ready() -> void:
   pedestrian.set_meta("walk_direction", 1.0 if index % 2 == 0 else -1.0)
   add_child(pedestrian)
   _pedestrians.append(pedestrian)
+
+func _on_crime_reported(_crime_id: String, world_position: Vector3, _severity: int) -> void:
+ _panic_timer = 12.0
+ _panic_origin = world_position
+ for pedestrian in _pedestrians:
+  var away := signf(pedestrian.global_position.x - world_position.x)
+  if is_zero_approx(away):
+   away = 1.0 if pedestrian.get_instance_id() % 2 == 0 else -1.0
+  pedestrian.set_meta("walk_direction", away)
 
 func _build_traffic_signal() -> void:
  var pole_material := StandardMaterial3D.new()
@@ -153,6 +166,7 @@ func _make_pedestrian(index: int) -> Node3D:
  return root
 
 func _process(delta: float) -> void:
+ _panic_timer = maxf(0.0, _panic_timer - delta)
  _signal_elapsed += delta
  if _signal_elapsed >= signal_cycle_seconds:
   _signal_elapsed = 0.0
@@ -161,7 +175,8 @@ func _process(delta: float) -> void:
  _signal_material.emission = _signal_material.albedo_color
  for index in range(_traffic.size()):
   var car := _traffic[index]
-  var next_x := car.position.x + travel_speed * delta
+  var panic_speed := 1.35 if _panic_timer > 0.0 else 1.0
+  var next_x := car.position.x + travel_speed * panic_speed * delta
   # Red light stop line at the boulevard crossing.
   if not _green_for_eastbound and car.position.x < 0.0 and next_x >= -3.0:
    next_x = -3.0
@@ -179,7 +194,8 @@ func _process(delta: float) -> void:
    car.position.x = -loop_length * 0.5
  for pedestrian in _pedestrians:
   var direction := float(pedestrian.get_meta("walk_direction", 1.0))
-  pedestrian.position.x += direction * 1.25 * delta
+  var walk_speed := 2.8 if _panic_timer > 0.0 else 1.25
+  pedestrian.position.x += direction * walk_speed * delta
   if absf(pedestrian.position.x) > 24.0:
    pedestrian.set_meta("walk_direction", -direction)
   pedestrian.rotation.y = PI if direction < 0.0 else 0.0
