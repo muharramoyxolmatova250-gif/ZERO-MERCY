@@ -110,7 +110,8 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         job = "retired"
     elif job == "resident" or job.is_empty():
         job = JOBS[local_rng.randi_range(0, JOBS.size() - 1)]
-    var married := age >= 22 and age <= 62 and local_rng.randf() < 0.48
+    # Household status is assigned only when a real second resident can be linked.
+    var married := false
     var profile := {
         "id": citizen_id, "name": FIRST_NAMES[local_rng.randi_range(0, FIRST_NAMES.size() - 1)] + " " + LAST_NAMES[local_rng.randi_range(0, LAST_NAMES.size() - 1)],
         "city": city_id, "sex": sex,
