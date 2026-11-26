@@ -175,31 +175,53 @@ func _try_form_household(citizen_id: String) -> void:
     _append_event(partner, "formed_household_with:" + citizen_id)
     resident_profiles[citizen_id] = profile
     resident_profiles[partner_id] = partner
+    marriages_total += 1
     _dirty = true
 
 
 func get_family_members(citizen_id: String) -> Array:
     if not resident_profiles.has(citizen_id):
         return []
-    var family_id := str(resident_profiles[citizen_id].get("family_id", ""))
-    if family_id.is_empty():
-        return []
+    var profile: Dictionary = resident_profiles[citizen_id]
+    var family_id := str(profile.get("family_id", ""))
+    var parent_ids: Array = profile.get("parents", [])
+    if parent_ids.is_empty():
+        var parent_id := str(profile.get("parent_id", ""))
+        var second_parent_id := str(profile.get("second_parent_id", ""))
+        if not parent_id.is_empty(): parent_ids.append(parent_id)
+        if not second_parent_id.is_empty(): parent_ids.append(second_parent_id)
+    var child_ids: Array = profile.get("children_ids", [])
     var members: Array = []
     for member_id in resident_profiles.keys():
+        if str(member_id) == citizen_id:
+            continue
         var member: Dictionary = resident_profiles[member_id]
-        if str(member.get("family_id", "")) == family_id:
-            var relationship := "family"
-            if str(member.get("partner_id", "")) == citizen_id:
-                relationship = "partner"
-            elif str(member.get("parent_id", "")) == citizen_id or str(member.get("second_parent_id", "")) == citizen_id:
-                relationship = "child"
-            elif str(member.get("id", "")) == str(resident_profiles[citizen_id].get("parent_id", "")):
-                relationship = "parent"
+        var member_parents: Array = member.get("parents", [])
+        if member_parents.is_empty():
+            var p1 := str(member.get("parent_id", ""))
+            var p2 := str(member.get("second_parent_id", ""))
+            if not p1.is_empty(): member_parents.append(p1)
+            if not p2.is_empty(): member_parents.append(p2)
+        var relationship := ""
+        if str(member.get("partner_id", "")) == citizen_id:
+            relationship = "partner"
+        elif parent_ids.has(str(member_id)):
+            relationship = "parent"
+        elif child_ids.has(str(member_id)) or str(member.get("parent_id", "")) == citizen_id or str(member.get("second_parent_id", "")) == citizen_id:
+            relationship = "child"
+        else:
+            for parent_id in parent_ids:
+                if member_parents.has(parent_id):
+                    relationship = "sibling"
+                    break
+        if relationship.is_empty() and not family_id.is_empty() and str(member.get("family_id", "")) == family_id:
+            relationship = "relative"
+        if not relationship.is_empty():
             members.append({"id": str(member_id), "name": str(member.get("name", member_id)),
-                "age_years": int(member.get("age_years", 0)), "occupation": str(member.get("occupation", "resident")),
-                "relationship": relationship})
+                "age_years": int(member.get("age_years", 0)),
+                "occupation": str(member.get("occupation", "resident")),
+                "relationship": relationship, "life_stage": str(member.get("life_stage", "adult"))})
     return members
-
 
 func record_family_interaction(citizen_id: String, activity: String = "family_time") -> void:
     if not resident_profiles.has(citizen_id):
@@ -208,13 +230,62 @@ func record_family_interaction(citizen_id: String, activity: String = "family_ti
     profile["happiness"] = clampf(float(profile.get("happiness", 0.5)) + 0.015, 0.0, 1.0)
     _append_event(profile, activity)
     resident_profiles[citizen_id] = profile
-    var partner_id := str(profile.get("partner_id", ""))
-    if resident_profiles.has(partner_id):
-        var partner: Dictionary = resident_profiles[partner_id]
-        partner["happiness"] = clampf(float(partner.get("happiness", 0.5)) + 0.01, 0.0, 1.0)
-        _append_event(partner, "shared_" + activity)
-        resident_profiles[partner_id] = partner
+    for member_data in get_family_members(citizen_id):
+        var member_id := str(member_data.get("id", ""))
+        if not resident_profiles.has(member_id):
+            continue
+        var member: Dictionary = resident_profiles[member_id]
+        var relation := str(member_data.get("relationship", "relative"))
+        var boost := 0.012 if relation in ["child", "parent", "partner"] else 0.006
+        member["happiness"] = clampf(float(member.get("happiness", 0.5)) + boost, 0.0, 1.0)
+        _append_event(member, "shared_" + activity + ":" + citizen_id)
+        resident_profiles[member_id] = member
     _dirty = true
+
+
+func record_family_conflict(first_id: String, second_id: String, severity: float = 0.25) -> void:
+    if not resident_profiles.has(first_id) or not resident_profiles.has(second_id):
+        return
+    var first: Dictionary = resident_profiles[first_id]
+    var second: Dictionary = resident_profiles[second_id]
+    var amount := clampf(severity, 0.0, 1.0)
+    first["happiness"] = clampf(float(first.get("happiness", 0.5)) - amount * 0.12, 0.0, 1.0)
+    second["happiness"] = clampf(float(second.get("happiness", 0.5)) - amount * 0.12, 0.0, 1.0)
+    first["family_stress"] = clampf(float(first.get("family_stress", 0.0)) + amount * 0.2, 0.0, 1.0)
+    second["family_stress"] = clampf(float(second.get("family_stress", 0.0)) + amount * 0.2, 0.0, 1.0)
+    _append_event(first, "family_conflict_with:" + second_id)
+    _append_event(second, "family_conflict_with:" + first_id)
+    resident_profiles[first_id] = first
+    resident_profiles[second_id] = second
+    record_social_interaction(first_id, second_id, "argument")
+    _dirty = true
+
+
+func separate_partners(citizen_id: String, reason: String = "mutual_separation") -> bool:
+    if not resident_profiles.has(citizen_id):
+        return false
+    var profile: Dictionary = resident_profiles[citizen_id]
+    var partner_id := str(profile.get("partner_id", ""))
+    if partner_id.is_empty() or not resident_profiles.has(partner_id):
+        return false
+    var partner: Dictionary = resident_profiles[partner_id]
+    profile["partner_id"] = ""
+    partner["partner_id"] = ""
+    profile["marital_status"] = "single"
+    partner["marital_status"] = "single"
+    # Children retain their shared family identity and links to both parents.
+    var retained_family := str(profile.get("family_id", ""))
+    _append_event(profile, "separated:" + reason)
+    _append_event(partner, "separated:" + reason)
+    if retained_family.is_empty():
+        retained_family = str(partner.get("family_id", ""))
+    profile["family_id"] = retained_family
+    partner["family_id"] = retained_family
+    resident_profiles[citizen_id] = profile
+    resident_profiles[partner_id] = partner
+    marriages_total = maxi(0, marriages_total - 1)
+    _dirty = true
+    return true
 
 func claim_resident_id(city_id: String) -> String:
     if not _claim_cache.has(city_id):
@@ -443,7 +514,7 @@ func _create_child_profile(parent: Dictionary, second_parent_id: String = "") ->
         "age_days": 0, "age_years": 0, "life_stage": "child",
         "occupation": "child", "education": "early_childhood", "school": "",
         "marital_status": "single", "partner_id": "",
-        "children_count": 0, "family_id": str(parent.get("family_id", "")),
+        "children_count": 0, "family_id": str(parent.get("family_id", "")) if not str(parent.get("family_id", "")).is_empty() else "family_" + str(abs(hash(parent_id))),
         "parent_id": parent_id, "second_parent_id": second_parent_id,
         "parents": [parent_id, second_parent_id] if not second_parent_id.is_empty() else [parent_id],
         "money": 0, "health": 0.98,
@@ -553,7 +624,7 @@ func _recount_all_hubs() -> void:
             "student", "child": counts["sample_students"] += 1
             "adult": counts["sample_workers"] += 1
             "retired": counts["sample_retired"] += 1
-        if str(profile.get("marital_status", "")) == "married":
+        if str(profile.get("marital_status", "")) == "partnered":
             counts["sample_families"] += 1
     for city_id in counts_by_city:
         var hub: Dictionary = hub_state[city_id]
