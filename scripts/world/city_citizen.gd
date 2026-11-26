@@ -273,7 +273,7 @@ func _decide_goal() -> void:
 		scores["play"] = 1.0 if hour >= 8 and hour < 20 else 0.2
 	elif life_stage == "retired":
 		scores["leisure"] = 0.85
-	if str(life_profile.get("marital_status", "single")) == "married":
+	if str(life_profile.get("marital_status", "single")) == "partnered":
 		scores["family"] = 0.35 + _social_need * 0.2
 	var previous_goal := current_goal
 	var best := "commute"
@@ -327,6 +327,9 @@ func _choose_next_waypoint() -> void:
 				life_sim.call("record_event", citizen_id, "visited_building:" + completed_goal)
 			if completed_goal == "family" and life_sim != null and life_sim.has_method("record_family_interaction"):
 				life_sim.call("record_family_interaction", citizen_id, "family_visit")
+				if life_sim.has_method("record_childcare"):
+					for child_id in life_profile.get("children_ids", []):
+						life_sim.call("record_childcare", citizen_id, str(child_id), "family_visit")
 				remember_event("family_time_shared")
 			_last_routed_goal = ""
 			_building_visit_phase = ""
