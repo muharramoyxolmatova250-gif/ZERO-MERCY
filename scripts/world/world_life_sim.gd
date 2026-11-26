@@ -562,6 +562,7 @@ func advance_month() -> void:
         if new_stage == "adult":
             _advance_career_month(profile)
             _process_job_interview(profile)
+            _process_monthly_finances(profile)
         if new_age >= 82 and _rng.randf() < 0.006:
             profile["life_stage"] = "deceased"
             profile["active"] = false
@@ -717,6 +718,37 @@ func _career_specialization(education: String, performance: float, rng: RandomNu
     elif performance < 0.45:
         fields = ["courier", "merchant", "artist", "mechanic"]
     return str(fields[rng.randi_range(0, fields.size() - 1)])
+
+
+func _monthly_salary_for_job(job: String, level: int) -> int:
+    var base := {
+        "engineer": 4200, "doctor": 4800, "teacher": 2600, "pilot": 5600,
+        "police": 3000, "mechanic": 2800, "designer": 3400, "courier": 1900,
+        "scientist": 5200, "merchant": 3100, "artist": 2400, "security": 2200
+    }
+    return int(base.get(job, 1600)) + maxi(0, level - 1) * 180
+
+
+func _process_monthly_finances(profile: Dictionary) -> void:
+    var job := str(profile.get("occupation", "unemployed"))
+    var level := int(profile.get("career_level", 1))
+    var income := _monthly_salary_for_job(job, level) if job in JOBS else 0
+    var living_independently := bool(profile.get("living_independently", false))
+    var rent := 650 if living_independently else 180
+    var food_and_services := 420 if job in JOBS else 300
+    var balance := income - rent - food_and_services
+    profile["monthly_income"] = income
+    profile["monthly_housing_cost"] = rent
+    profile["monthly_living_cost"] = food_and_services
+    profile["money"] = maxi(0, int(profile.get("money", 0)) + balance)
+    profile["financial_stability"] = clampf(float(profile.get("money", 0)) / 12000.0, 0.0, 1.0)
+    if int(profile.get("money", 0)) < 500:
+        profile["housing_status"] = "shared_or_family_home"
+    elif living_independently:
+        profile["housing_status"] = "independent_rental"
+    else:
+        profile["housing_status"] = "family_or_shared_home"
+    _append_event(profile, "monthly_finances:" + str(balance))
 
 
 func _process_job_interview(profile: Dictionary) -> void:
