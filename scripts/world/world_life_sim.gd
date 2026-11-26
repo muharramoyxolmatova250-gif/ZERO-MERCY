@@ -13,6 +13,7 @@ var simulation_month := 1
 var simulation_year := 1
 var hub_state: Dictionary = {}
 var resident_profiles: Dictionary = {}
+var social_bonds: Dictionary = {}
 var _claim_cache: Dictionary = {}
 var births_total := 0
 var deaths_total := 0
@@ -177,6 +178,45 @@ func record_activity(citizen_id: String, activity: String) -> void:
         profile["money"] = int(profile.get("money", 0)) + 1
     resident_profiles[citizen_id] = profile
     _dirty = true
+
+func record_social_interaction(first_id: String, second_id: String, interaction: String = "conversation") -> void:
+    if first_id.is_empty() or second_id.is_empty() or first_id == second_id:
+        return
+    var pair_id := _social_pair_key(first_id, second_id)
+    var bond: Dictionary = social_bonds.get(pair_id, {
+        "first": first_id, "second": second_id, "familiarity": 0.0,
+        "trust": 0.0, "friendship": 0.0, "interactions": 0,
+        "last_interaction_day": simulation_day, "history": []
+    })
+    bond["familiarity"] = clampf(float(bond.get("familiarity", 0.0)) + 0.04, 0.0, 1.0)
+    bond["interactions"] = int(bond.get("interactions", 0)) + 1
+    bond["last_interaction_day"] = simulation_day
+    var history: Array = bond.get("history", [])
+    history.append({"day": simulation_day, "type": interaction})
+    while history.size() > 16:
+        history.pop_front()
+    bond["history"] = history
+    if interaction in ["friendly_chat", "help", "shared_activity"]:
+        bond["trust"] = clampf(float(bond.get("trust", 0.0)) + 0.025, -1.0, 1.0)
+        bond["friendship"] = clampf(float(bond.get("friendship", 0.0)) + 0.035, -1.0, 1.0)
+    elif interaction in ["argument", "threat", "betrayal"]:
+        bond["trust"] = clampf(float(bond.get("trust", 0.0)) - 0.12, -1.0, 1.0)
+        bond["friendship"] = clampf(float(bond.get("friendship", 0.0)) - 0.08, -1.0, 1.0)
+    social_bonds[pair_id] = bond
+    _dirty = true
+
+
+func get_social_bond(first_id: String, second_id: String) -> Dictionary:
+    if first_id.is_empty() or second_id.is_empty():
+        return {}
+    return social_bonds.get(_social_pair_key(first_id, second_id), {}).duplicate(true)
+
+
+func _social_pair_key(first_id: String, second_id: String) -> String:
+    var ids := [first_id, second_id]
+    ids.sort()
+    return str(ids[0]) + "::" + str(ids[1])
+
 
 func record_event(citizen_id: String, event_name: String) -> void:
     if not resident_profiles.has(citizen_id):
@@ -467,6 +507,7 @@ func _load_state() -> void:
     simulation_year = int(parsed.get("simulation_year", simulation_year))
     hub_state = parsed.get("hub_state", {})
     resident_profiles = parsed.get("resident_profiles", {})
+    social_bonds = parsed.get("social_bonds", {})
     births_total = int(parsed.get("births_total", 0))
     deaths_total = int(parsed.get("deaths_total", 0))
     marriages_total = int(parsed.get("marriages_total", 0))
@@ -476,7 +517,7 @@ func _save_state() -> void:
     var data := {
         "simulation_day": simulation_day, "simulation_month": simulation_month,
         "simulation_year": simulation_year, "hub_state": hub_state,
-        "resident_profiles": resident_profiles, "births_total": births_total,
+        "resident_profiles": resident_profiles, "social_bonds": social_bonds, "births_total": births_total,
         "deaths_total": deaths_total, "marriages_total": marriages_total,
         "graduations_total": graduations_total
     }
