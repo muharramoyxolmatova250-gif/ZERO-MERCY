@@ -3,6 +3,7 @@ extends Node
 var _stops: Dictionary = {}
 var _routes: Dictionary = {}
 var _waiting_passengers: Dictionary = {}
+var _waiting_manifests: Dictionary = {}
 var _total_boardings := 0
 var _total_generated_passengers := 0
 var _demand_timer := 0.0
@@ -24,13 +25,23 @@ func _process(delta: float) -> void:
 		var demand := _rng.randi_range(1, 4)
 		if str(stop.get("name", "")).to_lower().contains("central"):
 			demand += 2
-		add_waiting_passengers(str(stop_id), demand)
+		var destination_ids: Array[String] = []
+		for candidate_id in _stops:
+			if str(candidate_id) != str(stop_id):
+				destination_ids.append(str(candidate_id))
+		if not destination_ids.is_empty():
+			for passenger_index in range(demand):
+				var destination_id := destination_ids[_rng.randi_range(0, destination_ids.size() - 1)]
+				add_waiting_trip(str(stop_id), destination_id, 1)
+		else:
+			add_waiting_passengers(str(stop_id), demand)
 
 func register_stop(stop_id: String, position: Vector3, name: String = "") -> bool:
 	if stop_id.is_empty():
 		return false
 	_stops[stop_id] = {"id": stop_id, "name": name if not name.is_empty() else stop_id, "position": position}
 	_waiting_passengers[stop_id] = 0
+	_waiting_manifests[stop_id] = []
 	return true
 
 func register_route(route_id: String, stop_ids: Array[String], vehicle_type: String = "bus", interval_minutes: int = 12) -> bool:
@@ -92,23 +103,49 @@ func get_stop_snapshot() -> Array[Dictionary]:
 func add_waiting_passengers(stop_id: String, amount: int) -> int:
 	if not _stops.has(stop_id):
 		return 0
-	var current := int(_waiting_passengers.get(stop_id, 0))
+	var current := get_waiting_passengers(stop_id)
 	var added := mini(maxi(0, amount), 60 - current)
-	_waiting_passengers[stop_id] = current + added
+	var manifest: Array = _waiting_manifests.get(stop_id, [])
+	for index in range(added):
+		manifest.append("")
+	_waiting_manifests[stop_id] = manifest
+	_waiting_passengers[stop_id] = manifest.size()
 	_total_generated_passengers += added
 	return added
+
+func add_waiting_trip(stop_id: String, destination_stop: String, amount: int = 1) -> int:
+	if not _stops.has(stop_id) or not _stops.has(destination_stop) or stop_id == destination_stop:
+		return 0
+	var manifest: Array = _waiting_manifests.get(stop_id, [])
+	var added := mini(maxi(0, amount), 60 - manifest.size())
+	for index in range(added):
+		manifest.append(destination_stop)
+	_waiting_manifests[stop_id] = manifest
+	_waiting_passengers[stop_id] = manifest.size()
+	_total_generated_passengers += added
+	return added
+
+func take_waiting_manifest(stop_id: String, available_seats: int) -> Array[String]:
+	var boarded: Array[String] = []
+	if not _stops.has(stop_id):
+		return boarded
+	var manifest: Array = _waiting_manifests.get(stop_id, [])
+	var count := mini(manifest.size(), maxi(0, available_seats))
+	for index in range(count):
+		boarded.append(str(manifest.pop_front()))
+	_waiting_manifests[stop_id] = manifest
+	_waiting_passengers[stop_id] = manifest.size()
+	_total_boardings += boarded.size()
+	return boarded
 
 func board_waiting_passengers(stop_id: String, available_seats: int) -> int:
 	if not _stops.has(stop_id):
 		return 0
-	var waiting := int(_waiting_passengers.get(stop_id, 0))
-	var boarded := mini(waiting, maxi(0, available_seats))
-	_waiting_passengers[stop_id] = waiting - boarded
-	_total_boardings += boarded
-	return boarded
+	var manifest := take_waiting_manifest(stop_id, available_seats)
+	return manifest.size()
 
 func get_waiting_passengers(stop_id: String) -> int:
-	return int(_waiting_passengers.get(stop_id, 0))
+	return int(_waiting_manifests.get(stop_id, []).size())
 
 func get_passenger_statistics() -> Dictionary:
 	var waiting_total := 0
