@@ -591,6 +591,7 @@ func advance_month() -> void:
             _try_form_household(str(citizen_id))
     _simulate_household_month()
     _simulate_city_markets()
+    _simulate_intercity_trade()
     _recount_businesses_by_city()
     _recount_all_hubs()
     _save_state()
@@ -1079,6 +1080,52 @@ func _sync_hub_demographics(city_id: String) -> void:
     for key in counts:
         hub[key] = counts[key]
     hub_state[city_id] = hub
+
+
+func _simulate_intercity_trade() -> void:
+    var city_ids: Array = hub_state.keys()
+    city_ids.sort()
+    if city_ids.size() < 2:
+        return
+    var goods_ids := ["food", "water", "medicine", "electronics", "clothing", "fuel"]
+    for index in range(city_ids.size()):
+        var from_id := str(city_ids[index])
+        var to_id := str(city_ids[(index + 1) % city_ids.size()])
+        if from_id == to_id:
+            continue
+        var from_hub: Dictionary = hub_state[from_id]
+        var to_hub: Dictionary = hub_state[to_id]
+        var from_market: Dictionary = from_hub.get("market", {})
+        var to_market: Dictionary = to_hub.get("market", {})
+        var shipped_total := 0
+        for good_id in goods_ids:
+            if not from_market.has(good_id) or not to_market.has(good_id):
+                continue
+            var source_good: Dictionary = from_market[good_id]
+            var target_good: Dictionary = to_market[good_id]
+            var source_stock := int(source_good.get("stock", 0))
+            var target_stock := int(target_good.get("stock", 0))
+            var source_price := float(source_good.get("price", 0.0))
+            var target_price := float(target_good.get("price", 0.0))
+            if source_stock < 100 or target_price < source_price * 1.18:
+                continue
+            var shipment := mini(350, maxi(0, int(float(source_stock - 100) * 0.025)))
+            if shipment <= 0:
+                continue
+            source_good["stock"] = source_stock - shipment
+            target_good["stock"] = target_stock + shipment
+            source_good["trade_exports"] = int(source_good.get("trade_exports", 0)) + shipment
+            target_good["trade_imports"] = int(target_good.get("trade_imports", 0)) + shipment
+            shipped_total += shipment
+            from_market[good_id] = source_good
+            to_market[good_id] = target_good
+        from_hub["market"] = from_market
+        to_hub["market"] = to_market
+        from_hub["monthly_trade_exports"] = int(from_hub.get("monthly_trade_exports", 0)) + shipped_total
+        to_hub["monthly_trade_imports"] = int(to_hub.get("monthly_trade_imports", 0)) + shipped_total
+        hub_state[from_id] = from_hub
+        hub_state[to_id] = to_hub
+    _dirty = true
 
 
 func _simulate_city_markets() -> void:
