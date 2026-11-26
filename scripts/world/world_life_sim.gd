@@ -794,6 +794,10 @@ func _consider_business_startup(profile: Dictionary) -> void:
     profile["business_capital"] = 30000
     profile["business_revenue"] = 0
     profile["business_months"] = 0
+    profile["business_city"] = str(profile.get("city", ""))
+    profile["business_workers"] = 0
+    profile["business_capacity"] = 2
+    profile["business_competition_pressure"] = 0.0
     profile["savings"] = int(profile.get("savings", 0)) - 30000
     profile["financial_goal"] = "grow_business"
     _append_event(profile, "founded_business:" + business_id)
