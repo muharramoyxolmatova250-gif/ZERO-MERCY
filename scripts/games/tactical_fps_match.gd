@@ -61,6 +61,12 @@ func _on_touch_aim(delta: Vector2) -> void:
 	camera.rotate_x(-delta.y * 0.003)
 	camera.rotation.x = clampf(camera.rotation.x, -1.45, 1.45)
 
+func _toggle_crouch() -> void:
+	crouched = not crouched
+	var capsule := player.get_node("CollisionShape3D").shape as CapsuleShape3D
+	capsule.height = 1.15 if crouched else 1.8
+	camera.position.y = 0.38 if crouched else 0.62
+
 func _jump() -> void:
 	if player.is_on_floor():
 		player.velocity.y = 5.0
@@ -175,6 +181,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_fire()
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_R:
 		_start_reload()
+	elif event is InputEventKey and event.pressed and event.keycode == KEY_C:
+		_toggle_crouch()
 
 func _capture_mouse() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -248,8 +256,10 @@ func _update_bots(delta: float) -> void:
 		var distance := offset.length()
 		if distance > 7.0:
 			var direction := offset.normalized()
-			bot.velocity.x = direction.x * 2.0
-			bot.velocity.z = direction.z * 2.0
+			var side := Vector3(-direction.z, 0.0, direction.x) * sin(float(Time.get_ticks_msec()) * 0.0012 + float(bot.get_instance_id() % 17))
+			var pursuit := (direction + side * 0.48).normalized()
+			bot.velocity.x = pursuit.x * 2.0
+			bot.velocity.z = pursuit.z * 2.0
 			bot.move_and_slide()
 		else:
 			bot.velocity = Vector3.ZERO
@@ -270,4 +280,4 @@ func _update_hud() -> void:
 		return
 	var state := ("RELOADING %.1fs" % reload_left) if reloading else ("AMMO %d / %d" % [ammo, reserve_ammo])
 	var outcome := " • YOU ARE DOWN" if health <= 0.0 else (" • TIME EXPIRED" if time_left <= 0.0 else "")
-	hud.text = "ZERO MERCY // TACTICAL BREACH\nHP %.0f   %s\nENEMIES %d   ELIMINATIONS %d\nTIME %03d:%02d%s\nWASD move • Mouse aim/fire • R reload • Space jump • Esc release mouse" % [health, state, bots.size(), score, int(time_left) / 60, int(time_left) % 60, outcome]
+	hud.text = "ZERO MERCY // TACTICAL BREACH\nHP %.0f   %s\nENEMIES %d   ELIMINATIONS %d\nTIME %03d:%02d%s\nWASD move • Shift sprint • C crouch • Mouse aim/fire • R reload • Space jump • Esc release mouse" % [health, state, bots.size(), score, int(time_left) / 60, int(time_left) % 60, outcome]
