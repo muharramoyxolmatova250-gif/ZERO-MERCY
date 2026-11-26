@@ -750,6 +750,7 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     _operate_personal_business(profile)
     _consider_home_purchase(profile)
     _manage_credit_and_debt(profile)
+    _apply_business_city_economy(profile)
     profile["financial_stability"] = clampf(float(profile.get("money", 0)) / 12000.0, 0.0, 1.0)
     if int(profile.get("money", 0)) < 500:
         profile["housing_status"] = "shared_or_family_home"
