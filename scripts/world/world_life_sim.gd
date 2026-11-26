@@ -456,7 +456,7 @@ func advance_daily_routines(hour: int) -> void:
         var activity := "sleep"
         if hour >= 6 and hour < 8:
             activity = "commute"
-        elif hour >= 8 and hour < 15 and stage == "student":
+        elif hour >= 8 and hour < 15 and stage in ["student", "university"]:
             activity = "school"
         elif hour >= 8 and hour < 17 and stage == "adult" and occupation not in ["unemployed", "retired", "child", "student"]:
             activity = "work"
@@ -612,6 +612,7 @@ func _rebuild_claim_cache() -> void:
 func _stage_for_age(age: int) -> String:
     if age < 6: return "child"
     if age < 18: return "student"
+    if age < 23: return "university"
     if age < 65: return "adult"
     return "retired"
 
@@ -626,7 +627,12 @@ func _apply_stage_transition(profile: Dictionary, old_stage: String, new_stage: 
         profile["occupation"] = "student"
         profile["school"] = SCHOOLS[_rng.randi_range(0, SCHOOLS.size() - 1)]
         _append_event(profile, "started_school")
-    elif old_stage == "student" and new_stage == "adult":
+    elif new_stage == "university":
+        profile["occupation"] = "student"
+        profile["school"] = "Global Science Institute"
+        profile["education"] = "university"
+        _append_event(profile, "entered_university")
+    elif old_stage in ["student", "university"] and new_stage == "adult":
         profile["occupation"] = JOBS[_rng.randi_range(0, JOBS.size() - 1)]
         profile["school"] = ""
         profile["education"] = "graduated"
@@ -692,7 +698,7 @@ func _sync_hub_demographics(city_id: String) -> void:
         if str(profile.get("city", "")) != city_id:
             continue
         match str(profile.get("life_stage", "")):
-            "student", "child": counts["sample_students"] += 1
+            "student", "university", "child": counts["sample_students"] += 1
             "adult": counts["sample_workers"] += 1
             "retired": counts["sample_retired"] += 1
         if str(profile.get("marital_status", "")) == "partnered":
@@ -757,7 +763,7 @@ func get_world_life_snapshot() -> Dictionary:
         if bool(profile.get("active", false)):
             active += 1
         match str(profile.get("life_stage", "")):
-            "child", "student": students += 1
+            "child", "student", "university": students += 1
             "adult": workers += 1
             "retired": retired += 1
     return {
