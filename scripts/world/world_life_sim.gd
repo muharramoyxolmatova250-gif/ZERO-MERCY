@@ -805,7 +805,8 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     var employer_id := str(profile.get("employer_id", ""))
     var income := _monthly_salary_for_job(job, level) if job in JOBS and employer_id.is_empty() else 0
     var living_independently := bool(profile.get("living_independently", false))
-    var rent := 650 if living_independently else 180
+    var owns_home := bool(profile.get("owns_home", false))
+    var rent := 90 if owns_home else (650 if living_independently else 180)
     var food_and_services := 420 if job in JOBS else 300
     var balance := income - rent - food_and_services
     profile["monthly_income"] = income
