@@ -5,7 +5,12 @@ extends Node3D
 @export var pause_at_waypoints := false
 var _target_index := 0
 var _body: MeshInstance3D
+var _head: MeshInstance3D
 var _phone: MeshInstance3D
+var _indoor_activity := ""
+var _indoor_activity_time := 0.0
+var _body_rest_position := Vector3.ZERO
+var _head_rest_rotation := Vector3.ZERO
 var _pause_remaining := 0.0
 var is_using_phone := false
 var phone_interaction_count := 0
@@ -113,12 +118,15 @@ func _physics_process(delta: float) -> void:
 	if _social_scan_timer >= 5.0:
 		_social_scan_timer = 0.0
 		_scan_social_context()
+	if _building_visit_phase == "inside":
+		_update_indoor_activity(delta)
 	if _pause_remaining > 0.0:
 		_pause_remaining = maxf(0.0, _pause_remaining - delta)
 		if _pause_remaining == 0.0:
 			is_using_phone = false
 			if _phone != null: _phone.visible = false
 			if _building_visit_phase == "inside":
+				_reset_indoor_pose()
 				route = PackedVector3Array([global_position, _building_exit_position])
 				_target_index = 1
 				_building_visit_phase = "exiting"
@@ -241,8 +249,9 @@ func _choose_next_waypoint() -> void:
 			_building_visit_phase = "inside"
 			route = PackedVector3Array([global_position])
 			_target_index = 0
+			_start_indoor_activity()
 			_pause_remaining = _rng.randf_range(8.0, 22.0)
-			remember_event("entered_building:" + _last_routed_goal)
+			remember_event("entered_building:" + _last_routed_goal + ":" + _indoor_activity)
 			return
 		if _building_visit_phase == "exiting":
 			var completed_goal := _last_routed_goal
@@ -276,6 +285,61 @@ func _choose_next_waypoint() -> void:
 	else:
 		_target_index = _rng.randi_range(0, route.size() - 1)
 
+
+func _start_indoor_activity() -> void:
+	_indoor_activity_time = 0.0
+	match current_goal:
+		"food": _indoor_activity = "eating"
+		"work": _indoor_activity = "working"
+		"school": _indoor_activity = "studying"
+		"rest", "family": _indoor_activity = "resting"
+		"social", "leisure": _indoor_activity = "socializing"
+		"play": _indoor_activity = "playing"
+		_: _indoor_activity = "browsing"
+	is_using_phone = _indoor_activity in ["socializing", "browsing"]
+	if _phone != null:
+		_phone.visible = is_using_phone
+	if is_using_phone:
+		phone_interaction_count += 1
+
+func _update_indoor_activity(delta: float) -> void:
+	_indoor_activity_time += delta
+	var wave := sin(_indoor_activity_time * (2.8 if _indoor_activity == "working" else 1.7))
+	if _body != null:
+		_body.position = _body_rest_position
+		_body.rotation = Vector3.ZERO
+		match _indoor_activity:
+			"eating":
+				_body.rotation.x = wave * 0.055
+				_body.position.y += absf(wave) * 0.025
+			"working", "studying":
+				_body.rotation.x = -0.09 + wave * 0.018
+				_body.position.y += absf(wave) * 0.012
+			"resting":
+				_body.rotation.x = 0.08 + wave * 0.025
+				_body.position.y -= 0.025 + absf(wave) * 0.018
+			"socializing", "browsing":
+				_body.rotation.y = wave * 0.045
+			"playing":
+				_body.position.y += absf(wave) * 0.07
+	if _head != null:
+		_head.rotation = _head_rest_rotation
+		_head.rotation.y += wave * (0.12 if _indoor_activity == "socializing" else 0.035)
+		if _indoor_activity in ["eating", "studying"]:
+			_head.rotation.x = 0.08 + absf(wave) * 0.06
+
+func _reset_indoor_pose() -> void:
+	_indoor_activity = ""
+	_indoor_activity_time = 0.0
+	if _body != null:
+		_body.position = _body_rest_position
+		_body.rotation = Vector3.ZERO
+	if _head != null:
+		_head.rotation = _head_rest_rotation
+	if _phone != null:
+		_phone.visible = false
+	is_using_phone = false
+
 func _pause_for_goal() -> float:
 	match current_goal:
 		"social": return _rng.randf_range(1.5, 4.0)
@@ -299,7 +363,7 @@ func _scan_social_context() -> void:
 			_social_target = candidate
 
 func get_ai_snapshot() -> Dictionary:
-	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"crowd_avoidance":true,"memories":_memory.size(),"decisions":ai_decision_count,"route_nodes":route.size(),"route_target_index":_target_index,"route_goal":_last_routed_goal,"route_active":not _last_routed_goal.is_empty(),"building_visit_phase":_building_visit_phase,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
+	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"crowd_avoidance":true,"memories":_memory.size(),"decisions":ai_decision_count,"route_nodes":route.size(),"route_target_index":_target_index,"route_goal":_last_routed_goal,"route_active":not _last_routed_goal.is_empty(),"building_visit_phase":_building_visit_phase,"indoor_activity":_indoor_activity,"indoor_activity_time":_indoor_activity_time,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
 
 func remember_event(event_name: String) -> void:
 	_memory.append(event_name)
@@ -329,14 +393,16 @@ func _build_appearance() -> void:
 	_body.position.y = 0.95
 	_body.material_override = coat
 	add_child(_body)
-	var head := MeshInstance3D.new()
+	_head = MeshInstance3D.new()
 	var head_mesh := SphereMesh.new()
 	head_mesh.radius = 0.22
 	head_mesh.height = 0.44
-	head.mesh = head_mesh
-	head.position.y = 1.78
-	head.material_override = glow
-	add_child(head)
+	_head.mesh = head_mesh
+	_head.position.y = 1.78
+	_head.material_override = glow
+	add_child(_head)
+	_body_rest_position = _body.position
+	_head_rest_rotation = _head.rotation
 	_phone = MeshInstance3D.new()
 	_phone.name = "Phone"
 	var phone_mesh := BoxMesh.new()
