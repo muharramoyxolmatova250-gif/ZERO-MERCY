@@ -557,7 +557,7 @@ func advance_month() -> void:
             _append_event(profile, "new_child_born")
             _create_child_profile(profile, str(profile.get("partner_id", "")))
             profile = resident_profiles.get(citizen_id, profile)
-        if new_stage == "adult" and old_stage == "student":
+        if new_stage == "adult" and old_stage in ["student", "university"]:
             _start_independent_life(profile)
         if new_stage == "adult":
             _advance_career_month(profile)
