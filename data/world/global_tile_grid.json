@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "name": "ZERO MERCY complete Earth tile grid",
+  "tile_degrees": 0.1,
+  "columns": 3600,
+  "rows": 1800,
+  "tile_count": 6480000,
+  "indexing": "row-major; x=floor((longitude+180)/0.1), y=floor((latitude+90)/0.1), index=y*3600+x",
+  "bounds": {
+    "west": -180,
+    "south": -90,
+    "east": 180,
+    "north": 90
+  },
+  "bounds_convention": "west/south inclusive, east/north exclusive",
+  "presence_bitmap": {
+    "path": "global_tile_presence.bin",
+    "encoding": "two consecutive bitsets; first OSM, second DEM; bit 1 indicates at least one verified source file",
+    "bytes_per_bitset": 810000,
+    "total_bytes": 1620000
+  },
+  "note": "Every 0.1-degree cell on Earth is represented implicitly. Unset presence bits mean source data has not yet been generated; no empty terrain/city data is fabricated."
+}
