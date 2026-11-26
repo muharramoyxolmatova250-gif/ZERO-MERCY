@@ -74,6 +74,11 @@ jobs:
     steps:
       - name: Checkout ZERO MERCY
         uses: actions/checkout@v4
+      - name: Sync latest branch state before selecting tiles
+        run: |
+          git fetch origin "$GITHUB_REF_NAME"
+          git reset --hard "origin/$GITHUB_REF_NAME"
+
       - name: Install Osmium
         run: |
           sudo apt-get update
