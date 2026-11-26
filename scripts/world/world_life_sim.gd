@@ -745,6 +745,8 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     profile["monthly_living_cost"] = food_and_services
     profile["money"] = maxi(0, int(profile.get("money", 0)) + balance)
     _manage_personal_savings(profile, balance)
+    _consider_business_startup(profile)
+    _operate_personal_business(profile)
     _consider_home_purchase(profile)
     profile["financial_stability"] = clampf(float(profile.get("money", 0)) / 12000.0, 0.0, 1.0)
     if int(profile.get("money", 0)) < 500:
