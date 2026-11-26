@@ -319,6 +319,9 @@ func _choose_next_waypoint() -> void:
 			var life_sim := get_tree().get_first_node_in_group("world_life_sim")
 			if life_sim != null and life_sim.has_method("record_event"):
 				life_sim.call("record_event", citizen_id, "visited_building:" + completed_goal)
+			if completed_goal == "family" and life_sim != null and life_sim.has_method("record_family_interaction"):
+				life_sim.call("record_family_interaction", citizen_id, "family_visit")
+				remember_event("family_time_shared")
 			_last_routed_goal = ""
 			_building_visit_phase = ""
 			_building_exit_position = Vector3.ZERO
