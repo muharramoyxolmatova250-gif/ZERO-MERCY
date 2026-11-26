@@ -3,16 +3,17 @@
   "current_region_id": null,
   "next_tile_by_region": {
     "uzbekistan": 168,
-    "afghanistan": 16
+    "afghanistan": 16,
+    "austria": 8
   },
   "completed_regions": [
     "andorra"
   ],
-  "last_updated_utc": "2026-11-25T14:57:15.847777+00:00",
+  "last_updated_utc": "2026-11-26T08:13:38.231467+00:00",
   "last_batch": {
-    "region_id": "andorra",
+    "region_id": "austria",
     "start": 0,
-    "processed": 7,
-    "total_tiles": 7
+    "processed": 8,
+    "total_tiles": 1103
   }
 }
