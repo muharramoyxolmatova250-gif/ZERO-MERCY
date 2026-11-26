@@ -591,6 +591,8 @@ func advance_month() -> void:
         var hub: Dictionary = hub_state[city_id]
         hub["monthly_business_revenue"] = 0
         hub["monthly_business_profit"] = 0
+        hub["monthly_trade_exports"] = 0
+        hub["monthly_trade_imports"] = 0
         var population := int(hub.get("population", 100000))
         var births := maxi(1, int(round(float(population) * 0.0011)))
         var deaths := maxi(1, int(round(float(population) * 0.00065)))
