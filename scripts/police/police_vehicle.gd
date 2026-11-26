@@ -9,6 +9,10 @@ var _siren_clock := 0.0
 var _red: StandardMaterial3D
 var _blue: StandardMaterial3D
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
+var _siren_player: AudioStreamPlayer3D
+var _siren_playback: AudioStreamGeneratorPlayback
+var _audio_clock := 0.0
+var _audio_sample_index := 0
 
 func _ready() -> void:
  add_to_group("police_vehicle")
@@ -19,6 +23,17 @@ func _ready() -> void:
  shape.position.y = 0.75
  add_child(shape)
  _build_car()
+ var siren_stream := AudioStreamGenerator.new()
+ siren_stream.mix_rate = 22050.0
+ siren_stream.buffer_length = 0.25
+ _siren_player = AudioStreamPlayer3D.new()
+ _siren_player.name = "ProceduralPoliceSiren"
+ _siren_player.stream = siren_stream
+ _siren_player.volume_db = -9.0
+ _siren_player.max_distance = 65.0
+ add_child(_siren_player)
+ _siren_player.play()
+ _siren_playback = _siren_player.get_stream_playback() as AudioStreamGeneratorPlayback
  var players := get_tree().get_nodes_in_group("player")
  if not players.is_empty():
   _target = players[0] as Node3D
@@ -71,6 +86,19 @@ func _build_car() -> void:
    wheel.rotation.z = PI * 0.5
    wheel.material_override = _material(Color(0.008, 0.01, 0.015), 0.1)
    add_child(wheel)
+
+func _process(delta: float) -> void:
+ _audio_clock += delta
+ if _audio_clock >= 0.1 and _siren_playback != null:
+  _audio_clock = 0.0
+  var samples := PackedVector2Array()
+  for sample_index in range(2205):
+   var sweep := fposmod(float(_audio_sample_index) / 22050.0, 1.6)
+   var frequency := 620.0 if sweep < 0.8 else 880.0
+   var value := sin(TAU * frequency * float(_audio_sample_index) / 22050.0) * 0.16
+   samples.append(Vector2(value, value))
+   _audio_sample_index += 1
+  _siren_playback.push_buffer(samples)
 
 func _physics_process(delta: float) -> void:
  _siren_clock += delta
