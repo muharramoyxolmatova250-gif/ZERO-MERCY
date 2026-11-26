@@ -293,10 +293,10 @@ func _simulate_household_month() -> void:
         var partner: Dictionary = resident_profiles[partner_id]
         var stress := (float(profile.get("family_stress", 0.0)) + float(partner.get("family_stress", 0.0))) * 0.5
         var happiness := (float(profile.get("happiness", 0.5)) + float(partner.get("happiness", 0.5))) * 0.5
-        if stress > 0.72 and happiness < 0.3 and _rng.randf() < 0.08:
-            record_family_conflict(str(citizen_id), partner_id, 0.3)
-        elif stress > 0.9 and happiness < 0.18 and _rng.randf() < 0.015:
+        if stress > 0.9 and happiness < 0.18 and _rng.randf() < 0.015:
             separate_partners(str(citizen_id), "relationship_breakdown")
+        elif stress > 0.72 and happiness < 0.3 and _rng.randf() < 0.08:
+            record_family_conflict(str(citizen_id), partner_id, 0.3)
         else:
             profile["family_stress"] = maxf(0.0, float(profile.get("family_stress", 0.0)) - 0.02)
             partner["family_stress"] = maxf(0.0, float(partner.get("family_stress", 0.0)) - 0.02)
