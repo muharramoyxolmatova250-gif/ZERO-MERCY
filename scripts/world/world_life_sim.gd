@@ -485,12 +485,29 @@ func advance_daily_routines(hour: int) -> void:
         elif activity == "work":
             profile["money"] = int(profile.get("money", 0)) + 5
         elif activity == "school":
-            profile["education"] = str(profile.get("education", "school"))
+            _advance_education(profile)
         resident_profiles[citizen_id] = profile
         changed_count += 1
     if changed_count > 0:
         _dirty = true
         publish_event_if_available("daily_routine_updated", {"hour": hour, "citizens_updated": changed_count})
+
+
+func _advance_education(profile: Dictionary) -> void:
+    var stage := str(profile.get("life_stage", ""))
+    if stage not in ["student", "university"]:
+        return
+    var attendance := clampf(float(profile.get("school_attendance", 0.0)) + 0.015, 0.0, 1.0)
+    var performance := clampf(float(profile.get("academic_performance", 0.5)) + _rng.randf_range(-0.008, 0.012), 0.1, 1.0)
+    var progress := float(profile.get("education_progress", 0.0))
+    progress += 0.006 + performance * 0.004
+    if progress >= 1.0:
+        progress -= 1.0
+        profile["school_grade"] = int(profile.get("school_grade", 0)) + 1
+        _append_event(profile, "completed_education_level:" + str(profile["school_grade"]))
+    profile["school_attendance"] = attendance
+    profile["academic_performance"] = performance
+    profile["education_progress"] = progress
 
 
 func publish_event_if_available(event_id: String, payload: Dictionary) -> void:
