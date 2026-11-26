@@ -39,7 +39,7 @@ func request_taxi(passenger_id: String, pickup: Vector3, destination: Vector3) -
 	_next_request_id += 1
 	var distance_km := pickup.distance_to(destination) / 1000.0
 	var fare := snappedf(2.5 + distance_km * 1.35, 0.1)
-	var request := {"id": request_id, "passenger_id": passenger_id, "taxi_id": taxi_id, "pickup": pickup, "destination": destination, "status": "dispatched", "fare": fare, "pickup_distance": best_distance}
+	var request := {"id": request_id, "passenger_id": passenger_id, "taxi_id": taxi_id, "pickup": pickup, "destination": destination, "status": "dispatched", "fare": fare, "pickup_distance": best_distance, "estimated_pickup_minutes": snappedf(best_distance / 180.0, 0.1), "created_at_msec": Time.get_ticks_msec()}
 	_requests[request_id] = request
 	var taxi_entry: Dictionary = _taxis[taxi_id]
 	taxi_entry["available"] = false
@@ -94,3 +94,25 @@ func get_dispatch_snapshot() -> Dictionary:
 		if bool(taxi.get("available", false)):
 			available += 1
 	return {"fleet_size": _taxis.size(), "available_taxis": available, "active_requests": _requests.size() - _completed_trips - _cancelled_trips, "completed_trips": _completed_trips, "cancelled_trips": _cancelled_trips, "total_fares": snappedf(_total_fares, 0.01)}
+
+func get_request_snapshot(request_id: String) -> Dictionary:
+	if not _requests.has(request_id):
+		return {}
+	return _requests[request_id].duplicate(true)
+
+func cancel_passenger_request(passenger_id: String) -> bool:
+	for request_id in _requests:
+		var request: Dictionary = _requests[request_id]
+		if str(request.get("passenger_id", "")) != passenger_id:
+			continue
+		if str(request.get("status", "")) in ["completed", "cancelled"]:
+			continue
+		report_trip_cancelled(str(request_id))
+		var taxi_id := str(request.get("taxi_id", ""))
+		if _taxis.has(taxi_id):
+			var taxi: Dictionary = _taxis[taxi_id]
+			var vehicle: Node3D = taxi.get("vehicle")
+			if is_instance_valid(vehicle) and vehicle.has_method("cancel_trip"):
+				vehicle.call("cancel_trip")
+		return true
+	return false
