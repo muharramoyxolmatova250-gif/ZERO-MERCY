@@ -60,6 +60,8 @@ var _hand_anchor_home := Vector3(0.48, -0.38, -1.15)
 
 func _ready() -> void:
 	add_to_group("player")
+	if Engine.has_singleton("GameSession") or get_node_or_null("/root/GameSession") != null:
+		GameSession.register_player(self)
 	_spawn_transform = global_transform
 	_hand_anchor = Marker3D.new()
 	_hand_anchor.name = "HeldItemAnchor"
@@ -74,6 +76,11 @@ func _ready() -> void:
 	health_changed.emit(health, max_health)
 	stamina_changed.emit(stamina, stamina_max)
 	ammo_changed.emit(ammo_in_magazine, reserve_ammo)
+
+
+func _exit_tree() -> void:
+	if get_node_or_null("/root/GameSession") != null:
+		GameSession.unregister_player(self)
 
 
 func _build_dara_visual() -> void:
