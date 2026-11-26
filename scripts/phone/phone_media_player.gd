@@ -1,4 +1,6 @@
 extends Control
+
+signal close_requested
 ## Plays actual imported video and image assets; metadata-only feed entries are rejected.
 @onready var video: VideoStreamPlayer = $Layout/MediaFrame/Video
 @onready var image: TextureRect = $Layout/MediaFrame/Image
@@ -10,6 +12,7 @@ func _ready() -> void:
 	video.finished.connect(_on_video_finished)
 	$Layout/Actions/Open.pressed.connect(_on_open_pressed)
 	$Layout/Actions/Stop.pressed.connect(_on_stop_pressed)
+	$Layout/Actions/Close.pressed.connect(func() -> void: close_requested.emit())
 	status.text = "Choose an imported video (.ogv) or image asset."
 	image.hide()
 
