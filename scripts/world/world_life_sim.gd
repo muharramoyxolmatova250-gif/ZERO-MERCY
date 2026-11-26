@@ -810,6 +810,51 @@ func _monthly_salary_for_job(job: String, level: int) -> int:
     return int(base.get(job, 1600)) + maxi(0, level - 1) * 180
 
 
+func _consider_vehicle_purchase(profile: Dictionary) -> void:
+    if not str(profile.get("vehicle_id", "")).is_empty():
+        return
+    if int(profile.get("age_years", 0)) < 18 or str(profile.get("life_stage", "")) != "adult":
+        return
+    if str(profile.get("occupation", "")) not in JOBS:
+        return
+    var money := int(profile.get("money", 0))
+    var savings := int(profile.get("savings", 0))
+    var bank_balance := int(profile.get("bank_balance", 0))
+    var total_funds := money + savings + bank_balance
+    if total_funds < 18000 or float(profile.get("financial_stability", 0.0)) < 0.55:
+        return
+    if _rng.randf() > 0.035:
+        return
+    var vehicle_types := ["compact_car", "sedan", "motorcycle", "electric_car"]
+    var vehicle_prices := {"compact_car": 18000, "sedan": 26000, "motorcycle": 8500, "electric_car": 34000}
+    var vehicle_type := vehicle_types[_rng.randi_range(0, vehicle_types.size() - 1)]
+    var price := int(vehicle_prices[vehicle_type])
+    if total_funds < price:
+        vehicle_type = "motorcycle"
+        price = int(vehicle_prices[vehicle_type])
+    if total_funds < price:
+        return
+    var remaining := price
+    var from_money := mini(money, remaining)
+    remaining -= from_money
+    var from_savings := mini(savings, remaining)
+    remaining -= from_savings
+    var from_bank := mini(bank_balance, remaining)
+    remaining -= from_bank
+    if remaining > 0:
+        return
+    profile["money"] = money - from_money
+    profile["savings"] = savings - from_savings
+    profile["bank_balance"] = bank_balance - from_bank
+    profile["vehicle_id"] = "vehicle_" + str(abs(hash(str(profile.get("id", "")) + ":" + str(simulation_day))))
+    profile["vehicle_type"] = vehicle_type
+    profile["vehicle_value"] = price
+    profile["vehicle_fuel"] = 45.0 if vehicle_type != "motorcycle" else 14.0
+    profile["vehicle_condition"] = 1.0
+    profile["transport_preference"] = "private"
+    _append_event(profile, "purchased_vehicle:" + vehicle_type + ":" + str(price))
+
+
 func _process_npc_transport(profile: Dictionary) -> int:
     var vehicle_id := str(profile.get("vehicle_id", ""))
     var job := str(profile.get("occupation", ""))
@@ -857,6 +902,7 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     _consider_home_purchase(profile)
     _manage_credit_and_debt(profile)
     _process_npc_banking(profile)
+    _consider_vehicle_purchase(profile)
     _apply_business_city_economy(profile)
     profile["financial_stability"] = clampf(float(profile.get("money", 0)) / 12000.0, 0.0, 1.0)
     if int(profile.get("money", 0)) < 500:
