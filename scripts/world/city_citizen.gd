@@ -138,7 +138,8 @@ func _physics_process(delta: float) -> void:
 			_pause_remaining = _rng.randf_range(2.0, 5.0)
 			return
 		_choose_next_waypoint()
-		_pause_remaining = _pause_for_goal()
+		if _building_visit_phase != "inside":
+			_pause_remaining = _pause_for_goal()
 		is_using_phone = current_goal in ["social", "commute", "explore"] and _rng.randf() < 0.68
 		if is_using_phone: phone_interaction_count += 1
 		if _phone != null: _phone.visible = is_using_phone
