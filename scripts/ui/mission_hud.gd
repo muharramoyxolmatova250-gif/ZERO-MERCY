@@ -54,7 +54,7 @@ func _build_ui() -> void:
 	objective_label = _make_label("Loading objective...", 17, Color(0.9, 0.94, 1.0))
 	objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(objective_label)
-	status_label = _make_label("WASD MOVE  //  SHIFT SPRINT  //  LMB FIRE  //  R RELOAD  //  E INTERACT  //  M MAP  //  F5 SAVE  //  F9 LOAD", 10, Color(0.45, 0.62, 0.72))
+	status_label = _make_label("WASD MOVE  //  SHIFT SPRINT  //  LMB FIRE  //  F MELEE  //  R RELOAD  //  E INTERACT  //  M MAP  //  F5 SAVE  //  F9 LOAD", 10, Color(0.45, 0.62, 0.72))
 	column.add_child(status_label)
 	var separator := HSeparator.new()
 	column.add_child(separator)
