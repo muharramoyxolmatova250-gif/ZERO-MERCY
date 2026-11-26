@@ -10,6 +10,8 @@ signal route_loop_completed
 @export var bus_color := Color(0.02, 0.18, 0.24)
 @export_range(8, 80, 1) var passenger_capacity := 32
 var passenger_count := 0
+var passenger_destinations: Array[String] = []
+var total_alighted := 0
 var completed_stops := 0
 var _target_index := 0
 var _current_speed := 0.0
@@ -114,9 +116,12 @@ func _safe_follow_speed() -> float:
 
 func set_passenger_count(value: int) -> void:
     passenger_count = clampi(value, 0, passenger_capacity)
+	passenger_destinations.clear()
+	for index in range(passenger_count):
+		passenger_destinations.append("")
 
 func get_vehicle_snapshot() -> Dictionary:
-    return {"passengers": passenger_count, "capacity": passenger_capacity, "completed_stops": completed_stops, "speed": _current_speed, "dwelling": _dwell_remaining > 0.0, "doors_open": _door_open, "route_id": route_id}
+    return {"passengers": passenger_count, "capacity": passenger_capacity, "alighted_total": total_alighted, "completed_stops": completed_stops, "speed": _current_speed, "dwelling": _dwell_remaining > 0.0, "doors_open": _door_open, "route_id": route_id}
 
 func _build_bus() -> void:
     var body := MeshInstance3D.new()
