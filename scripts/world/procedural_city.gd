@@ -125,7 +125,7 @@ func _building(base: Vector3, size: Vector3) -> void:
 	var body_color: Color = mats[rng.randi_range(0, mats.size() - 1)].albedo_color
 	var destination_categories := ["home", "work", "food", "school", "play", "leisure"]
 	var destination_category := str(destination_categories[rng.randi_range(0, destination_categories.size() - 1)])
-	_building_destinations.append({"category": destination_category, "position": base + Vector3(0.0, 0.0, -size.z * 0.5 - road_width * 0.5 - 2.0)})
+	_building_destinations.append({"category": destination_category, "position": base + Vector3(0.0, 0.0, -size.z * 0.5 - road_width * 0.5 - 2.0), "interior": base + Vector3(0.0, 0.0, -size.z * 0.5 + 3.0)})
 	# Hollow visual shell: the front doorway remains physically and visually open.
 	_building_visual_shell(base, size, body_color)
 	if generate_collision:
@@ -512,7 +512,7 @@ func _build_pedestrian_route_network() -> void:
 	add_child(_pedestrian_route_network)
 	_pedestrian_route_network.call("build_grid", blocks_per_side, block_spacing, road_width)
 	for destination in _building_destinations:
-		_pedestrian_route_network.call("register_destination", str(destination.get("category", "explore")), destination.get("position", Vector3.ZERO))
+		_pedestrian_route_network.call("register_destination", str(destination.get("category", "explore")), destination.get("position", Vector3.ZERO), destination.get("interior", Vector3.ZERO))
 
 func _spawn_city_life() -> void:
 	var citizen_script := load("res://scripts/world/city_citizen.gd")
