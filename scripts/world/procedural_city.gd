@@ -35,6 +35,7 @@ func _ready() -> void:
 	_roads_and_blocks()
 	_spawn_street_furniture()
 	_build_pedestrian_route_network()
+	_build_public_transit_network()
 	_spawn_city_life()
 	_spawn_interactive_props()
 
@@ -551,6 +552,75 @@ func _build_pedestrian_route_network() -> void:
 	_pedestrian_route_network.call("build_grid", blocks_per_side, block_spacing, road_width)
 	for destination in _building_destinations:
 		_pedestrian_route_network.call("register_destination", str(destination.get("category", "explore")), destination.get("position", Vector3.ZERO), destination.get("interior", Vector3.ZERO), float(destination.get("height", 3.2)))
+
+func _build_public_transit_network() -> void:
+	var transit_script := load("res://scripts/world/public_transit_network.gd")
+	var bus_script := load("res://scripts/world/city_transit_vehicle.gd")
+	if transit_script == null or bus_script == null:
+		push_warning("Public transit scripts are missing; city buses were not created.")
+		return
+	var network := Node.new()
+	network.name = "PublicTransitNetwork"
+	network.set_script(transit_script)
+	network.add_to_group("public_transit_network")
+	add_child(network)
+	var half := blocks_per_side * block_spacing * 0.5
+	var lane_offset := road_width * 0.5 + 1.8
+	var edge := half - lane_offset
+	var stop_points := PackedVector3Array([
+		Vector3(-edge, 0.0, -edge),
+		Vector3(0.0, 0.0, -edge),
+		Vector3(edge, 0.0, -edge),
+		Vector3(edge, 0.0, 0.0),
+		Vector3(edge, 0.0, edge),
+		Vector3(0.0, 0.0, edge),
+		Vector3(-edge, 0.0, edge),
+		Vector3(-edge, 0.0, 0.0)
+	])
+	var stop_ids: Array[String] = []
+	for i in range(stop_points.size()):
+		var stop_id := _resolved_settlement_id() + "_bus_stop_" + str(i + 1)
+		stop_ids.append(stop_id)
+		network.call("register_stop", stop_id, stop_points[i], "Transit Stop " + str(i + 1))
+		_build_bus_stop(stop_points[i], i + 1)
+	network.call("register_route", _resolved_settlement_id() + "_bus_loop", stop_ids, "electric_bus", 8)
+	for bus_index in range(2):
+		var bus := Node3D.new()
+		bus.set_script(bus_script)
+		bus.name = "CityBus_%d" % (bus_index + 1)
+		var bus_route := PackedVector3Array()
+		var start_index := bus_index * 4
+		for point_index in range(stop_points.size()):
+			bus_route.append(stop_points[(start_index + point_index) % stop_points.size()])
+		bus.set("route", bus_route)
+		bus.set("cruise_speed", rng.randf_range(7.0, 9.5))
+		bus.position = bus_route[0]
+		add_child(bus)
+
+
+func _build_bus_stop(position: Vector3, stop_number: int) -> void:
+	var pole := MeshInstance3D.new()
+	var pole_mesh := BoxMesh.new()
+	pole_mesh.size = Vector3(0.12, 2.8, 0.12)
+	pole.mesh = pole_mesh
+	pole.position = position + Vector3(2.2, 1.4, 0.0)
+	var pole_material := StandardMaterial3D.new()
+	pole_material.albedo_color = Color(0.025, 0.055, 0.085)
+	pole_material.metallic = 0.78
+	pole.material_override = pole_material
+	add_child(pole)
+	var sign := MeshInstance3D.new()
+	var sign_mesh := BoxMesh.new()
+	sign_mesh.size = Vector3(0.85, 0.9, 0.12)
+	sign.mesh = sign_mesh
+	sign.position = position + Vector3(2.2, 2.45, 0.0)
+	var sign_material := StandardMaterial3D.new()
+	sign_material.albedo_color = Color(0.0, 0.72, 0.88)
+	sign_material.emission_enabled = true
+	sign_material.emission = Color(0.0, 0.42, 0.62)
+	sign.material_override = sign_material
+	add_child(sign)
+
 
 func _spawn_city_life() -> void:
 	var citizen_script := load("res://scripts/world/city_citizen.gd")
