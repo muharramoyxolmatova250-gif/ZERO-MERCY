@@ -16,7 +16,7 @@ def main() -> int:
     p.add_argument("source", type=Path, help="Downloaded source .osm.pbf")
     p.add_argument("plan", type=Path, help="Tile plan JSON")
     p.add_argument("--start", type=int, default=0)
-    p.add_argument("--count", type=int, default=16)
+    p.add_argument("--count", type=int, default=32)
     p.add_argument("--force", action="store_true")
     a = p.parse_args()
     if not a.source.is_file():
