@@ -55,6 +55,9 @@ func save_player_state(player: Node3D) -> bool:
 		"ammo_in_magazine": int(player.get("ammo_in_magazine")),
 		"reserve_ammo": int(player.get("reserve_ammo"))
 	}
+	var bridge := player.get_parent().get_node_or_null("GameplaySystemBridge") if player.get_parent() != null else null
+	if bridge != null and bridge.has_method("get_inventory_snapshot"):
+		payload["inventory"] = bridge.call("get_inventory_snapshot")
 	if get_node_or_null("/root/GameSession") != null:
 		payload["world_session"] = {
 			"day_time_hours": float(GameSession.day_time_hours),
@@ -105,6 +108,10 @@ func restore_player_state(player: Node3D) -> bool:
 	player.emit_signal("health_changed", player.get("health"), player.get("max_health"))
 	player.emit_signal("stamina_changed", player.get("stamina"), player.get("stamina_max"))
 	player.emit_signal("ammo_changed", player.get("ammo_in_magazine"), player.get("reserve_ammo"))
+	var inventory_data: Variant = payload.get("inventory", {})
+	var bridge := player.get_parent().get_node_or_null("GameplaySystemBridge") if player.get_parent() != null else null
+	if bridge != null and typeof(inventory_data) == TYPE_DICTIONARY and bridge.has_method("restore_inventory_snapshot"):
+		bridge.call("restore_inventory_snapshot", inventory_data)
 	var session_data: Variant = payload.get("world_session", {})
 	if typeof(session_data) == TYPE_DICTIONARY and get_node_or_null("/root/GameSession") != null:
 		var saved_hour := float(session_data.get("day_time_hours", GameSession.day_time_hours))
