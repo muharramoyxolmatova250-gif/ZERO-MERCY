@@ -955,18 +955,30 @@ func _operate_personal_business(profile: Dictionary) -> void:
     var inventory_factor := clampf(float(inventory) / 120.0, 0.15, 1.8)
     var market_factor := 1.0
     var business_city := str(profile.get("business_city", profile.get("city", "")))
+    var category_good := "food" if str(profile.get("business_type", "")) == "food_store" else "medicine" if str(profile.get("business_type", "")) == "pharmacy" else "electronics" if str(profile.get("business_type", "")) == "electronics_shop" else "clothing" if str(profile.get("business_type", "")) == "clothing_store" else "fuel"
+    var units_sold := mini(inventory, _rng.randi_range(18, 55))
+    inventory = maxi(0, inventory - units_sold)
     if hub_state.has(business_city):
         var local_hub: Dictionary = hub_state[business_city]
         var local_market: Dictionary = local_hub.get("market", {})
-        var category_good := "food" if str(profile.get("business_type", "")) == "food_store" else "medicine" if str(profile.get("business_type", "")) == "pharmacy" else "electronics" if str(profile.get("business_type", "")) == "electronics_shop" else "clothing" if str(profile.get("business_type", "")) == "clothing_store" else "fuel"
         if local_market.has(category_good):
             var market_good: Dictionary = local_market[category_good]
             market_factor = clampf(float(market_good.get("price", 10.0)) / float(market_good.get("base_price", 10.0)), 0.7, 1.6)
+            var wholesale_units := mini(int(market_good.get("stock", 0)), mini(60, 120 - inventory))
+            if wholesale_units > 0:
+                market_good["stock"] = int(market_good.get("stock", 0)) - wholesale_units
+                market_good["wholesale_sales"] = int(market_good.get("wholesale_sales", 0)) + wholesale_units
+                inventory += wholesale_units
+                local_market[category_good] = market_good
+                local_hub["market"] = local_market
+                hub_state[business_city] = local_hub
+    inventory_factor = clampf(float(units_sold) / 30.0, 0.1, 1.6)
     var revenue := int(float(_rng.randi_range(1800, 6200) + int(profile.get("business_workers", 0)) * 650) * inventory_factor * market_factor * (1.0 - competition * 0.22))
     var payroll_total := _pay_business_workers(profile)
     var restock_cost := mini(capital, int(profile.get("business_restock_budget", 1800)))
     var operating_cost := _rng.randi_range(1200, 3600) + int(profile.get("business_workers", 0)) * 420 + restock_cost + payroll_total
-    profile["business_inventory"] = clampi(inventory - _rng.randi_range(12, 34) + _rng.randi_range(18, 48), 0, 500)
+    profile["business_inventory"] = clampi(inventory, 0, 500)
+    profile["business_units_sold"] = int(profile.get("business_units_sold", 0)) + units_sold
     var profit := revenue - operating_cost
     capital = maxi(0, capital + profit)
     profile["business_months"] = months
