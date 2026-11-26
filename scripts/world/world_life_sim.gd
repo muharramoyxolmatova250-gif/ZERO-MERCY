@@ -261,6 +261,49 @@ func record_family_conflict(first_id: String, second_id: String, severity: float
     _dirty = true
 
 
+func record_childcare(parent_id: String, child_id: String, care_action: String = "care") -> bool:
+    if not resident_profiles.has(parent_id) or not resident_profiles.has(child_id):
+        return false
+    var child: Dictionary = resident_profiles[child_id]
+    if str(child.get("parent_id", "")) != parent_id and str(child.get("second_parent_id", "")) != parent_id:
+        return false
+    child["happiness"] = clampf(float(child.get("happiness", 0.5)) + 0.025, 0.0, 1.0)
+    child["health"] = clampf(float(child.get("health", 0.8)) + 0.008, 0.0, 1.0)
+    _append_event(child, "received_care:" + care_action)
+    resident_profiles[child_id] = child
+    var parent: Dictionary = resident_profiles[parent_id]
+    parent["family_stress"] = clampf(float(parent.get("family_stress", 0.0)) - 0.025, 0.0, 1.0)
+    _append_event(parent, "provided_childcare:" + child_id)
+    resident_profiles[parent_id] = parent
+    _dirty = true
+    return true
+
+
+func _simulate_household_month() -> void:
+    var handled_pairs: Dictionary = {}
+    for citizen_id in resident_profiles.keys():
+        var profile: Dictionary = resident_profiles[citizen_id]
+        var partner_id := str(profile.get("partner_id", ""))
+        if partner_id.is_empty() or not resident_profiles.has(partner_id):
+            continue
+        var pair_key := _social_pair_key(str(citizen_id), partner_id)
+        if handled_pairs.has(pair_key):
+            continue
+        handled_pairs[pair_key] = true
+        var partner: Dictionary = resident_profiles[partner_id]
+        var stress := (float(profile.get("family_stress", 0.0)) + float(partner.get("family_stress", 0.0))) * 0.5
+        var happiness := (float(profile.get("happiness", 0.5)) + float(partner.get("happiness", 0.5))) * 0.5
+        if stress > 0.72 and happiness < 0.3 and _rng.randf() < 0.08:
+            record_family_conflict(str(citizen_id), partner_id, 0.3)
+        elif stress > 0.9 and happiness < 0.18 and _rng.randf() < 0.015:
+            separate_partners(str(citizen_id), "relationship_breakdown")
+        else:
+            profile["family_stress"] = maxf(0.0, float(profile.get("family_stress", 0.0)) - 0.02)
+            partner["family_stress"] = maxf(0.0, float(partner.get("family_stress", 0.0)) - 0.02)
+            resident_profiles[citizen_id] = profile
+            resident_profiles[partner_id] = partner
+
+
 func separate_partners(citizen_id: String, reason: String = "mutual_separation") -> bool:
     if not resident_profiles.has(citizen_id):
         return false
@@ -492,6 +535,7 @@ func advance_month() -> void:
         var candidate: Dictionary = resident_profiles[citizen_id]
         if str(candidate.get("marital_status", "single")) == "single":
             _try_form_household(str(citizen_id))
+    _simulate_household_month()
     _recount_all_hubs()
     _save_state()
     print("ZERO MERCY life month ", simulation_year, "-", simulation_month,
