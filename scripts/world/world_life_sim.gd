@@ -803,6 +803,37 @@ func _consider_business_startup(profile: Dictionary) -> void:
     _append_event(profile, "founded_business:" + business_id)
 
 
+func _hire_business_workers(owner: Dictionary) -> void:
+    var capacity := int(owner.get("business_capacity", 2))
+    var workers := int(owner.get("business_workers", 0))
+    if workers >= capacity:
+        return
+    var city := str(owner.get("city", ""))
+    var owner_id := str(owner.get("id", ""))
+    var candidates: Array[String] = []
+    for resident_id in resident_profiles:
+        var worker: Dictionary = resident_profiles[resident_id]
+        if str(resident_id) == owner_id or str(worker.get("city", "")) != city:
+            continue
+        if str(worker.get("life_stage", "")) != "adult":
+            continue
+        if str(worker.get("occupation", "")) in ["unemployed", "resident"] and str(worker.get("employer_id", "")).is_empty():
+            candidates.append(str(resident_id))
+    if candidates.is_empty() or _rng.randf() > 0.18:
+        return
+    candidates.sort()
+    var hired_id := candidates[_rng.randi_range(0, candidates.size() - 1)]
+    var hired: Dictionary = resident_profiles[hired_id]
+    hired["occupation"] = "merchant"
+    hired["employer_id"] = str(owner.get("business_id", ""))
+    hired["monthly_income"] = 1500
+    hired["job_search_status"] = "employed"
+    _append_event(hired, "hired_by_business:" + str(owner.get("business_id", "")))
+    resident_profiles[hired_id] = hired
+    owner["business_workers"] = workers + 1
+    owner["business_capacity"] = capacity + 1
+
+
 func _operate_personal_business(profile: Dictionary) -> void:
     if str(profile.get("business_id", "")).is_empty():
         return
