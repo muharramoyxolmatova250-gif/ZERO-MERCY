@@ -28,7 +28,7 @@ class GlobalCompleteGridTests(unittest.TestCase):
             metadata, bitmap = base / "global_tile_grid.json", base / "presence.bin"
             subprocess.run([
                 sys.executable, str(BUILDER), "--runtime-index", str(runtime),
-                "--metadata", str(metadata), "--bitmap", str(bitmap)
+                "--metadata", str(metadata), "--bitmap", str(bitmap), "--root", str(base)
             ], check=True, cwd=ROOT)
             data = json.loads(metadata.read_text())
             self.assertEqual(data["tile_count"], 6_480_000)
