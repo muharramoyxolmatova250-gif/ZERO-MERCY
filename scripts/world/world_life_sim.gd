@@ -762,6 +762,7 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     _operate_personal_business(profile)
     _consider_home_purchase(profile)
     _manage_credit_and_debt(profile)
+    _process_npc_banking(profile)
     _apply_business_city_economy(profile)
     profile["financial_stability"] = clampf(float(profile.get("money", 0)) / 12000.0, 0.0, 1.0)
     if int(profile.get("money", 0)) < 500:
@@ -788,6 +789,30 @@ func _apply_business_city_economy(profile: Dictionary) -> void:
     hub["local_economic_activity"] = clampf(float(hub.get("local_economic_activity", 0.5)) + float(profit) / 100000.0, 0.0, 1.0)
     hub_state[city_id] = hub
     _dirty = true
+
+
+func _process_npc_banking(profile: Dictionary) -> void:
+    var money := int(profile.get("money", 0))
+    var balance := int(profile.get("bank_balance", 0))
+    var interest := int(float(balance) * 0.0025)
+    if balance > 0:
+        balance += maxi(0, interest)
+        profile["bank_interest_earned"] = int(profile.get("bank_interest_earned", 0)) + maxi(0, interest)
+    if money > 6000 and balance < 250000 and _rng.randf() < 0.32:
+        var deposit := mini(money - 3500, mini(2500, 250000 - balance))
+        if deposit > 0:
+            money -= deposit
+            balance += deposit
+            _append_event(profile, "bank_deposit:" + str(deposit))
+    elif money < 700 and balance > 0 and _rng.randf() < 0.45:
+        var withdrawal := mini(balance, maxi(0, 1200 - money))
+        if withdrawal > 0:
+            balance -= withdrawal
+            money += withdrawal
+            _append_event(profile, "bank_withdrawal:" + str(withdrawal))
+    profile["money"] = money
+    profile["bank_balance"] = balance
+    profile["credit_score"] = clampi(int(profile.get("credit_score", 600)) + (1 if interest > 0 else 0), 300, 850)
 
 
 func _manage_credit_and_debt(profile: Dictionary) -> void:
