@@ -819,6 +819,10 @@ func _consider_business_startup(profile: Dictionary) -> void:
     var citizen_id := str(profile.get("id", "unknown"))
     var business_id := "business_" + str(abs(hash(citizen_id + ":" + str(simulation_day))))
     profile["business_id"] = business_id
+    var business_types := ["food_store", "pharmacy", "electronics_shop", "clothing_store", "fuel_station"]
+    profile["business_type"] = business_types[_rng.randi_range(0, business_types.size() - 1)]
+    profile["business_inventory"] = _rng.randi_range(80, 260)
+    profile["business_restock_budget"] = 1800
     profile["business_capital"] = 30000
     profile["business_revenue"] = 0
     profile["business_months"] = 0
@@ -881,14 +885,28 @@ func _operate_personal_business(profile: Dictionary) -> void:
     _hire_business_workers(profile)
     var competition := _measure_business_competition(str(profile.get("business_city", profile.get("city", ""))), str(profile.get("business_id", "")))
     profile["business_competition_pressure"] = competition
-    var revenue := int(float(_rng.randi_range(1800, 6200) + int(profile.get("business_workers", 0)) * 650) * (1.0 - competition * 0.22))
-    var operating_cost := _rng.randi_range(1200, 3600) + int(profile.get("business_workers", 0)) * 420
+    var inventory := int(profile.get("business_inventory", 120))
+    var inventory_factor := clampf(float(inventory) / 120.0, 0.15, 1.8)
+    var market_factor := 1.0
+    var business_city := str(profile.get("business_city", profile.get("city", "")))
+    if hub_state.has(business_city):
+        var local_hub: Dictionary = hub_state[business_city]
+        var local_market: Dictionary = local_hub.get("market", {})
+        var category_good := "food" if str(profile.get("business_type", "")) == "food_store" else "medicine" if str(profile.get("business_type", "")) == "pharmacy" else "electronics" if str(profile.get("business_type", "")) == "electronics_shop" else "clothing" if str(profile.get("business_type", "")) == "clothing_store" else "fuel"
+        if local_market.has(category_good):
+            var market_good: Dictionary = local_market[category_good]
+            market_factor = clampf(float(market_good.get("price", 10.0)) / float(market_good.get("base_price", 10.0)), 0.7, 1.6)
+    var revenue := int(float(_rng.randi_range(1800, 6200) + int(profile.get("business_workers", 0)) * 650) * inventory_factor * market_factor * (1.0 - competition * 0.22))
+    var restock_cost := mini(capital, int(profile.get("business_restock_budget", 1800)))
+    var operating_cost := _rng.randi_range(1200, 3600) + int(profile.get("business_workers", 0)) * 420 + restock_cost
+    profile["business_inventory"] = clampi(inventory - _rng.randi_range(12, 34) + _rng.randi_range(18, 48), 0, 500)
     var profit := revenue - operating_cost
     capital = maxi(0, capital + profit)
     profile["business_months"] = months
     profile["business_revenue"] = revenue
     profile["business_last_profit"] = profit
     profile["business_capital"] = capital
+    profile["business_restock_budget"] = clampi(int(float(revenue) * 0.22), 300, 5000)
     profile["business_health"] = clampf(float(capital) / 60000.0, 0.0, 1.0)
     profile["money"] = int(profile.get("money", 0)) + maxi(0, profit / 2)
     if capital > 90000 and int(profile.get("business_capacity", 2)) < 12 and _rng.randf() < 0.18:
