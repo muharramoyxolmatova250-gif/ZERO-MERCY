@@ -996,6 +996,7 @@ func _pay_business_workers(owner: Dictionary) -> int:
         if paid <= 0:
             continue
         worker["money"] = int(worker.get("money", 0)) + paid
+        worker["monthly_income"] = paid
         worker["last_employer_payment"] = paid
         worker["employer_paid_month"] = simulation_day
         _append_event(worker, "received_business_wage:" + str(paid))
