@@ -129,8 +129,84 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
     }
     resident_profiles[citizen_id] = profile
     _prune_profiles_if_needed()
+    _try_form_household(citizen_id)
     _dirty = true
-    return profile
+    return resident_profiles.get(citizen_id, profile)
+
+
+func _try_form_household(citizen_id: String) -> void:
+    if not resident_profiles.has(citizen_id):
+        return
+    var profile: Dictionary = resident_profiles[citizen_id]
+    var age := int(profile.get("age_years", 0))
+    if age < 20 or age > 60 or str(profile.get("marital_status", "single")) != "single":
+        return
+    var local_rng := RandomNumberGenerator.new()
+    local_rng.seed = int(abs(hash(citizen_id + ":household")))
+    if local_rng.randf() > 0.22:
+        return
+    var candidates: Array[String] = []
+    for other_id in resident_profiles.keys():
+        if str(other_id) == citizen_id:
+            continue
+        var other: Dictionary = resident_profiles[other_id]
+        if str(other.get("city", "")) != str(profile.get("city", "")):
+            continue
+        if str(other.get("marital_status", "single")) != "single":
+            continue
+        var other_age := int(other.get("age_years", 0))
+        if other_age < 20 or other_age > 60 or str(other.get("life_stage", "")) == "deceased":
+            continue
+        candidates.append(str(other_id))
+    if candidates.is_empty():
+        return
+    candidates.sort()
+    var partner_id := candidates[local_rng.randi_range(0, candidates.size() - 1)]
+    var family_id := "family_" + str(abs(hash(citizen_id + "::" + partner_id)))
+    profile["marital_status"] = "partnered"
+    profile["partner_id"] = partner_id
+    profile["family_id"] = family_id
+    _append_event(profile, "formed_household_with:" + partner_id)
+    var partner: Dictionary = resident_profiles[partner_id]
+    partner["marital_status"] = "partnered"
+    partner["partner_id"] = citizen_id
+    partner["family_id"] = family_id
+    _append_event(partner, "formed_household_with:" + citizen_id)
+    resident_profiles[citizen_id] = profile
+    resident_profiles[partner_id] = partner
+    _dirty = true
+
+
+func get_family_members(citizen_id: String) -> Array:
+    if not resident_profiles.has(citizen_id):
+        return []
+    var family_id := str(resident_profiles[citizen_id].get("family_id", ""))
+    if family_id.is_empty():
+        return []
+    var members: Array = []
+    for member_id in resident_profiles.keys():
+        var member: Dictionary = resident_profiles[member_id]
+        if str(member.get("family_id", "")) == family_id:
+            members.append({"id": str(member_id), "name": str(member.get("name", member_id)),
+                "age_years": int(member.get("age_years", 0)), "occupation": str(member.get("occupation", "resident")),
+                "relationship": "partner" if str(member.get("partner_id", "")) == citizen_id else "family"})
+    return members
+
+
+func record_family_interaction(citizen_id: String, activity: String = "family_time") -> void:
+    if not resident_profiles.has(citizen_id):
+        return
+    var profile: Dictionary = resident_profiles[citizen_id]
+    profile["happiness"] = clampf(float(profile.get("happiness", 0.5)) + 0.015, 0.0, 1.0)
+    _append_event(profile, activity)
+    resident_profiles[citizen_id] = profile
+    var partner_id := str(profile.get("partner_id", ""))
+    if resident_profiles.has(partner_id):
+        var partner: Dictionary = resident_profiles[partner_id]
+        partner["happiness"] = clampf(float(partner.get("happiness", 0.5)) + 0.01, 0.0, 1.0)
+        _append_event(partner, "shared_" + activity)
+        resident_profiles[partner_id] = partner
+    _dirty = true
 
 func claim_resident_id(city_id: String) -> String:
     if not _claim_cache.has(city_id):
@@ -264,6 +340,13 @@ func advance_daily_routines(hour: int) -> void:
         profile["schedule_hour"] = hour
         if activity in ["family", "social", "play", "leisure"]:
             profile["happiness"] = clampf(float(profile.get("happiness", 0.5)) + 0.001, 0.0, 1.0)
+        if activity == "family":
+            profile["family_time_days"] = int(profile.get("family_time_days", 0)) + 1
+            var partner_id := str(profile.get("partner_id", ""))
+            if resident_profiles.has(partner_id):
+                var partner: Dictionary = resident_profiles[partner_id]
+                partner["happiness"] = clampf(float(partner.get("happiness", 0.5)) + 0.002, 0.0, 1.0)
+                resident_profiles[partner_id] = partner
         elif activity == "work":
             profile["money"] = int(profile.get("money", 0)) + 5
         elif activity == "school":
