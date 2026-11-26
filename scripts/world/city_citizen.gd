@@ -31,6 +31,8 @@ var _last_visual_age := -1
 var _age_refresh_timer := 0.0
 var _spatial_update_timer := 0.0
 var _last_routed_goal := ""
+var _building_visit_phase := ""
+var _building_exit_position := Vector3.ZERO
 @export var citizen_id := ""
 @export var city_id := ""
 @export var occupation := "resident"
@@ -111,13 +113,17 @@ func _physics_process(delta: float) -> void:
 	if _social_scan_timer >= 5.0:
 		_social_scan_timer = 0.0
 		_scan_social_context()
-	if route.size() < 2:
-		return
 	if _pause_remaining > 0.0:
 		_pause_remaining = maxf(0.0, _pause_remaining - delta)
 		if _pause_remaining == 0.0:
 			is_using_phone = false
 			if _phone != null: _phone.visible = false
+			if _building_visit_phase == "inside":
+				route = PackedVector3Array([global_position, _building_exit_position])
+				_target_index = 1
+				_building_visit_phase = "exiting"
+		return
+	if route.size() < 2:
 		return
 	var target := route[_target_index]
 	if current_goal == "social" and is_instance_valid(_social_target):
@@ -230,11 +236,36 @@ func _choose_next_waypoint() -> void:
 	# Once the final node is reached, wait for the next AI decision to pick
 	# a fresh activity and destination from the route network.
 	if not _last_routed_goal.is_empty() and _target_index >= route.size() - 1:
+		if _building_visit_phase == "entering":
+			_building_visit_phase = "inside"
+			route = PackedVector3Array([global_position])
+			_target_index = 0
+			_pause_remaining = _rng.randf_range(8.0, 22.0)
+			remember_event("entered_building:" + _last_routed_goal)
+			return
+		if _building_visit_phase == "exiting":
+			var completed_goal := _last_routed_goal
+			remember_event("arrived_at_destination:" + completed_goal)
+			var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+			if life_sim != null and life_sim.has_method("record_event"):
+				life_sim.call("record_event", citizen_id, "visited_building:" + completed_goal)
+			_last_routed_goal = ""
+			_building_visit_phase = ""
+			_building_exit_position = Vector3.ZERO
+			route = PackedVector3Array([global_position])
+			_target_index = 0
+			return
+		var route_network := get_tree().get_first_node_in_group("pedestrian_route_network")
+		if route_network != null and route_network.has_method("request_activity_interior_position"):
+			var interior: Vector3 = route_network.call("request_activity_interior_position", _last_routed_goal, citizen_id)
+			if interior != Vector3.ZERO and global_position.distance_to(interior) > 1.0:
+				_building_exit_position = route[route.size() - 1]
+				route = PackedVector3Array([global_position, interior])
+				_target_index = 1
+				_building_visit_phase = "entering"
+				return
 		var completed_goal := _last_routed_goal
 		remember_event("arrived_at_destination:" + completed_goal)
-		var life_sim := get_tree().get_first_node_in_group("world_life_sim")
-		if life_sim != null and life_sim.has_method("record_event"):
-			life_sim.call("record_event", citizen_id, "visited_building:" + completed_goal)
 		_last_routed_goal = ""
 		route = PackedVector3Array([global_position])
 		_target_index = 0
@@ -267,7 +298,7 @@ func _scan_social_context() -> void:
 			_social_target = candidate
 
 func get_ai_snapshot() -> Dictionary:
-	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"crowd_avoidance":true,"memories":_memory.size(),"decisions":ai_decision_count,"route_nodes":route.size(),"route_target_index":_target_index,"route_goal":_last_routed_goal,"route_active":not _last_routed_goal.is_empty(),"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
+	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"crowd_avoidance":true,"memories":_memory.size(),"decisions":ai_decision_count,"route_nodes":route.size(),"route_target_index":_target_index,"route_goal":_last_routed_goal,"route_active":not _last_routed_goal.is_empty(),"building_visit_phase":_building_visit_phase,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
 
 func remember_event(event_name: String) -> void:
 	_memory.append(event_name)
