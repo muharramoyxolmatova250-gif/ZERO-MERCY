@@ -145,7 +145,11 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         "household_id": "household_" + str(abs(hash(citizen_id))),
         "money": local_rng.randi_range(50, 250000), "savings": 0, "monthly_budget": 0,
         "financial_goal": "build_savings", "credit_score": 600, "debt": 0,
-        "owns_home": false, "home_value": 0, "business_id": "", "business_revenue": 0,
+        "owns_home": false, "home_value": 0,
+        "vehicle_id": "", "vehicle_type": "", "vehicle_value": 0,
+        "vehicle_fuel": 0.0, "vehicle_condition": 1.0, "vehicle_monthly_km": 0,
+        "transport_preference": "public" if local_rng.randf() < 0.72 else "private",
+        "business_id": "", "business_revenue": 0,
         "business_months": 0, "business_last_profit": 0, "business_health": 0.0,
         "health": local_rng.randf_range(0.65, 1.0),
         "happiness": local_rng.randf_range(0.35, 0.9), "active": true,
@@ -479,7 +483,14 @@ func get_citizen_financial_snapshot(citizen_id: String) -> Dictionary:
         "debt": int(profile.get("debt", 0)),
         "credit_score": int(profile.get("credit_score", 600)),
         "monthly_income": int(profile.get("monthly_income", 0)),
-        "monthly_housing_cost": int(profile.get("monthly_housing_cost", 0))
+        "monthly_housing_cost": int(profile.get("monthly_housing_cost", 0)),
+        "vehicle_id": str(profile.get("vehicle_id", "")),
+        "vehicle_type": str(profile.get("vehicle_type", "")),
+        "vehicle_value": int(profile.get("vehicle_value", 0)),
+        "vehicle_fuel": float(profile.get("vehicle_fuel", 0.0)),
+        "vehicle_condition": float(profile.get("vehicle_condition", 1.0)),
+        "vehicle_monthly_km": int(profile.get("vehicle_monthly_km", 0)),
+        "transport_preference": str(profile.get("transport_preference", "public"))
     }
 
 
