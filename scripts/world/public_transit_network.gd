@@ -78,12 +78,15 @@ func get_nearest_stop(position: Vector3, max_distance: float = 120.0) -> Diction
 			best_distance = distance
 			nearest = stop.duplicate(true)
 			nearest["distance"] = distance
+			nearest["waiting_passengers"] = get_waiting_passengers(str(stop_id))
 	return nearest
 
 func get_stop_snapshot() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for stop_id in _stops:
-		result.append(_stops[stop_id].duplicate(true))
+		var stop: Dictionary = _stops[stop_id].duplicate(true)
+		stop["waiting_passengers"] = get_waiting_passengers(str(stop_id))
+		result.append(stop)
 	return result
 
 func add_waiting_passengers(stop_id: String, amount: int) -> int:
