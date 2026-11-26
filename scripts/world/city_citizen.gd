@@ -30,6 +30,7 @@ var life_profile: Dictionary = {}
 var _last_visual_age := -1
 var _age_refresh_timer := 0.0
 var _spatial_update_timer := 0.0
+var _last_routed_goal := ""
 @export var citizen_id := ""
 @export var city_id := ""
 @export var occupation := "resident"
@@ -204,6 +205,14 @@ func _decide_goal() -> void:
 			best_score = score
 			best = goal
 	current_goal = best
+	if _last_routed_goal != best:
+		var route_network := get_tree().get_first_node_in_group("pedestrian_route_network")
+		if route_network != null:
+			var planned_route: PackedVector3Array = route_network.call("request_activity_route", global_position, best, citizen_id)
+			if planned_route.size() > 1:
+				route = planned_route
+				_target_index = 1
+				_last_routed_goal = best
 	if best != previous_goal:
 		var life_sim := get_tree().get_first_node_in_group("world_life_sim")
 		if life_sim != null:
@@ -217,6 +226,10 @@ func _decide_goal() -> void:
 	if _memory.size() > 24: _memory.pop_front()
 
 func _choose_next_waypoint() -> void:
+	if not _last_routed_goal.is_empty() and _target_index >= route.size() - 1:
+		_last_routed_goal = ""
+		_target_index = 0
+		return
 	if route.size() <= 2 or _rng.randf() < 0.75:
 		_target_index = (_target_index + 1) % route.size()
 	else:
