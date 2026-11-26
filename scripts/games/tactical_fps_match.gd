@@ -29,6 +29,7 @@ var rounds_lost := 0
 var aiming := false
 var round_finished := false
 var crosshair: Label
+var restart_button: Button
 var weapon_pivot: Node3D
 var muzzle_flash: OmniLight3D
 
@@ -236,6 +237,19 @@ func _build_hud() -> void:
 	exit_button.offset_bottom = 66.0
 	exit_button.pressed.connect(_exit_to_phone)
 	layer.add_child(exit_button)
+	restart_button = Button.new()
+	restart_button.text = "PLAY AGAIN"
+	restart_button.anchor_left = 0.5
+	restart_button.anchor_right = 0.5
+	restart_button.anchor_top = 0.5
+	restart_button.anchor_bottom = 0.5
+	restart_button.offset_left = -105.0
+	restart_button.offset_right = 105.0
+	restart_button.offset_top = 64.0
+	restart_button.offset_bottom = 116.0
+	restart_button.visible = false
+	restart_button.pressed.connect(_restart_round)
+	layer.add_child(restart_button)
 
 func _exit_to_phone() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -375,8 +389,11 @@ func _update_bots(delta: float) -> void:
 			wait = 1.5 + float(bot.get_instance_id() % 10) * 0.08
 		bot.set_meta("fire_wait", wait)
 
+	# Round outcome is also actionable on touch-only devices.
 func _finish_round() -> void:
 	round_finished = true
+	if restart_button != null:
+		restart_button.visible = true
 	if bots.is_empty():
 		rounds_won += 1
 	else:
@@ -409,6 +426,8 @@ func _restart_round() -> void:
 	if weapon_pivot != null:
 		weapon_pivot.position = Vector3(0.32, -0.28, -0.58)
 	round_finished = false
+	if restart_button != null:
+		restart_button.visible = false
 	touch_fire_held = false
 	touch_sprinting = false
 	touch_move = Vector2.ZERO
