@@ -755,6 +755,31 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     _append_event(profile, "monthly_finances:" + str(balance))
 
 
+func _consider_home_purchase(profile: Dictionary) -> void:
+    if bool(profile.get("owns_home", false)) or not bool(profile.get("living_independently", false)):
+        return
+    var money := int(profile.get("money", 0))
+    var savings := int(profile.get("savings", 0))
+    var stability := float(profile.get("financial_stability", 0.0))
+    var home_price := 42000 + int(profile.get("career_level", 1)) * 1800
+    if money + savings < home_price or stability < 0.72:
+        return
+    if _rng.randf() > 0.12:
+        return
+    var payment := mini(money, home_price)
+    if payment < home_price:
+        var from_savings := home_price - payment
+        if savings < from_savings:
+            return
+        profile["savings"] = savings - from_savings
+    profile["money"] = money - payment
+    profile["owns_home"] = true
+    profile["home_value"] = home_price
+    profile["housing_status"] = "home_owner"
+    profile["monthly_housing_cost"] = 90
+    _append_event(profile, "purchased_home:" + str(home_price))
+
+
 func _process_job_interview(profile: Dictionary) -> void:
     if str(profile.get("life_stage", "")) != "adult":
         return
