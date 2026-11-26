@@ -14,7 +14,7 @@ class GlobalCompleteGridTests(unittest.TestCase):
             base = Path(tmp)
             (base / "data/osm/tiles/test").mkdir(parents=True)
             (base / "data/terrain/tiles/global").mkdir(parents=True)
-            (base / "data/osm/tiles/test/0_0.geojson").write_text('{"type":"FeatureCollection","features":[]}')
+            (base / "data/osm/tiles/test/0_0.geojson").write_text('{"type":"FeatureCollection","features":[]}' + " " * 100)
             (base / "data/terrain/tiles/global/0_0.f32").write_bytes(b"dem")
             runtime = base / "region_tiles.json"
             runtime.write_text(json.dumps({
