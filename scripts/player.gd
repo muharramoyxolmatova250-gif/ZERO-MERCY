@@ -487,6 +487,7 @@ func _fire_weapon() -> void:
 		return
 	shot_cooldown = shot_interval
 	set_meta("wanted_until", Time.get_ticks_msec() + 45000)
+	set_meta("wanted_level", maxi(1, int(get_meta("wanted_level", 0))))
 	_play_weapon_recoil()
 	_trigger_muzzle_flash()
 	ammo_in_magazine -= 1
