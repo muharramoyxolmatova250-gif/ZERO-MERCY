@@ -611,6 +611,44 @@ func _consider_autonomous_phone_use() -> void:
 		chance *= 0.25
 	if _rng.randf() > chance:
 		return
+	# Entertainment is a genuine autonomous choice, weighted by mood and free time.
+	var free_time := current_goal in ["social", "leisure", "rest", "family", "play"]
+	var entertainment_roll := _rng.randf()
+	if free_time and entertainment_roll < 0.34 and life_sim.has_method("get_phone_media_feed"):
+		var media_feed: Array = life_sim.call("get_phone_media_feed", "video", 60)
+		if not media_feed.is_empty():
+			var watched: Dictionary = media_feed[_rng.randi_range(0, media_feed.size() - 1)]
+			var watch_time := _rng.randf_range(18.0, minf(180.0, float(watched.get("duration_seconds", 180))))
+			life_sim.call("record_phone_media_view", citizen_id, str(watched.get("id", "")), watch_time)
+			remember_event("watched_video:" + str(watched.get("topic", "variety")))
+			_phone_action_cooldown = _rng.randf_range(45.0, 120.0)
+			_phone_battery_visual = maxf(0.15, _phone_battery_visual - watch_time * 0.0008)
+			_set_phone_visible(true)
+			_pause_remaining = maxf(_pause_remaining, watch_time * 0.08)
+			return
+	if free_time and entertainment_roll < 0.52 and life_sim.has_method("play_phone_game"):
+		var games: Array = life_sim.call("get_phone_games_catalog")
+		if not games.is_empty():
+			var selected_game: Dictionary = games[_rng.randi_range(0, games.size() - 1)]
+			var match_time := _rng.randi_range(5, 18)
+			var match_result: Dictionary = life_sim.call("play_phone_game", citizen_id, str(selected_game.get("id", "")), match_time)
+			if not match_result.is_empty():
+				remember_event("phone_game:" + str(selected_game.get("id", "")) + (":won" if bool(match_result.get("won", false)) else ":lost"))
+				_phone_action_cooldown = _rng.randf_range(70.0, 150.0)
+				_phone_battery_visual = maxf(0.15, _phone_battery_visual - float(match_time) * 0.0045)
+				_set_phone_visible(true)
+				_pause_remaining = maxf(_pause_remaining, float(match_time) * 0.12)
+				return
+	if _curiosity > 0.58 and life_sim.has_method("publish_phone_media") and _rng.randf() < 0.24:
+		var media_kind := ["video", "image", "post"][_rng.randi_range(0, 2)]
+		var topics := ["city_life", "music", "cars", "food", "travel", "gaming", "wildlife", "fashion", "sports", "technology"]
+		var topic: String = topics[_rng.randi_range(0, topics.size() - 1)]
+		var captions := ["Bugungi lahza!", "Shahardan yangi kadrlar.", "Buni ko'rishingiz kerak.", "Yangi taassurotlar."]
+		life_sim.call("publish_phone_media", citizen_id, media_kind, topic.capitalize() + " — " + str(_rng.randi_range(1, 9999)), topic, captions[_rng.randi_range(0, captions.size() - 1)])
+		remember_event("shared_phone_" + media_kind)
+		_phone_action_cooldown = _rng.randf_range(90.0, 180.0)
+		_set_phone_visible(true)
+		return
 	var contacts: Array = life_sim.call("get_phone_snapshot", citizen_id).get("contacts", [])
 	var possible_contacts: Array[String] = []
 	for candidate in _get_nearby_citizens(35.0):
