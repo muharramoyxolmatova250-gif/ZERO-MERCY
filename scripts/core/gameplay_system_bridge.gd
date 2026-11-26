@@ -17,6 +17,10 @@ var hacking: Node
 var mission_tracker: Node
 var event_scheduler: Node
 
+func _process(_delta: float) -> void:
+\tif is_instance_valid(event_scheduler) and get_node_or_null("/root/GameSession") != null:
+\t\tevent_scheduler.call("update_simulation_time", float(GameSession.day_time_hours))
+
 func bind_player(target: Node) -> void:
 	player = target
 	var player_systems := Node.new()
