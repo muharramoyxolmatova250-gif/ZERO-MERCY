@@ -11,6 +11,7 @@ on:
       - "tools/geodata/select_global_country_batch.py"
       - "tools/geodata/advance_global_country_batch.py"
       - "tools/geodata/rebuild_global_runtime_index.py"
+      - "tools/geodata/build_global_tile_grid.py"
       - "tools/geodata/download_etopo_tile.py"
       - "tools/geodata/convert_dem.py"
       - "tools/geodata/build_dem_tile_batch.py"
@@ -18,6 +19,7 @@ on:
       - "tools/geodata/build_osm_urban_tile_bboxes.py"
       - "tests/test_osm_urban_tile_bboxes.py"
       - "tests/test_global_tile_grid.py"
+      - "tests/test_global_complete_grid.py"
       - "tests/test_global_build_state.py"
       - "tests/test_global_country_queue.py"
       - "data/world/global_build_state.json"
@@ -94,6 +96,7 @@ jobs:
           python tools/geodata/build_global_country_queue.py
           python tests/test_global_country_queue.py
           python tests/test_global_tile_grid.py
+          python tests/test_global_complete_grid.py
           python tests/test_global_build_state.py
           python tests/test_etopo_tile_index.py
           python tests/test_osm_urban_tile_bboxes.py
@@ -211,6 +214,10 @@ jobs:
           python tools/geodata/advance_global_country_batch.py --region-id "$REGION_ID" \
             --tile-start "$TILE_START" --tile-count "$TILE_COUNT" \
             --plan "data/world/tile_jobs/$SAFE_REGION.json"
+      - name: Build compact index for all 6,480,000 Earth cells
+        if: steps.select.outputs.has_work == 'true'
+        run: |
+          python tools/geodata/build_global_tile_grid.py
       - name: Commit verified country tiles and progress
         if: steps.select.outputs.has_work == 'true'
         env:
@@ -219,6 +226,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/world/global_build_state.json data/world/region_tiles.json \
+            data/world/global_tile_grid.json data/world/global_tile_presence.bin \
             "data/world/tile_jobs/$SAFE_REGION.json" "data/world/tile_jobs/urban_bboxes/$SAFE_REGION.json" "data/osm/tiles/$SAFE_REGION/" \
             data/terrain/tiles/global/
           if git diff --cached --quiet; then
