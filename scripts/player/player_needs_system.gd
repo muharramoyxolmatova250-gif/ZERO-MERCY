@@ -36,3 +36,15 @@ func get_performance_multiplier() -> float:
 
 func get_snapshot() -> Dictionary:
 	return {"hunger": hunger, "thirst": thirst, "stamina": stamina, "fatigue": fatigue, "performance": get_performance_multiplier()}
+
+func restore_snapshot(snapshot: Dictionary) -> bool:
+	for key in ["hunger", "thirst", "stamina", "fatigue"]:
+		var value: Variant = snapshot.get(key, get(key))
+		if (typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT) or not is_finite(float(value)):
+			return false
+	hunger = clampf(float(snapshot.get("hunger", hunger)), 0.0, 100.0)
+	thirst = clampf(float(snapshot.get("thirst", thirst)), 0.0, 100.0)
+	stamina = clampf(float(snapshot.get("stamina", stamina)), 0.0, 100.0)
+	fatigue = clampf(float(snapshot.get("fatigue", fatigue)), 0.0, 100.0)
+	needs_changed.emit(get_snapshot())
+	return true
