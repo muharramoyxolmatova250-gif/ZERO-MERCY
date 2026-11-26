@@ -80,7 +80,7 @@ def main() -> int:
     if pending:
         # The expensive PBF extraction remains a single Osmium pass; independent
         # GeoJSON conversions run concurrently to reduce per-tile overhead.
-        with ThreadPoolExecutor(max_workers=min(4, len(pending))) as pool:
+        with ThreadPoolExecutor(max_workers=min(8, len(pending))) as pool:
             futures = [pool.submit(export_one, item) for item in pending]
             for future in as_completed(futures):
                 tile_id, geo, feature_count = future.result()
