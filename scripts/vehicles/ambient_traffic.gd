@@ -94,6 +94,7 @@ func _make_traffic_car(index: int) -> Node3D:
  root.add_child(lights)
  var traffic_body := StaticBody3D.new()
  traffic_body.name = "TrafficCollision"
+ traffic_body.add_to_group("traffic_obstacle")
  var traffic_shape := CollisionShape3D.new()
  var traffic_box := BoxShape3D.new()
  traffic_box.size = Vector3(1.8, 1.0, 3.6)
