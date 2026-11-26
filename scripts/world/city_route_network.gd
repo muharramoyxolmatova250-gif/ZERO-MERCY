@@ -43,7 +43,7 @@ func build_grid(blocks_per_side: int, spacing: float, road_width: float) -> void
 				pool.append(index)
 		_destinations[category] = pool
 
-func register_destination(category: String, position: Vector3, interior_position: Vector3 = Vector3.ZERO) -> void:
+func register_destination(category: String, position: Vector3, interior_position: Vector3 = Vector3.ZERO, building_height: float = 3.2) -> void:
 	if _points.is_empty():
 		return
 	var node_id := _nearest_point(position)
@@ -58,8 +58,12 @@ func register_destination(category: String, position: Vector3, interior_position
 		pool.append(node_id)
 	_destinations[category] = pool
 	var interiors: Array = _interior_destinations.get(category, [])
-	if interior_position != Vector3.ZERO and not interiors.has(interior_position):
-		interiors.append(interior_position)
+	if interior_position != Vector3.ZERO:
+		var floor_count := clampi(int(floor(building_height / 3.2)), 1, 12)
+		for floor_index in range(floor_count):
+			var floor_position := interior_position + Vector3(0.0, float(floor_index) * 3.2, 0.0)
+			if not interiors.has(floor_position):
+				interiors.append(floor_position)
 	_interior_destinations[category] = interiors
 
 func request_activity_interior_position(activity: String, citizen_id: String) -> Vector3:
@@ -69,8 +73,7 @@ func request_activity_interior_position(activity: String, citizen_id: String) ->
 		return Vector3.ZERO
 	var seed := absi(hash(citizen_id + ":" + activity))
 	var anchor: Vector3 = interiors[seed % interiors.size()]
-	# Give each resident a stable nearby standing slot instead of stacking every
-	# visitor on the exact same lobby coordinate.
+	# Stable resident-specific offsets prevent every visitor stacking on one point.
 	var angle := float(seed % 6283) / 1000.0
 	var radius := 0.28 + float((seed / 6283) % 5) * 0.12
 	return anchor + Vector3(cos(angle) * radius, 0.0, sin(angle) * radius)
