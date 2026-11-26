@@ -904,6 +904,21 @@ func _hire_business_workers(owner: Dictionary) -> void:
     owner["business_capacity"] = capacity + 1
 
 
+func _release_business_workers(business_id: String) -> void:
+    if business_id.is_empty():
+        return
+    for worker_id in resident_profiles.keys():
+        var worker: Dictionary = resident_profiles[worker_id]
+        if str(worker.get("employer_id", "")) != business_id:
+            continue
+        worker["employer_id"] = ""
+        worker["occupation"] = "unemployed"
+        worker["monthly_income"] = 0
+        worker["job_search_status"] = "seeking"
+        _append_event(worker, "business_closed_job_lost:" + business_id)
+        resident_profiles[worker_id] = worker
+
+
 func _pay_business_workers(owner: Dictionary) -> int:
     var business_id := str(owner.get("business_id", ""))
     if business_id.is_empty():
@@ -966,6 +981,8 @@ func _operate_personal_business(profile: Dictionary) -> void:
         profile["business_expansions"] = int(profile.get("business_expansions", 0)) + 1
         _append_event(profile, "business_expanded:" + str(profile["business_capacity"]))
     if capital < 500 and months > 2:
+        var closed_business_id := str(profile.get("business_id", ""))
+        _release_business_workers(closed_business_id)
         profile["business_id"] = ""
         profile["business_workers"] = 0
         profile["financial_goal"] = "rebuild_savings"
