@@ -56,6 +56,9 @@ func report_pickup(request_id: String) -> void:
 	var request: Dictionary = _requests[request_id]
 	request["status"] = "picked_up"
 	_requests[request_id] = request
+	var passenger := _find_passenger(str(request.get("passenger_id", "")))
+	if passenger != null and passenger.has_method("begin_taxi_ride"):
+		passenger.call("begin_taxi_ride", request_id)
 
 func report_trip_complete(request_id: String) -> void:
 	if not _requests.has(request_id):
@@ -65,6 +68,9 @@ func report_trip_complete(request_id: String) -> void:
 		return
 	request["status"] = "completed"
 	_requests[request_id] = request
+	var passenger := _find_passenger(str(request.get("passenger_id", "")))
+	if passenger != null and passenger.has_method("finish_taxi_ride"):
+		passenger.call("finish_taxi_ride", request_id, request.get("destination", Vector3.ZERO))
 	_completed_trips += 1
 	_total_fares += float(request.get("fare", 0.0))
 	var taxi_id := str(request.get("taxi_id", ""))
@@ -116,3 +122,9 @@ func cancel_passenger_request(passenger_id: String) -> bool:
 				vehicle.call("cancel_trip")
 		return true
 	return false
+
+func _find_passenger(passenger_id: String) -> Node:
+	for citizen in get_tree().get_nodes_in_group("city_citizen"):
+		if is_instance_valid(citizen) and str(citizen.get("citizen_id")) == passenger_id:
+			return citizen
+	return null
