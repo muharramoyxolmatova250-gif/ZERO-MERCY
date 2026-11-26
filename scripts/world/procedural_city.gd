@@ -36,6 +36,7 @@ func _ready() -> void:
 	_spawn_street_furniture()
 	_build_pedestrian_route_network()
 	_build_public_transit_network()
+	_build_taxi_dispatch()
 	_spawn_city_life()
 	_spawn_interactive_props()
 
@@ -688,3 +689,31 @@ func _spawn_interactive_props() -> void:
 		item.set("glow_color", entry[2])
 		item.position = entry[0]
 		add_child(item)
+
+func _build_taxi_dispatch() -> void:
+	var dispatch_script := load("res://scripts/world/city_taxi_dispatch.gd")
+	var taxi_script := load("res://scripts/world/city_taxi_vehicle.gd")
+	if dispatch_script == null or taxi_script == null:
+		push_warning("Taxi dispatch scripts are missing; city taxi fleet was not created.")
+		return
+	var dispatch := Node.new()
+	dispatch.name = "CityTaxiDispatch"
+	dispatch.set_script(dispatch_script)
+	dispatch.add_to_group("city_taxi_dispatch")
+	add_child(dispatch)
+	var half := blocks_per_side * block_spacing * 0.5
+	var lane := road_width * 0.5 + 2.5
+	var taxi_positions := [
+		Vector3(-half + lane, 0.0, -half + lane),
+		Vector3(half - lane, 0.0, -half + lane),
+		Vector3(half - lane, 0.0, half - lane),
+		Vector3(-half + lane, 0.0, half - lane)
+	]
+	for index in range(taxi_positions.size()):
+		var taxi := Node3D.new()
+		taxi.set_script(taxi_script)
+		taxi.name = "CityTaxi_%02d" % (index + 1)
+		taxi.set("taxi_id", _resolved_settlement_id() + "_taxi_" + str(index + 1))
+		taxi.set("dispatch_service", dispatch)
+		taxi.position = taxi_positions[index]
+		add_child(taxi)
