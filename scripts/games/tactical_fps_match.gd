@@ -23,6 +23,7 @@ var sprinting := false
 var rounds_won := 0
 var rounds_lost := 0
 var aiming := false
+var round_finished := false
 var crosshair: Label
 
 func _ready() -> void:
@@ -194,6 +195,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_start_reload()
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_C:
 		_toggle_crouch()
+	elif event is InputEventKey and event.pressed and event.keycode == KEY_T and round_finished:
+		_restart_round()
 
 func _set_aiming(enabled: bool) -> void:
 	 aiming = enabled
@@ -206,7 +209,9 @@ func _capture_mouse() -> void:
 	mouse_captured = true
 
 func _physics_process(delta: float) -> void:
-	if health <= 0.0 or time_left <= 0.0:
+	if health <= 0.0 or time_left <= 0.0 or bots.is_empty():
+		if not round_finished:
+			_finish_round()
 		_update_hud()
 		return
 	time_left = maxf(0.0, time_left - delta)
@@ -292,9 +297,37 @@ func _update_bots(delta: float) -> void:
 			wait = 1.5 + float(bot.get_instance_id() % 10) * 0.08
 		bot.set_meta("fire_wait", wait)
 
+func _finish_round() -> void:
+	round_finished = true
+	if bots.is_empty():
+		rounds_won += 1
+	else:
+		rounds_lost += 1
+
+func _restart_round() -> void:
+	for bot in bots:
+		if is_instance_valid(bot):
+			bot.queue_free()
+	bots.clear()
+	health = 100.0
+	ammo = 30
+	reserve_ammo = 90
+	score = 0
+	time_left = ROUND_SECONDS
+	reloading = false
+	reload_left = 0.0
+	player.global_position = Vector3(0, 1, 19)
+	player.velocity = Vector3.ZERO
+	player.rotation = Vector3.ZERO
+	camera.rotation = Vector3.ZERO
+	camera.fov = 75.0
+	aiming = false
+	round_finished = false
+	_build_bots()
+
 func _update_hud() -> void:
 	if hud == null:
 		return
 	var state := ("RELOADING %.1fs" % reload_left) if reloading else ("AMMO %d / %d" % [ammo, reserve_ammo])
-	var outcome := " • YOU ARE DOWN" if health <= 0.0 else (" • TIME EXPIRED" if time_left <= 0.0 else "")
-	hud.text = "ZERO MERCY // TACTICAL BREACH\nHP %.0f   %s\nENEMIES %d   ELIMINATIONS %d\nTIME %03d:%02d%s\nWASD move • Shift sprint • C crouch • Right-click ADS • Mouse aim/fire • R reload • Space jump • Esc release mouse" % [health, state, bots.size(), score, int(time_left) / 60, int(time_left) % 60, outcome]
+	var outcome := " • YOU ARE DOWN" if health <= 0.0 else (" • TIME EXPIRED" if time_left <= 0.0 else (" • ROUND WON" if bots.is_empty() else ""))
+	hud.text = "ZERO MERCY // TACTICAL BREACH\nHP %.0f   %s\nENEMIES %d   ELIMINATIONS %d   W/L %d/%d\nTIME %03d:%02d%s\nWASD move • Shift sprint • C crouch • Right-click ADS • Mouse aim/fire • R reload • Space jump • T restart after round • Esc release mouse" % [health, state, bots.size(), score, rounds_won, rounds_lost, int(time_left) / 60, int(time_left) % 60, outcome]
