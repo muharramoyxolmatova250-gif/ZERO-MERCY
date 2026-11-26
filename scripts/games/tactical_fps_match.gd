@@ -40,7 +40,10 @@ func _build_touch_controls() -> void:
 	touch_controls.set_script(touch_script)
 	touch_controls.name = "MobileControls"
 	touch_controls.visible = OS.has_feature("mobile")
-	add_child(touch_controls)
+	var touch_layer := CanvasLayer.new()
+	touch_layer.name = "TouchControlsLayer"
+	add_child(touch_layer)
+	touch_layer.add_child(touch_controls)
 	touch_controls.movement_changed.connect(func(direction: Vector2) -> void: touch_move = direction)
 	touch_controls.aim_changed.connect(_on_touch_aim)
 	touch_controls.fire_pressed.connect(_fire)
