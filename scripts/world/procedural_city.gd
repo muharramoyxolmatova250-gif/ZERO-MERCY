@@ -205,6 +205,7 @@ func _building_lobby(base: Vector3, size: Vector3, accent: Color) -> void:
 	_box(lobby_center + Vector3(-room_width * 0.27, 2.15, room_depth * 0.12), Vector3(1.4, 0.8, 0.06), Color(0.0, 0.18, 0.25), true, false)
 	for seat_x in [-1.0, 1.0]:
 		_box(lobby_center + Vector3(seat_x * room_width * 0.27, 0.42, -room_depth * 0.25), Vector3(1.0, 0.35, 0.75), Color(0.04, 0.055, 0.08), false, false)
+	_building_vertical_access(lobby_center, room_width, room_depth, size.y, accent)
 	var lobby_light := OmniLight3D.new()
 	lobby_light.name = "LobbyNeonLight"
 	lobby_light.add_to_group("building_lobby_light")
@@ -214,6 +215,43 @@ func _building_lobby(base: Vector3, size: Vector3, accent: Color) -> void:
 	lobby_light.omni_range = 10.0
 	lobby_light.shadow_enabled = false
 	add_child(lobby_light)
+
+
+func _building_vertical_access(center: Vector3, room_width: float, room_depth: float, building_height: float, accent: Color) -> void:
+	# Ground-floor elevator doors and call panel.
+	var elevator_x := room_width * 0.31
+	var rear_z := center.z + room_depth * 0.5 - 0.42
+	_box(center + Vector3(elevator_x, 1.45, rear_z), Vector3(1.65, 2.9, 0.12), Color(0.035, 0.055, 0.075), false, false)
+	_box(center + Vector3(elevator_x - 0.39, 1.45, rear_z - 0.075), Vector3(0.76, 2.72, 0.035), Color(0.08, 0.12, 0.16), true, false)
+	_box(center + Vector3(elevator_x + 0.39, 1.45, rear_z - 0.075), Vector3(0.76, 2.72, 0.035), Color(0.08, 0.12, 0.16), true, false)
+	_box(center + Vector3(elevator_x, 2.98, rear_z - 0.1), Vector3(0.48, 0.22, 0.06), accent, true, false)
+	_box(center + Vector3(elevator_x - 1.02, 1.35, rear_z - 0.12), Vector3(0.16, 0.42, 0.08), accent, true, false)
+	# Compact stepped stair flight along the opposite lobby wall.
+	var stair_x := -room_width * 0.31
+	var step_count := 7
+	for step in range(step_count):
+		var rise := float(step) * 0.22
+		var depth := float(step) * 0.34
+		_box(center + Vector3(stair_x, 0.12 + rise, -room_depth * 0.31 + depth), Vector3(1.45, 0.24, 0.52), Color(0.045, 0.065, 0.085), false, false)
+		if step % 2 == 0:
+			_box(center + Vector3(stair_x, 0.27 + rise, -room_depth * 0.31 + depth - 0.12), Vector3(1.48, 0.035, 0.035), accent, true, false)
+	# Floor count and access signage are visual guidance, not a working lift yet.
+	var floors := maxi(1, int(floor(building_height / 3.2)))
+	_box(center + Vector3(elevator_x, 3.28, rear_z - 0.11), Vector3(0.58, 0.22, 0.07), Color(0.0, 0.12, 0.18), true, false)
+	if floors > 1:
+		for floor_index in range(mini(floors - 1, 5)):
+			var marker := MeshInstance3D.new()
+			var marker_mesh := BoxMesh.new()
+			marker_mesh.size = Vector3(0.11, 0.11, 0.045)
+			marker.mesh = marker_mesh
+			marker.position = center + Vector3(elevator_x + 0.43, 3.2 + float(floor_index) * 0.15, rear_z - 0.16)
+			var marker_material := StandardMaterial3D.new()
+			marker_material.albedo_color = accent
+			marker_material.emission_enabled = true
+			marker_material.emission = accent
+			marker_material.emission_energy_multiplier = 1.1
+			marker.material_override = marker_material
+			add_child(marker)
 
 func _facade_windows_instanced(base: Vector3, size: Vector3, accent_index: int) -> void:
 	var columns := maxi(2, int(size.x / 2.8))
