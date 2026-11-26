@@ -149,6 +149,8 @@ func _physics_process(delta: float) -> void:
    var driver := get_tree().get_first_node_in_group("player")
    if driver != null:
     driver.set_meta("wanted_until", Time.get_ticks_msec() + 60000)
-				 driver.set_meta("wanted_level", mini(5, int(driver.get_meta("wanted_level", 0)) + 1))
+				 var previous_wanted_until := int(driver.get_meta("wanted_until", 0))
+				 var old_level := int(driver.get_meta("wanted_level", 0)) if Time.get_ticks_msec() < previous_wanted_until else 0
+				 driver.set_meta("wanted_level", mini(5, old_level + 1))
    _speed *= 0.35
    break
