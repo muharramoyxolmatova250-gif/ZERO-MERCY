@@ -36,6 +36,9 @@ var _last_visual_age := -1
 var _age_refresh_timer := 0.0
 var _spatial_update_timer := 0.0
 var _last_routed_goal := ""
+var _personality_traits: Dictionary = {}
+var _long_term_goal := "build_a_stable_life"
+var _decision_reason := "initializing"
 var _building_visit_phase := ""
 var _building_exit_position := Vector3.ZERO
 @export var citizen_id := ""
@@ -58,6 +61,7 @@ func _ready() -> void:
 		route = PackedVector3Array([Vector3(-5,0,-5), Vector3(5,0,-5), Vector3(5,0,5), Vector3(-5,0,5)])
 	_target_index = 1
 	personality = _rng.randi_range(1, 5)
+	_initialize_personality()
 	_decide_goal()
 
 func _register_life_profile() -> void:
@@ -185,6 +189,31 @@ func _get_crowd_separation() -> Vector3:
 		separation /= float(nearby_count)
 	return separation
 
+func _initialize_personality() -> void:
+	# Stable traits are derived from citizen identity, preserving temperament across streaming.
+	var trait_rng := RandomNumberGenerator.new()
+	trait_rng.seed = int(abs(hash(citizen_id + ":personality")))
+	_personality_traits = {
+		"ambition": trait_rng.randf_range(0.15, 1.0),
+		"kindness": trait_rng.randf_range(0.15, 1.0),
+		"courage": trait_rng.randf_range(0.15, 1.0),
+		"curiosity": trait_rng.randf_range(0.15, 1.0),
+		"discipline": trait_rng.randf_range(0.15, 1.0),
+		"sociability": trait_rng.randf_range(0.15, 1.0),
+		"risk_tolerance": trait_rng.randf_range(0.1, 0.9)
+	}
+	if float(_personality_traits["ambition"]) > 0.72:
+		_long_term_goal = "career_success"
+	elif float(_personality_traits["kindness"]) > 0.72:
+		_long_term_goal = "help_others"
+	elif float(_personality_traits["curiosity"]) > 0.72:
+		_long_term_goal = "discover_the_world"
+	elif float(_personality_traits["sociability"]) > 0.72:
+		_long_term_goal = "build_relationships"
+	else:
+		_long_term_goal = "build_a_stable_life"
+
+
 func _update_needs() -> void:
 	_energy = clampf(_energy - 0.002, 0.0, 1.0)
 	_hunger = clampf(_hunger + 0.003, 0.0, 1.0)
@@ -198,7 +227,33 @@ func _decide_goal() -> void:
 	var society_clock := get_tree().get_first_node_in_group("world_society_sim")
 	if society_clock != null:
 		hour = int(society_clock.get("simulation_hour"))
-	var scores := {"work": (1.0 if hour >= 8 and hour < 18 else 0.12) + (0.18 if occupation != "unemployed" else 0.0), "food": _hunger * 1.65, "social": _social_need * (1.0 + float(personality) * 0.12) + (0.25 if is_instance_valid(_social_target) else 0.0), "rest": (1.0 - _energy) * 1.5 + (0.35 if hour >= 21 or hour < 6 else 0.0), "explore": _curiosity * (0.75 + float(personality) * 0.08), "commute": 0.9 if hour in [7, 8, 17, 18] else 0.18, "avoid_crowd": _stress * 0.55}
+	var ambition := float(_personality_traits.get("ambition", 0.5))
+	var kindness := float(_personality_traits.get("kindness", 0.5))
+	var curiosity_trait := float(_personality_traits.get("curiosity", 0.5))
+	var sociability := float(_personality_traits.get("sociability", 0.5))
+	var discipline := float(_personality_traits.get("discipline", 0.5))
+	var risk_tolerance := float(_personality_traits.get("risk_tolerance", 0.5))
+	var scores := {
+		"work": (1.0 if hour >= 8 and hour < 18 else 0.12) + (0.18 if occupation != "unemployed" else 0.0) + ambition * 0.38 + discipline * 0.2,
+		"food": _hunger * 1.65,
+		"social": _social_need * (0.75 + sociability * 0.8) + (0.25 if is_instance_valid(_social_target) else 0.0) + kindness * 0.08,
+		"rest": (1.0 - _energy) * 1.5 + (0.35 if hour >= 21 or hour < 6 else 0.0) + (1.0 - discipline) * 0.12,
+		"explore": _curiosity * (0.55 + curiosity_trait * 0.9) + risk_tolerance * 0.12,
+		"commute": 0.9 if hour in [7, 8, 17, 18] else 0.18,
+		"avoid_crowd": _stress * (0.45 + (1.0 - risk_tolerance) * 0.35)
+	}
+	if _long_term_goal == "career_success":
+		scores["work"] = float(scores["work"]) + 0.32
+	elif _long_term_goal == "help_others":
+		scores["social"] = float(scores["social"]) + 0.18
+	elif _long_term_goal == "discover_the_world":
+		scores["explore"] = float(scores["explore"]) + 0.3
+	elif _long_term_goal == "build_relationships":
+		scores["social"] = float(scores["social"]) + 0.3
+	if _memory.has("recently_rejected_social_contact"):
+		scores["social"] = float(scores["social"]) * 0.72
+	if _memory.has("recently_witnessed_violence"):
+		scores["avoid_crowd"] = float(scores["avoid_crowd"]) + 0.35
 	var life_stage := str(life_profile.get("life_stage", "adult"))
 	if life_stage != "adult":
 		scores["work"] = float(scores["work"]) * 0.2
@@ -220,6 +275,7 @@ func _decide_goal() -> void:
 			best_score = score
 			best = goal
 	current_goal = best
+	_decision_reason = "needs_personality_memory_and_schedule"
 	if _last_routed_goal != best:
 		var route_network := get_tree().get_first_node_in_group("pedestrian_route_network")
 		if route_network != null:
@@ -363,14 +419,26 @@ func _scan_social_context() -> void:
 			_social_target = candidate
 
 func get_ai_snapshot() -> Dictionary:
-	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"crowd_avoidance":true,"memories":_memory.size(),"decisions":ai_decision_count,"route_nodes":route.size(),"route_target_index":_target_index,"route_goal":_last_routed_goal,"route_active":not _last_routed_goal.is_empty(),"building_visit_phase":_building_visit_phase,"indoor_activity":_indoor_activity,"indoor_activity_time":_indoor_activity_time,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
+	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"crowd_avoidance":true,"memories":_memory.size(),"decisions":ai_decision_count,"personality_traits":_personality_traits.duplicate(true),"long_term_goal":_long_term_goal,"decision_reason":_decision_reason,"route_nodes":route.size(),"route_target_index":_target_index,"route_goal":_last_routed_goal,"route_active":not _last_routed_goal.is_empty(),"building_visit_phase":_building_visit_phase,"indoor_activity":_indoor_activity,"indoor_activity_time":_indoor_activity_time,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
 
 func remember_event(event_name: String) -> void:
 	_memory.append(event_name)
+	var normalized_event := event_name.to_lower()
+	if "crime" in normalized_event or "violence" in normalized_event or "attack" in normalized_event:
+		_stress = clampf(_stress + 0.12, 0.0, 1.0)
+		if not _memory.has("recently_witnessed_violence"):
+			_memory.append("recently_witnessed_violence")
+	if "help" in normalized_event or "saved" in normalized_event:
+		relationship_score = clampf(relationship_score + 0.12, -1.0, 1.0)
+		_stress = clampf(_stress - 0.08, 0.0, 1.0)
+	elif "betray" in normalized_event or "threat" in normalized_event:
+		relationship_score = clampf(relationship_score - 0.16, -1.0, 1.0)
+		_stress = clampf(_stress + 0.1, 0.0, 1.0)
+	elif "met:" in normalized_event or "conversation:" in normalized_event:
+		relationship_score = clampf(relationship_score + 0.035, -1.0, 1.0)
 	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
 	if life_sim != null:
 		life_sim.call("record_event", citizen_id, event_name)
-	relationship_score = clampf(relationship_score + 0.02, -1.0, 1.0)
 	if _memory.size() > 24: _memory.pop_front()
 
 func get_memory_snapshot() -> PackedStringArray:
