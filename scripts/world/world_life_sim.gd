@@ -822,10 +822,13 @@ func _manage_credit_and_debt(profile: Dictionary) -> void:
     var money := int(profile.get("money", 0))
     var credit := int(profile.get("credit_score", 600))
     if debt > 0:
+        var interest_charge := maxi(1, int(float(debt) * 0.012))
+        debt += interest_charge
         var payment := mini(debt, maxi(0, int(float(money) * 0.08)))
         profile["money"] = money - payment
         profile["debt"] = debt - payment
-        credit = mini(850, credit + (3 if payment > 0 else -2))
+        profile["monthly_debt_interest"] = interest_charge
+        credit = mini(850, credit + (3 if payment > interest_charge else -2))
     elif money < 250 and int(profile.get("savings", 0)) < 300 and _rng.randf() < 0.015:
         var loan := 1200 if credit >= 620 else 400
         profile["debt"] = loan
