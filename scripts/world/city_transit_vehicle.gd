@@ -16,10 +16,17 @@ var _current_speed := 0.0
 var _dwell_remaining := 0.0
 var _door_open := false
 var _door_mesh: MeshInstance3D
+var route_id := ""
+var stop_ids: Array[String] = []
+var transit_network: Node
+var _rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
     add_to_group("city_transit_vehicles")
+    _rng.randomize()
     _build_bus()
+    if transit_network != null and not route_id.is_empty() and transit_network.has_method("report_vehicle_active"):
+        transit_network.call("report_vehicle_active", route_id, true)
     if route.size() >= 2:
         _target_index = 1
         global_position = route[0]
@@ -31,6 +38,10 @@ func _physics_process(delta: float) -> void:
     if _dwell_remaining > 0.0:
         _dwell_remaining = maxf(0.0, _dwell_remaining - delta)
         _current_speed = move_toward(_current_speed, 0.0, 8.0 * delta)
+        if _dwell_remaining <= 0.0:
+            _door_open = false
+            if _door_mesh != null:
+                _door_mesh.visible = false
         return
     var target := route[_target_index]
     var offset := target - global_position
@@ -55,6 +66,15 @@ func _arrive_at_stop() -> void:
     global_position = route[_target_index]
     _current_speed = 0.0
     _door_open = true
+    var stop_id := stop_ids[_target_index] if _target_index < stop_ids.size() else ""
+    var alighted := _rng.randi_range(0, mini(passenger_count, maxi(1, int(round(float(passenger_count) * 0.22))))) if passenger_count > 0 else 0
+    passenger_count -= alighted
+    var boarded := 0
+    if transit_network != null and not stop_id.is_empty() and transit_network.has_method("board_waiting_passengers"):
+        boarded = int(transit_network.call("board_waiting_passengers", stop_id, passenger_capacity - passenger_count))
+        passenger_count += boarded
+        if transit_network.has_method("report_vehicle_stop"):
+            transit_network.call("report_vehicle_stop", route_id, stop_id, boarded)
     if _door_mesh != null:
         _door_mesh.visible = true
     _dwell_remaining = dwell_seconds
@@ -96,7 +116,7 @@ func set_passenger_count(value: int) -> void:
     passenger_count = clampi(value, 0, passenger_capacity)
 
 func get_vehicle_snapshot() -> Dictionary:
-    return {"passengers": passenger_count, "capacity": passenger_capacity, "completed_stops": completed_stops, "speed": _current_speed, "dwelling": _dwell_remaining > 0.0}
+    return {"passengers": passenger_count, "capacity": passenger_capacity, "completed_stops": completed_stops, "speed": _current_speed, "dwelling": _dwell_remaining > 0.0, "doors_open": _door_open, "route_id": route_id}
 
 func _build_bus() -> void:
     var body := MeshInstance3D.new()
@@ -133,3 +153,7 @@ func _build_bus() -> void:
     door_mat.emission = Color(0.0, 0.65, 0.9)
     _door_mesh.material_override = door_mat
     add_child(_door_mesh)
+
+func _exit_tree() -> void:
+    if transit_network != null and not route_id.is_empty() and transit_network.has_method("report_vehicle_active"):
+        transit_network.call("report_vehicle_active", route_id, false)
