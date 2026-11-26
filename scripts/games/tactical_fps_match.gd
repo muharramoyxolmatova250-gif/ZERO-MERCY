@@ -16,6 +16,12 @@ var bots: Array[CharacterBody3D] = []
 var mouse_captured := false
 var touch_move := Vector2.ZERO
 var touch_controls: Control
+var fire_cooldown := 0.0
+var recoil_recovery := 0.0
+var crouched := false
+var sprinting := false
+var rounds_won := 0
+var rounds_lost := 0
 
 func _ready() -> void:
 	_build_arena()
@@ -179,6 +185,8 @@ func _physics_process(delta: float) -> void:
 		_update_hud()
 		return
 	time_left = maxf(0.0, time_left - delta)
+	fire_cooldown = maxf(0.0, fire_cooldown - delta)
+	recoil_recovery = move_toward(recoil_recovery, 0.0, delta * 2.8)
 	if reloading:
 		reload_left -= delta
 		if reload_left <= 0.0:
@@ -189,8 +197,10 @@ func _physics_process(delta: float) -> void:
 			reloading = false
 	var input := Vector2(Input.get_action_strength("fps_right") - Input.get_action_strength("fps_left"), Input.get_action_strength("fps_back") - Input.get_action_strength("fps_forward")) + touch_move
 	var wish := (player.transform.basis * Vector3(input.x, 0, input.y)).normalized()
-	player.velocity.x = wish.x * 5.2
-	player.velocity.z = wish.z * 5.2
+	sprinting = Input.is_key_pressed(KEY_SHIFT) and input.length() > 0.1 and not crouched
+	var move_speed := 7.2 if sprinting else (2.8 if crouched else 5.2)
+	player.velocity.x = wish.x * move_speed
+	player.velocity.z = wish.z * move_speed
 	if player.is_on_floor():
 		player.velocity.y = 0.0
 		if Input.is_action_just_pressed("fps_jump"):
@@ -202,9 +212,12 @@ func _physics_process(delta: float) -> void:
 	_update_hud()
 
 func _fire() -> void:
-	if ammo <= 0 or reloading or health <= 0.0:
+	if ammo <= 0 or reloading or health <= 0.0 or fire_cooldown > 0.0:
 		return
 	ammo -= 1
+	fire_cooldown = 0.105
+	recoil_recovery = minf(0.7, recoil_recovery + 0.12)
+	camera.rotation.x = clampf(camera.rotation.x - 0.012, -1.45, 1.45)
 	var origin := camera.global_position
 	var end := origin + (-camera.global_transform.basis.z * 120.0)
 	var query := PhysicsRayQueryParameters3D.create(origin, end)
