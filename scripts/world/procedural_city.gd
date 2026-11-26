@@ -23,6 +23,7 @@ var _wet_road_material: Material
 var _facade_trim_material: StandardMaterial3D
 var _glass_facade_material: StandardMaterial3D
 var _pedestrian_route_network: Node
+var _building_destinations: Array[Dictionary] = []
 var _building_shell_shader: Shader
 @export var settlement_id := ""
 @export var settlement_display_name := ""
@@ -122,6 +123,9 @@ func _block(center: Vector3) -> void:
 
 func _building(base: Vector3, size: Vector3) -> void:
 	var body_color: Color = mats[rng.randi_range(0, mats.size() - 1)].albedo_color
+	var destination_categories := ["home", "work", "food", "school", "play", "leisure"]
+	var destination_category := str(destination_categories[rng.randi_range(0, destination_categories.size() - 1)])
+	_building_destinations.append({"category": destination_category, "position": base + Vector3(0.0, 0.0, -size.z * 0.5 - road_width * 0.5 - 2.0)})
 	# Hollow visual shell: the front doorway remains physically and visually open.
 	_building_visual_shell(base, size, body_color)
 	if generate_collision:
@@ -507,6 +511,8 @@ func _build_pedestrian_route_network() -> void:
 	_pedestrian_route_network.set_script(load("res://scripts/world/city_route_network.gd"))
 	add_child(_pedestrian_route_network)
 	_pedestrian_route_network.call("build_grid", blocks_per_side, block_spacing, road_width)
+	for destination in _building_destinations:
+		_pedestrian_route_network.call("register_destination", str(destination.get("category", "explore")), destination.get("position", Vector3.ZERO))
 
 func _spawn_city_life() -> void:
 	var citizen_script := load("res://scripts/world/city_citizen.gd")
