@@ -1098,19 +1098,25 @@ func _consider_home_purchase(profile: Dictionary) -> void:
         return
     var money := int(profile.get("money", 0))
     var savings := int(profile.get("savings", 0))
+    var bank_balance := int(profile.get("bank_balance", 0))
     var stability := float(profile.get("financial_stability", 0.0))
     var home_price := 42000 + int(profile.get("career_level", 1)) * 1800
-    if money + savings < home_price or stability < 0.72:
+    if money + savings + bank_balance < home_price or stability < 0.72:
         return
     if _rng.randf() > 0.12:
         return
-    var payment := mini(money, home_price)
-    if payment < home_price:
-        var from_savings := home_price - payment
-        if savings < from_savings:
-            return
-        profile["savings"] = savings - from_savings
-    profile["money"] = money - payment
+    var remaining := home_price
+    var from_money := mini(money, remaining)
+    remaining -= from_money
+    var from_savings := mini(savings, remaining)
+    remaining -= from_savings
+    var from_bank := mini(bank_balance, remaining)
+    remaining -= from_bank
+    if remaining > 0:
+        return
+    profile["money"] = money - from_money
+    profile["savings"] = savings - from_savings
+    profile["bank_balance"] = bank_balance - from_bank
     profile["owns_home"] = true
     profile["home_value"] = home_price
     profile["housing_status"] = "home_owner"
