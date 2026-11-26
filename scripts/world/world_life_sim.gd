@@ -135,7 +135,10 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         "children_count": local_rng.randi_range(0, 3) if married and age >= 25 else 0,
         "family_id": "family_" + str(abs(hash(citizen_id))) if married else "",
         "household_id": "household_" + str(abs(hash(citizen_id))),
-        "money": local_rng.randi_range(50, 250000), "health": local_rng.randf_range(0.65, 1.0),
+        "money": local_rng.randi_range(50, 250000), "savings": 0, "monthly_budget": 0,
+        "financial_goal": "build_savings", "credit_score": 600, "debt": 0,
+        "owns_home": false, "home_value": 0, "business_id": "", "business_revenue": 0,
+        "business_months": 0, "health": local_rng.randf_range(0.65, 1.0),
         "happiness": local_rng.randf_range(0.35, 0.9), "active": true,
         "born_day": simulation_day - age * 365, "last_seen_day": simulation_day,
         "last_activity": "commute", "life_events": ["registered_in_world"]
