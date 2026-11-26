@@ -44,6 +44,8 @@ var _muzzle_flash_timer := 0.0
 var _spawn_transform: Transform3D
 var _dara_animation_time := 0.0
 var _dara_visual_nodes: Dictionary = {}
+var _dara_was_airborne := false
+var _landing_compression := 0.0
 
 
 func _ready() -> void:
@@ -106,7 +108,7 @@ func _build_dara_visual() -> void:
 		_add_dara_capsule("Shin_%s" % side, Vector3(side * 0.17, 0.16, -0.025), 0.115, 0.38, armor)
 		_add_dara_box("KneePlate_%s" % side, Vector3(side * 0.17, 0.34, -0.125), Vector3(0.22, 0.16, 0.07), magenta)
 		_add_dara_box("Boot_%s" % side, Vector3(side * 0.17, 0.055, -0.09), Vector3(0.24, 0.13, 0.38), armor)
-	for part_name in ["TorsoArmor", "Head", "UpperArm_-1.0", "UpperArm_1.0", "Forearm_-1.0", "Forearm_1.0", "Thigh_-1.0", "Thigh_1.0", "Shin_-1.0", "Shin_1.0"]:
+	for part_name in ["TorsoArmor", "Head", "UpperArm_-1.0", "UpperArm_1.0", "Forearm_-1.0", "Forearm_1.0", "Thigh_-1.0", "Thigh_1.0", "Shin_-1.0", "Shin_1.0", "Shoulder_-1.0", "Shoulder_1.0", "Boot_-1.0", "Boot_1.0"]:
 		_dara_visual_nodes[part_name] = get_node_or_null(part_name)
 
 
@@ -248,29 +250,55 @@ func _process(delta: float) -> void:
 
 
 func _animate_dara_visual(delta: float) -> void:
-	var horizontal_speed := Vector2(velocity.x, velocity.z).length()
+	# Layered procedural locomotion: gait, upper-body counter-motion,
+	# foot clearance, sprint posture and landing absorption.
+	var horizontal_velocity := Vector2(velocity.x, velocity.z)
+	var horizontal_speed := horizontal_velocity.length()
 	var movement_weight := clampf(horizontal_speed / maxf(sprint_speed, 0.01), 0.0, 1.0)
+	var sprint_weight := clampf((horizontal_speed - walk_speed) / maxf(sprint_speed - walk_speed, 0.01), 0.0, 1.0)
+	var airborne := not is_on_floor()
+	if _dara_was_airborne and not airborne and velocity.y < -1.0:
+		_landing_compression = clampf(absf(velocity.y) * 0.018, 0.0, 0.22)
+	_dara_was_airborne = airborne
+	_landing_compression = move_toward(_landing_compression, 0.0, delta * 1.7)
+
 	if is_dead:
 		movement_weight = 0.0
-	_dara_animation_time += delta * lerpf(1.0, 2.0, movement_weight)
-	var stride := sin(_dara_animation_time * 8.5) * movement_weight
-	var idle_breath := sin(_dara_animation_time * 2.1) * 0.018
+		sprint_weight = 0.0
+	_dara_animation_time += delta * lerpf(1.0, 1.65, sprint_weight)
+	var phase := _dara_animation_time * lerpf(7.2, 10.2, sprint_weight)
+	var left_phase := sin(phase)
+	var right_phase := sin(phase + PI)
+	var left_lift := maxf(0.0, cos(phase)) * movement_weight
+	var right_lift := maxf(0.0, cos(phase + PI)) * movement_weight
+	var breath := sin(_dara_animation_time * 2.0) * 0.012
+	var air_pose := 1.0 if airborne else 0.0
+	var strafe := 0.0
+	if horizontal_speed > 0.15:
+		var local_velocity := global_transform.basis.inverse() * Vector3(velocity.x, 0.0, velocity.z)
+		strafe = clampf(local_velocity.x / sprint_speed, -1.0, 1.0)
+
 	var targets := {
-		"TorsoArmor": Vector3(idle_breath + absf(stride) * 0.035, 0.0, 0.0),
-		"Head": Vector3(-idle_breath * 0.6, 0.0, 0.0),
-		"UpperArm_-1.0": Vector3(-stride * 0.48, 0.0, 0.0),
-		"UpperArm_1.0": Vector3(stride * 0.48, 0.0, 0.0),
-		"Forearm_-1.0": Vector3(-0.12 - maxf(0.0, stride) * 0.12, 0.0, 0.0),
-		"Forearm_1.0": Vector3(-0.12 - maxf(0.0, -stride) * 0.12, 0.0, 0.0),
-		"Thigh_-1.0": Vector3(stride * 0.62, 0.0, 0.0),
-		"Thigh_1.0": Vector3(-stride * 0.62, 0.0, 0.0),
-		"Shin_-1.0": Vector3(maxf(0.0, -stride) * 0.55, 0.0, 0.0),
-		"Shin_1.0": Vector3(maxf(0.0, stride) * 0.55, 0.0, 0.0)
+		"TorsoArmor": Vector3(-0.10 * sprint_weight + breath + _landing_compression, 0.0, -strafe * 0.10),
+		"Head": Vector3(0.035 * movement_weight - breath * 0.5 - air_pose * 0.06, 0.0, strafe * 0.045),
+		"Shoulder_-1.0": Vector3(-left_phase * 0.22 * movement_weight, 0.0, 0.0),
+		"Shoulder_1.0": Vector3(-right_phase * 0.22 * movement_weight, 0.0, 0.0),
+		"UpperArm_-1.0": Vector3(-left_phase * 0.48 * movement_weight - 0.12, 0.0, -strafe * 0.08),
+		"UpperArm_1.0": Vector3(-right_phase * 0.48 * movement_weight - 0.12, 0.0, -strafe * 0.08),
+		"Forearm_-1.0": Vector3(-0.18 - maxf(0.0, left_phase) * 0.16 * movement_weight, 0.0, 0.0),
+		"Forearm_1.0": Vector3(-0.18 - maxf(0.0, right_phase) * 0.16 * movement_weight, 0.0, 0.0),
+		"Thigh_-1.0": Vector3(left_phase * lerpf(0.42, 0.68, sprint_weight) * movement_weight - air_pose * 0.28, 0.0, 0.0),
+		"Thigh_1.0": Vector3(right_phase * lerpf(0.42, 0.68, sprint_weight) * movement_weight - air_pose * 0.28, 0.0, 0.0),
+		"Shin_-1.0": Vector3(maxf(0.0, -left_phase) * 0.72 * movement_weight + left_lift * 0.16, 0.0, 0.0),
+		"Shin_1.0": Vector3(maxf(0.0, -right_phase) * 0.72 * movement_weight + right_lift * 0.16, 0.0, 0.0),
+		"Boot_-1.0": Vector3(-left_lift * 0.28 + _landing_compression * 0.45, 0.0, 0.0),
+		"Boot_1.0": Vector3(-right_lift * 0.28 + _landing_compression * 0.45, 0.0, 0.0)
 	}
 	for part_name in targets:
 		var part: Node3D = _dara_visual_nodes.get(part_name) as Node3D
 		if part != null:
-			part.rotation = part.rotation.lerp(targets[part_name], clampf(delta * 12.0, 0.0, 1.0))
+			var blend := clampf(delta * (14.0 if movement_weight > 0.05 else 7.0), 0.0, 1.0)
+			part.rotation = part.rotation.lerp(targets[part_name], blend)
 
 
 func _physics_process(delta: float) -> void:
