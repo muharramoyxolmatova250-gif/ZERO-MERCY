@@ -432,6 +432,57 @@ func record_social_interaction(first_id: String, second_id: String, interaction:
     _dirty = true
 
 
+func get_city_market_snapshot(city_id: String) -> Dictionary:
+    if not hub_state.has(city_id):
+        return {}
+    var hub: Dictionary = hub_state[city_id]
+    var market: Dictionary = hub.get("market", {})
+    return market.duplicate(true)
+
+
+func get_citizen_business_snapshot(citizen_id: String) -> Dictionary:
+    if not resident_profiles.has(citizen_id):
+        return {}
+    var profile: Dictionary = resident_profiles[citizen_id]
+    var business_id := str(profile.get("business_id", ""))
+    if business_id.is_empty():
+        return {}
+    var worker_ids: Array[String] = []
+    for worker_id in resident_profiles.keys():
+        var worker: Dictionary = resident_profiles[worker_id]
+        if str(worker.get("employer_id", "")) == business_id:
+            worker_ids.append(str(worker_id))
+    return {
+        "business_id": business_id,
+        "owner_id": citizen_id,
+        "city": str(profile.get("business_city", profile.get("city", ""))),
+        "type": str(profile.get("business_type", "")),
+        "capital": int(profile.get("business_capital", 0)),
+        "revenue": int(profile.get("business_revenue", 0)),
+        "last_profit": int(profile.get("business_last_profit", 0)),
+        "health": float(profile.get("business_health", 0.0)),
+        "inventory": int(profile.get("business_inventory", 0)),
+        "workers": worker_ids,
+        "months_open": int(profile.get("business_months", 0))
+    }
+
+
+func get_citizen_financial_snapshot(citizen_id: String) -> Dictionary:
+    if not resident_profiles.has(citizen_id):
+        return {}
+    var profile: Dictionary = resident_profiles[citizen_id]
+    return {
+        "money": int(profile.get("money", 0)),
+        "savings": int(profile.get("savings", 0)),
+        "bank_balance": int(profile.get("bank_balance", 0)),
+        "bank_interest_earned": int(profile.get("bank_interest_earned", 0)),
+        "debt": int(profile.get("debt", 0)),
+        "credit_score": int(profile.get("credit_score", 600)),
+        "monthly_income": int(profile.get("monthly_income", 0)),
+        "monthly_housing_cost": int(profile.get("monthly_housing_cost", 0))
+    }
+
+
 func get_social_bond(first_id: String, second_id: String) -> Dictionary:
     if first_id.is_empty() or second_id.is_empty():
         return {}
