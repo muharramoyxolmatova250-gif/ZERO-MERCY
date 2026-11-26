@@ -83,8 +83,9 @@ def main() -> int:
     p.add_argument("--runtime-index", type=Path, default=ROOT / "data/world/region_tiles.json")
     p.add_argument("--metadata", type=Path, default=ROOT / "data/world/global_tile_grid.json")
     p.add_argument("--bitmap", type=Path, default=ROOT / "data/world/global_tile_presence.bin")
+    p.add_argument("--root", type=Path, default=ROOT, help="repository/data root used to resolve res:// paths")
     a = p.parse_args()
-    result = build(a.runtime_index, a.metadata, a.bitmap)
+    result = build(a.runtime_index, a.metadata, a.bitmap, root=a.root)
     print(f"Global grid indexed: {result['tile_count']:,} cells ({result['columns']}x{result['rows']}); "
           f"OSM files: {result['osm_cells_with_files']:,}; DEM files: {result['dem_cells_with_files']:,}.")
     return 0
