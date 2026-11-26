@@ -56,3 +56,30 @@ func has_item(item_id: String, amount: int = 1) -> bool:
 
 func get_snapshot() -> Dictionary:
 	return {"capacity": slot_capacity, "used_slots": _stacks.size(), "stacks": _stacks.duplicate(true)}
+
+func restore_snapshot(snapshot: Dictionary) -> bool:
+	var raw_stacks: Variant = snapshot.get("stacks", {})
+	if typeof(raw_stacks) != TYPE_DICTIONARY:
+		return false
+	var restored: Dictionary = {}
+	for key in raw_stacks:
+		var raw_stack: Variant = raw_stacks[key]
+		if typeof(raw_stack) != TYPE_DICTIONARY:
+			return false
+		var stack: Dictionary = raw_stack.duplicate(true)
+		var count := int(stack.get("count", 0))
+		var item_id := str(stack.get("item_id", str(key)))
+		var max_stack := int(stack.get("max_stack", 99))
+		if item_id.is_empty() or count <= 0 or max_stack <= 0 or count > max_stack:
+			return false
+		stack["item_id"] = item_id
+		stack["count"] = count
+		stack["max_stack"] = max_stack
+		restored[str(key)] = stack
+	var capacity := maxi(1, int(snapshot.get("capacity", slot_capacity)))
+	if restored.size() > capacity:
+		return false
+	slot_capacity = capacity
+	_stacks = restored
+	inventory_changed.emit()
+	return true
