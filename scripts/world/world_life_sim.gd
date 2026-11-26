@@ -129,7 +129,7 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         "academic_performance": local_rng.randf_range(0.35, 0.95),
         "school_attendance": 0.0,
         "career_satisfaction": local_rng.randf_range(0.35, 0.8),
-        "career_field": "",
+        "career_field": _career_specialization(str(_education_for_age(age, local_rng)), local_rng.randf_range(0.35, 0.95), local_rng),
         "marital_status": "single",
         "partner_id": "family_" + str(abs(hash(citizen_id))) if married else "",
         "children_count": local_rng.randi_range(0, 3) if married and age >= 25 else 0,
@@ -705,6 +705,17 @@ func _start_independent_life(profile: Dictionary) -> void:
             var parent: Dictionary = resident_profiles[str(parent_id)]
             _append_event(parent, "adult_child_moved_out:" + citizen_id)
             resident_profiles[str(parent_id)] = parent
+
+
+func _career_specialization(education: String, performance: float, rng: RandomNumberGenerator) -> String:
+    var fields := JOBS.duplicate()
+    if education in ["university", "postgraduate", "graduated"]:
+        fields = ["engineer", "doctor", "scientist", "designer", "pilot"]
+    elif education == "technical":
+        fields = ["mechanic", "courier", "security", "merchant", "engineer"]
+    elif performance < 0.45:
+        fields = ["courier", "merchant", "artist", "mechanic"]
+    return str(fields[rng.randi_range(0, fields.size() - 1)])
 
 
 func _advance_career_month(profile: Dictionary) -> void:
