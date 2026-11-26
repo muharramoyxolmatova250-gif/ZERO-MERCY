@@ -256,7 +256,7 @@ func _set_aiming(enabled: bool) -> void:
 	_weapon_tween.parallel().tween_property(camera, "fov",  get_aim_camera_fov(), 0.18)
 
 
-func fifty_five_fov() -> float:
+func get_aim_camera_fov() -> float:
 	return 55.0 if _aiming else 75.0
 
 
