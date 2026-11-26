@@ -48,10 +48,13 @@ func _build_phone() -> void:
     _panel.anchor_right = 0.5
     _panel.anchor_top = 0.5
     _panel.anchor_bottom = 0.5
-    _panel.offset_left = -225
-    _panel.offset_right = 225
-    _panel.offset_top = -330
-    _panel.offset_bottom = 330
+    var viewport_size := get_viewport().get_visible_rect().size
+    var phone_width := minf(450.0, viewport_size.x - 20.0)
+    var phone_height := minf(660.0, viewport_size.y - 20.0)
+    _panel.offset_left = -phone_width * 0.5
+    _panel.offset_right = phone_width * 0.5
+    _panel.offset_top = -phone_height * 0.5
+    _panel.offset_bottom = phone_height * 0.5
     var panel_style := StyleBoxFlat.new()
     panel_style.bg_color = Color(0.012, 0.022, 0.04, 0.98)
     panel_style.border_color = Color(0.0, 0.82, 0.95, 0.9)
