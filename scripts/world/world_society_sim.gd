@@ -16,6 +16,8 @@ var _rng := RandomNumberGenerator.new()
 var total_generated_posts := 0
 var crime_events_total := 0
 var current_wanted_level := 0
+var global_crime_pressure := 0.08
+var global_public_mood := 0.62
 func _ready() -> void:
  add_to_group("world_society_sim")
  _rng.randomize()
@@ -52,11 +54,8 @@ func _on_wanted_level_changed(level: int, _reason: String) -> void:
 
 func _on_crime_reported(crime_id: String, _world_position: Vector3, severity: int) -> void:
  crime_events_total += 1
- if not city_state.is_empty():
-  var state: Dictionary = city_state[0]
-  state["crime_pressure"] = clampf(float(state.get("crime_pressure", 0.08)) + 0.025 * float(severity), 0.0, 1.0)
-  state["public_mood"] = clampf(float(state.get("public_mood", 0.6)) - 0.015 * float(severity), 0.0, 1.0)
-  city_state[0] = state
+ global_crime_pressure = clampf(global_crime_pressure + 0.025 * float(severity), 0.0, 1.0)
+ global_public_mood = clampf(global_public_mood - 0.015 * float(severity), 0.0, 1.0)
  var post := {"post_id":"ZM-CRIME-"+str(crime_events_total),"city":"Current District","author_id":"city_alert","author_name":"City Safety Network","topic":"public_safety","likes":0,"comments":0,"created_day":simulation_day,"created_hour":simulation_hour,"caption":"Public safety alert: incident reported ("+crime_id+"). Emergency services have been notified.","video":false}
  social_feed.push_front(post)
  total_generated_posts += 1
@@ -154,7 +153,7 @@ func _caption_for(topic: String, city: String) -> String:
   "street_art": return "Fresh street art spotted in "+city+"."
   _: return "Live update from "+city+"."
 func get_world_society_snapshot() -> Dictionary:
- return {"cities":city_state.size(),"institutions":institution_activity.size(),"feed_posts_cached":social_feed.size(),"posts_generated":total_generated_posts,"simulation_day":simulation_day,"simulation_hour":simulation_hour,"crime_events":crime_events_total,"wanted_level":current_wanted_level}
+ return {"cities":city_state.size(),"institutions":institution_activity.size(),"feed_posts_cached":social_feed.size(),"posts_generated":total_generated_posts,"simulation_day":simulation_day,"simulation_hour":simulation_hour,"crime_events":crime_events_total,"wanted_level":current_wanted_level,"global_crime_pressure":global_crime_pressure,"global_public_mood":global_public_mood}
 func get_social_feed(limit: int = 20) -> Array[Dictionary]:
  var result: Array[Dictionary] = []
  for i in range(mini(limit,social_feed.size())):
