@@ -226,8 +226,12 @@ func _decide_goal() -> void:
 	if _memory.size() > 24: _memory.pop_front()
 
 func _choose_next_waypoint() -> void:
+	# A planned destination route is a one-way trip, not a patrol loop.
+	# Once the final node is reached, wait for the next AI decision to pick
+	# a fresh activity and destination from the route network.
 	if not _last_routed_goal.is_empty() and _target_index >= route.size() - 1:
 		_last_routed_goal = ""
+		route = PackedVector3Array([global_position])
 		_target_index = 0
 		return
 	if route.size() <= 2 or _rng.randf() < 0.75:
