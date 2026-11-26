@@ -529,6 +529,9 @@ func _interact_with_world() -> void:
 		if objective_collider is StaticBody3D and objective_collider.is_in_group("mission_objective") and objective_collider.has_method("interact"):
 			objective_collider.call("interact")
 			return
+		if objective_collider is Node3D and objective_collider.is_in_group("drivable_vehicle") and objective_collider.has_method("interact"):
+			objective_collider.call("interact")
+			return
 	# Keep ordinary pickups close to the player.
 	var pickup_end := origin + (-camera.global_transform.basis.z * 3.5)
 	var pickup_query := PhysicsRayQueryParameters3D.create(origin, pickup_end)
