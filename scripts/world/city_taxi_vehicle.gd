@@ -87,6 +87,12 @@ func _safe_follow_speed(direction: Vector3) -> float:
 				safe_speed = minf(safe_speed, cruise_speed * clampf((distance - 1.5) / 4.0, 0.0, 1.0))
 	return safe_speed
 
+func cancel_trip() -> void:
+	_request_id = ""
+	_phase = "idle"
+	_wait_timer = 0.0
+	_speed = 0.0
+
 func get_taxi_snapshot() -> Dictionary:
 	return {"id": taxi_id, "phase": _phase, "request_id": _request_id, "speed": _speed, "available": _phase == "idle"}
 
