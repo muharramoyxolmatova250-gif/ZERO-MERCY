@@ -147,6 +147,13 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         "financial_goal": "build_savings", "credit_score": 600, "debt": 0,
         "owns_home": false, "home_value": 0,
         "vehicle_id": "", "vehicle_type": "", "vehicle_value": 0,
+        "phone_id": "phone_" + str(abs(hash(citizen_id))),
+        "phone_model": "Neon One",
+        "phone_number": _generate_phone_number(citizen_id),
+        "phone_contacts": [], "phone_inbox": [], "phone_outbox": [],
+        "phone_call_history": [], "phone_notifications": [],
+        "phone_social_posts": [], "phone_last_used_day": simulation_day,
+        "phone_battery": 100.0, "phone_privacy": "friends",
         "vehicle_fuel": 0.0, "vehicle_condition": 1.0, "vehicle_monthly_km": 0,
         "transport_preference": "public" if local_rng.randf() < 0.72 else "private",
         "business_id": "", "business_revenue": 0,
@@ -1525,3 +1532,31 @@ func _save_state() -> void:
         file.store_string(JSON.stringify(data))
         _dirty = false
         _save_elapsed = 0.0
+
+
+func _generate_phone_number(citizen_id: String) -> String:
+    var number_rng := RandomNumberGenerator.new()
+    number_rng.seed = int(abs(hash(citizen_id + ":phone_number")))
+    return "+1-" + str(number_rng.randi_range(200, 999)) + "-" + str(number_rng.randi_range(200, 999)) + "-" + str(number_rng.randi_range(1000, 9999))
+
+
+func _ensure_phone_profile(citizen_id: String) -> Dictionary:
+    if not resident_profiles.has(citizen_id):
+        return {}
+    var profile: Dictionary = resident_profiles[citizen_id]
+    if not profile.has("phone_id"):
+        profile["phone_id"] = "phone_" + str(abs(hash(citizen_id)))
+        profile["phone_model"] = "Neon One"
+        profile["phone_number"] = _generate_phone_number(citizen_id)
+        profile["phone_contacts"] = []
+        profile["phone_inbox"] = []
+        profile["phone_outbox"] = []
+        profile["phone_call_history"] = []
+        profile["phone_notifications"] = []
+        profile["phone_social_posts"] = []
+        profile["phone_last_used_day"] = simulation_day
+        profile["phone_battery"] = 100.0
+        profile["phone_privacy"] = "friends"
+        resident_profiles[citizen_id] = profile
+        _dirty = true
+    return profile
