@@ -76,7 +76,7 @@ func _arrive_at_stop() -> void:
         boarded = int(transit_network.call("board_waiting_passengers", stop_id, passenger_capacity - passenger_count))
         passenger_count += boarded
         if transit_network.has_method("report_vehicle_stop"):
-            transit_network.call("report_vehicle_stop", route_id, stop_id, boarded)
+            transit_network.call("report_vehicle_stop", route_id, stop_id, boarded, alighted)
     if _door_mesh != null:
         _door_mesh.visible = true
     _dwell_remaining = dwell_seconds
@@ -121,7 +121,7 @@ func set_passenger_count(value: int) -> void:
 		passenger_destinations.append("")
 
 func get_vehicle_snapshot() -> Dictionary:
-    return {"passengers": passenger_count, "capacity": passenger_capacity, "alighted_total": total_alighted, "completed_stops": completed_stops, "speed": _current_speed, "dwelling": _dwell_remaining > 0.0, "doors_open": _door_open, "route_id": route_id}
+    return {"passengers": passenger_count, "capacity": passenger_capacity, "alighted_total": total_alighted, "onboard_destinations": passenger_destinations.duplicate(), "completed_stops": completed_stops, "speed": _current_speed, "dwelling": _dwell_remaining > 0.0, "doors_open": _door_open, "route_id": route_id}
 
 func _build_bus() -> void:
     var body := MeshInstance3D.new()
