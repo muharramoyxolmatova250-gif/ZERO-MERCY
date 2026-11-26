@@ -55,6 +55,11 @@ func consume_supplies(nutrition: float, hydration: float = 0.0) -> void:
 	if is_instance_valid(needs):
 		needs.call("consume_food", nutrition, hydration)
 
+func get_player_performance() -> float:
+	if not is_instance_valid(needs):
+		return 1.0
+	return float(needs.call("get_performance_multiplier"))
+
 func _attach_system(parent: Node, node_name: String, script_resource: Script) -> Node:
 	var system := Node.new()
 	system.name = node_name
