@@ -6,6 +6,7 @@ var _metal := StandardMaterial3D.new()
 var _dark_metal := StandardMaterial3D.new()
 var _gold := StandardMaterial3D.new()
 var _arm_pivots: Array[Node3D] = []
+var _finger_hinges: Array[Node3D] = []
 var _clock := 0.0
 
 func _ready() -> void:
@@ -37,6 +38,10 @@ func _process(delta: float) -> void:
 		var phase := gait * side
 		var target := Vector3(-0.10 - phase * 0.34 * gait_weight + breathing, 0.0, side * 0.035 * gait_weight)
 		pivot.rotation = pivot.rotation.lerp(target, clampf(delta * 12.0, 0.0, 1.0))
+\tfor hinge_index in range(_finger_hinges.size()):
+\t\tvar curl := 0.08 + sprint_weight * 0.22 + sin(_clock * 3.0 + float(hinge_index) * 0.45) * 0.025
+\t\tvar hinge := _finger_hinges[hinge_index]
+\t\thinge.rotation.x = lerpf(hinge.rotation.x, curl, clampf(delta * 9.0, 0.0, 1.0))
 
 func _build_arm(side: float, right_hand: bool) -> void:
 	var arm := Node3D.new()
@@ -57,9 +62,20 @@ func _build_arm(side: float, right_hand: bool) -> void:
 		var is_gold := right_hand and (finger == 1 or finger == 2)
 		var finger_material: Material = _gold if is_gold else _metal
 		var base := Vector3(side * 0.69 + x_offset, -0.62, -0.025)
-		_add_box(arm, "Finger_%d_Base" % finger, base, Vector3(0.052, 0.13, 0.075), finger_material)
-		_add_box(arm, "Finger_%d_Middle" % finger, base + Vector3(0.0, -0.105, -0.005), Vector3(0.047, 0.085, 0.068), finger_material)
-		_add_box(arm, "Finger_%d_Tip" % finger, base + Vector3(0.0, -0.18, -0.008), Vector3(0.043, 0.065, 0.06), finger_material)
+		var finger_root := Node3D.new()
+		finger_root.name = "Finger_%d_Hinge" % finger
+		finger_root.position = base
+		arm.add_child(finger_root)
+		_finger_hinges.append(finger_root)
+		_add_box(finger_root, "Finger_%d_Base" % finger, Vector3(0.0, -0.065, 0.0), Vector3(0.052, 0.13, 0.075), finger_material)
+		var middle_hinge := Node3D.new()
+		middle_hinge.position = Vector3(0.0, -0.13, 0.0)
+		finger_root.add_child(middle_hinge)
+		_add_box(middle_hinge, "Finger_%d_Middle" % finger, Vector3(0.0, -0.0425, -0.005), Vector3(0.047, 0.085, 0.068), finger_material)
+		var tip_hinge := Node3D.new()
+		tip_hinge.position = Vector3(0.0, -0.085, -0.005)
+		middle_hinge.add_child(tip_hinge)
+		_add_box(tip_hinge, "Finger_%d_Tip" % finger, Vector3(0.0, -0.0325, -0.003), Vector3(0.043, 0.065, 0.06), finger_material)
 
 	_add_box(arm, "Thumb_Base", Vector3(side * 0.55, -0.51, -0.015), Vector3(0.13, 0.075, 0.08), _metal)
 	_add_box(arm, "Thumb_Tip", Vector3(side * 0.50, -0.58, -0.025), Vector3(0.09, 0.065, 0.07), _metal)
