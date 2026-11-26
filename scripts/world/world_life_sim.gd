@@ -851,6 +851,11 @@ func _process_npc_banking(profile: Dictionary) -> void:
     if balance > 0:
         balance += maxi(0, interest)
         profile["bank_interest_earned"] = int(profile.get("bank_interest_earned", 0)) + maxi(0, interest)
+    if money < 900 and int(profile.get("debt", 0)) == 0 and int(profile.get("credit_score", 600)) >= 660 and _rng.randf() < 0.025:
+        var loan := mini(3500, 1200 + int(float(profile.get("credit_score", 600) - 660) * 12.0))
+        profile["debt"] = loan
+        money += loan
+        _append_event(profile, "approved_bank_loan:" + str(loan))
     if money > 6000 and balance < 250000 and _rng.randf() < 0.32:
         var deposit := mini(money - 3500, mini(2500, 250000 - balance))
         if deposit > 0:
