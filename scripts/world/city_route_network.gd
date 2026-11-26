@@ -5,6 +5,9 @@ var _points: Array[Vector3] = []
 var _adjacency: Array[Array] = []
 var _destinations: Dictionary = {}
 
+func _ready() -> void:
+	add_to_group("pedestrian_route_network")
+
 func build_grid(blocks_per_side: int, spacing: float, road_width: float) -> void:
 	_points.clear()
 	_adjacency.clear()
@@ -17,14 +20,14 @@ func build_grid(blocks_per_side: int, spacing: float, road_width: float) -> void
 			var base := Vector3(first + float(x) * spacing, 0.0, first + float(z) * spacing)
 			var node_id := _add_point(base + Vector3(-side_offset, 0.0, -side_offset))
 			if x > 0:
-				_connect(node_id, node_id - grid_size)
+				_connect(node_id, node_id - grid_size * 2)
 			if z > 0:
-				_connect(node_id, node_id - 1)
+				_connect(node_id, node_id - 2)
 			var opposite := _add_point(base + Vector3(side_offset, 0.0, side_offset))
 			if x > 0:
-				_connect(opposite, opposite - grid_size)
+				_connect(opposite, opposite - grid_size * 2)
 			if z > 0:
-				_connect(opposite, opposite - 1)
+				_connect(opposite, opposite - 2)
 	var categories := ["home", "work", "food", "school", "play", "leisure", "family", "explore", "commute", "rest"]
 	for category in categories:
 		var pool: Array[int] = []
