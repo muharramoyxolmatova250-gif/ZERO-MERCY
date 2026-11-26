@@ -749,7 +749,8 @@ func _monthly_salary_for_job(job: String, level: int) -> int:
 func _process_monthly_finances(profile: Dictionary) -> void:
     var job := str(profile.get("occupation", "unemployed"))
     var level := int(profile.get("career_level", 1))
-    var income := _monthly_salary_for_job(job, level) if job in JOBS else 0
+    var employer_id := str(profile.get("employer_id", ""))
+    var income := _monthly_salary_for_job(job, level) if job in JOBS and employer_id.is_empty() else 0
     var living_independently := bool(profile.get("living_independently", false))
     var rent := 650 if living_independently else 180
     var food_and_services := 420 if job in JOBS else 300
@@ -903,6 +904,30 @@ func _hire_business_workers(owner: Dictionary) -> void:
     owner["business_capacity"] = capacity + 1
 
 
+func _pay_business_workers(owner: Dictionary) -> int:
+    var business_id := str(owner.get("business_id", ""))
+    if business_id.is_empty():
+        return 0
+    var payroll := 0
+    for worker_id in resident_profiles.keys():
+        var worker: Dictionary = resident_profiles[worker_id]
+        if str(worker.get("employer_id", "")) != business_id:
+            continue
+        if str(worker.get("life_stage", "")) == "deceased":
+            continue
+        var wage := maxi(650, int(worker.get("contract_salary", 1500)))
+        var paid := mini(wage, maxi(0, int(owner.get("business_capital", 0)) - payroll))
+        if paid <= 0:
+            continue
+        worker["money"] = int(worker.get("money", 0)) + paid
+        worker["last_employer_payment"] = paid
+        worker["employer_paid_month"] = simulation_day
+        _append_event(worker, "received_business_wage:" + str(paid))
+        resident_profiles[worker_id] = worker
+        payroll += paid
+    return payroll
+
+
 func _operate_personal_business(profile: Dictionary) -> void:
     if str(profile.get("business_id", "")).is_empty():
         return
@@ -923,8 +948,9 @@ func _operate_personal_business(profile: Dictionary) -> void:
             var market_good: Dictionary = local_market[category_good]
             market_factor = clampf(float(market_good.get("price", 10.0)) / float(market_good.get("base_price", 10.0)), 0.7, 1.6)
     var revenue := int(float(_rng.randi_range(1800, 6200) + int(profile.get("business_workers", 0)) * 650) * inventory_factor * market_factor * (1.0 - competition * 0.22))
+    var payroll_total := _pay_business_workers(profile)
     var restock_cost := mini(capital, int(profile.get("business_restock_budget", 1800)))
-    var operating_cost := _rng.randi_range(1200, 3600) + int(profile.get("business_workers", 0)) * 420 + restock_cost
+    var operating_cost := _rng.randi_range(1200, 3600) + int(profile.get("business_workers", 0)) * 420 + restock_cost + payroll_total
     profile["business_inventory"] = clampi(inventory - _rng.randi_range(12, 34) + _rng.randi_range(18, 48), 0, 500)
     var profit := revenue - operating_cost
     capital = maxi(0, capital + profit)
