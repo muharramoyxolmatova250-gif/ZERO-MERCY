@@ -22,6 +22,7 @@ var _window_materials: Array[StandardMaterial3D] = []
 var _wet_road_material: Material
 var _facade_trim_material: StandardMaterial3D
 var _glass_facade_material: StandardMaterial3D
+var _pedestrian_route_network: Node
 var _building_shell_shader: Shader
 @export var settlement_id := ""
 @export var settlement_display_name := ""
@@ -32,6 +33,7 @@ func _ready() -> void:
 	_register_settlement_hub()
 	_roads_and_blocks()
 	_spawn_street_furniture()
+	_build_pedestrian_route_network()
 	_spawn_city_life()
 	_spawn_interactive_props()
 
@@ -498,6 +500,13 @@ func _street_light(base: Vector3) -> void:
 	lamp.omni_range = 13.0
 	lamp.shadow_enabled = false
 	add_child(lamp)
+
+func _build_pedestrian_route_network() -> void:
+	_pedestrian_route_network = Node.new()
+	_pedestrian_route_network.name = "PedestrianRouteNetwork"
+	_pedestrian_route_network.set_script(load("res://scripts/world/city_route_network.gd"))
+	add_child(_pedestrian_route_network)
+	_pedestrian_route_network.call("build_grid", blocks_per_side, block_spacing, road_width)
 
 func _spawn_city_life() -> void:
 	var citizen_script := load("res://scripts/world/city_citizen.gd")
