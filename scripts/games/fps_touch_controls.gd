@@ -21,13 +21,13 @@ func _ready() -> void:
 	set_process_input(true)
 
 func _draw() -> void:
-	var base := Vector2(118, size.y - 132)
+	var base := _move_center()
 	draw_circle(base, JOYSTICK_RADIUS, Color(0.08, 0.12, 0.16, 0.42))
 	draw_arc(base, JOYSTICK_RADIUS, 0.0, TAU, 48, Color(0.55, 0.8, 0.9, 0.7), 3.0)
 	draw_circle(base + _move_vector * 48.0, 27.0, Color(0.35, 0.75, 0.9, 0.75))
-	var fire := Vector2(size.x - 100, size.y - 145)
-	var reload := Vector2(size.x - 205, size.y - 76)
-	var jump := Vector2(size.x - 95, size.y - 300)
+	var fire := _fire_center()
+	var reload := _reload_center()
+	var jump := _jump_center()
 	draw_circle(fire, 48, Color(0.75, 0.12, 0.08, 0.7))
 	draw_circle(reload, 31, Color(0.15, 0.4, 0.55, 0.75))
 	draw_circle(jump, 31, Color(0.2, 0.55, 0.35, 0.75))
@@ -45,11 +45,11 @@ func _gui_input(event: InputEvent) -> void:
 				accept_event()
 			elif event.position.x >= size.x * 0.42 and _aim_touch == -1:
 				_aim_touch = event.index
-				if _is_near(event.position, Vector2(size.x - 100, size.y - 145), 52.0):
+				if _is_near(event.position, _fire_center(), 52.0):
 					fire_pressed.emit()
-				elif _is_near(event.position, Vector2(size.x - 205, size.y - 76), 38.0):
+				elif _is_near(event.position, _reload_center(), 38.0):
 					reload_pressed.emit()
-				elif _is_near(event.position, Vector2(size.x - 95, size.y - 300), 38.0):
+				elif _is_near(event.position, _jump_center(), 38.0):
 					jump_pressed.emit()
 				accept_event()
 		else:
@@ -70,3 +70,16 @@ func _gui_input(event: InputEvent) -> void:
 
 func _is_near(point: Vector2, center: Vector2, radius: float) -> bool:
 	return point.distance_to(center) <= radius
+
+
+func _move_center() -> Vector2:
+    return Vector2(clampf(size.x * 0.22, 88.0, 132.0), size.y - 132.0)
+
+func _fire_center() -> Vector2:
+    return Vector2(size.x - 92.0, size.y - 142.0)
+
+func _reload_center() -> Vector2:
+    return Vector2(size.x - 190.0, size.y - 74.0)
+
+func _jump_center() -> Vector2:
+    return Vector2(size.x - 88.0, size.y - 292.0)
