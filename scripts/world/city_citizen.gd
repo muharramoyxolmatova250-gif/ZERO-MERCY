@@ -615,7 +615,7 @@ func _consider_autonomous_phone_use() -> void:
 	var free_time := current_goal in ["social", "leisure", "rest", "family", "play"]
 	var entertainment_roll := _rng.randf()
 	if free_time and entertainment_roll < 0.34 and life_sim.has_method("get_phone_media_feed"):
-		var media_feed: Array = life_sim.call("get_phone_media_feed", "video", 60)
+		var media_feed: Array = life_sim.call("get_phone_recommended_feed", citizen_id, "video", 60)
 		if not media_feed.is_empty():
 			var watched: Dictionary = media_feed[_rng.randi_range(0, media_feed.size() - 1)]
 			var watch_time := _rng.randf_range(18.0, minf(180.0, float(watched.get("duration_seconds", 180))))
