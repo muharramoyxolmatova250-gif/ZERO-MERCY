@@ -46,6 +46,8 @@ var _dara_animation_time := 0.0
 var _dara_visual_nodes: Dictionary = {}
 var _dara_was_airborne := false
 var _landing_compression := 0.0
+var _damage_reaction_timer := 0.0
+var _damage_reaction_strength := 0.0
 
 
 func _ready() -> void:
@@ -98,7 +100,14 @@ func _build_dara_visual() -> void:
 	_add_dara_box("ChestCore", Vector3(0.0, 1.24, -0.354), Vector3(0.12, 0.19, 0.025), cyan)
 	_add_dara_capsule("Neck", Vector3(0.0, 1.55, 0.0), 0.105, 0.2, dark_fabric)
 	_add_dara_sphere("Head", Vector3(0.0, 1.78, 0.0), Vector3(0.235, 0.29, 0.22), dark_fabric)
-	_add_dara_box("Visor", Vector3(0.0, 1.83, -0.205), Vector3(0.31, 0.075, 0.035), cyan)
+	_add_dara_box("FacePlate", Vector3(0.0, 1.755, -0.194), Vector3(0.285, 0.19, 0.055), armor)
+	_add_dara_box("Visor", Vector3(0.0, 1.84, -0.226), Vector3(0.31, 0.065, 0.035), cyan)
+	for eye_side in [-1.0, 1.0]:
+		_add_dara_sphere("Eye_%s" % eye_side, Vector3(eye_side * 0.078, 1.805, -0.229), Vector3(0.026, 0.014, 0.012), cyan)
+		_add_dara_box("Brow_%s" % eye_side, Vector3(eye_side * 0.078, 1.835, -0.222), Vector3(0.075, 0.012, 0.018), armor)
+	_add_dara_box("JawSeam", Vector3(0.0, 1.685, -0.222), Vector3(0.13, 0.012, 0.018), magenta)
+	_add_dara_box("CheekLight_L", Vector3(-0.15, 1.755, -0.19), Vector3(0.035, 0.018, 0.02), cyan)
+	_add_dara_box("CheekLight_R", Vector3(0.15, 1.755, -0.19), Vector3(0.035, 0.018, 0.02), cyan)
 	for side in [-1.0, 1.0]:
 		_add_dara_capsule("Shoulder_%s" % side, Vector3(side * 0.39, 1.42, 0.0), 0.17, 0.32, armor)
 		_add_dara_capsule("UpperArm_%s" % side, Vector3(side * 0.43, 1.12, 0.0), 0.115, 0.48, dark_fabric)
@@ -109,7 +118,7 @@ func _build_dara_visual() -> void:
 		_add_dara_box("KneePlate_%s" % side, Vector3(side * 0.17, 0.34, -0.125), Vector3(0.22, 0.16, 0.07), magenta)
 		_add_dara_box("Boot_%s" % side, Vector3(side * 0.17, 0.055, -0.09), Vector3(0.24, 0.13, 0.38), armor)
 	_dara_visual_nodes["TorsoArmor"] = get_node_or_null("TorsoArmor")
-	_dara_visual_nodes["Head"] = get_node_or_null("Head")
+	_dara_visual_nodes["Head"] = _create_visual_joint("Head", Vector3(0.0, 1.78, 0.0))
 	for side in [-1.0, 1.0]:
 		var suffix := "-1.0" if side < 0.0 else "1.0"
 		_dara_visual_nodes["UpperArm_%s" % suffix] = _create_visual_joint("UpperArm_%s" % suffix, Vector3(side * 0.39, 1.36, 0.0))
@@ -280,6 +289,8 @@ func _animate_dara_visual(delta: float) -> void:
 		_landing_compression = clampf(absf(velocity.y) * 0.018, 0.0, 0.22)
 	_dara_was_airborne = airborne
 	_landing_compression = move_toward(_landing_compression, 0.0, delta * 1.7)
+	_damage_reaction_timer = maxf(_damage_reaction_timer - delta, 0.0)
+	_damage_reaction_strength = move_toward(_damage_reaction_strength, 0.0, delta * 2.8)
 
 	if is_dead:
 		movement_weight = 0.0
@@ -299,7 +310,7 @@ func _animate_dara_visual(delta: float) -> void:
 
 	var targets := {
 		"TorsoArmor": Vector3(-0.10 * sprint_weight + breath + _landing_compression, 0.0, -strafe * 0.10),
-		"Head": Vector3(0.035 * movement_weight - breath * 0.5 - air_pose * 0.06, 0.0, strafe * 0.045),
+		"Head": Vector3(0.035 * movement_weight - breath * 0.5 - air_pose * 0.06 + _damage_reaction_strength * 0.16, 0.0, strafe * 0.045 + _damage_reaction_strength * 0.12),
 		"Shoulder_-1.0": Vector3(-left_phase * 0.22 * movement_weight, 0.0, 0.0),
 		"Shoulder_1.0": Vector3(-right_phase * 0.22 * movement_weight, 0.0, 0.0),
 		"UpperArm_-1.0": Vector3(-left_phase * 0.48 * movement_weight - 0.12, 0.0, -strafe * 0.08),
@@ -356,6 +367,8 @@ func take_damage(amount: float, _source: Node = null) -> void:
 	if is_dead or amount <= 0.0:
 		return
 	health = maxf(health - amount, 0.0)
+	_damage_reaction_timer = 0.22
+	_damage_reaction_strength = minf(_damage_reaction_strength + 0.65, 1.0)
 	health_changed.emit(health, max_health)
 	if health <= 0.0:
 		is_dead = true
