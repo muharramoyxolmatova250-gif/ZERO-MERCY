@@ -486,6 +486,7 @@ func _fire_weapon() -> void:
 	if ammo_in_magazine <= 0:
 		return
 	shot_cooldown = shot_interval
+	set_meta("wanted_until", Time.get_ticks_msec() + 45000)
 	_play_weapon_recoil()
 	_trigger_muzzle_flash()
 	ammo_in_magazine -= 1
