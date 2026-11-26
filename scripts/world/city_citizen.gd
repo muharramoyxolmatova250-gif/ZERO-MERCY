@@ -626,6 +626,18 @@ func _consider_autonomous_phone_use() -> void:
 			_set_phone_visible(true)
 			_pause_remaining = maxf(_pause_remaining, watch_time * 0.08)
 			return
+	if free_time and entertainment_roll >= 0.52 and entertainment_roll < 0.70 and life_sim.has_method("get_phone_recommended_feed"):
+		var image_feed: Array = life_sim.call("get_phone_recommended_feed", citizen_id, "image", 40)
+		if not image_feed.is_empty():
+			var image_item: Dictionary = image_feed[_rng.randi_range(0, image_feed.size() - 1)]
+			life_sim.call("record_phone_media_view", citizen_id, str(image_item.get("id", "")), _rng.randf_range(3.0, 12.0))
+			if _rng.randf() < 0.3 and life_sim.has_method("react_to_phone_media"):
+				life_sim.call("react_to_phone_media", citizen_id, str(image_item.get("id", "")), "like")
+			remember_event("viewed_phone_image:" + str(image_item.get("topic", "photo")))
+			_phone_action_cooldown = _rng.randf_range(25.0, 75.0)
+			_set_phone_visible(true)
+			_pause_remaining = maxf(_pause_remaining, 0.8)
+			return
 	if free_time and entertainment_roll < 0.52 and life_sim.has_method("play_phone_game"):
 		var games: Array = life_sim.call("get_phone_games_catalog")
 		if not games.is_empty():
