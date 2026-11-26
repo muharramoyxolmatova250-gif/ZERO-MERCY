@@ -81,3 +81,40 @@ func get_item_count(item_id: String) -> int:
 	if not is_instance_valid(inventory):
 		return 0
 	return int(inventory.call("get_item_count", item_id))
+
+func get_needs_snapshot() -> Dictionary:
+	if not is_instance_valid(needs):
+		return {}
+	return needs.call("get_snapshot")
+
+func restore_needs_snapshot(snapshot: Dictionary) -> bool:
+	if not is_instance_valid(needs):
+		return false
+	return bool(needs.call("restore_snapshot", snapshot))
+
+func use_inventory_item(item_id: String) -> bool:
+	if not is_instance_valid(inventory):
+		return false
+	var nutrition := 0.0
+	var hydration := 0.0
+	var health_restore := 0.0
+	match item_id:
+		"food_ration":
+			nutrition = 35.0
+			hydration = 3.0
+		"water_bottle":
+			hydration = 40.0
+		"medkit":
+			health_restore = 45.0
+		_:
+			return false
+	if not bool(inventory.call("has_item", item_id, 1)):
+		return false
+	if not bool(inventory.call("remove_item", item_id, 1)):
+		return false
+	if nutrition > 0.0 or hydration > 0.0:
+		needs.call("consume_food", nutrition, hydration)
+	if health_restore > 0.0 and is_instance_valid(player):
+		player.set("health", minf(float(player.get("max_health")), float(player.get("health")) + health_restore))
+		player.emit_signal("health_changed", player.get("health"), player.get("max_health"))
+	return true
