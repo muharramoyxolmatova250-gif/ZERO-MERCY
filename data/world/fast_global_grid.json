@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "name": "ZERO MERCY fast global land grid",
+  "source": "Natural Earth 1:110m country polygons",
+  "resolution_degrees": 0.4,
+  "columns": 900,
+  "rows": 450,
+  "cell_count": 405000,
+  "land_cell_count": 134328,
+  "water_cell_count": 270672,
+  "mask_file": "fast_global_land_mask.bin",
+  "mask_encoding": "row-major bitset; 1=cell center intersects mapped land union, 0=water",
+  "mask_bytes": 50625,
+  "bounds": {
+    "west": -180.0,
+    "south": -90.0,
+    "east": 180.0,
+    "north": 90.0
+  },
+  "indexing": "index=y*900+x; x=floor((longitude+180)/0.4); y=floor((latitude+90)/0.4)",
+  "purpose": "Fast low-detail whole-Earth land/water scaffold. Detailed OSM roads/buildings and DEM elevation remain separate streamed layers.",
+  "attribution": "Natural Earth public domain; country geometry source is Natural Earth 1:110m"
+}
