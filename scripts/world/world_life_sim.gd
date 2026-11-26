@@ -14,6 +14,7 @@ var simulation_year := 1
 var hub_state: Dictionary = {}
 var resident_profiles: Dictionary = {}
 var social_bonds: Dictionary = {}
+var _social_feed: Array = []
 var _claim_cache: Dictionary = {}
 var births_total := 0
 var deaths_total := 0
@@ -1638,3 +1639,83 @@ func _add_phone_notification(citizen_id: String, kind: String, title: String) ->
         notifications.pop_front()
     profile["phone_notifications"] = notifications
     resident_profiles[citizen_id] = profile
+
+
+func make_phone_call(caller_id: String, recipient_id: String, duration_seconds: int = 30) -> bool:
+    if caller_id == recipient_id or not resident_profiles.has(caller_id) or not resident_profiles.has(recipient_id):
+        return false
+    var caller := _ensure_phone_profile(caller_id)
+    var recipient := _ensure_phone_profile(recipient_id)
+    var call_record := {
+        "to": recipient_id, "from": caller_id, "day": simulation_day,
+        "duration_seconds": maxi(0, duration_seconds), "status": "completed"
+    }
+    var caller_calls: Array = caller.get("phone_call_history", [])
+    caller_calls.append(call_record)
+    while caller_calls.size() > 40:
+        caller_calls.pop_front()
+    caller["phone_call_history"] = caller_calls
+    var recipient_calls: Array = recipient.get("phone_call_history", [])
+    var received := call_record.duplicate(true)
+    received["status"] = "received"
+    recipient_calls.append(received)
+    while recipient_calls.size() > 40:
+        recipient_calls.pop_front()
+    recipient["phone_call_history"] = recipient_calls
+    _add_phone_contact(caller_id, recipient_id)
+    _add_phone_contact(recipient_id, caller_id)
+    _add_phone_notification(recipient_id, "call", "Incoming call from " + str(caller.get("name", caller_id)))
+    caller["phone_battery"] = maxf(0.0, float(caller.get("phone_battery", 100.0)) - 0.4)
+    recipient["phone_battery"] = maxf(0.0, float(recipient.get("phone_battery", 100.0)) - 0.2)
+    resident_profiles[caller_id] = caller
+    resident_profiles[recipient_id] = recipient
+    record_social_interaction(caller_id, recipient_id, "phone_call")
+    record_event(caller_id, "phone_call_with:" + recipient_id)
+    _dirty = true
+    return true
+
+
+func publish_phone_post(citizen_id: String, post_text: String, mood: String = "neutral") -> bool:
+    if post_text.strip_edges().is_empty() or not resident_profiles.has(citizen_id):
+        return false
+    var profile := _ensure_phone_profile(citizen_id)
+    var post := {
+        "id": "post_" + str(Time.get_unix_time_from_system()) + "_" + str(_rng.randi()),
+        "author_id": citizen_id, "author": str(profile.get("name", citizen_id)),
+        "text": post_text, "mood": mood, "day": simulation_day,
+        "likes": 0, "comments": 0
+    }
+    var personal_posts: Array = profile.get("phone_social_posts", [])
+    personal_posts.append(post.duplicate(true))
+    while personal_posts.size() > 30:
+        personal_posts.pop_front()
+    profile["phone_social_posts"] = personal_posts
+    _add_phone_notification(citizen_id, "social", "Your post was published")
+    resident_profiles[citizen_id] = profile
+    _social_feed.append(post)
+    while _social_feed.size() > 200:
+        _social_feed.pop_front()
+    record_event(citizen_id, "published_social_post")
+    _dirty = true
+    return true
+
+
+func get_phone_social_feed(limit: int = 30) -> Array:
+    var result: Array = _social_feed.duplicate(true)
+    var start := maxi(0, result.size() - maxi(1, limit))
+    return result.slice(start)
+
+
+func react_to_phone_post(citizen_id: String, post_id: String) -> bool:
+    if not resident_profiles.has(citizen_id):
+        return false
+    for index in range(_social_feed.size() - 1, -1, -1):
+        var post: Dictionary = _social_feed[index]
+        if str(post.get("id", "")) != post_id or str(post.get("author_id", "")) == citizen_id:
+            continue
+        post["likes"] = int(post.get("likes", 0)) + 1
+        _social_feed[index] = post
+        record_social_interaction(citizen_id, str(post.get("author_id", "")), "social_post_like")
+        _dirty = true
+        return true
+    return false
