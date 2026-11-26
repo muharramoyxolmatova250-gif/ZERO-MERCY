@@ -55,6 +55,13 @@ func save_player_state(player: Node3D) -> bool:
 		"ammo_in_magazine": int(player.get("ammo_in_magazine")),
 		"reserve_ammo": int(player.get("reserve_ammo"))
 	}
+	if get_node_or_null("/root/GameSession") != null:
+		payload["world_session"] = {
+			"day_time_hours": float(GameSession.day_time_hours),
+			"time_scale": float(GameSession.time_scale),
+			"wanted_level": int(GameSession.wanted_level),
+			"wanted_remaining_ms": maxi(0, int(GameSession.wanted_until_ms) - Time.get_ticks_msec())
+		}
 	return save_game(payload)
 
 
@@ -98,4 +105,16 @@ func restore_player_state(player: Node3D) -> bool:
 	player.emit_signal("health_changed", player.get("health"), player.get("max_health"))
 	player.emit_signal("stamina_changed", player.get("stamina"), player.get("stamina_max"))
 	player.emit_signal("ammo_changed", player.get("ammo_in_magazine"), player.get("reserve_ammo"))
+	var session_data: Variant = payload.get("world_session", {})
+	if typeof(session_data) == TYPE_DICTIONARY and get_node_or_null("/root/GameSession") != null:
+		var saved_hour := float(session_data.get("day_time_hours", GameSession.day_time_hours))
+		var saved_scale := float(session_data.get("time_scale", GameSession.time_scale))
+		var saved_wanted := int(session_data.get("wanted_level", 0))
+		var remaining_ms := int(session_data.get("wanted_remaining_ms", 0))
+		if is_finite(saved_hour) and is_finite(saved_scale):
+			GameSession.day_time_hours = fposmod(saved_hour, 24.0)
+			GameSession.time_scale = clampf(saved_scale, 0.0, 20.0)
+			GameSession.wanted_level = clampi(saved_wanted, 0, GameSession.MAX_WANTED_LEVEL)
+			GameSession.wanted_until_ms = Time.get_ticks_msec() + clampi(remaining_ms, 0, GameSession.WANTED_DURATION_MS)
+			GameSession.call("_sync_wanted_to_player")
 	return true
