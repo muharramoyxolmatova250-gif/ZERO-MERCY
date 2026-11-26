@@ -111,7 +111,7 @@ func _build_dara_visual() -> void:
 	_dara_visual_nodes["TorsoArmor"] = get_node_or_null("TorsoArmor")
 	_dara_visual_nodes["Head"] = get_node_or_null("Head")
 	for side in [-1.0, 1.0]:
-		var suffix := str(side)
+		var suffix := "-1.0" if side < 0.0 else "1.0"
 		_dara_visual_nodes["UpperArm_%s" % suffix] = _create_visual_joint("UpperArm_%s" % suffix, Vector3(side * 0.39, 1.36, 0.0))
 		_dara_visual_nodes["Forearm_%s" % suffix] = _create_visual_joint("Forearm_%s" % suffix, Vector3(side * 0.46, 0.97, -0.025))
 		_dara_visual_nodes["Thigh_%s" % suffix] = _create_visual_joint("Thigh_%s" % suffix, Vector3(side * 0.17, 0.74, 0.0))
