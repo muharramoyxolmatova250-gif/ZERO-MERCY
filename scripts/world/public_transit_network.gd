@@ -30,13 +30,37 @@ func find_route_between(start_stop: String, destination_stop: String) -> Diction
 		var stops: Array = route.get("stops", [])
 		var a := stops.find(start_stop)
 		var b := stops.find(destination_stop)
-		if a >= 0 and b >= 0 and absi(a - b) < best_hops:
-			best_hops = absi(a - b)
+		if a < 0 or b < 0:
+			continue
+		var forward_hops := absi(a - b)
+		var reverse_hops := stops.size() - forward_hops
+		var chosen_hops := mini(forward_hops, reverse_hops)
+		if chosen_hops < best_hops:
+			best_hops = chosen_hops
 			best = route.duplicate(true)
 			best["start_index"] = a
 			best["destination_index"] = b
-			best["stops_away"] = best_hops
+			best["stops_away"] = chosen_hops
+			best["travel_direction"] = "forward" if (b - a + stops.size()) % stops.size() == chosen_hops else "reverse"
 	return best
+
+func get_nearest_stop(position: Vector3, max_distance: float = 120.0) -> Dictionary:
+	var nearest: Dictionary = {}
+	var best_distance := max_distance
+	for stop_id in _stops:
+		var stop: Dictionary = _stops[stop_id]
+		var distance := position.distance_to(stop.get("position", Vector3.ZERO))
+		if distance < best_distance:
+			best_distance = distance
+			nearest = stop.duplicate(true)
+			nearest["distance"] = distance
+	return nearest
+
+func get_stop_snapshot() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for stop_id in _stops:
+		result.append(_stops[stop_id].duplicate(true))
+	return result
 
 func set_route_active(route_id: String, active: bool) -> void:
 	if _routes.has(route_id):
