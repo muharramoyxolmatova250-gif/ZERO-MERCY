@@ -44,6 +44,9 @@ var _building_exit_position := Vector3.ZERO
 var _transport_cooldown := 0.0
 var _taxi_request_id := ""
 var _taxi_riding := false
+var _phone_brain_timer := 0.0
+var _phone_action_cooldown := 0.0
+var _phone_battery_visual := 1.0
 @export var citizen_id := ""
 @export var city_id := ""
 @export var occupation := "resident"
@@ -119,6 +122,11 @@ func _physics_process(delta: float) -> void:
 			var body_scale := 0.55 if current_age < 6 else (0.76 if current_age < 18 else (0.94 if current_age >= 65 else 1.0))
 			scale = Vector3.ONE * body_scale
 	_transport_cooldown = maxf(0.0, _transport_cooldown - delta)
+	_phone_action_cooldown = maxf(0.0, _phone_action_cooldown - delta)
+	_phone_brain_timer += delta
+	if _phone_brain_timer >= 9.0:
+		_phone_brain_timer = 0.0
+		_consider_autonomous_phone_use()
 	_decision_timer += delta
 	if _decision_timer >= 2.5:
 		_decision_timer = 0.0
@@ -586,3 +594,63 @@ func _exit_tree() -> void:
 	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
 	if life_sim != null and not citizen_id.is_empty():
 		life_sim.call("unregister_citizen", citizen_id)
+
+
+func _consider_autonomous_phone_use() -> void:
+	if _phone_action_cooldown > 0.0 or _taxi_riding or _crime_flee_timer > 0.0:
+		return
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	if life_sim == null:
+		return
+	var chance := 0.12 + float(_personality_traits.get("sociability", 0.5)) * 0.18
+	if current_goal in ["social", "leisure", "rest", "family"]:
+		chance += 0.22
+	if _indoor_activity in ["working", "studying"]:
+		chance *= 0.25
+	if _rng.randf() > chance:
+		return
+	var contacts: Array = life_sim.call("get_phone_snapshot", citizen_id).get("contacts", [])
+	var possible_contacts: Array[String] = []
+	for candidate in _get_nearby_citizens(35.0):
+		if candidate == self:
+			continue
+		var other_id := str(candidate.get("citizen_id"))
+		if not other_id.is_empty():
+			possible_contacts.append(other_id)
+	if possible_contacts.is_empty() and life_sim.has_method("get_family_members"):
+		for member in life_sim.call("get_family_members", citizen_id):
+			var family_id := str(member.get("id", ""))
+			if not family_id.is_empty() and family_id != citizen_id:
+				possible_contacts.append(family_id)
+	if _social_need > 0.62 and not possible_contacts.is_empty():
+		var recipient_id := possible_contacts[_rng.randi_range(0, possible_contacts.size() - 1)]
+		var messages := ["Qalaysan? Bugun ko'rishamizmi?", "Ishlaring yaxshimi?", "Keyinroq gaplashamiz.", "Bugun shaharda nima yangilik?"]
+		if life_sim.has_method("send_phone_message"):
+			life_sim.call("send_phone_message", citizen_id, recipient_id, messages[_rng.randi_range(0, messages.size() - 1)])
+			remember_event("sent_message_to:" + recipient_id)
+			_phone_action_cooldown = _rng.randf_range(35.0, 75.0)
+			_phone_battery_visual = maxf(0.15, _phone_battery_visual - 0.015)
+			_set_phone_visible(true)
+			return
+	if _social_need > 0.48 and not possible_contacts.is_empty() and _rng.randf() < 0.28:
+		var call_target := possible_contacts[_rng.randi_range(0, possible_contacts.size() - 1)]
+		if life_sim.has_method("make_phone_call"):
+			life_sim.call("make_phone_call", citizen_id, call_target, _rng.randi_range(18, 150))
+			remember_event("called:" + call_target)
+			_phone_action_cooldown = _rng.randf_range(55.0, 110.0)
+			_phone_battery_visual = maxf(0.15, _phone_battery_visual - 0.025)
+			_set_phone_visible(true)
+			return
+	if _curiosity > 0.66 and life_sim.has_method("publish_phone_post") and _rng.randf() < 0.2:
+		var posts := ["Bugun shahar juda gavjum.", "Yangi kun, yangi rejalar.", "Bugun yaxshi voqea yuz berdi.", "Kelajak tez o'zgaryapti."]
+		life_sim.call("publish_phone_post", citizen_id, posts[_rng.randi_range(0, posts.size() - 1)], "curious")
+		remember_event("published_phone_post")
+		_phone_action_cooldown = _rng.randf_range(80.0, 160.0)
+		_phone_battery_visual = maxf(0.15, _phone_battery_visual - 0.02)
+		_set_phone_visible(true)
+
+
+func _set_phone_visible(show_phone: bool) -> void:
+	is_using_phone = show_phone
+	if _phone != null:
+		_phone.visible = show_phone
