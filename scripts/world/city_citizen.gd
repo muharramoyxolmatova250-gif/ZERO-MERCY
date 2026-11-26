@@ -144,8 +144,12 @@ func _physics_process(delta: float) -> void:
 	direction.y = 0.0
 	if direction.length() < (1.8 if current_goal == "social" else 0.35):
 		if current_goal == "social" and is_instance_valid(_social_target):
+			var other_id := str(_social_target.get("citizen_id"))
 			_social_target.call("remember_event", "met:" + citizen_id)
-			remember_event("conversation:" + str(_social_target.get("citizen_id")))
+			remember_event("conversation:" + other_id)
+			var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+			if life_sim != null and life_sim.has_method("record_social_interaction"):
+				life_sim.call("record_social_interaction", citizen_id, other_id, "friendly_chat")
 			_social_target = null
 			_pause_remaining = _rng.randf_range(2.0, 5.0)
 			return
@@ -410,12 +414,22 @@ func _pause_for_goal() -> float:
 
 func _scan_social_context() -> void:
 	_social_target = null
-	var nearest_distance := 11.0
-	for candidate in _get_nearby_citizens(nearest_distance):
-		if candidate == self: continue
+	var best_score := INF
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	for candidate in _get_nearby_citizens(11.0):
+		if candidate == self:
+			continue
+		var other_id := str(candidate.get("citizen_id"))
 		var distance := global_position.distance_to(candidate.global_position)
-		if distance < nearest_distance:
-			nearest_distance = distance
+		var score := distance
+		if life_sim != null and life_sim.has_method("get_social_bond"):
+			var bond: Dictionary = life_sim.call("get_social_bond", citizen_id, other_id)
+			score -= float(bond.get("familiarity", 0.0)) * 1.1
+			score -= float(bond.get("friendship", 0.0)) * 2.2
+			score -= float(bond.get("trust", 0.0)) * 0.8
+		# A resident may prefer a familiar friend, but distance still matters.
+		if score < best_score:
+			best_score = score
 			_social_target = candidate
 
 func get_ai_snapshot() -> Dictionary:
