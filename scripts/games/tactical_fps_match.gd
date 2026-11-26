@@ -17,6 +17,7 @@ var reload_left := 0.0
 var bots: Array[CharacterBody3D] = []
 var mouse_captured := false
 var touch_move := Vector2.ZERO
+var touch_fire_held := false
 var touch_controls: Control
 var fire_cooldown := 0.0
 var recoil_recovery := 0.0
@@ -60,6 +61,7 @@ func _build_touch_controls() -> void:
 	touch_controls.movement_changed.connect(func(direction: Vector2) -> void: touch_move = direction)
 	touch_controls.aim_changed.connect(_on_touch_aim)
 	touch_controls.fire_pressed.connect(_fire)
+	touch_controls.fire_held_changed.connect(func(held: bool) -> void: touch_fire_held = held)
 	touch_controls.reload_pressed.connect(_start_reload)
 	touch_controls.jump_pressed.connect(_jump)
 
@@ -280,6 +282,8 @@ func _physics_process(delta: float) -> void:
 		return
 	time_left = maxf(0.0, time_left - delta)
 	fire_cooldown = maxf(0.0, fire_cooldown - delta)
+	if touch_fire_held:
+		_fire()
 	recoil_recovery = move_toward(recoil_recovery, 0.0, delta * 2.8)
 	if reloading:
 		reload_left -= delta
@@ -403,6 +407,7 @@ func _restart_round() -> void:
 	if weapon_pivot != null:
 		weapon_pivot.position = Vector3(0.32, -0.28, -0.58)
 	round_finished = false
+	touch_fire_held = false
 	_build_bots()
 
 func _update_hud() -> void:
