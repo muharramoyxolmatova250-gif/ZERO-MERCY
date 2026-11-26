@@ -5,6 +5,26 @@ var _routes: Dictionary = {}
 var _waiting_passengers: Dictionary = {}
 var _total_boardings := 0
 var _total_generated_passengers := 0
+var _demand_timer := 0.0
+var _rng := RandomNumberGenerator.new()
+@export_range(5.0, 120.0, 1.0) var demand_interval_seconds := 28.0
+
+func _ready() -> void:
+	_rng.randomize()
+
+func _process(delta: float) -> void:
+	if _stops.is_empty():
+		return
+	_demand_timer += delta
+	if _demand_timer < demand_interval_seconds:
+		return
+	_demand_timer = 0.0
+	for stop_id in _stops:
+		var stop: Dictionary = _stops[stop_id]
+		var demand := _rng.randi_range(1, 4)
+		if str(stop.get("name", "")).to_lower().contains("central"):
+			demand += 2
+		add_waiting_passengers(str(stop_id), demand)
 
 func register_stop(stop_id: String, position: Vector3, name: String = "") -> bool:
 	if stop_id.is_empty():
