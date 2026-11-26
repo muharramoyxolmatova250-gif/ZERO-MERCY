@@ -47,18 +47,18 @@ func register_destination(category: String, position: Vector3, interior_position
 	if _points.is_empty():
 		return
 	var node_id := _nearest_point(position)
-	# Prefer actual generated building entrances over synthetic fallback nodes.
+	# The first real building replaces the synthetic fallback pool for this category.
+	# Clear both collections together before registering its first generated destination.
 	if not bool(_registered_categories.get(category, false)):
 		_destinations[category] = []
+		_interior_destinations[category] = []
 		_registered_categories[category] = true
 	var pool: Array = _destinations.get(category, [])
 	if not pool.has(node_id):
 		pool.append(node_id)
 	_destinations[category] = pool
 	var interiors: Array = _interior_destinations.get(category, [])
-	if not bool(_registered_categories.get(category, false)):
-		interiors.clear()
-	if interior_position != Vector3.ZERO:
+	if interior_position != Vector3.ZERO and not interiors.has(interior_position):
 		interiors.append(interior_position)
 	_interior_destinations[category] = interiors
 
@@ -68,7 +68,12 @@ func request_activity_interior_position(activity: String, citizen_id: String) ->
 	if interiors.is_empty():
 		return Vector3.ZERO
 	var seed := absi(hash(citizen_id + ":" + activity))
-	return interiors[seed % interiors.size()]
+	var anchor: Vector3 = interiors[seed % interiors.size()]
+	# Give each resident a stable nearby standing slot instead of stacking every
+	# visitor on the exact same lobby coordinate.
+	var angle := float(seed % 6283) / 1000.0
+	var radius := 0.28 + float((seed / 6283) % 5) * 0.12
+	return anchor + Vector3(cos(angle) * radius, 0.0, sin(angle) * radius)
 
 func request_activity_route(start_world: Vector3, activity: String, citizen_id: String) -> PackedVector3Array:
 	if _points.is_empty():
@@ -88,7 +93,13 @@ func request_activity_route(start_world: Vector3, activity: String, citizen_id: 
 	return result
 
 func get_network_snapshot() -> Dictionary:
-	return {"nodes": _points.size(), "edges": _count_edges(), "destination_categories": _destinations.size(), "registered_building_categories": _registered_categories.size(), "destination_counts": _destination_counts()}
+	return {"nodes": _points.size(), "edges": _count_edges(), "destination_categories": _destinations.size(), "registered_building_categories": _registered_categories.size(), "interior_destination_counts": _interior_destination_counts(), "destination_counts": _destination_counts()}
+
+func _interior_destination_counts() -> Dictionary:
+	var counts: Dictionary = {}
+	for category in _interior_destinations:
+		counts[str(category)] = (_interior_destinations[category] as Array).size()
+	return counts
 
 func _add_point(point: Vector3) -> int:
 	var index := _points.size()
