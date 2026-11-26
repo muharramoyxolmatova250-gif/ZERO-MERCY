@@ -230,6 +230,11 @@ func _choose_next_waypoint() -> void:
 	# Once the final node is reached, wait for the next AI decision to pick
 	# a fresh activity and destination from the route network.
 	if not _last_routed_goal.is_empty() and _target_index >= route.size() - 1:
+		var completed_goal := _last_routed_goal
+		remember_event("arrived_at_destination:" + completed_goal)
+		var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+		if life_sim != null and life_sim.has_method("record_event"):
+			life_sim.call("record_event", citizen_id, "visited_building:" + completed_goal)
 		_last_routed_goal = ""
 		route = PackedVector3Array([global_position])
 		_target_index = 0
