@@ -41,6 +41,9 @@ var _long_term_goal := "build_a_stable_life"
 var _decision_reason := "initializing"
 var _building_visit_phase := ""
 var _building_exit_position := Vector3.ZERO
+var _transport_cooldown := 0.0
+var _taxi_request_id := ""
+var _taxi_riding := false
 @export var citizen_id := ""
 @export var city_id := ""
 @export var occupation := "resident"
@@ -113,11 +116,13 @@ func _physics_process(delta: float) -> void:
 			_last_visual_age = current_age
 			var body_scale := 0.55 if current_age < 6 else (0.76 if current_age < 18 else (0.94 if current_age >= 65 else 1.0))
 			scale = Vector3.ONE * body_scale
+	_transport_cooldown = maxf(0.0, _transport_cooldown - delta)
 	_decision_timer += delta
 	if _decision_timer >= 2.5:
 		_decision_timer = 0.0
 		_update_needs()
 		_decide_goal()
+		_consider_autonomous_taxi()
 	_social_scan_timer += delta
 	if _social_scan_timer >= 5.0:
 		_social_scan_timer = 0.0
@@ -305,6 +310,50 @@ func _decide_goal() -> void:
 	if best == "avoid_crowd": _stress = maxf(0.0, _stress - 0.08)
 	_memory.append("decision:" + best)
 	if _memory.size() > 24: _memory.pop_front()
+
+
+func _consider_autonomous_taxi() -> void:
+	if _taxi_riding or not _taxi_request_id.is_empty() or _transport_cooldown > 0.0:
+		return
+	if _crime_flee_timer > 0.0 or _building_visit_phase == "inside" or route.size() < 2:
+		return
+	var destination: Vector3 = route[route.size() - 1]
+	var distance := global_position.distance_to(destination)
+	var preference := float(_personality_traits.get("risk_tolerance", 0.5))
+	var should_call := distance > 95.0 and (_energy < 0.28 or _stress > 0.72 or (current_goal == "commute" and preference > 0.42))
+	if not should_call:
+		return
+	var dispatch := get_tree().get_first_node_in_group("city_taxi_dispatch")
+	if dispatch == null or not dispatch.has_method("request_taxi"):
+		return
+	var result: Dictionary = dispatch.call("request_taxi", citizen_id, global_position, destination)
+	if bool(result.get("accepted", false)):
+		var request: Dictionary = result.get("request", {})
+		_taxi_request_id = str(request.get("id", ""))
+		remember_event("requested_taxi:" + _taxi_request_id)
+		_decision_reason = "autonomous_taxi_choice_for_long_trip"
+	else:
+		_transport_cooldown = 25.0
+
+func begin_taxi_ride(request_id: String) -> void:
+	if request_id != _taxi_request_id or _taxi_riding:
+		return
+	_taxi_riding = true
+	visible = false
+	remember_event("boarded_taxi:" + request_id)
+
+func finish_taxi_ride(request_id: String, destination: Vector3) -> void:
+	if request_id != _taxi_request_id or not _taxi_riding:
+		return
+	global_position = destination
+	visible = true
+	_taxi_riding = false
+	_taxi_request_id = ""
+	_transport_cooldown = 45.0
+	route = PackedVector3Array([global_position, global_position + Vector3(2.0, 0.0, 0.0)])
+	_target_index = 1
+	_last_routed_goal = ""
+	remember_event("completed_taxi_trip:" + request_id)
 
 func _choose_next_waypoint() -> void:
 	# A planned destination route is a one-way trip, not a patrol loop.
