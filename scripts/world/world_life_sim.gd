@@ -763,6 +763,21 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     _append_event(profile, "monthly_finances:" + str(balance))
 
 
+func _apply_business_city_economy(profile: Dictionary) -> void:
+    var city_id := str(profile.get("business_city", ""))
+    if city_id.is_empty() or not hub_state.has(city_id):
+        return
+    var hub: Dictionary = hub_state[city_id]
+    var revenue := int(profile.get("business_revenue", 0))
+    var profit := int(profile.get("business_last_profit", 0))
+    hub["business_count"] = int(hub.get("business_count", 0)) + (1 if int(profile.get("business_months", 0)) == 1 else 0)
+    hub["monthly_business_revenue"] = int(hub.get("monthly_business_revenue", 0)) + revenue
+    hub["monthly_business_profit"] = int(hub.get("monthly_business_profit", 0)) + profit
+    hub["local_economic_activity"] = clampf(float(hub.get("local_economic_activity", 0.5)) + float(profit) / 100000.0, 0.0, 1.0)
+    hub_state[city_id] = hub
+    _dirty = true
+
+
 func _manage_credit_and_debt(profile: Dictionary) -> void:
     var debt := int(profile.get("debt", 0))
     var money := int(profile.get("money", 0))
