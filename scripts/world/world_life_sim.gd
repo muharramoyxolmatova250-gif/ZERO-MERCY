@@ -188,9 +188,16 @@ func get_family_members(citizen_id: String) -> Array:
     for member_id in resident_profiles.keys():
         var member: Dictionary = resident_profiles[member_id]
         if str(member.get("family_id", "")) == family_id:
+            var relationship := "family"
+            if str(member.get("partner_id", "")) == citizen_id:
+                relationship = "partner"
+            elif str(member.get("parent_id", "")) == citizen_id or str(member.get("second_parent_id", "")) == citizen_id:
+                relationship = "child"
+            elif str(member.get("id", "")) == str(resident_profiles[citizen_id].get("parent_id", "")):
+                relationship = "parent"
             members.append({"id": str(member_id), "name": str(member.get("name", member_id)),
                 "age_years": int(member.get("age_years", 0)), "occupation": str(member.get("occupation", "resident")),
-                "relationship": "partner" if str(member.get("partner_id", "")) == citizen_id else "family"})
+                "relationship": relationship})
     return members
 
 
@@ -401,6 +408,7 @@ func advance_month() -> void:
             births_total += 1
             _append_event(profile, "new_child_born")
             _create_child_profile(profile, str(profile.get("partner_id", "")))
+            profile = resident_profiles.get(citizen_id, profile)
         if new_age >= 82 and _rng.randf() < 0.006:
             profile["life_stage"] = "deceased"
             profile["active"] = false
@@ -422,6 +430,7 @@ func advance_month() -> void:
 
 func _create_child_profile(parent: Dictionary, second_parent_id: String = "") -> void:
     var parent_id := str(parent.get("id", "parent"))
+    resident_profiles[parent_id] = parent
     var child_number := int(parent.get("children_count", 1))
     var child_id := "birth_" + str(abs(hash(parent_id + ":" + str(simulation_day) + ":" + str(child_number))))
     if resident_profiles.has(child_id):
@@ -519,7 +528,7 @@ func _sync_hub_demographics(city_id: String) -> void:
             "student", "child": counts["sample_students"] += 1
             "adult": counts["sample_workers"] += 1
             "retired": counts["sample_retired"] += 1
-        if str(profile.get("marital_status", "")) == "married":
+        if str(profile.get("marital_status", "")) == "partnered":
             counts["sample_families"] += 1
     for key in counts:
         hub[key] = counts[key]
