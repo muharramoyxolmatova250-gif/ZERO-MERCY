@@ -396,17 +396,11 @@ func advance_month() -> void:
         if new_stage != old_stage:
             profile["life_stage"] = new_stage
             _apply_stage_transition(profile, old_stage, new_stage)
-        if new_age >= 22 and new_age <= 45 and str(profile.get("marital_status", "single")) == "single" and _rng.randf() < 0.008:
-            profile["marital_status"] = "married"
-            profile["family_id"] = "family_" + str(abs(hash(str(citizen_id) + ":" + str(simulation_day))))
-            profile["partner_id"] = profile["family_id"]
-            marriages_total += 1
-            _append_event(profile, "married")
-        if new_age >= 20 and new_age <= 42 and str(profile.get("sex", "")) == "female" and str(profile.get("marital_status", "single")) == "married" and _rng.randf() < 0.012:
+        if new_age >= 20 and new_age <= 42 and str(profile.get("sex", "")) == "female" and str(profile.get("marital_status", "single")) == "partnered" and _rng.randf() < 0.006:
             profile["children_count"] = int(profile.get("children_count", 0)) + 1
             births_total += 1
             _append_event(profile, "new_child_born")
-            _create_child_profile(profile)
+            _create_child_profile(profile, str(profile.get("partner_id", "")))
         if new_age >= 82 and _rng.randf() < 0.006:
             profile["life_stage"] = "deceased"
             profile["active"] = false
@@ -414,6 +408,11 @@ func advance_month() -> void:
             _append_event(profile, "died_of_old_age")
         profile["health"] = clampf(float(profile.get("health", 0.9)) + _rng.randf_range(-0.015, 0.008), 0.05, 1.0)
         resident_profiles[citizen_id] = profile
+    # Marriage is only recorded when two real residents are linked.
+    for citizen_id in resident_profiles.keys():
+        var candidate: Dictionary = resident_profiles[citizen_id]
+        if str(candidate.get("marital_status", "single")) == "single":
+            _try_form_household(str(citizen_id))
     _recount_all_hubs()
     _save_state()
     print("ZERO MERCY life month ", simulation_year, "-", simulation_month,
@@ -421,7 +420,7 @@ func advance_month() -> void:
         " residents=", resident_profiles.size())
 
 
-func _create_child_profile(parent: Dictionary) -> void:
+func _create_child_profile(parent: Dictionary, second_parent_id: String = "") -> void:
     var parent_id := str(parent.get("id", "parent"))
     var child_number := int(parent.get("children_count", 1))
     var child_id := "birth_" + str(abs(hash(parent_id + ":" + str(simulation_day) + ":" + str(child_number))))
@@ -436,7 +435,9 @@ func _create_child_profile(parent: Dictionary) -> void:
         "occupation": "child", "education": "early_childhood", "school": "",
         "marital_status": "single", "partner_id": "",
         "children_count": 0, "family_id": str(parent.get("family_id", "")),
-        "parent_id": parent_id, "money": 0, "health": 0.98,
+        "parent_id": parent_id, "second_parent_id": second_parent_id,
+        "parents": [parent_id, second_parent_id] if not second_parent_id.is_empty() else [parent_id],
+        "money": 0, "health": 0.98,
         "happiness": 0.8, "active": false, "born_day": simulation_day,
         "last_seen_day": simulation_day, "last_activity": "sleep",
         "life_events": [{"day": simulation_day, "event": "born"}]
@@ -444,6 +445,21 @@ func _create_child_profile(parent: Dictionary) -> void:
     if not _claim_cache.has(city_id):
         _claim_cache[city_id] = []
     _claim_cache[city_id].append(child_id)
+    var updated_parent: Dictionary = resident_profiles.get(parent_id, parent)
+    var children: Array = updated_parent.get("children_ids", [])
+    children.append(child_id)
+    updated_parent["children_ids"] = children
+    resident_profiles[parent_id] = updated_parent
+    if resident_profiles.has(second_parent_id):
+        var other_parent: Dictionary = resident_profiles[second_parent_id]
+        other_parent["children_count"] = int(other_parent.get("children_count", 0)) + 1
+        var other_children: Array = other_parent.get("children_ids", [])
+        other_children.append(child_id)
+        other_parent["children_ids"] = other_children
+        _append_event(other_parent, "child_born:" + child_id)
+        resident_profiles[second_parent_id] = other_parent
+    _dirty = true
+
 
 func _rebuild_claim_cache() -> void:
     _claim_cache.clear()
