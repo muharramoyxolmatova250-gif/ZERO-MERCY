@@ -863,8 +863,13 @@ func _operate_personal_business(profile: Dictionary) -> void:
     profile["business_capital"] = capital
     profile["business_health"] = clampf(float(capital) / 60000.0, 0.0, 1.0)
     profile["money"] = int(profile.get("money", 0)) + maxi(0, profit / 2)
+    if capital > 90000 and int(profile.get("business_capacity", 2)) < 12 and _rng.randf() < 0.18:
+        profile["business_capacity"] = int(profile.get("business_capacity", 2)) + 2
+        profile["business_expansions"] = int(profile.get("business_expansions", 0)) + 1
+        _append_event(profile, "business_expanded:" + str(profile["business_capacity"]))
     if capital < 500 and months > 2:
         profile["business_id"] = ""
+        profile["business_workers"] = 0
         profile["financial_goal"] = "rebuild_savings"
         _append_event(profile, "business_closed_after_losses")
     elif months % 6 == 0:
