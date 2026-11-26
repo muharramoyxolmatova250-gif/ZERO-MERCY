@@ -18,6 +18,9 @@ var _decision_timer := 0.0
 var _social_scan_timer := 0.0
 var _social_target: Node3D
 var _stress := 0.15
+var _crime_flee_timer := 0.0
+var _crime_flee_direction := Vector3.ZERO
+var _last_crime_id := ""
 var personality := 3
 var _memory: Array[String] = []
 var ai_decision_count := 0
@@ -37,6 +40,8 @@ func _ready() -> void:
 	if citizen_id.is_empty():
 		citizen_id = "citizen_" + str(abs(hash(str(position) + ":" + city_id)))
 	_register_life_profile()
+	if has_node("/root/GameSession"):
+		GameSession.crime_reported.connect(_on_crime_reported)
 	if route.size() < 2:
 		route = PackedVector3Array([Vector3(-5,0,-5), Vector3(5,0,-5), Vector3(5,0,5), Vector3(-5,0,5)])
 	_target_index = 1
@@ -53,7 +58,31 @@ func _register_life_profile() -> void:
 	_last_visual_age = -1
 
 
+func _on_crime_reported(crime_id: String, crime_position: Vector3, severity: int) -> void:
+	var distance := global_position.distance_to(crime_position)
+	if distance > 55.0:
+		return
+	_last_crime_id = crime_id
+	_crime_flee_timer = maxf(_crime_flee_timer, 5.0 + float(severity) * 2.0)
+	_crime_flee_direction = global_position - crime_position
+	_crime_flee_direction.y = 0.0
+	if _crime_flee_direction.length_squared() < 0.01:
+		_crime_flee_direction = Vector3.RIGHT.rotated(Vector3.UP, _rng.randf_range(-PI, PI))
+	_crime_flee_direction = _crime_flee_direction.normalized()
+	_stress = clampf(_stress + 0.35, 0.0, 1.0)
+	current_goal = "flee"
+	remember_event("witnessed_crime:" + crime_id)
+
 func _physics_process(delta: float) -> void:
+	if _crime_flee_timer > 0.0:
+		_crime_flee_timer = maxf(0.0, _crime_flee_timer - delta)
+		position += _crime_flee_direction * walk_speed * 2.1 * delta
+		if _crime_flee_direction.length_squared() > 0.001:
+			look_at(position + _crime_flee_direction, Vector3.UP)
+		if _crime_flee_timer <= 0.0:
+			current_goal = "avoid_crowd"
+			_pause_remaining = 1.5
+		return
 	_age_refresh_timer += delta
 	if _age_refresh_timer >= 10.0:
 		_age_refresh_timer = 0.0
@@ -97,7 +126,7 @@ func _physics_process(delta: float) -> void:
 		if is_using_phone: phone_interaction_count += 1
 		if _phone != null: _phone.visible = is_using_phone
 		return
-	var speed_factor := 1.3 if current_goal == "commute" else (0.65 if current_goal == "rest" else 1.0)
+	var speed_factor := 1.3 if current_goal == "commute" else (0.65 if current_goal in ["rest", "leisure", "family"] else (1.12 if current_goal in ["food", "school", "play"] else 1.0))
 	position += direction.normalized() * walk_speed * speed_factor * delta
 	if direction.length_squared() > 0.001: look_at(position + direction, Vector3.UP)
 
@@ -177,7 +206,7 @@ func _scan_social_context() -> void:
 			_social_target = candidate
 
 func get_ai_snapshot() -> Dictionary:
-	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"memories":_memory.size(),"decisions":ai_decision_count,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
+	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"memories":_memory.size(),"decisions":ai_decision_count,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0))}
 
 func remember_event(event_name: String) -> void:
 	_memory.append(event_name)
