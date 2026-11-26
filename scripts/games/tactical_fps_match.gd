@@ -25,6 +25,8 @@ var rounds_lost := 0
 var aiming := false
 var round_finished := false
 var crosshair: Label
+var weapon_pivot: Node3D
+var muzzle_flash: OmniLight3D
 
 func _ready() -> void:
 	_build_arena()
@@ -133,7 +135,50 @@ func _build_player() -> void:
 	camera.position.y = 0.62
 	camera.current = true
 	player.add_child(camera)
+	_build_weapon_viewmodel()
 	add_child(player)
+
+func _build_weapon_viewmodel() -> void:
+	weapon_pivot = Node3D.new()
+	weapon_pivot.name = "FirstPersonRifle"
+	weapon_pivot.position = Vector3(0.32, -0.28, -0.58)
+	camera.add_child(weapon_pivot)
+	var receiver := MeshInstance3D.new()
+	var receiver_mesh := BoxMesh.new()
+	receiver_mesh.size = Vector3(0.16, 0.18, 0.48)
+	receiver.mesh = receiver_mesh
+	var metal := StandardMaterial3D.new()
+	metal.albedo_color = Color(0.075, 0.09, 0.105)
+	metal.metallic = 0.86
+	metal.roughness = 0.24
+	receiver.material_override = metal
+	weapon_pivot.add_child(receiver)
+	var barrel := MeshInstance3D.new()
+	var barrel_mesh := CylinderMesh.new()
+	barrel_mesh.top_radius = 0.035
+	barrel_mesh.bottom_radius = 0.035
+	barrel_mesh.height = 0.48
+	barrel_mesh.radial_segments = 12
+	barrel.mesh = barrel_mesh
+	barrel.rotation.x = PI / 2.0
+	barrel.position.z = -0.38
+	barrel.material_override = metal
+	weapon_pivot.add_child(barrel)
+	var grip := MeshInstance3D.new()
+	var grip_mesh := BoxMesh.new()
+	grip_mesh.size = Vector3(0.11, 0.24, 0.13)
+	grip.mesh = grip_mesh
+	grip.position = Vector3(0, -0.17, 0.08)
+	grip.rotation.x = -0.18
+	grip.material_override = metal
+	weapon_pivot.add_child(grip)
+	muzzle_flash = OmniLight3D.new()
+	muzzle_flash.light_color = Color(1.0, 0.62, 0.2)
+	muzzle_flash.light_energy = 3.5
+	muzzle_flash.omni_range = 3.0
+	muzzle_flash.position.z = -0.66
+	muzzle_flash.visible = false
+	weapon_pivot.add_child(muzzle_flash)
 
 func _build_bots() -> void:
 	for i in range(BOT_COUNT):
@@ -201,6 +246,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func _set_aiming(enabled: bool) -> void:
 	 aiming = enabled
 	camera.fov = 48.0 if aiming else 75.0
+	if weapon_pivot != null:
+		weapon_pivot.position.x = 0.18 if aiming else 0.32
+		weapon_pivot.position.y = -0.22 if aiming else -0.28
 	if crosshair != null:
 		crosshair.visible = not aiming
 
@@ -245,6 +293,14 @@ func _fire() -> void:
 	if ammo <= 0 or reloading or health <= 0.0 or fire_cooldown > 0.0:
 		return
 	ammo -= 1
+	if weapon_pivot != null:
+		weapon_pivot.position.z = -0.49
+		var kick := create_tween()
+		kick.tween_property(weapon_pivot, "position:z", -0.58, 0.09).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		muzzle_flash.visible = true
+		get_tree().create_timer(0.045).timeout.connect(func() -> void:
+			if is_instance_valid(muzzle_flash):
+				muzzle_flash.visible = false)
 	fire_cooldown = 0.105
 	recoil_recovery = minf(0.7, recoil_recovery + 0.12)
 	camera.rotation.x = clampf(camera.rotation.x - 0.012, -1.45, 1.45)
