@@ -810,6 +810,31 @@ func _monthly_salary_for_job(job: String, level: int) -> int:
     return int(base.get(job, 1600)) + maxi(0, level - 1) * 180
 
 
+func _process_npc_transport(profile: Dictionary) -> int:
+    var vehicle_id := str(profile.get("vehicle_id", ""))
+    var job := str(profile.get("occupation", ""))
+    if vehicle_id.is_empty():
+        if job in JOBS:
+            return _rng.randi_range(90, 240)
+        return _rng.randi_range(25, 90)
+    var monthly_km := _rng.randi_range(180, 1100) if job in JOBS else _rng.randi_range(60, 260)
+    var fuel_used := float(monthly_km) * 0.085
+    var fuel := maxf(0.0, float(profile.get("vehicle_fuel", 0.0)) - fuel_used)
+    var fuel_cost := int(fuel_used * 1.4)
+    var wear := float(monthly_km) / 180000.0
+    var condition := clampf(float(profile.get("vehicle_condition", 1.0)) - wear, 0.0, 1.0)
+    var maintenance := 0
+    if condition < 0.55:
+        maintenance = _rng.randi_range(180, 650)
+        condition = minf(1.0, condition + 0.12)
+    profile["vehicle_fuel"] = fuel
+    profile["vehicle_condition"] = condition
+    profile["vehicle_monthly_km"] = int(profile.get("vehicle_monthly_km", 0)) + monthly_km
+    profile["vehicle_last_month_km"] = monthly_km
+    profile["vehicle_maintenance_cost"] = maintenance
+    return fuel_cost + maintenance
+
+
 func _process_monthly_finances(profile: Dictionary) -> void:
     var job := str(profile.get("occupation", "unemployed"))
     var level := int(profile.get("career_level", 1))
@@ -819,10 +844,12 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     var owns_home := bool(profile.get("owns_home", false))
     var rent := 90 if owns_home else (650 if living_independently else 180)
     var food_and_services := 420 if job in JOBS else 300
-    var balance := income - rent - food_and_services
+    var transport_cost := _process_npc_transport(profile)
+    var balance := income - rent - food_and_services - transport_cost
     profile["monthly_income"] = income
     profile["monthly_housing_cost"] = rent
     profile["monthly_living_cost"] = food_and_services
+    profile["monthly_transport_cost"] = transport_cost
     profile["money"] = maxi(0, int(profile.get("money", 0)) + balance)
     _manage_personal_savings(profile, balance)
     _consider_business_startup(profile)
