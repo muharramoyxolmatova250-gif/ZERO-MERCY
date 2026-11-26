@@ -130,3 +130,12 @@ func _physics_process(delta: float) -> void:
  else:
   velocity.y = -0.2
  move_and_slide()
+ for collision_index in range(get_slide_collision_count()):
+  var impact := get_slide_collision(collision_index)
+  var obstacle := impact.get_collider()
+  if obstacle is Node and obstacle.is_in_group("traffic_obstacle") and absf(_speed) > 9.0:
+   var driver := get_tree().get_first_node_in_group("player")
+   if driver != null:
+    driver.set_meta("wanted_until", Time.get_ticks_msec() + 60000)
+   _speed *= 0.35
+   break
