@@ -5,6 +5,7 @@ var _points: Array[Vector3] = []
 var _adjacency: Array[Array] = []
 var _destinations: Dictionary = {}
 var _registered_categories: Dictionary = {}
+var _interior_destinations: Dictionary = {}
 
 func _ready() -> void:
 	add_to_group("pedestrian_route_network")
@@ -14,6 +15,7 @@ func build_grid(blocks_per_side: int, spacing: float, road_width: float) -> void
 	_adjacency.clear()
 	_destinations.clear()
 	_registered_categories.clear()
+	_interior_destinations.clear()
 	var side_offset := road_width * 0.5 + 1.8
 	var first := -float(blocks_per_side) * spacing * 0.5
 	var grid_size := blocks_per_side + 1
@@ -41,7 +43,7 @@ func build_grid(blocks_per_side: int, spacing: float, road_width: float) -> void
 				pool.append(index)
 		_destinations[category] = pool
 
-func register_destination(category: String, position: Vector3) -> void:
+func register_destination(category: String, position: Vector3, interior_position: Vector3 = Vector3.ZERO) -> void:
 	if _points.is_empty():
 		return
 	var node_id := _nearest_point(position)
@@ -53,6 +55,20 @@ func register_destination(category: String, position: Vector3) -> void:
 	if not pool.has(node_id):
 		pool.append(node_id)
 	_destinations[category] = pool
+	var interiors: Array = _interior_destinations.get(category, [])
+	if not bool(_registered_categories.get(category, false)):
+		interiors.clear()
+	if interior_position != Vector3.ZERO:
+		interiors.append(interior_position)
+	_interior_destinations[category] = interiors
+
+func request_activity_interior_position(activity: String, citizen_id: String) -> Vector3:
+	var category := _activity_category(activity)
+	var interiors: Array = _interior_destinations.get(category, [])
+	if interiors.is_empty():
+		return Vector3.ZERO
+	var seed := absi(hash(citizen_id + ":" + activity))
+	return interiors[seed % interiors.size()]
 
 func request_activity_route(start_world: Vector3, activity: String, citizen_id: String) -> PackedVector3Array:
 	if _points.is_empty():
