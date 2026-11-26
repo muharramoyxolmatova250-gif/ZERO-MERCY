@@ -21,6 +21,8 @@ var marriages_total := 0
 var separations_total := 0
 var graduations_total := 0
 var career_promotions_total := 0
+var career_changes_total := 0
+var education_levels_completed_total := 0
 var independent_households_total := 0
 var _elapsed := 0.0
 var _save_elapsed := 0.0
@@ -123,6 +125,7 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         "education": _education_for_age(age, local_rng),
         "school": SCHOOLS[local_rng.randi_range(0, SCHOOLS.size() - 1)] if stage in ["student", "university"] else "",
         "education_progress": local_rng.randf_range(0.0, 0.85),
+        "school_grade": maxi(0, age - 5),
         "academic_performance": local_rng.randf_range(0.35, 0.95),
         "school_attendance": 0.0,
         "career_satisfaction": local_rng.randf_range(0.35, 0.8),
@@ -504,6 +507,7 @@ func _advance_education(profile: Dictionary) -> void:
     if progress >= 1.0:
         progress -= 1.0
         profile["school_grade"] = int(profile.get("school_grade", 0)) + 1
+        education_levels_completed_total += 1
         _append_event(profile, "completed_education_level:" + str(profile["school_grade"]))
     profile["school_attendance"] = attendance
     profile["academic_performance"] = performance
@@ -718,6 +722,7 @@ func _advance_career_month(profile: Dictionary) -> void:
         if next_job != occupation:
             profile["occupation"] = next_job
             profile["career_field"] = next_job
+            career_changes_total += 1
             profile["career_progress"] = 0.0
             satisfaction = 0.48
             _append_event(profile, "changed_career_to:" + next_job)
@@ -816,6 +821,8 @@ func get_world_life_snapshot() -> Dictionary:
         "sample_retired": retired, "births_total": births_total, "deaths_total": deaths_total,
         "marriages_total": marriages_total, "separations_total": separations_total,
         "graduations_total": graduations_total, "career_promotions_total": career_promotions_total,
+        "career_changes_total": career_changes_total,
+        "education_levels_completed_total": education_levels_completed_total,
         "independent_households_total": independent_households_total
     }
 
@@ -840,6 +847,8 @@ func _load_state() -> void:
     separations_total = int(parsed.get("separations_total", 0))
     graduations_total = int(parsed.get("graduations_total", 0))
     career_promotions_total = int(parsed.get("career_promotions_total", 0))
+    career_changes_total = int(parsed.get("career_changes_total", 0))
+    education_levels_completed_total = int(parsed.get("education_levels_completed_total", 0))
     independent_households_total = int(parsed.get("independent_households_total", 0))
 
 func _save_state() -> void:
@@ -850,6 +859,8 @@ func _save_state() -> void:
         "deaths_total": deaths_total, "marriages_total": marriages_total,
         "separations_total": separations_total, "graduations_total": graduations_total,
         "career_promotions_total": career_promotions_total,
+        "career_changes_total": career_changes_total,
+        "education_levels_completed_total": education_levels_completed_total,
         "independent_households_total": independent_households_total
     }
     var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
