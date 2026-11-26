@@ -69,14 +69,26 @@ func _arrive_at_stop() -> void:
     _current_speed = 0.0
     _door_open = true
     var stop_id := stop_ids[_target_index] if _target_index < stop_ids.size() else ""
-    var alighted := _rng.randi_range(0, mini(passenger_count, maxi(1, int(round(float(passenger_count) * 0.22))))) if passenger_count > 0 else 0
-    passenger_count -= alighted
-    var boarded := 0
-    if transit_network != null and not stop_id.is_empty() and transit_network.has_method("board_waiting_passengers"):
-        boarded = int(transit_network.call("board_waiting_passengers", stop_id, passenger_capacity - passenger_count))
-        passenger_count += boarded
-        if transit_network.has_method("report_vehicle_stop"):
-            transit_network.call("report_vehicle_stop", route_id, stop_id, boarded, alighted)
+    var alighted := 0
+    if not stop_id.is_empty():
+        for passenger_index in range(passenger_destinations.size() - 1, -1, -1):
+            var destination: String = passenger_destinations[passenger_index]
+            if destination.is_empty() or destination == stop_id:
+                passenger_destinations.remove_at(passenger_index)
+                alighted += 1
+    passenger_count = passenger_destinations.size()
+    total_alighted += alighted
+    var boarded_manifest: Array[String] = []
+    if transit_network != null and not stop_id.is_empty() and transit_network.has_method("take_waiting_manifest"):
+        var available_seats := passenger_capacity - passenger_count
+        var received: Array = transit_network.call("take_waiting_manifest", stop_id, available_seats)
+        for destination in received:
+            boarded_manifest.append(str(destination))
+            passenger_destinations.append(str(destination))
+    var boarded := boarded_manifest.size()
+    passenger_count = passenger_destinations.size()
+    if transit_network != null and not stop_id.is_empty() and transit_network.has_method("report_vehicle_stop"):
+        transit_network.call("report_vehicle_stop", route_id, stop_id, boarded, alighted)
     if _door_mesh != null:
         _door_mesh.visible = true
     _dwell_remaining = dwell_seconds
