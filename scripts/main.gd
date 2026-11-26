@@ -45,9 +45,18 @@ func _ready() -> void:
  var rescue_zone := RESCUE_SCENE.instantiate()
  rescue_zone.position = Vector3(15, 0, -25)
  add_child(rescue_zone)
- var enemy := ENEMY_SCENE.instantiate()
- enemy.position = Vector3(0, 0, -18)
- add_child(enemy)
+ # Initial hostile patrol: three enemies enter from a loose formation.
+ # Each unit runs its own perception, pursuit and attack logic.
+ var patrol_positions := [
+  Vector3(0, 0, -18),
+  Vector3(-6.5, 0, -23),
+  Vector3(6.5, 0, -25)
+ ]
+ for index in range(patrol_positions.size()):
+  var enemy := ENEMY_SCENE.instantiate()
+  enemy.name = "HostilePatrol_%02d" % (index + 1)
+  enemy.position = patrol_positions[index]
+  add_child(enemy)
 
 
 
