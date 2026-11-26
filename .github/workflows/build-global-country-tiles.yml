@@ -46,11 +46,6 @@ on:
         required: false
         default: "16"
         type: string
-      batch_count:
-        description: Number of 16-tile batches to run sequentially (manual runs)
-        required: false
-        default: "10"
-        type: string
       tile_degrees:
         description: Global grid tile width in degrees
         required: true
@@ -73,12 +68,7 @@ concurrency:
 
 jobs:
   build-country-batch:
-    if: (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success') && matrix.batch <= fromJSON(inputs.batch_count || '1')
-    strategy:
-      max-parallel: 1
-      fail-fast: false
-      matrix:
-        batch: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
