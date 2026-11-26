@@ -12,10 +12,13 @@ var _signal_lamp: MeshInstance3D
 var _signal_material: StandardMaterial3D
 var _panic_timer := 0.0
 var _panic_origin := Vector3.ZERO
+var _life_sim: Node
 
 func _ready() -> void:
+ _life_sim = get_tree().get_first_node_in_group("world_life_sim")
  if has_node("/root/GameSession"):
   GameSession.crime_reported.connect(_on_crime_reported)
+  GameSession.session_clock_changed.connect(_on_session_clock_changed)
  _build_traffic_signal()
  for index in range(vehicle_count):
   var car := _make_traffic_car(index)
@@ -28,6 +31,22 @@ func _ready() -> void:
   pedestrian.set_meta("walk_direction", 1.0 if index % 2 == 0 else -1.0)
   add_child(pedestrian)
   _pedestrians.append(pedestrian)
+  if _life_sim != null:
+   var citizen_id := "street_npc_" + str(index)
+   _life_sim.call("register_citizen", citizen_id, "Neo-Tashkent", "resident")
+   pedestrian.set_meta("citizen_id", citizen_id)
+
+func _on_session_clock_changed(hour: float) -> void:
+ if _life_sim == null:
+  return
+ var profiles: Dictionary = _life_sim.get("resident_profiles")
+ for pedestrian in _pedestrians:
+  var citizen_id := str(pedestrian.get_meta("citizen_id", ""))
+  if citizen_id.is_empty() or not profiles.has(citizen_id):
+   continue
+  var profile: Dictionary = profiles[citizen_id]
+  pedestrian.set_meta("routine_activity", str(profile.get("last_activity", "commute")))
+  pedestrian.set_meta("routine_hour", floori(hour))
 
 func _on_crime_reported(_crime_id: String, world_position: Vector3, _severity: int) -> void:
  _panic_timer = 12.0
@@ -37,6 +56,18 @@ func _on_crime_reported(_crime_id: String, world_position: Vector3, _severity: i
   if is_zero_approx(away):
    away = 1.0 if pedestrian.get_instance_id() % 2 == 0 else -1.0
   pedestrian.set_meta("walk_direction", away)
+  var citizen_id := str(pedestrian.get_meta("citizen_id", ""))
+  if _life_sim != null and not citizen_id.is_empty() and pedestrian.global_position.distance_to(world_position) <= 35.0:
+   _life_sim.call("record_event", citizen_id, "witnessed_crime")
+   _life_sim.call("record_activity", citizen_id, "flee")
+
+func _exit_tree() -> void:
+ if _life_sim == null:
+  return
+ for pedestrian in _pedestrians:
+  var citizen_id := str(pedestrian.get_meta("citizen_id", ""))
+  if not citizen_id.is_empty():
+   _life_sim.call("unregister_citizen", citizen_id)
 
 func _build_traffic_signal() -> void:
  var pole_material := StandardMaterial3D.new()
@@ -194,7 +225,15 @@ func _process(delta: float) -> void:
    car.position.x = -loop_length * 0.5
  for pedestrian in _pedestrians:
   var direction := float(pedestrian.get_meta("walk_direction", 1.0))
-  var walk_speed := 2.8 if _panic_timer > 0.0 else 1.25
+  var routine_activity := str(pedestrian.get_meta("routine_activity", "commute"))
+  var routine_speed := 1.25
+  if routine_activity == "sleep":
+   routine_speed = 0.0
+  elif routine_activity in ["family", "social", "leisure"]:
+   routine_speed = 0.55
+  elif routine_activity == "play":
+   routine_speed = 1.6
+  var walk_speed := 2.8 if _panic_timer > 0.0 else routine_speed
   pedestrian.position.x += direction * walk_speed * delta
   if absf(pedestrian.position.x) > 24.0:
    pedestrian.set_meta("walk_direction", -direction)
