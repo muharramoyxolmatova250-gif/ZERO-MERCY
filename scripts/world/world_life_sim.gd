@@ -758,6 +758,45 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     _append_event(profile, "monthly_finances:" + str(balance))
 
 
+func _consider_business_startup(profile: Dictionary) -> void:
+    if not str(profile.get("business_id", "")).is_empty():
+        return
+    if int(profile.get("savings", 0)) < 50000 or str(profile.get("financial_goal", "")) != "start_business":
+        return
+    if _rng.randf() > 0.025:
+        return
+    var citizen_id := str(profile.get("id", "unknown"))
+    var business_id := "business_" + str(abs(hash(citizen_id + ":" + str(simulation_day))))
+    profile["business_id"] = business_id
+    profile["business_capital"] = 30000
+    profile["business_revenue"] = 0
+    profile["business_months"] = 0
+    profile["savings"] = int(profile.get("savings", 0)) - 30000
+    profile["financial_goal"] = "grow_business"
+    _append_event(profile, "founded_business:" + business_id)
+
+
+func _operate_personal_business(profile: Dictionary) -> void:
+    if str(profile.get("business_id", "")).is_empty():
+        return
+    var months := int(profile.get("business_months", 0)) + 1
+    var capital := int(profile.get("business_capital", 0))
+    var revenue := _rng.randi_range(1800, 6200)
+    var operating_cost := _rng.randi_range(1200, 3600)
+    var profit := revenue - operating_cost
+    capital = maxi(0, capital + profit)
+    profile["business_months"] = months
+    profile["business_revenue"] = revenue
+    profile["business_capital"] = capital
+    profile["money"] = int(profile.get("money", 0)) + maxi(0, profit / 2)
+    if capital < 500 and months > 2:
+        profile["business_id"] = ""
+        profile["financial_goal"] = "rebuild_savings"
+        _append_event(profile, "business_closed_after_losses")
+    elif months % 6 == 0:
+        _append_event(profile, "business_reviewed:" + str(profit))
+
+
 func _manage_personal_savings(profile: Dictionary, monthly_balance: int) -> void:
     var money := int(profile.get("money", 0))
     var savings := int(profile.get("savings", 0))
