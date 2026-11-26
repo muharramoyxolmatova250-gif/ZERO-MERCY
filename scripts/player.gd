@@ -253,7 +253,7 @@ func _set_aiming(enabled: bool) -> void:
 	_weapon_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	var target_position := Vector3(0.22, -0.29, -0.92) if _aiming else _hand_anchor_home
 	_weapon_tween.tween_property(_hand_anchor, "position", target_position, 0.18)
-	_weapon_tween.parallel().tween_property(camera, "fov",  fifty_five_fov(), 0.18)
+	_weapon_tween.parallel().tween_property(camera, "fov",  get_aim_camera_fov(), 0.18)
 
 
 func fifty_five_fov() -> float:
@@ -366,10 +366,10 @@ func _animate_dara_visual(delta: float) -> void:
 		"Head": Vector3(0.035 * movement_weight - breath * 0.5 - air_pose * 0.06 + _damage_reaction_strength * 0.16, 0.0, strafe * 0.045 + _damage_reaction_strength * 0.12),
 		"Shoulder_-1.0": Vector3(-left_phase * 0.22 * movement_weight, 0.0, 0.0),
 		"Shoulder_1.0": Vector3(-right_phase * 0.22 * movement_weight, 0.0, 0.0),
-		"UpperArm_-1.0": Vector3(-left_phase * 0.48 * movement_weight - 0.12, 0.0, -strafe * 0.08),
-		"UpperArm_1.0": Vector3(-right_phase * 0.48 * movement_weight - 0.12, 0.0, -strafe * 0.08),
-		"Forearm_-1.0": Vector3(-0.18 - maxf(0.0, left_phase) * 0.16 * movement_weight, 0.0, 0.0),
-		"Forearm_1.0": Vector3(-0.18 - maxf(0.0, right_phase) * 0.16 * movement_weight, 0.0, 0.0),
+		"UpperArm_-1.0": Vector3(-left_phase * 0.48 * movement_weight - 0.12 - (0.52 if _aiming else 0.0), 0.0, -strafe * 0.08),
+		"UpperArm_1.0": Vector3(-right_phase * 0.48 * movement_weight - 0.12 - (0.52 if _aiming else 0.0), 0.0, -strafe * 0.08),
+		"Forearm_-1.0": Vector3(-0.18 - maxf(0.0, left_phase) * 0.16 * movement_weight - (0.62 if _aiming else 0.0), 0.0, 0.0),
+		"Forearm_1.0": Vector3(-0.18 - maxf(0.0, right_phase) * 0.16 * movement_weight - (0.62 if _aiming else 0.0), 0.0, 0.0),
 		"Thigh_-1.0": Vector3(left_phase * lerpf(0.42, 0.68, sprint_weight) * movement_weight - air_pose * 0.28, 0.0, 0.0),
 		"Thigh_1.0": Vector3(right_phase * lerpf(0.42, 0.68, sprint_weight) * movement_weight - air_pose * 0.28, 0.0, 0.0),
 		"Shin_-1.0": Vector3(maxf(0.0, -left_phase) * 0.72 * movement_weight + left_lift * 0.16, 0.0, 0.0),
