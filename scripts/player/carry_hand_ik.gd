@@ -165,3 +165,6 @@ static func get_elbow_plane_normal(shoulder: Vector3, elbow: Vector3, wrist: Vec
 
 static func get_wrist_to_target_direction(wrist: Vector3, target: Vector3) -> Vector3:
 	return safe_normalize(target - wrist, Vector3.FORWARD)
+
+static func smooth_weight(current: float, target: float, delta: float, speed: float) -> float:
+	return move_toward(current, target, maxf(delta, 0.0) * maxf(speed, 0.0))
