@@ -28,6 +28,10 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
     if not visible:
         return
+    _system_refresh_elapsed += delta
+    if _system_refresh_elapsed >= 0.5:
+        _system_refresh_elapsed = 0.0
+        _update_phone_system_bar()
     _refresh_elapsed += delta
     if _refresh_elapsed >= 2.0:
         _refresh_elapsed = 0.0
