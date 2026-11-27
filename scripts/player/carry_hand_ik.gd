@@ -3,10 +3,13 @@ extends RefCounted
 ## Returns geometric targets; it does not replace a skinned-mesh IK rig.
 
 static func clamp_reach_target(shoulder: Vector3, target: Vector3, upper_length: float, lower_length: float, margin: float = 0.025) -> Vector3:
+	var upper := maxf(upper_length, 0.001)
+	var lower := maxf(lower_length, 0.001)
+	var safe_margin := clampf(margin, 0.0, minf(upper, lower) * 0.45)
 	var delta := target - shoulder
 	var distance := delta.length()
-	var minimum_distance := absf(upper_length - lower_length) + margin
-	var maximum_distance := maxf(minimum_distance, upper_length + lower_length - margin)
+	var minimum_distance := absf(upper - lower) + safe_margin
+	var maximum_distance := maxf(minimum_distance, upper + lower - safe_margin)
 	if distance < 0.0001:
 		return shoulder + Vector3.DOWN * minimum_distance
 	return shoulder + delta / distance * clampf(distance, minimum_distance, maximum_distance)
