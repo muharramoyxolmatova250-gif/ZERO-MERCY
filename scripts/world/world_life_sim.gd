@@ -436,9 +436,11 @@ func record_social_interaction(first_id: String, second_id: String, interaction:
     while history.size() > 16:
         history.pop_front()
     bond["history"] = history
-    if interaction in ["friendly_chat", "help", "shared_activity"]:
-        bond["trust"] = clampf(float(bond.get("trust", 0.0)) + 0.025, -1.0, 1.0)
-        bond["friendship"] = clampf(float(bond.get("friendship", 0.0)) + 0.035, -1.0, 1.0)
+    if interaction in ["friendly_chat", "help", "shared_activity", "phone_message"]:
+        var trust_gain := 0.008 if interaction == "phone_message" else 0.025
+        var friendship_gain := 0.012 if interaction == "phone_message" else 0.035
+        bond["trust"] = clampf(float(bond.get("trust", 0.0)) + trust_gain, -1.0, 1.0)
+        bond["friendship"] = clampf(float(bond.get("friendship", 0.0)) + friendship_gain, -1.0, 1.0)
     elif interaction == "social_comment":
         bond["trust"] = clampf(float(bond.get("trust", 0.0)) + 0.012, -1.0, 1.0)
         bond["friendship"] = clampf(float(bond.get("friendship", 0.0)) + 0.01, -1.0, 1.0)
@@ -1692,6 +1694,7 @@ func send_phone_message(sender_id: String, recipient_id: String, message_text: S
     resident_profiles[recipient_id] = recipient
     record_event(sender_id, "sent_phone_message:" + recipient_id)
     record_event(recipient_id, "received_phone_message:" + sender_id)
+    record_social_interaction(sender_id, recipient_id, "phone_message")
     _dirty = true
     return true
 
