@@ -180,3 +180,7 @@ func get_gait_sway() -> Vector3:
 func get_support_hand_profile() -> Dictionary:
 	var weight := get_secondary_grip_weight()
 	return {"weight": weight, "active": weight > 0.05, "reach_speed": lerpf(7.0, 12.0, weight), "wrist_stiffness": lerpf(0.35, 0.9, weight)}
+
+
+func get_footstep_intensity() -> float:
+	return clampf(0.35 + mass_kg * 0.035 + impact_load * 0.2, 0.0, 1.0)
