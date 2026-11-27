@@ -367,3 +367,12 @@ func set_relationship_context(score: float, familiar: bool) -> void:
 	elif score > 0.65:
 		voice_profile["verbosity"] = minf(1.0,float(voice_profile.get("verbosity",0.6))+0.12)
 
+
+
+func answer_private_question(question: String, trust: float) -> String:
+	if trust < 0.25:
+		return "I don't know you well enough to share something that personal. I hope you understand."
+	if float(traits.get("sociability",0.5)) < 0.3:
+		return "I'd rather keep that part of my life private, if that's okay."
+	return "That's personal, but I can share a little if we trust each other."
+
