@@ -414,7 +414,13 @@ func _update_bots(delta: float) -> void:
 			center_offset.y = 0.0
 			if center_offset.length() > 5.0:
 				cohesion = center_offset.normalized() * 0.35
-		var pursuit := (approach + side * 0.58 + separation * 0.9 + cohesion).normalized()
+		var flank_steering := Vector3.ZERO
+		if role == "flanker" and distance > 4.0:
+			var flank_target := player.global_position + Vector3(-direction.z, 0.0, direction.x) * flank_sign * 7.0 - direction * 2.0
+			var flank_offset := flank_target - bot.global_position
+			flank_offset.y = 0.0
+			flank_steering = flank_offset.normalized() * 0.7
+		var pursuit := (approach + side * 0.58 + separation * 0.9 + cohesion + flank_steering).normalized()
 		var bot_health := float(bot.get_meta("health", 100.0))
 		var suppressed_time := maxf(0.0, float(bot.get_meta("suppressed_time", 0.0)) - delta)
 		bot.set_meta("suppressed_time", suppressed_time)
