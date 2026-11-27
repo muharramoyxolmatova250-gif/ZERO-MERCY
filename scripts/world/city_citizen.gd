@@ -527,6 +527,7 @@ func _choose_next_waypoint() -> void:
 		if _building_visit_phase == "exiting":
 			var completed_goal := _last_routed_goal
 			remember_event("arrived_at_destination:" + completed_goal)
+			_record_cognitive_activity_outcome(completed_goal, true, 0.62)
 			var life_sim := get_tree().get_first_node_in_group("world_life_sim")
 			if life_sim != null and life_sim.has_method("record_event"):
 				life_sim.call("record_event", citizen_id, "visited_building:" + completed_goal)
@@ -1068,6 +1069,7 @@ func _complete_indoor_personal_action() -> void:
 	_record_personal_activity_progress(goal_id, 0.2)
 	if not goal_id.is_empty(): _self_direction.record_goal_outcome(goal_id, satisfaction, true)
 	_finalize_personal_activity_effects(goal_id, satisfaction)
+	_record_cognitive_activity_outcome(_indoor_activity, true, satisfaction)
 	_memory.append("completed_personal_activity:" + goal_id)
 	if _memory.size() > 24: _memory.pop_front()
 
