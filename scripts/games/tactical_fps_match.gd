@@ -732,6 +732,27 @@ func _update_allies(delta: float) -> void:
 			ally.set_meta("revive_progress", revive_progress)
 			ally.set_meta("fire_wait", 0.0)
 			continue
+		var incoming_grenade: Node3D
+		var grenade_distance := INF
+		for grenade in get_tree().get_nodes_in_group("enemy_grenades"):
+			if not is_instance_valid(grenade):
+				continue
+			var danger_distance := ally.global_position.distance_to(grenade.global_position)
+			if danger_distance < grenade_distance:
+				grenade_distance = danger_distance
+				incoming_grenade = grenade
+		if incoming_grenade != null and grenade_distance < 7.0:
+			var escape := ally.global_position - incoming_grenade.global_position
+			escape.y = 0.0
+			if escape.length() < 0.1:
+				escape = Vector3.RIGHT.rotated(Vector3.UP, float(ally.get_instance_id()) * 0.01)
+			var escape_direction := escape.normalized()
+			ally.velocity.x = escape_direction.x * 5.8
+			ally.velocity.z = escape_direction.z * 5.8
+			ally.look_at(ally.global_position + escape_direction, Vector3.UP)
+			ally.move_and_slide()
+			ally.set_meta("fire_wait", 0.25)
+			continue
 		var nearest: CharacterBody3D
 		var best_target_score := INF
 		var role := str(ally.get_meta("squad_role", "assault"))
