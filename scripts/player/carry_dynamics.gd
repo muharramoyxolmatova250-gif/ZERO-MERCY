@@ -285,3 +285,7 @@ func get_forward_lean() -> float:
 func get_fragile_gait_envelope() -> Vector2:
 	var factor := 0.42 if fragile else 1.0
 	return Vector2(0.035 * factor, 0.018 * factor)
+
+func get_sway_offset() -> Vector3:
+	var factor := get_sway_factor() * clampf(1.0 - stability * 0.25, 0.55, 1.0)
+	return Vector3(sin(sway_phase) * 0.014, absf(cos(sway_phase)) * 0.009, sin(sway_phase * 0.5) * 0.012) * factor
