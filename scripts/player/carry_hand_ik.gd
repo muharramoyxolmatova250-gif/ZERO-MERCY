@@ -230,3 +230,9 @@ static func get_solution_elbow(solution: Dictionary) -> Vector3:
 
 static func get_solution_shoulder(solution: Dictionary) -> Vector3:
 	return solution.get("shoulder", Vector3.ZERO)
+
+static func get_solution_segment_lengths(solution: Dictionary) -> Vector2:
+	var points := get_joint_positions(solution)
+	if points.size() < 3:
+		return Vector2.ZERO
+	return Vector2(points[0].distance_to(points[1]), points[1].distance_to(points[2]))
