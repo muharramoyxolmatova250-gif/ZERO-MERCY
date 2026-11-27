@@ -47,6 +47,7 @@ var _taxi_riding := false
 var _phone_brain_timer := 0.0
 var _phone_action_cooldown := 0.0
 var _phone_battery_visual := 1.0
+var _last_browser_topic := ""
 @export var citizen_id := ""
 @export var city_id := ""
 @export var occupation := "resident"
@@ -519,7 +520,7 @@ func _scan_social_context() -> void:
 			_social_target = candidate
 
 func get_ai_snapshot() -> Dictionary:
-	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"crowd_avoidance":true,"memories":_memory.size(),"decisions":ai_decision_count,"personality_traits":_personality_traits.duplicate(true),"long_term_goal":_long_term_goal,"decision_reason":_decision_reason,"route_nodes":route.size(),"route_target_index":_target_index,"route_goal":_last_routed_goal,"route_active":not _last_routed_goal.is_empty(),"building_visit_phase":_building_visit_phase,"indoor_activity":_indoor_activity,"indoor_activity_time":_indoor_activity_time,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0)),"phone_visible":is_using_phone,"phone_interactions":phone_interaction_count,"phone_battery":_phone_battery_visual,"phone_action_cooldown":_phone_action_cooldown}
+	return {"id":citizen_id,"goal":current_goal,"energy":_energy,"hunger":_hunger,"social":_social_need,"stress":_stress,"flee_timer":_crime_flee_timer,"last_crime_id":_last_crime_id,"crowd_avoidance":true,"memories":_memory.size(),"decisions":ai_decision_count,"personality_traits":_personality_traits.duplicate(true),"long_term_goal":_long_term_goal,"decision_reason":_decision_reason,"route_nodes":route.size(),"route_target_index":_target_index,"route_goal":_last_routed_goal,"route_active":not _last_routed_goal.is_empty(),"building_visit_phase":_building_visit_phase,"indoor_activity":_indoor_activity,"indoor_activity_time":_indoor_activity_time,"name":str(life_profile.get("name",citizen_id)),"age_years":int(life_profile.get("age_years",30)),"life_stage":str(life_profile.get("life_stage","adult")),"occupation":occupation,"marital_status":str(life_profile.get("marital_status","single")),"children":int(life_profile.get("children_count",0)),"phone_visible":is_using_phone,"phone_interactions":phone_interaction_count,"phone_battery":_phone_battery_visual,"phone_action_cooldown":_phone_action_cooldown,"last_browser_topic":_last_browser_topic}
 
 func remember_event(event_name: String) -> void:
 	_memory.append(event_name)
@@ -637,6 +638,20 @@ func _consider_autonomous_phone_use() -> void:
 			_phone_action_cooldown = _rng.randf_range(25.0, 75.0)
 			_set_phone_visible(true)
 			_pause_remaining = maxf(_pause_remaining, 0.8)
+			return
+	if free_time and _curiosity > 0.42 and entertainment_roll >= 0.70 and _rng.randf() < 0.38 and life_sim.has_method("get_phone_browser_recommendation") and life_sim.has_method("record_phone_browser_visit"):
+		var preferred_topic := "technology" if float(_personality_traits.get("curiosity", 0.5)) > 0.72 else ""
+		var page: Dictionary = life_sim.call("get_phone_browser_recommendation", citizen_id, preferred_topic)
+		if not page.is_empty():
+			var reading_time := _rng.randf_range(12.0, 95.0)
+			var topic := str(page.get("topic", "general"))
+			life_sim.call("record_phone_browser_visit", citizen_id, str(page.get("id", "")), str(page.get("title", "World page")), topic, reading_time)
+			_last_browser_topic = topic
+			remember_event("read_web_page:" + topic)
+			_phone_action_cooldown = _rng.randf_range(55.0, 130.0)
+			_phone_battery_visual = maxf(0.15, _phone_battery_visual - reading_time * 0.0007)
+			_set_phone_visible(true)
+			_pause_remaining = maxf(_pause_remaining, reading_time * 0.06)
 			return
 	if free_time and entertainment_roll < 0.52 and life_sim.has_method("play_phone_game"):
 		var games: Array = life_sim.call("get_phone_games_catalog")
