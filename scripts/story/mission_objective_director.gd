@@ -12,6 +12,7 @@ func _ready() -> void:
     MissionManager.objective_updated.connect(_on_objective_updated)
     MissionManager.objective_completed.connect(_on_objective_completed)
     MissionManager.mission_completed.connect(_on_mission_completed)
+	MissionManager.mission_failed.connect(_on_mission_failed)
     if MissionManager.active_mission_id != "":
         _spawn_current_objective()
         _start_simulation_witness_if_needed()
