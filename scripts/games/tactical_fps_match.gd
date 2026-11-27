@@ -353,6 +353,11 @@ func _fire() -> void:
 	fire_cooldown = 0.105
 	recoil_recovery = minf(0.7, recoil_recovery + 0.12)
 	camera.rotation.x = clampf(camera.rotation.x - 0.012, -1.45, 1.45)
+	for bot in bots:
+		if is_instance_valid(bot) and bot.global_position.distance_to(player.global_position) <= 34.0:
+			bot.set_meta("last_known_player_position", player.global_position)
+			bot.set_meta("awareness", 1.0)
+			bot.set_meta("search_time", 5.0)
 	var origin := camera.global_position
 	var end := origin + (-camera.global_transform.basis.z * 120.0)
 	var query := PhysicsRayQueryParameters3D.create(origin, end)
