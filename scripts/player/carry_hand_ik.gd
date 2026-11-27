@@ -353,3 +353,12 @@ static func get_solution_world(solution: Dictionary, transform: Transform3D) -> 
 			var point: Vector3 = result[key]
 			result[key] = transform * point
 	return result
+
+static func get_solution_local(solution: Dictionary, transform: Transform3D) -> Dictionary:
+	var result := solution.duplicate(true)
+	var inverse := transform.affine_inverse()
+	for key in ["shoulder", "elbow", "wrist"]:
+		if result.has(key):
+			var point: Vector3 = result[key]
+			result[key] = inverse * point
+	return result
