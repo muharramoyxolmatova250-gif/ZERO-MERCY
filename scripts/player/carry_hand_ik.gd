@@ -345,3 +345,11 @@ static func get_solution_is_stable(solution: Dictionary, maximum_error: float = 
 
 static func get_solution_lerp(from_solution: Dictionary, to_solution: Dictionary, weight: float) -> Dictionary:
 	return blend_solution(from_solution, to_solution, weight)
+
+static func get_solution_world(solution: Dictionary, transform: Transform3D) -> Dictionary:
+	var result := solution.duplicate(true)
+	for key in ["shoulder", "elbow", "wrist"]:
+		if result.has(key):
+			var point: Vector3 = result[key]
+			result[key] = transform * point
+	return result
