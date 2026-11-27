@@ -160,3 +160,32 @@ func get_evidence_by_kind(kind: String) -> Array[Dictionary]:
 
 func export_persistent_state() -> Dictionary:
 	return {"resident_id":resident_id,"evidence":evidence.duplicate(true),"hypotheses":hypotheses.duplicate(true),"experiments":experiments.duplicate(true),"suspicion":suspicion,"curiosity":curiosity}
+
+
+func restore_persistent_state(payload: Dictionary) -> void:
+	if str(payload.get("resident_id", resident_id)) != resident_id:
+		return
+	evidence.clear()
+	known_anomalies.clear()
+	for item in payload.get("evidence", []):
+		if typeof(item) != TYPE_DICTIONARY:
+			continue
+		var copy: Dictionary = item.duplicate(true)
+		var evidence_id := str(copy.get("id", ""))
+		if evidence_id.is_empty():
+			continue
+		evidence.append(copy)
+		known_anomalies[evidence_id] = true
+	while evidence.size() > MAX_EVIDENCE:
+		var removed: Dictionary = evidence.pop_front()
+		known_anomalies.erase(str(removed.get("id", "")))
+	hypotheses.clear()
+	for item in payload.get("hypotheses", []):
+		if typeof(item) == TYPE_DICTIONARY and hypotheses.size() < MAX_HYPOTHESES:
+			hypotheses.append(item.duplicate(true))
+	experiments.clear()
+	for item in payload.get("experiments", []):
+		if typeof(item) == TYPE_DICTIONARY and experiments.size() < MAX_EXPERIMENTS:
+			experiments.append(item.duplicate(true))
+	suspicion = clampf(float(payload.get("suspicion", 0.0)), 0.0, 1.0)
+	curiosity = clampf(float(payload.get("curiosity", curiosity)), 0.0, 1.0)
