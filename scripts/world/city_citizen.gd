@@ -259,6 +259,12 @@ func _decide_goal() -> void:
 	var sociability := float(_personality_traits.get("sociability", 0.5))
 	var discipline := float(_personality_traits.get("discipline", 0.5))
 	var risk_tolerance := float(_personality_traits.get("risk_tolerance", 0.5))
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	var own_standing: Dictionary = {}
+	if life_sim != null and life_sim.has_method("get_resident_reputation"):
+		own_standing = life_sim.call("get_resident_reputation", citizen_id)
+	var community_respect := float(own_standing.get("respect", 0.0))
+	var public_notoriety := float(own_standing.get("notoriety", 0.0))
 	var scores := {
 		"work": (1.0 if hour >= 8 and hour < 18 else 0.12) + (0.18 if occupation != "unemployed" else 0.0) + ambition * 0.38 + discipline * 0.2,
 		"food": _hunger * 1.65,
@@ -276,6 +282,8 @@ func _decide_goal() -> void:
 		scores["explore"] = float(scores["explore"]) + 0.3
 	elif _long_term_goal == "build_relationships":
 		scores["social"] = float(scores["social"]) + 0.3
+	scores["social"] = float(scores["social"]) + community_respect * 0.12
+	scores["avoid_crowd"] = float(scores["avoid_crowd"]) + public_notoriety * 0.16
 	if _memory.has("recently_rejected_social_contact"):
 		scores["social"] = float(scores["social"]) * 0.72
 	if _memory.has("recently_witnessed_violence"):
@@ -514,7 +522,15 @@ func _scan_social_context() -> void:
 			score -= float(bond.get("familiarity", 0.0)) * 1.1
 			score -= float(bond.get("friendship", 0.0)) * 2.2
 			score -= float(bond.get("trust", 0.0)) * 0.8
-		# A resident may prefer a familiar friend, but distance still matters.
+		if life_sim != null and life_sim.has_method("get_resident_reputation"):
+			var public_standing: Dictionary = life_sim.call("get_resident_reputation", other_id)
+			var respect := float(public_standing.get("respect", 0.0))
+			var notoriety := float(public_standing.get("notoriety", 0.0))
+			var kindness_trait := float(_personality_traits.get("kindness", 0.5))
+			var courage_trait := float(_personality_traits.get("courage", 0.5))
+			score -= respect * (1.2 + kindness_trait)
+			score += notoriety * (0.6 + (1.0 - courage_trait))
+		# Familiarity, relationship quality and public standing shape who a resident approaches.
 		if score < best_score:
 			best_score = score
 			_social_target = candidate
