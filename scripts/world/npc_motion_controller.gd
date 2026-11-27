@@ -141,3 +141,7 @@ func face_direction(actor: Node3D, direction: Vector3, delta: float) -> void:
 	if flat.length_squared() < 0.0001:
 		return
 	actor.rotation.y = lerp_angle(actor.rotation.y, atan2(-flat.x, -flat.z), get_turn_blend(delta))
+func clamp_velocity(maximum: float) -> void:
+	var limit := clampf(maximum, 0.1, 6.0)
+	if velocity.length() > limit:
+		velocity = velocity.normalized() * limit
