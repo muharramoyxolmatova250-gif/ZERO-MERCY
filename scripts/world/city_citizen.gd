@@ -80,7 +80,6 @@ func _ready() -> void:
 	if citizen_id.is_empty():
 		citizen_id = "citizen_" + str(abs(hash(str(position) + ":" + city_id)))
 	_register_life_profile()
-	_simulation_awareness.setup(citizen_id, float(_personality_traits.get("curiosity", 0.5)))
 	var spatial_index := get_tree().get_first_node_in_group("citizen_spatial_index")
 	if spatial_index != null:
 		spatial_index.call("register_citizen", self)
@@ -94,6 +93,7 @@ func _ready() -> void:
 	_target_index = 1
 	personality = _rng.randi_range(1, 5)
 	_initialize_personality()
+	_simulation_awareness.setup(citizen_id, float(_personality_traits.get("curiosity", 0.5)))
 	_decide_goal()
 
 func _register_life_profile() -> void:
