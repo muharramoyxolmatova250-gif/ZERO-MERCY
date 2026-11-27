@@ -128,6 +128,7 @@ func _on_emergency_incident_created(incident_id: String, payload: Dictionary) ->
 	var courage := float(_personality_traits.get("courage", 0.5))
 	var curiosity := float(_personality_traits.get("curiosity", 0.5))
 	_stress = clampf(_stress + severity * (0.45 + (1.0 - courage) * 0.25), 0.0, 1.0)
+	_animation_controller.trigger_reaction("scared" if courage < 0.45 else "startled", severity)
 	remember_event("nearby_emergency:" + incident_id)
 	_independent_mind.observe_world_fact("nearby_emergency:" + incident_id, "An emergency occurred nearby", severity, "emergency_dispatch", {"distance":distance,"position":incident_position})
 	if courage < 0.32:
@@ -156,6 +157,7 @@ func _on_crime_reported(crime_id: String, crime_position: Vector3, severity: int
 		_crime_flee_direction = Vector3.RIGHT.rotated(Vector3.UP, _rng.randf_range(-PI, PI))
 	_crime_flee_direction = _crime_flee_direction.normalized()
 	_stress = clampf(_stress + 0.35, 0.0, 1.0)
+	_animation_controller.trigger_reaction("scared", clampf(float(severity) / 5.0, 0.35, 1.0))
 	current_goal = "flee"
 	remember_event("witnessed_crime:" + crime_id)
 	_independent_mind.observe_world_fact("crime:" + crime_id, "A crime was reported nearby", clampf(float(severity) / 5.0, 0.2, 1.0), "crime_report", {"distance":distance,"position":crime_position})
@@ -1288,6 +1290,7 @@ func _scan_simulation_anomalies() -> void:
 	if _simulation_awareness.observe_anomaly(anomaly_id, kind, detail, strength, "direct_observation"):
 		_independent_mind.observe_world_fact("simulation_anomaly:" + anomaly_id, detail, strength, "direct_observation", {"distance":nearest_distance,"kind":kind})
 		remember_event("noticed_simulation_anomaly:" + anomaly_id)
+		_animation_controller.trigger_reaction("curious", strength)
 		_decision_reason = "noticed_unusual_world_pattern"
 
 func receive_simulation_rumor(payload: Dictionary, trust: float = 0.35) -> bool:
