@@ -97,3 +97,6 @@ static func get_stretch_warning(shoulder: Vector3, target: Vector3, upper_length
 static func get_pole_vector(shoulder: Vector3, wrist: Vector3, pole: Vector3) -> Vector3:
 	var axis := get_segment_direction(shoulder, wrist)
 	return get_bend_normal(axis, pole)
+
+static func get_segment_midpoint(start: Vector3, finish: Vector3) -> Vector3:
+	return start.lerp(finish, 0.5)
