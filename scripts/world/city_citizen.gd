@@ -724,12 +724,13 @@ func _consider_autonomous_phone_use() -> void:
 			_phone_battery_visual = maxf(0.15, _phone_battery_visual - 0.025)
 			_set_phone_visible(true)
 			return
-	if free_time and _social_need > 0.5 and life_sim.has_method("get_phone_network_feed") and _rng.randf() < 0.32:
-		var network_posts: Array = life_sim.call("get_phone_network_feed", citizen_id, 18, false)
+	if free_time and _social_need > 0.5 and life_sim.has_method("get_phone_trending_feed") and _rng.randf() < 0.32:
+		var network_posts: Array = life_sim.call("get_phone_trending_feed", citizen_id, 18)
 		var interesting_posts: Array[Dictionary] = []
 		for network_post_value in network_posts:
 			var network_post: Dictionary = network_post_value
-			if str(network_post.get("author_id", "")) != citizen_id:
+			var liked_by: Array = network_post.get("liked_by", [])
+			if str(network_post.get("author_id", "")) != citizen_id and not liked_by.has(citizen_id):
 				interesting_posts.append(network_post)
 		if not interesting_posts.is_empty():
 			var selected_post: Dictionary = interesting_posts[_rng.randi_range(0, interesting_posts.size() - 1)]
