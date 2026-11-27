@@ -1907,6 +1907,32 @@ func block_phone_contact(citizen_id: String, contact_id: String) -> bool:
     return true
 
 
+func mute_phone_contact(citizen_id: String, contact_id: String) -> bool:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty() or not resident_profiles.has(contact_id):
+        return false
+    var muted: Array = profile.get("phone_muted_contacts", [])
+    if muted.has(contact_id):
+        return false
+    muted.append(contact_id)
+    profile["phone_muted_contacts"] = muted
+    resident_profiles[citizen_id] = profile
+    _dirty = true
+    return true
+
+
+func unmute_phone_contact(citizen_id: String, contact_id: String) -> bool:
+    var profile := _ensure_phone_profile(citizen_id)
+    var muted: Array = profile.get("phone_muted_contacts", [])
+    if not muted.has(contact_id):
+        return false
+    muted.erase(contact_id)
+    profile["phone_muted_contacts"] = muted
+    resident_profiles[citizen_id] = profile
+    _dirty = true
+    return true
+
+
 func unblock_phone_contact(citizen_id: String, contact_id: String) -> bool:
     var profile := _ensure_phone_profile(citizen_id)
     var blocked: Array = profile.get("phone_blocked_contacts", [])
