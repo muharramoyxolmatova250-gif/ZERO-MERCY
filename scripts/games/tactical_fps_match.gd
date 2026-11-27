@@ -547,7 +547,7 @@ func _update_bots(delta: float) -> void:
 		var facing := -bot.global_transform.basis.z
 		var to_player := offset.normalized()
 		var inside_vision_cone := offset.length() > 0.01 and facing.dot(to_player) >= 0.574
-		var sees_player := distance < 28.0 and inside_vision_cone and not vision_hit.is_empty() and vision_hit.get("collider") == player
+		var sees_player: bool = distance < 28.0 and inside_vision_cone and not vision_hit.is_empty() and vision_hit.get("collider") == player
 		var search_time := maxf(0.0, float(bot.get_meta("search_time", 0.0)) - delta)
 		if sees_player:
 			bot.set_meta("last_known_player_position", player.global_position)
