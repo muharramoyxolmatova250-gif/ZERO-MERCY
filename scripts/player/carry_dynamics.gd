@@ -269,3 +269,6 @@ func get_debug_snapshot() -> Dictionary:
 
 func get_acceleration_response() -> float:
 	return clampf(1.0 - mass_kg * 0.018, 0.42, 1.0)
+
+func get_braking_response() -> float:
+	return clampf(1.0 - mass_kg * 0.012 - (0.08 if fragile else 0.0), 0.5, 1.0)
