@@ -365,3 +365,6 @@ static func get_solution_local(solution: Dictionary, transform: Transform3D) -> 
 
 static func get_solution_reach_margin(solution: Dictionary, upper_length: float, lower_length: float) -> float:
 	return get_reach_margin(get_solution_shoulder(solution), get_solution_endpoint(solution), upper_length, lower_length)
+
+static func get_solution_fold_margin(solution: Dictionary, upper_length: float, lower_length: float) -> float:
+	return get_fold_margin(upper_length, lower_length, get_solution_endpoint(solution), get_solution_shoulder(solution))
