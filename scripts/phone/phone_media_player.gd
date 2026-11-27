@@ -65,6 +65,8 @@ func _play_feed_item(index: int) -> void:
 	if index < 0 or index >= _feed_items.size():
 		return
 	_current_index = index
+	for i in range(_feed_buttons.size()):
+		_feed_buttons[i].modulate = Color(0.2, 1.0, 1.0) if i == index else Color.WHITE
 	open_media(_feed_items[index])
 
 func _show_previous() -> void:
@@ -90,14 +92,18 @@ func open_asset(path: String) -> bool:
 		video.stream = resource as VideoStream
 		video.show()
 		video.play()
-		status.text = "Playing video: " + path.get_file()
+		_current_path = path
+		_current_title = str(_feed_items[_current_index].get("title", _feed_items[_current_index].get("caption", path.get_file()))) if _current_index >= 0 and _current_index < _feed_items.size() else path.get_file()
+		status.text = "NOW PLAYING  •  " + _current_title + "  •  " + path.get_file()
 		return true
 	if resource is Texture2D:
 		video.stop()
 		video.hide()
 		image.texture = resource as Texture2D
 		image.show()
-		status.text = "Viewing photo: " + path.get_file()
+		_current_path = path
+		_current_title = str(_feed_items[_current_index].get("title", _feed_items[_current_index].get("caption", path.get_file()))) if _current_index >= 0 and _current_index < _feed_items.size() else path.get_file()
+		status.text = "PHOTO  •  " + _current_title + "  •  " + path.get_file()
 		return true
 	status.text = "Unsupported asset. Use a Godot video stream or image texture."
 	return false
