@@ -181,7 +181,7 @@ func _try_form_household(citizen_id: String) -> void:
     if age < 20 or age > 60 or str(profile.get("marital_status", "single")) != "single":
         return
     # Retry with a fresh world RNG roll each month; failed attempts are not permanent.
-    if _rng.randf() > 0.22:
+	if _rng.randf() > 0.22:
         return
     var candidates: Array[String] = []
     for other_id in resident_profiles.keys():
@@ -820,7 +820,7 @@ func _start_independent_life(profile: Dictionary) -> void:
 
 func _career_specialization(education: String, performance: float, rng: RandomNumberGenerator) -> String:
     var fields := JOBS.duplicate()
-    if education in ["university", "postgraduate", "graduated"]:
+	if education in ["university", "postgraduate", "graduated"]:
         fields = ["engineer", "doctor", "scientist", "designer", "pilot"]
     elif education == "technical":
         fields = ["mechanic", "courier", "security", "merchant", "engineer"]
@@ -851,7 +851,7 @@ func _consider_vehicle_purchase(profile: Dictionary) -> void:
     var total_funds := money + savings + bank_balance
     if total_funds < 18000 or float(profile.get("financial_stability", 0.0)) < 0.55:
         return
-    if _rng.randf() > 0.035:
+	if _rng.randf() > 0.035:
         return
     var vehicle_types := ["compact_car", "sedan", "motorcycle", "electric_car"]
     var vehicle_prices := {"compact_car": 18000, "sedan": 26000, "motorcycle": 8500, "electric_car": 34000}
@@ -939,7 +939,7 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     var transport_cost := _process_npc_transport(profile)
     var balance := income - rent - food_and_services - transport_cost
     profile["monthly_income"] = income
-    profile["monthly_housing_cost"] = rent
+	profile["monthly_housing_cost"] = rent
     profile["monthly_living_cost"] = food_and_services
     profile["monthly_transport_cost"] = transport_cost
     profile["money"] = maxi(0, int(profile.get("money", 0)) + balance)
@@ -1034,7 +1034,7 @@ func _consider_business_startup(profile: Dictionary) -> void:
         return
     if int(profile.get("savings", 0)) < 50000 or str(profile.get("financial_goal", "")) != "start_business":
         return
-    if _rng.randf() > 0.025:
+	if _rng.randf() > 0.025:
         return
     var citizen_id := str(profile.get("id", "unknown"))
     var business_id := "business_" + str(abs(hash(citizen_id + ":" + str(simulation_day))))
@@ -1234,7 +1234,7 @@ func _consider_home_purchase(profile: Dictionary) -> void:
     var home_price := 42000 + int(profile.get("career_level", 1)) * 1800
     if money + savings + bank_balance < home_price or stability < 0.72:
         return
-    if _rng.randf() > 0.12:
+	if _rng.randf() > 0.12:
         return
     var remaining := home_price
     var from_money := mini(money, remaining)
@@ -1249,38 +1249,38 @@ func _consider_home_purchase(profile: Dictionary) -> void:
     profile["savings"] = savings - from_savings
     profile["bank_balance"] = bank_balance - from_bank
     profile["owns_home"] = true
-    profile["home_value"] = home_price
-    profile["housing_status"] = "home_owner"
-    profile["monthly_housing_cost"] = 90
-    _append_event(profile, "purchased_home:" + str(home_price))
+	profile["home_value"] = home_price
+	profile["housing_status"] = "home_owner"
+	profile["monthly_housing_cost"] = 90
+	_append_event(profile, "purchased_home:" + str(home_price))
 
 
 func _process_job_interview(profile: Dictionary) -> void:
-    if str(profile.get("life_stage", "")) != "adult":
+	if str(profile.get("life_stage", "")) != "adult":
         return
-    var occupation := str(profile.get("occupation", "unemployed"))
-    if occupation not in ["unemployed", "resident"]:
+	var occupation := str(profile.get("occupation", "unemployed"))
+	if occupation not in ["unemployed", "resident"]:
         return
 	var education := str(profile.get("education", "secondary"))
-    var chance := 0.16 + float(profile.get("academic_performance", 0.5)) * 0.22
-    if education in ["university", "postgraduate", "graduated"]:
+	var chance := 0.16 + float(profile.get("academic_performance", 0.5)) * 0.22
+	if education in ["university", "postgraduate", "graduated"]:
         chance += 0.2
-    if _rng.randf() > clampf(chance, 0.05, 0.7):
+	if _rng.randf() > clampf(chance, 0.05, 0.7):
         profile["job_search_status"] = "application_rejected"
         _append_event(profile, "job_interview_rejected")
         return
-    var preferred := str(profile.get("career_field", ""))
+	var preferred := str(profile.get("career_field", ""))
     if preferred.is_empty() or preferred not in JOBS:
         preferred = _career_specialization(education, float(profile.get("academic_performance", 0.5)), _rng)
     profile["occupation"] = preferred
     profile["career_field"] = preferred
-    profile["job_search_status"] = "employed"
+	profile["job_search_status"] = "employed"
     profile["career_satisfaction"] = maxf(0.45, float(profile.get("career_satisfaction", 0.5)))
     _append_event(profile, "job_interview_passed:" + preferred)
 
 
 func _advance_career_month(profile: Dictionary) -> void:
-    var occupation := str(profile.get("occupation", ""))
+	var occupation := str(profile.get("occupation", ""))
     if occupation in ["", "unemployed", "retired", "student", "child"]:
         return
     var satisfaction := float(profile.get("career_satisfaction", 0.5))
