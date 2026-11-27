@@ -65,3 +65,6 @@ static func get_min_reach(upper_length: float, lower_length: float, margin: floa
 
 static func get_reach_ratio(shoulder: Vector3, target: Vector3, upper_length: float, lower_length: float) -> float:
 	return clampf(shoulder.distance_to(target) / maxf(upper_length + lower_length, 0.001), 0.0, 1.5)
+
+static func get_endpoint_error(actual_wrist: Vector3, desired_target: Vector3) -> float:
+	return actual_wrist.distance_to(desired_target)
