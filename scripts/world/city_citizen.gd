@@ -1122,7 +1122,11 @@ func revise_resident_belief(subject: String, claim: String, evidence_quality: fl
 	return _independent_mind.revise_belief(subject, claim, evidence_quality)
 
 func get_independent_mind_snapshot() -> Dictionary:
-	return _independent_mind.get_cognitive_snapshot()
+	var snapshot: Dictionary = _independent_mind.get_full_cognitive_snapshot()
+	snapshot["current_world_goal"] = current_goal
+	snapshot["current_action_plan"] = _action_planner.get_plan_snapshot()
+	snapshot["cognitive_plan_id"] = _cognitive_plan_id
+	return snapshot
 
 func reflect_on_recent_life(topic: String = "") -> Dictionary:
 	return _independent_mind.simulate_reflection({"topic":topic,"goal":current_goal,"stress":_stress})
@@ -1187,8 +1191,11 @@ func _record_cognitive_activity_outcome(activity: String, success: bool, satisfa
 	_independent_mind.reflect_on_outcome(activity, success, satisfaction, {"goal":current_goal,"position":global_position})
 	if _cognitive_plan_id >= 0:
 		var advanced: Dictionary = _independent_mind.advance_plan(_cognitive_plan_id, success, "world_activity:" + activity)
-		if not advanced.is_empty() and str(advanced.get("status", "")) == "completed":
+		var plan_status := str(advanced.get("status", ""))
+		if plan_status == "completed":
 			var completed_goal_id := int(advanced.get("goal_id", -1))
 			if completed_goal_id >= 0:
-				_independent_mind.update_goal_progress(completed_goal_id, 0.25)
-	_cognitive_plan_id = -1
+				_independent_mind.complete_goal(completed_goal_id, "world_plan_completed:" + activity)
+			_cognitive_plan_id = -1
+		elif plan_status == "interrupted" or advanced.is_empty():
+			_cognitive_plan_id = -1
