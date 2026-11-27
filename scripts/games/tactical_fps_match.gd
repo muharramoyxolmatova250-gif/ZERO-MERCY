@@ -567,8 +567,14 @@ func _update_bots(delta: float) -> void:
 		bot.velocity.x = pursuit.x * move_speed
 		bot.velocity.z = pursuit.z * move_speed
 		bot.move_and_slide()
-		var reload_time := maxf(0.0, float(bot.get_meta("reload_time", 0.0)) - delta)
+		var previous_reload_time := float(bot.get_meta("reload_time", 0.0))
+		var reload_time := maxf(0.0, previous_reload_time - delta)
+		if previous_reload_time > 0.0 and reload_time <= 0.0:
+			bot.set_meta("magazine_ammo", 18)
 		bot.set_meta("reload_time", reload_time)
+		var weapon_status := bot.get_node_or_null("WeaponStatus") as Label3D
+		if weapon_status != null:
+			weapon_status.text = "RELOADING" if reload_time > 0.0 else "OPERATOR %d/18" % int(bot.get_meta("magazine_ammo", 18))
 		var wait := float(bot.get_meta("fire_wait", 1.0)) - delta
 		var enemy_target: Node3D = player
 		var enemy_target_distance := bot.global_position.distance_to(player.global_position)
