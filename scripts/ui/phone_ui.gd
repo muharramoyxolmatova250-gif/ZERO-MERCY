@@ -1143,6 +1143,10 @@ func _build_social_network() -> void:
         _add_stat("RESIDENT ID", owner_id)
         _add_stat("OCCUPATION", str(profile.get("occupation", "Resident")))
         _add_stat("CITY", str(profile.get("city", "Unknown")))
+        var own_standing: Dictionary = _life.call("get_resident_reputation", owner_id) if _life.has_method("get_resident_reputation") else {}
+        _add_stat("PUBLIC STANDING", str(own_standing.get("standing", "ordinary")).to_upper())
+        _add_stat("REPUTATION", str(snappedf(float(own_standing.get("reputation", 0.0)) * 100.0) / 100.0))
+        _add_stat("COMMUNITY RESPECT", str(snappedf(float(own_standing.get("respect", 0.0)) * 100.0) / 100.0))
         _add_stat("TOTAL LIKES", str(profile.get("total_likes", 0)))
         _add_stat("TOTAL COMMENTS", str(profile.get("total_comments", 0)))
         _add_section_title("FOLLOWING")
@@ -1262,7 +1266,9 @@ func _build_social_discover(owner_id: String) -> void:
     for resident in suggestions:
         var row := HBoxContainer.new()
         var details := Label.new()
-        details.text = str(resident.get("name", "Resident")) + "\\n" + str(resident.get("occupation", "Resident")) + "  •  " + str(resident.get("followers", 0)) + " followers"
+        var resident_id := str(resident.get("id", ""))
+        var standing: Dictionary = _life.call("get_resident_reputation", resident_id) if _life.has_method("get_resident_reputation") else {}
+        details.text = str(resident.get("name", "Resident")) + "\\n" + str(resident.get("occupation", "Resident")) + "  •  " + str(resident.get("followers", 0)) + " followers" + "\\n" + str(standing.get("standing", "ordinary")).to_upper() + "  •  INFLUENCE " + str(standing.get("influence", 0))
         details.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
         row.add_child(details)
