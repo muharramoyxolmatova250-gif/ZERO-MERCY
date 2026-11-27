@@ -115,3 +115,11 @@ func get_speed_ratio() -> float:
 func choose_sidestep(offset: Vector3) -> Vector3:
 	var side := Vector3(-offset.z, 0.0, offset.x) * sidestep_sign
 	return side.normalized() if side.length_squared() > 0.0001 else Vector3.ZERO
+func update_stuck_detection(position: Vector3, delta: float) -> bool:
+	var dt := _safe_delta(delta)
+	if last_position.distance_squared_to(position) < 0.0004 and velocity.length() > 0.18:
+		stuck_time += dt
+	else:
+		stuck_time = maxf(0.0, stuck_time - dt * 2.0)
+	last_position = position
+	return stuck_time > 1.1
