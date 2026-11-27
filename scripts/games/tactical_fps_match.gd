@@ -379,6 +379,7 @@ func _physics_process(delta: float) -> void:
 		player.velocity.y -= 18.0 * delta
 	player.move_and_slide()
 	_update_bots(delta)
+	_update_allies(delta)
 	_update_hud()
 
 func _fire() -> void:
@@ -558,6 +559,63 @@ func _update_bots(delta: float) -> void:
 		bot.set_meta("fire_wait", wait)
 
 	# Round outcome is also actionable on touch-only devices.
+func _update_allies(delta: float) -> void:
+	for ally in allies:
+		if not is_instance_valid(ally):
+			continue
+		var nearest: CharacterBody3D
+		var nearest_distance := 36.0
+		for enemy in bots:
+			if not is_instance_valid(enemy):
+				continue
+			var enemy_distance := ally.global_position.distance_to(enemy.global_position)
+			if enemy_distance < nearest_distance:
+				nearest = enemy
+				nearest_distance = enemy_distance
+		var wait := maxf(0.0, float(ally.get_meta("fire_wait", 0.5)) - delta)
+		if nearest != null:
+			var aim_point := nearest.global_position + Vector3.UP * 0.55
+			var aim_offset := aim_point - (ally.global_position + Vector3.UP * 0.6)
+			var flat_aim := Vector3(aim_offset.x, 0.0, aim_offset.z)
+			if flat_aim.length() > 0.1:
+				ally.look_at(ally.global_position + flat_aim, Vector3.UP)
+			var sight := PhysicsRayQueryParameters3D.create(ally.global_position + Vector3.UP * 0.6, aim_point)
+			sight.exclude = [ally.get_rid()]
+			var hit := get_world_3d().direct_space_state.intersect_ray(sight)
+			if wait <= 0.0 and not hit.is_empty() and hit.get("collider") == nearest:
+				var skill := float(ally.get_meta("combat_skill", 0.72))
+				var damage := 10.0 + skill * 10.0
+				var remaining := float(nearest.get_meta("health", 100.0)) - damage
+				nearest.set_meta("health", remaining)
+				wait = 1.25 - skill * 0.45
+				if remaining <= 0.0:
+					nearest.queue_free()
+					bots.erase(nearest)
+					score += 1
+			elif hit.is_empty() or hit.get("collider") != nearest:
+				wait = minf(wait, 0.2)
+		else:
+			var slot := int(ally.get_meta("squad_slot", 0))
+			var side := -1.0 if slot % 2 == 0 else 1.0
+			var row := float(slot / 2)
+			var follow_point := player.global_position + player.global_transform.basis * Vector3(side * 2.0, 0.0, 2.8 + row * 1.8)
+			var follow_offset := follow_point - ally.global_position
+			follow_offset.y = 0.0
+			if follow_offset.length() > 1.4:
+				var follow_direction := follow_offset.normalized()
+				ally.velocity.x = follow_direction.x * 4.2
+				ally.velocity.z = follow_direction.z * 4.2
+				ally.look_at(Vector3(follow_point.x, ally.global_position.y, follow_point.z), Vector3.UP)
+			else:
+				ally.velocity.x = move_toward(ally.velocity.x, 0.0, 8.0 * delta)
+				ally.velocity.z = move_toward(ally.velocity.z, 0.0, 8.0 * delta)
+		if nearest != null:
+			ally.velocity.x = move_toward(ally.velocity.x, 0.0, 8.0 * delta)
+			ally.velocity.z = move_toward(ally.velocity.z, 0.0, 8.0 * delta)
+		ally.velocity.y = 0.0
+		ally.move_and_slide()
+		ally.set_meta("fire_wait", wait)
+
 func _finish_round() -> void:
 	round_finished = true
 	if restart_button != null:
