@@ -388,8 +388,25 @@ func _update_bots(delta: float) -> void:
 		var offset := player.global_position - bot.global_position
 		offset.y = 0.0
 		var distance := offset.length()
-		bot.look_at(Vector3(player.global_position.x, bot.global_position.y, player.global_position.z), Vector3.UP)
-		var direction := offset.normalized()
+		var vision_origin := bot.global_position + Vector3.UP * 0.55
+		var vision_query := PhysicsRayQueryParameters3D.create(vision_origin, camera.global_position)
+		vision_query.exclude = [bot.get_rid()]
+		var vision_hit := get_world_3d().direct_space_state.intersect_ray(vision_query)
+		var sees_player := distance < 28.0 and not vision_hit.is_empty() and vision_hit.get("collider") == player
+		var search_time := maxf(0.0, float(bot.get_meta("search_time", 0.0)) - delta)
+		if sees_player:
+			bot.set_meta("last_known_player_position", player.global_position)
+			bot.set_meta("awareness", 1.0)
+			search_time = 4.0
+		else:
+			bot.set_meta("awareness", maxf(0.0, float(bot.get_meta("awareness", 0.0)) - delta * 0.2))
+		bot.set_meta("search_time", search_time)
+		var remembered_position: Vector3 = bot.get_meta("last_known_player_position", player.global_position)
+		var steering_target := player.global_position if sees_player else remembered_position
+		var steering_offset := steering_target - bot.global_position
+		steering_offset.y = 0.0
+		bot.look_at(Vector3(steering_target.x, bot.global_position.y, steering_target.z), Vector3.UP)
+		var direction := steering_offset.normalized()
 		var phase := float(bot.get_meta("strafe_phase", 0.0))
 		var role := str(bot.get_meta("squad_role", "support"))
 		var flank_sign := -1.0 if int(bot.get_meta("squad_slot", 0)) % 2 == 0 else 1.0
