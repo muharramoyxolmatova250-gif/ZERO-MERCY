@@ -626,6 +626,16 @@ func _update_bots(delta: float) -> void:
 		bot.velocity.x = pursuit.x * move_speed
 		bot.velocity.z = pursuit.z * move_speed
 		bot.move_and_slide()
+		var grenade_cooldown := maxf(0.0, float(bot.get_meta("grenade_cooldown", 8.0)) - delta)
+		bot.set_meta("grenade_cooldown", grenade_cooldown)
+		var grenade_target := player.global_position
+		var cluster_count := 1
+		for squad_target in allies:
+			if is_instance_valid(squad_target) and not bool(squad_target.get_meta("downed", false)) and squad_target.global_position.distance_to(player.global_position) < 4.5:
+				cluster_count += 1
+		if distance > 5.0 and distance < 17.0 and cluster_count >= 2 and grenade_cooldown <= 0.0 and sees_player:
+			_throw_tactical_grenade(bot, grenade_target)
+			bot.set_meta("grenade_cooldown", 13.0)
 		var previous_reload_time := float(bot.get_meta("reload_time", 0.0))
 		var reload_time := maxf(0.0, previous_reload_time - delta)
 		if previous_reload_time > 0.0 and reload_time <= 0.0:
