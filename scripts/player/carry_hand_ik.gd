@@ -287,3 +287,7 @@ static func get_solution_quality(solution: Dictionary, desired_target: Vector3) 
 	var elbow := get_solution_elbow(solution)
 	var wrist := get_solution_endpoint(solution)
 	return get_pose_quality(shoulder, elbow, wrist, desired_target)
+
+static func get_segment_transform(start: Vector3, finish: Vector3, up_hint: Vector3 = Vector3.UP) -> Transform3D:
+	var basis := get_chain_orientation(start, finish, up_hint)
+	return Transform3D(basis, get_segment_midpoint(start, finish))
