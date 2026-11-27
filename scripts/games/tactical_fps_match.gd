@@ -583,6 +583,12 @@ func _update_allies(delta: float) -> void:
 	for ally in allies:
 		if not is_instance_valid(ally):
 			continue
+		var ally_health := float(ally.get_meta("health", 100.0))
+		var downed := bool(ally.get_meta("downed", false))
+		if downed:
+			ally.velocity = Vector3.ZERO
+			ally.set_meta("fire_wait", 0.0)
+			continue
 		var nearest: CharacterBody3D
 		var nearest_distance := 36.0
 		for enemy in bots:
