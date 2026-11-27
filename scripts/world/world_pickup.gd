@@ -4,11 +4,17 @@ extends StaticBody3D
 @export var glow_color := Color(0.0,0.8,1.0)
 @export var grip_offset := Vector3(0.0, -0.06, -0.13)
 @export var grip_rotation := Vector3.ZERO
+@export_range(0.1, 80.0, 0.1) var carry_mass_kg := 2.0
+@export var is_fragile := false
+@export var requires_careful_carry := false
 var being_held := false
 func _ready() -> void:
  add_to_group("world_pickup")
  set_meta("grip_offset", grip_offset)
  set_meta("grip_rotation", grip_rotation)
+ set_meta("carry_mass_kg", carry_mass_kg)
+ set_meta("is_fragile", is_fragile)
+ set_meta("requires_careful_carry", requires_careful_carry)
  var mesh := MeshInstance3D.new()
  var shape_mesh := BoxMesh.new()
  shape_mesh.size = Vector3(0.42,0.42,0.42)
