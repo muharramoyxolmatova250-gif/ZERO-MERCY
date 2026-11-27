@@ -425,6 +425,14 @@ func _decide_goal() -> void:
 
 	_sync_independent_goal_state(cognition_context)
 	_apply_independent_goal_bias(scores)
+	var deliberation_options: Array[Dictionary] = []
+	for activity_name in scores:
+		var normalized_score := clampf(float(scores[activity_name]) / 2.2, 0.0, 1.0)
+		deliberation_options.append({"action":str(activity_name),"personal_fit":normalized_score,"reward":normalized_score,"risk":_stress * 0.65,"effort":1.0-_energy,"kind":"social" if activity_name == "social" else "activity"})
+	var deliberation: Dictionary = _independent_mind.deliberate(deliberation_options, cognition_context)
+	var deliberated_activity := str(deliberation.get("best", {}).get("action", ""))
+	if scores.has(deliberated_activity):
+		scores[deliberated_activity] = float(scores[deliberated_activity]) + 0.12
 	var cognitive_drives: Array[Dictionary] = _independent_mind.evaluate_need_drives()
 	for drive in cognitive_drives:
 		var drive_key := str(drive.get("need", ""))
