@@ -330,3 +330,14 @@ func plan_complexity(context: Dictionary = {}) -> int:
  if urgency > 0.8:
   base = mini(base,3)
  return clampi(base,2,7)
+
+
+func replan_if_world_changed(goal: String, old_context: Dictionary, new_context: Dictionary) -> bool:
+ for key in ["danger","hunger","energy","weather","target_available","urgent_need"]:
+  if old_context.get(key,null) != new_context.get(key,null):
+   active_plan.clear()
+   plan_index = 0
+   plan_reason = "world_state_changed:" + key
+   build_plan(goal,new_context)
+   return true
+ return false
