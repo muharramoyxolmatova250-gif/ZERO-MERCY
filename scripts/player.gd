@@ -697,6 +697,8 @@ func _finish_pickup() -> void:
 			_held_item.call("set_being_held", true)
 	if is_instance_valid(_cybernetic_hands) and _cybernetic_hands.has_method("set_carry_profile"):
 		_cybernetic_hands.call("set_carry_profile", _carried_mass_kg, _carried_item_fragile)
+	if is_instance_valid(_cybernetic_hands) and _cybernetic_hands.has_method("set_carry_object"):
+		_cybernetic_hands.call("set_carry_object", _held_item)
 	if is_instance_valid(_weapon_visual):
 		_weapon_visual.visible = false
 	_pickup_in_progress = false
