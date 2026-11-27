@@ -370,3 +370,73 @@ func should_reconsider_goal(context: Dictionary = {}) -> bool:
 	if not goal_matches_world_state(active_personal_goal,context): return true
 	if bool(context.get("urgent_need",false)) or bool(context.get("major_event",false)): return true
 	return float(context.get("goal_satisfaction",0.5)) < 0.12
+
+
+func goal_is_repetitive(goal_id: String, window: int = 6) -> bool:
+	var seen := 0
+	for record in completed_goals:
+		if str(record.get("id",""))==goal_id: seen+=1
+	return seen >= maxi(2,window)
+
+func set_personal_boundary(boundary: String, enabled: bool = true) -> void:
+	if boundary.is_empty(): return
+	var boundaries: Dictionary = preferences.get("boundaries",{})
+	boundaries[boundary]=enabled
+	preferences["boundaries"]=boundaries
+
+func respects_goal_boundaries(goal: Dictionary, context: Dictionary = {}) -> bool:
+	var boundaries: Dictionary = preferences.get("boundaries",{})
+	var category := str(goal.get("need",""))
+	if bool(boundaries.get(category,false)): return false
+	if bool(context.get("sleeping",false)) or bool(context.get("injured",false)): return false
+	if bool(context.get("danger",false)) and str(goal.get("need",""))=="discovery": return false
+	return true
+
+func discover_personal_values(events: Array[Dictionary]) -> Dictionary:
+	var values := {"family":0.0,"freedom":0.0,"security":0.0,"knowledge":0.0,"community":0.0}
+	for event in events:
+		var kind := str(event.get("kind",""))
+		var impact := clampf(float(event.get("impact",0.0)),-1.0,1.0)
+		if kind in ["family","friend","child"]: values.family+=impact
+		elif kind in ["restriction","choice","travel"]: values.freedom+=impact
+		elif kind in ["danger","loss","debt"]: values.security+=impact
+		elif kind in ["study","discovery","skill"]: values.knowledge+=impact
+		elif kind in ["help","volunteer","community"]: values.community+=impact
+	for key in values: values[key]=clampf(float(values[key]),-1.0,1.0)
+	preferences["personal_values"]=values
+	return values
+
+func choose_value_aligned_goal(context: Dictionary = {}) -> Dictionary:
+	var values: Dictionary = preferences.get("personal_values",{})
+	var candidates: Array[Dictionary] = []
+	for goal in GOAL_CATALOG:
+		var need := str(goal.get("need",""))
+		var value_key := "knowledge" if need in ["growth","discovery"] else ("family" if need=="belonging" else ("security" if need=="security" else ("community" if need=="purpose" else "freedom")))
+		var candidate := goal.duplicate(true)
+		candidate["interest"]=float(values.get(value_key,0.0))*0.25+0.25
+		candidates.append(candidate)
+	return choose_from_candidates(candidates,context)
+
+func update_social_preference(person_id: String, interaction_result: float) -> void:
+	if person_id.is_empty(): return
+	var key := "person_"+person_id
+	preferences[key]=clampf(float(preferences.get(key,0.0))*0.75+(clampf(interaction_result,0.0,1.0)-0.5)*0.5,-1.0,1.0)
+
+func choose_environmental_target(targets: Array[Dictionary], context: Dictionary = {}) -> Dictionary:
+	var best: Dictionary={}
+	var top := -INF
+	for target in targets:
+		var score := float(target.get("interest",0.0))*0.35+float(target.get("usefulness",0.0))*0.3
+		score += float(preferences.get("target_"+str(target.get("id","")),0.0))*0.2
+		score -= float(target.get("risk",0.0))*(1.0-_trait("risk_tolerance"))*0.35
+		score -= float(target.get("distance",0.0))/250.0
+		if score>top: top=score;best=target.duplicate(true)
+	best["score"]=top
+	return best
+
+func goal_completion_reward(goal: Dictionary, result: Dictionary = {}) -> float:
+	var reward := float(result.get("satisfaction",0.5))*0.55
+	reward += float(result.get("progress",0.0))*0.25
+	reward += _trait("discipline")*0.1
+	if bool(result.get("helped_other",false)): reward += _trait("kindness")*0.1
+	return clampf(reward,0.0,1.0)
