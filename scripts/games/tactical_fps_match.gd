@@ -475,7 +475,9 @@ func _throw_tactical_grenade(thrower: CharacterBody3D, target_position: Vector3)
 	add_child(grenade)
 	var landing := target_position + Vector3.UP * 0.2
 	var flight := create_tween()
-	flight.tween_property(grenade, "global_position", landing, 1.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	var apex := landing.lerp(grenade.global_position, 0.5) + Vector3.UP * 2.8
+	flight.tween_property(grenade, "global_position", apex, 0.52).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	flight.tween_property(grenade, "global_position", landing, 0.63).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	await get_tree().create_timer(1.15).timeout
 	if is_instance_valid(grenade):
 		var blast_position := grenade.global_position
