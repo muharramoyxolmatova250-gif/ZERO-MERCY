@@ -1077,3 +1077,6 @@ func _finalize_personal_activity_effects(goal_id: String, satisfaction: float) -
 	_record_autonomous_family_time(goal_id)
 	_record_autonomous_social_progress(goal_id)
 	_remember_personal_activity_outcome(goal_id, satisfaction)
+
+func get_indoor_action_snapshot() -> Dictionary:
+	return {"activity":_indoor_activity,"elapsed":_indoor_activity_time,"completed":_indoor_action_completed,"token":_indoor_action_token,"personal_goal":_get_active_personal_goal_id(),"context":_get_indoor_action_context()}
