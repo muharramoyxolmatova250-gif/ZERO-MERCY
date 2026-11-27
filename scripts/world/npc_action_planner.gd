@@ -243,3 +243,12 @@ func rank_urgent_goals(goals: Array[Dictionary], context: Dictionary = {}) -> Ar
   ranked.append(item)
  ranked.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.priority)>float(b.priority))
  return ranked
+
+
+func mark_step_result(action: String, success: bool, detail: String = "") -> void:
+ for index in range(active_plan.size()):
+  if str(active_plan[index].get("action","")) == action and str(active_plan[index].get("status","")) == "planned":
+   active_plan[index]["status"] = "completed" if success else "failed"
+   active_plan[index]["detail"] = detail
+   learn_outcome(action,0.82 if success else 0.2)
+   break
