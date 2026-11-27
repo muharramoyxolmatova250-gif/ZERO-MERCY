@@ -42,6 +42,17 @@ func set_phone_open(open: bool) -> void:
     Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if open else Input.MOUSE_MODE_CAPTURED
     if open:
         _refresh_content()
+        if _panel != null:
+            _panel.pivot_offset = _panel.size * 0.5
+            _panel.scale = Vector2(0.94, 0.94)
+            _panel.modulate.a = 0.65
+            var boot_tween := create_tween()
+            boot_tween.set_parallel(true)
+            boot_tween.tween_property(_panel, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+            boot_tween.tween_property(_panel, "modulate:a", 1.0, 0.18)
+    if not open and _panel != null:
+        _panel.scale = Vector2.ONE
+        _panel.modulate.a = 1.0
 
 func is_phone_open() -> bool:
     return visible
