@@ -126,3 +126,9 @@ func update_stuck_detection(position: Vector3, delta: float) -> bool:
 func get_recovery_direction(forward: Vector3) -> Vector3:
 	var side := Vector3(-forward.z, 0.0, forward.x) * sidestep_sign
 	return (side + forward * 0.25).normalized()
+func get_urgency_speed(urgent: bool, cautious: bool) -> float:
+	if urgent:
+		return preferred_speed * 1.55
+	if cautious:
+		return preferred_speed * 0.68
+	return preferred_speed
