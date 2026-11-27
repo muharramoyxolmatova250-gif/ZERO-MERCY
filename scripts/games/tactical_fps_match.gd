@@ -401,8 +401,9 @@ func _update_bots(delta: float) -> void:
 					best_cover = retreat_point
 			var cover_direction := (best_cover - bot.global_position).normalized()
 			pursuit = cover_direction
-		bot.velocity.x = pursuit.x * (2.5 if bot_health <= 65.0 else 2.15)
-		bot.velocity.z = pursuit.z * 2.15
+		var move_speed := 2.5 if bot_health <= 65.0 else 2.15
+		bot.velocity.x = pursuit.x * move_speed
+		bot.velocity.z = pursuit.z * move_speed
 		bot.move_and_slide()
 		var wait := float(bot.get_meta("fire_wait", 1.0)) - delta
 		if wait <= 0.0 and distance < 24.0:
