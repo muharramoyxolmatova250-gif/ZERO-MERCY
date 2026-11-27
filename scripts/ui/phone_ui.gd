@@ -16,6 +16,10 @@ var _party_game_id := "tactical_breach"
 var _last_party_result: Dictionary = {}
 var _phone_camera = preload("res://scripts/phone/phone_camera.gd").new()
 var _phone_system = preload("res://scripts/phone/phone_system.gd").new()
+var _phone_browser = preload("res://scripts/phone/phone_browser.gd").new()
+var _browser_query := ""
+var _browser_page_id := ""
+var _browser_status := "READY"
 var _last_camera_message := "READY TO CAPTURE"
 var _last_call_message := ""
 
@@ -160,7 +164,7 @@ func _build_phone() -> void:
     tabs.add_theme_constant_override("separation", 4)
     tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     tab_scroll.add_child(tabs)
-    for tab in ["home", "feed", "media", "games", "news", "contacts", "sms", "notifications", "life", "missions", "map", "camera", "gallery", "settings", "calls"]:
+    for tab in ["home", "feed", "media", "games", "news", "contacts", "sms", "notifications", "life", "missions", "map", "camera", "gallery", "settings", "calls", "browser"]:
         var button := Button.new()
         button.text = tab.to_upper()
         button.custom_minimum_size = Vector2(76, 36)
@@ -266,6 +270,8 @@ func _refresh_content() -> void:
             _build_phone_settings()
         "calls":
             _build_phone_calls()
+        "browser":
+            _build_browser()
 
 
 func _build_home_screen() -> void:
@@ -301,6 +307,7 @@ func _build_home_screen() -> void:
     _add_phone_app_tile(grid, "GALLERY", "▧", "gallery")
     _add_phone_app_tile(grid, "SETTINGS", "⚙", "settings")
     _add_phone_app_tile(grid, "CALLS", "☎", "calls")
+    _add_phone_app_tile(grid, "BROWSER", "◎", "browser")
 
 
 func _add_phone_app_tile(parent: GridContainer, title: String, glyph: String, target_tab: String) -> void:
