@@ -9,7 +9,9 @@ var _arm_pivots: Array[Node3D] = []
 var _finger_hinges: Array[Node3D] = []
 var _thumb_hinges: Array[Node3D] = []
 var _right_arm: Node3D
+var _left_arm: Node3D
 var _grip_anchor: Marker3D
+var _carry_object: Node3D
 var _reach_rotation := Vector3.ZERO
 var _reach_weight := 0.0
 var _is_gripping := false
@@ -50,6 +52,11 @@ func _process(delta: float) -> void:
 				target = Vector3(-0.24 - minf(_carry_mass_kg * 0.006, 0.16), 0.0, 0.045)
 			else:
 				target = Vector3(-0.16 - minf(_carry_mass_kg * 0.004, 0.10), 0.0, -0.025)
+				if _carry_mass_kg >= 8.0 and is_instance_valid(_carry_object):
+					var target_local := to_local(_carry_object.global_position) - pivot.position
+					var target_horizontal := Vector2(target_local.x, target_local.z).length()
+					target.x = clampf(atan2(target_local.y, maxf(0.001, target_horizontal)) + 0.45, -0.8, 0.55)
+					target.y = clampf(atan2(-target_local.z, target_local.x), -0.95, 0.95)
 		else:
 			if side > 0.0:
 				target += _reach_rotation * _reach_weight
@@ -74,6 +81,8 @@ func _build_arm(side: float, right_hand: bool) -> void:
 		_grip_anchor.name = "ObjectGripAnchor"
 		_grip_anchor.position = Vector3(side * 0.69, -0.47, -0.11)
 		arm.add_child(_grip_anchor)
+	else:
+		_left_arm = arm
 	_arm_pivots.append(arm)
 
 	# Every part is positioned relative to the shoulder pivot.
@@ -148,10 +157,14 @@ func set_carry_profile(mass_kg: float, fragile: bool = false) -> void:
 	_carry_mass_kg = maxf(0.0, mass_kg)
 	_carry_fragile = fragile
 
+func set_carry_object(item: Node3D) -> void:
+	_carry_object = item
+
 func release_object() -> void:
 	_is_gripping = false
 	_carry_mass_kg = 0.0
 	_carry_fragile = false
+	_carry_object = null
 	_reach_weight = 0.0
 	_reach_rotation = Vector3.ZERO
 
