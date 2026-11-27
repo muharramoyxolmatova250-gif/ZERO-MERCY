@@ -64,6 +64,9 @@ func _ready() -> void:
 		spatial_index.call("register_citizen", self)
 	if has_node("/root/GameSession"):
 		GameSession.crime_reported.connect(_on_crime_reported)
+	var emergency_dispatch := get_tree().get_first_node_in_group("emergency_dispatch_ai")
+	if emergency_dispatch != null and emergency_dispatch.has_signal("incident_created"):
+		emergency_dispatch.incident_created.connect(_on_emergency_incident_created)
 	if route.size() < 2:
 		route = PackedVector3Array([Vector3(-5,0,-5), Vector3(5,0,-5), Vector3(5,0,5), Vector3(-5,0,5)])
 	_target_index = 1
@@ -80,6 +83,28 @@ func _register_life_profile() -> void:
 	occupation = str(life_profile.get("occupation", occupation))
 	_last_visual_age = -1
 
+
+
+func _on_emergency_incident_created(incident_id: String, payload: Dictionary) -> void:
+	var incident_position: Vector3 = payload.get("position", global_position)
+	var distance := global_position.distance_to(incident_position)
+	if distance > 38.0:
+		return
+	var severity := float(payload.get("severity", 0.5))
+	var courage := float(_personality_traits.get("courage", 0.5))
+	var curiosity := float(_personality_traits.get("curiosity", 0.5))
+	_stress = clampf(_stress + severity * (0.45 + (1.0 - courage) * 0.25), 0.0, 1.0)
+	remember_event("nearby_emergency:" + incident_id)
+	if courage < 0.32:
+		_crime_flee_timer = maxf(_crime_flee_timer, 3.0 + severity * 5.0)
+		_crime_flee_direction = global_position - incident_position
+		_crime_flee_direction.y = 0.0
+		if _crime_flee_direction.length_squared() > 0.01:
+			_crime_flee_direction = _crime_flee_direction.normalized()
+		current_goal = "flee"
+	elif curiosity > 0.82 and severity < 0.45:
+		current_goal = "avoid_crowd"
+		_decision_reason = "observed_low_risk_emergency_from_safe_distance"
 
 func _on_crime_reported(crime_id: String, crime_position: Vector3, severity: int) -> void:
 	var distance := global_position.distance_to(crime_position)
