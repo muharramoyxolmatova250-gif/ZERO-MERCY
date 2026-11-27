@@ -1574,7 +1574,10 @@ func _ensure_phone_profile(citizen_id: String) -> Dictionary:
         "public_reputation":0.0, "public_notoriety":0.0, "community_respect":0.0,
         "phone_game_stats":{}, "phone_topic_interests":{},
         "phone_saved_media":[], "phone_last_used_day":simulation_day,
-        "phone_battery":100.0, "phone_privacy":"friends"
+        "phone_battery":100.0, "phone_privacy":"friends",
+        "phone_blocked_contacts":[], "phone_muted_contacts":[], "phone_contact_aliases":{}
+    }
+    for key in defaults:
     }
     for key in defaults:
         if not profile.has(key):
