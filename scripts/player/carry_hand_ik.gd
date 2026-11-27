@@ -274,3 +274,7 @@ static func get_joint_angle_limit(angle: float, minimum: float, maximum: float) 
 
 static func get_bend_plane_distance(point: Vector3, plane: Plane) -> float:
 	return absf(plane.distance_to(point))
+
+static func project_direction_on_plane(direction: Vector3, plane_normal: Vector3) -> Vector3:
+	var normal := safe_normalize(plane_normal, Vector3.UP)
+	return safe_normalize(direction - normal * direction.dot(normal), Vector3.FORWARD)
