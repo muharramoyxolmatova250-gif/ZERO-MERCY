@@ -173,6 +173,24 @@ func _build_phone() -> void:
     footer.add_theme_font_size_override("font_size", 9)
     outer.add_child(footer)
 
+func _update_phone_system_bar() -> void:
+    if _phone_clock_label != null:
+        _phone_clock_label.text = Time.get_time_string_from_system()
+    if _phone_battery_label != null:
+        var battery := 100.0
+        var owner_id := _get_phone_owner_id()
+        if owner_id != "" and _life != null and _life.has_method("get_phone_snapshot"):
+            var phone: Dictionary = _life.call("get_phone_snapshot", owner_id)
+            battery = clampf(float(phone.get("battery", 100.0)), 0.0, 100.0)
+        _phone_battery_label.text = "▣ " + str(roundi(battery)) + "%"
+        _phone_battery_label.add_theme_color_override("font_color", Color(1.0, 0.36, 0.32) if battery < 15.0 else Color(0.55, 0.94, 0.72))
+    if _phone_network_label != null:
+        var owner_id := _get_phone_owner_id()
+        var connected := _life != null and owner_id != ""
+        _phone_network_label.text = "▰ 5G" if connected else "◌ OFFLINE"
+        _phone_network_label.add_theme_color_override("font_color", Color(0.2, 0.9, 0.78) if connected else Color(1.0, 0.55, 0.35))
+
+
 func _make_phone_button_style(fill: Color, edge: Color) -> StyleBoxFlat:
     var style := StyleBoxFlat.new()
     style.bg_color = fill
