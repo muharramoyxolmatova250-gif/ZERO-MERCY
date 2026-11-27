@@ -57,33 +57,17 @@ func _generate_initial_aspirations(profile: Dictionary) -> void:
 		active_personal_goal = aspirations[0].duplicate(true)
 
 func choose_personal_goal(context: Dictionary = {}) -> Dictionary:
-	decision_count += 1
-	var best: Dictionary = {}
-	var best_score := -INF
-	for candidate in GOAL_CATALOG:
-		var goal_id := str(candidate.get("id", ""))
-		if rejected_goals.has(goal_id):
-			continue
-		var drive := str(candidate.get("drive", "curiosity"))
-		var score := _trait(drive) * float(candidate.get("weight", 0.5))
-		score += float(preferences.get(goal_id, 0.0)) * 0.3
-		score += _context_bonus(candidate, context)
-		if str(active_personal_goal.get("id", "")) == goal_id:
-			score -= 0.08
-		score += _rng.randf_range(0.0, 0.09)
-		if score > best_score:
-			best_score = score
-			best = candidate.duplicate(true)
-	if best.is_empty():
+	var selected := select_next_autonomous_intention(context)
+	if selected.is_empty():
+		selected = choose_goal_with_constraints(context)
+	if selected.is_empty():
 		return {}
-	_goal_counter += 1
-	best["instance_id"] = citizen_id + "_personal_" + str(_goal_counter)
-	best["chosen_score"] = best_score
-	best["status"] = "chosen"
-	best["self_chosen"] = true
-	active_personal_goal = best.duplicate(true)
-	autonomy_score = clampf(best_score, 0.0, 1.0)
-	return best
+	if not selected.has("instance_id"):
+		_goal_counter += 1
+		selected["instance_id"] = citizen_id + "_personal_" + str(_goal_counter)
+	selected["self_chosen"] = true
+	active_personal_goal = selected.duplicate(true)
+	return selected
 
 func _context_bonus(goal: Dictionary, context: Dictionary) -> float:
 	var bonus := 0.0
