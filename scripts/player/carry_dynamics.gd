@@ -207,3 +207,7 @@ func get_handling_factor() -> float:
 	if not is_instance_valid(held_item):
 		return 1.0
 	return clampf(float(held_item.get_meta("handling_sensitivity", 1.0)), 0.35, 2.0)
+
+
+func get_pickup_reach_duration() -> float:
+	return clampf(0.22 + mass_kg * 0.008, 0.22, 0.72)
