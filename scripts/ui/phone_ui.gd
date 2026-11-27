@@ -375,6 +375,9 @@ func _add_section_title(value: String) -> void:
     label.text = value
     label.add_theme_color_override("font_color", Color(0.1, 0.9, 1.0))
     label.add_theme_font_size_override("font_size", 16)
+    label.add_theme_color_override("font_shadow_color", Color(0.0, 0.72, 1.0, 0.45))
+    label.add_theme_constant_override("shadow_offset_x", 1)
+    label.add_theme_constant_override("shadow_offset_y", 1)
     _content.add_child(label)
 
 func _add_body(value: String) -> void:
@@ -387,8 +390,15 @@ func _add_body(value: String) -> void:
 func _add_stat(label_text: String, value: String) -> void:
     var row := PanelContainer.new()
     var style := StyleBoxFlat.new()
-    style.bg_color = Color(0.025, 0.045, 0.07, 0.96)
-    style.set_corner_radius_all(6)
+    style.bg_color = Color(0.012, 0.032, 0.052, 0.98)
+    style.border_color = Color(0.0, 0.48, 0.62, 0.48)
+    style.set_border_width_all(1)
+    style.border_width_left = 2
+    style.set_corner_radius_all(7)
+    style.content_margin_left = 9
+    style.content_margin_right = 9
+    style.content_margin_top = 6
+    style.content_margin_bottom = 6
     row.add_theme_stylebox_override("panel", style)
     _content.add_child(row)
     var box := HBoxContainer.new()
