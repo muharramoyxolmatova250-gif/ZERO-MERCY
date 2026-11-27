@@ -840,3 +840,27 @@ func _set_phone_visible(show_phone: bool) -> void:
 	is_using_phone = show_phone
 	if _phone != null:
 		_phone.visible = show_phone
+
+ 
+func get_ai_decision_snapshot() -> Dictionary:
+	return {
+		"citizen_id": citizen_id,
+		"goal": current_goal,
+		"long_term_goal": _long_term_goal,
+		"decision_reason": _decision_reason,
+		"decision_count": ai_decision_count,
+		"needs": {"energy": _energy, "hunger": _hunger, "social": _social_need, "curiosity": _curiosity, "stress": _stress},
+		"personality": _personality_traits.duplicate(true),
+		"recent_memories": _memory.duplicate(),
+		"life_stage": str(life_profile.get("life_stage", "unknown")),
+		"transport": "taxi" if _taxi_riding else "walking",
+		"emergency_flee_remaining": _crime_flee_timer
+	}
+
+func evaluate_local_risk(threat_position: Vector3, threat_severity: float = 0.5) -> Dictionary:
+	var distance := global_position.distance_to(threat_position)
+	var courage := float(_personality_traits.get("courage", 0.5))
+	var risk_tolerance := float(_personality_traits.get("risk_tolerance", 0.5))
+	var exposure := clampf(1.0 - distance / 65.0, 0.0, 1.0)
+	var perceived_risk := clampf(exposure * clampf(threat_severity, 0.0, 1.0) * (1.25 - courage * 0.45) * (1.15 - risk_tolerance * 0.3), 0.0, 1.0)
+	return {"distance": distance, "perceived_risk": perceived_risk, "should_evacuate": perceived_risk >= 0.38, "courage": courage, "risk_tolerance": risk_tolerance}
