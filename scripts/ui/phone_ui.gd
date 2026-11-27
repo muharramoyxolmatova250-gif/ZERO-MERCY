@@ -593,6 +593,27 @@ func _capture_phone_photo() -> void:
     _refresh_content()
 
 
+func _build_phone_gallery() -> void:
+    _add_section_title("ZERO GALLERY // MY PHOTOS")
+    var photos: Array[String] = _phone_camera.get_gallery_images()
+    _add_stat("SAVED PHOTOS", str(photos.size()))
+    if photos.is_empty():
+        _add_body("Your gallery is empty. Open CAMERA and take your first world photo.")
+        var camera_button := Button.new()
+        camera_button.text = "OPEN CAMERA"
+        camera_button.pressed.connect(_set_tab.bind("camera"))
+        _content.add_child(camera_button)
+        return
+    for index in range(photos.size()):
+        var photo_path := photos[index]
+        var entry := Button.new()
+        entry.text = "%02d   %s" % [index + 1, photo_path.get_file()]
+        entry.custom_minimum_size = Vector2(0, 42)
+        entry.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        entry.pressed.connect(_show_gallery_photo.bind(photo_path))
+        _content.add_child(entry)
+
+
 func _build_media_hub() -> void:
     _add_section_title("ZERO MEDIA // REAL ASSETS")
     _add_body("Open the media library. Only imported video and image files can play; feed entries without licensed local assets remain metadata.")
