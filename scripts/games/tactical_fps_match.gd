@@ -15,6 +15,7 @@ var time_left := ROUND_SECONDS
 var reloading := false
 var reload_left := 0.0
 var bots: Array[CharacterBody3D] = []
+var cover_positions: Array[Vector3] = []
 var mouse_captured := false
 var touch_move := Vector2.ZERO
 var touch_fire_held := false
@@ -125,6 +126,7 @@ func _build_arena() -> void:
 		shape.shape = collision
 		cover.add_child(shape)
 		cover.position = Vector3(-15.0 + float(i % 4) * 10.0, 0.75, -12.0 + float(i / 4) * 10.0)
+		cover_positions.append(cover.position)
 		add_child(cover)
 	var light := DirectionalLight3D.new()
 	light.rotation_degrees = Vector3(-55, -25, 0)
