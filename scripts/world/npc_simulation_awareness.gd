@@ -189,3 +189,16 @@ func restore_persistent_state(payload: Dictionary) -> void:
 			experiments.append(item.duplicate(true))
 	suspicion = clampf(float(payload.get("suspicion", 0.0)), 0.0, 1.0)
 	curiosity = clampf(float(payload.get("curiosity", curiosity)), 0.0, 1.0)
+
+
+func get_investigation_readiness() -> float:
+	if evidence.is_empty():
+		return 0.0
+	var strongest := 0.0
+	for item in evidence:
+		strongest = maxf(strongest, float(item.get("strength", 0.0)))
+	var independent_kinds: Dictionary = {}
+	for item in evidence:
+		independent_kinds[str(item.get("kind", "unknown"))] = true
+	var corroboration := clampf(float(independent_kinds.size()) / 3.0, 0.0, 1.0)
+	return clampf(strongest * 0.55 + corroboration * 0.25 + suspicion * 0.2, 0.0, 1.0)
