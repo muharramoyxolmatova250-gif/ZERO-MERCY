@@ -322,3 +322,7 @@ func get_posture_state() -> String:
 	if mass_kg >= heavy_mass_limit: return "heavy"
 	if mass_kg >= sprint_mass_limit: return "braced"
 	return "light"
+
+func get_secondary_grip_local() -> Vector3:
+	if not is_instance_valid(held_item): return Vector3.ZERO
+	return held_item.get_meta("secondary_grip_offset", Vector3(-0.24, -0.05, -0.10))
