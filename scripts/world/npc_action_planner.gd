@@ -303,3 +303,8 @@ func learn_routine_preference(activity: String, satisfaction: float, repetition:
  var rate := clampf(0.06*maxf(0.25,repetition),0.02,0.22)
  habits[activity] = clampf(lerpf(old,clampf(satisfaction,0.0,1.0),rate),0.0,1.0)
  learned[activity] = clampf(float(learned.get(activity,0.0))+(habits[activity]-0.5)*0.08,-1.0,1.0)
+
+
+func should_switch_goal(current_score: float, candidate_score: float, urgency: float = 0.0) -> bool:
+ var margin := 0.18 - clampf(urgency,0.0,1.0)*0.12
+ return candidate_score > current_score + margin
