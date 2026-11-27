@@ -383,14 +383,25 @@ func _update_bots(delta: float) -> void:
 		var desired_range := 10.0 + float(int(bot.get_instance_id()) % 4)
 		var approach := direction * clampf((distance - desired_range) / 5.0, -0.65, 1.0)
 		var separation := Vector3.ZERO
+		var squad_center := Vector3.ZERO
+		var squad_count := 0
 		for other in bots:
 			if other == bot or not is_instance_valid(other):
 				continue
+			squad_center += other.global_position
+			squad_count += 1
 			var gap := bot.global_position - other.global_position
 			gap.y = 0.0
 			if gap.length() > 0.01 and gap.length() < 2.8:
 				separation += gap.normalized() * (2.8 - gap.length())
-		var pursuit := (approach + side * 0.58 + separation * 0.9).normalized()
+		var cohesion := Vector3.ZERO
+		if squad_count > 0:
+			squad_center /= float(squad_count)
+			var center_offset := squad_center - bot.global_position
+			center_offset.y = 0.0
+			if center_offset.length() > 5.0:
+				cohesion = center_offset.normalized() * 0.35
+		var pursuit := (approach + side * 0.58 + separation * 0.9 + cohesion).normalized()
 		var bot_health := float(bot.get_meta("health", 100.0))
 		if bot_health <= 65.0 and not cover_positions.is_empty():
 			var best_cover := cover_positions[0]
