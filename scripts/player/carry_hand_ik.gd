@@ -224,3 +224,6 @@ static func get_solution_is_valid(solution: Dictionary) -> bool:
 
 static func get_solution_endpoint(solution: Dictionary) -> Vector3:
 	return solution.get("wrist", Vector3.ZERO)
+
+static func get_solution_elbow(solution: Dictionary) -> Vector3:
+	return solution.get("elbow", Vector3.ZERO)
