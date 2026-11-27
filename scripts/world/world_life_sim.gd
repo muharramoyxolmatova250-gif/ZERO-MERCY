@@ -154,7 +154,8 @@ func register_citizen(citizen_id: String, city_id: String, fallback_occupation: 
         "phone_number": _generate_phone_number(citizen_id),
         "phone_contacts": [], "phone_inbox": [], "phone_outbox": [],
         "phone_call_history": [], "phone_notifications": [],
-        "phone_social_posts": [], "phone_last_used_day": simulation_day,
+        "phone_social_posts": [], "phone_following": [], "phone_followers": [], "phone_last_used_day": simulation_day,
+        "public_reputation": 0.0, "public_notoriety": 0.0, "community_respect": 0.0,
         "phone_battery": 100.0, "phone_privacy": "friends",
         "vehicle_fuel": 0.0, "vehicle_condition": 1.0, "vehicle_monthly_km": 0,
         "transport_preference": "public" if local_rng.randf() < 0.72 else "private",
@@ -1560,6 +1561,7 @@ func _ensure_phone_profile(citizen_id: String) -> Dictionary:
         "phone_contacts":[], "phone_inbox":[], "phone_outbox":[],
         "phone_call_history":[], "phone_notifications":[],
         "phone_social_posts":[], "phone_following":[], "phone_followers":[], "phone_watch_history":[], "phone_browser_history":[],
+        "public_reputation":0.0, "public_notoriety":0.0, "community_respect":0.0,
         "phone_game_stats":{}, "phone_topic_interests":{},
         "phone_saved_media":[], "phone_last_used_day":simulation_day,
         "phone_battery":100.0, "phone_privacy":"friends"
