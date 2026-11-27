@@ -587,6 +587,16 @@ func _update_allies(delta: float) -> void:
 		var downed := bool(ally.get_meta("downed", false))
 		if downed:
 			ally.velocity = Vector3.ZERO
+			var revive_progress := float(ally.get_meta("revive_progress", 0.0))
+			if ally.global_position.distance_to(player.global_position) <= 2.4:
+				revive_progress += delta
+			else:
+				revive_progress = maxf(0.0, revive_progress - delta * 0.5)
+			if revive_progress >= 4.0:
+				ally.set_meta("health", 45.0)
+				ally.set_meta("downed", false)
+				revive_progress = 0.0
+			ally.set_meta("revive_progress", revive_progress)
 			ally.set_meta("fire_wait", 0.0)
 			continue
 		var nearest: CharacterBody3D
