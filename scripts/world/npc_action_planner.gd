@@ -149,3 +149,11 @@ func interrupt_plan(reason: String, replacement_goal: String, context: Dictionar
  plan_index = 0
  plan_reason = "interrupted:" + reason
  return build_plan(replacement_goal,context)
+
+
+func advance_time(delta: float) -> void:
+ var decay := maxf(0.0,delta) * 0.025
+ for key in _cooldowns.keys():
+  _cooldowns[key] = maxf(0.0,float(_cooldowns[key])-decay)
+  if float(_cooldowns[key]) <= 0.0:
+   _cooldowns.erase(key)
