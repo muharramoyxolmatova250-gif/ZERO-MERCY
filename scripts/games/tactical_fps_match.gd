@@ -67,6 +67,8 @@ func _build_touch_controls() -> void:
 	touch_controls.sprint_held_changed.connect(func(held: bool) -> void: touch_sprinting = held)
 	touch_controls.reload_pressed.connect(_start_reload)
 	touch_controls.jump_pressed.connect(_jump)
+	touch_controls.crouch_pressed.connect(_toggle_crouch)
+	touch_controls.aim_toggle_pressed.connect(func() -> void: _set_aiming(not aiming))
 
 func _on_touch_aim(delta: Vector2) -> void:
 	player.rotate_y(-delta.x * 0.003)
