@@ -300,3 +300,6 @@ func needs_second_hand() -> bool:
 
 func get_lift_height_factor() -> float:
 	return clampf(1.0 - mass_kg * 0.006, 0.58, 1.0)
+
+func get_reach_duration() -> float:
+	return clampf(0.2 + mass_kg * 0.007 + (0.08 if fragile else 0.0), 0.2, 0.85)
