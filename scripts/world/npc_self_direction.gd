@@ -138,3 +138,6 @@ func abandon_goal(reason: String) -> void:
 
 func get_snapshot() -> Dictionary:
 	return {"citizen_id":citizen_id,"active_goal":active_personal_goal.duplicate(true),"aspirations":aspirations.duplicate(true),"preferences":preferences.duplicate(true),"completed_goal_count":completed_goals.size(),"decisions":decision_count,"autonomy_score":autonomy_score}
+func revise_aspirations(context: Dictionary = {}) -> void:
+	if float(context.get("life_change", 0.0)) > 0.6 or aspirations.is_empty():
+		_generate_initial_aspirations(context.get("profile", {}))
