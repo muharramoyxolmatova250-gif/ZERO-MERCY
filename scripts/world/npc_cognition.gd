@@ -105,3 +105,23 @@ func remember_episode(kind: String, summary: String, importance: float, location
 				weakest = index
 		episodic_memory.remove_at(weakest)
 
+
+
+func recall_episodes(query: String, limit: int = 5) -> Array[Dictionary]:
+	var terms := query.to_lower().split(" ",false)
+	var matches: Array[Dictionary] = []
+	for episode in episodic_memory:
+		var text := (str(episode.get("kind",""))+" "+str(episode.get("summary",""))).to_lower()
+		var relevance := 0.0
+		for term in terms:
+			if term.length() > 2 and term in text:
+				relevance += 1.0
+		if relevance > 0.0:
+			var result := episode.duplicate(true)
+			result["recall_score"] = relevance + float(episode.get("importance",0.0))
+			matches.append(result)
+	matches.sort_custom(func(a: Dictionary,b: Dictionary)->bool: return float(a.get("recall_score",0.0)) > float(b.get("recall_score",0.0)))
+	if matches.size() > limit:
+		matches.resize(limit)
+	return matches
+
