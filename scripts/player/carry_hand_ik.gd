@@ -318,3 +318,9 @@ static func get_solution_validity_report(solution: Dictionary) -> Dictionary:
 static func get_solution_error_report(solution: Dictionary, target: Vector3) -> Dictionary:
 	var wrist := get_solution_endpoint(solution)
 	return {"endpoint_error": wrist.distance_to(target), "target_clamped": bool(solution.get("target_clamped", false)), "valid": get_solution_is_valid(solution)}
+
+static func get_solution_bend_sign(solution: Dictionary) -> float:
+	var shoulder := get_solution_shoulder(solution)
+	var elbow := get_solution_elbow(solution)
+	var wrist := get_solution_endpoint(solution)
+	return signf((elbow - project_point_on_segment(elbow, shoulder, wrist)).dot(Vector3.UP))
