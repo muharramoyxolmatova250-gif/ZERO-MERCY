@@ -13,6 +13,7 @@ var _thumb_hinges: Array[Node3D] = []
 var _right_arm: Node3D
 var _left_arm: Node3D
 var _grip_anchor: Marker3D
+var _support_grip_anchor: Marker3D
 var _carry_object: Node3D
 var _reach_rotation := Vector3.ZERO
 var _reach_weight := 0.0
@@ -103,6 +104,10 @@ func _build_arm(side: float, right_hand: bool) -> void:
 		arm.add_child(_grip_anchor)
 	else:
 		_left_arm = arm
+		_support_grip_anchor = Marker3D.new()
+		_support_grip_anchor.name = "SupportGripAnchor"
+		_support_grip_anchor.position = Vector3(side * 0.69, -0.47, -0.11)
+		arm.add_child(_support_grip_anchor)
 	_arm_pivots.append(arm)
 
 	# Every part is positioned relative to the shoulder pivot.
@@ -196,3 +201,6 @@ func release_object() -> void:
 
 func get_grip_anchor() -> Marker3D:
 	return _grip_anchor
+
+func get_support_grip_anchor() -> Marker3D:
+	return _support_grip_anchor
