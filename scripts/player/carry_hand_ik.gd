@@ -324,3 +324,12 @@ static func get_solution_bend_sign(solution: Dictionary) -> float:
 	var elbow := get_solution_elbow(solution)
 	var wrist := get_solution_endpoint(solution)
 	return signf((elbow - project_point_on_segment(elbow, shoulder, wrist)).dot(Vector3.UP))
+
+static func get_solution_bounds(solution: Dictionary) -> AABB:
+	var points := get_joint_positions(solution)
+	if points.is_empty():
+		return AABB()
+	var bounds := AABB(points[0], Vector3.ZERO)
+	for point in points:
+		bounds = bounds.expand(point)
+	return bounds
