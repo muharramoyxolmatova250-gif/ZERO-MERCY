@@ -281,3 +281,7 @@ func get_lateral_balance() -> float:
 
 func get_forward_lean() -> float:
 	return clampf(impact_load * mass_kg * 0.0018, 0.0, 0.18)
+
+func get_fragile_gait_envelope() -> Vector2:
+	var factor := 0.42 if fragile else 1.0
+	return Vector2(0.035 * factor, 0.018 * factor)
