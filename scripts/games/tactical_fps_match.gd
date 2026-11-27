@@ -264,6 +264,7 @@ func _build_allies() -> void:
 		ally.set_meta("morale", 1.0)
 		ally.set_meta("last_combat_callout", "")
 		ally.set_meta("health", 100.0)
+		ally.set_meta("blast_impulse", Vector3.ZERO)
 		ally.set_meta("downed", false)
 		ally.set_meta("revive_progress", 0.0)
 		ally.set_meta("fire_wait", 0.5 + float(i) * 0.35)
