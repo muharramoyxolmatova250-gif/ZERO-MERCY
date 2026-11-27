@@ -1176,10 +1176,7 @@ func _sync_independent_goal_state(context: Dictionary) -> void:
 
 func _apply_independent_goal_bias(scores: Dictionary) -> void:
 	var activity_map := {"hunger":"food","energy":"rest","social":"social","safety":"avoid_crowd","curiosity":"explore","comfort":"rest","purpose":"work","exploration":"explore"}
-	var ranked: Array[Dictionary] = []
-	for goal in _independent_mind.goals:
-		if str(goal.get("status", "")) == "active":
-			ranked.append(goal)
+	var ranked: Array[Dictionary] = _independent_mind.get_active_goals(32)
 	ranked.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.get("priority", 0.0)) > float(b.get("priority", 0.0)))
 	for index in range(mini(3, ranked.size())):
 		var goal: Dictionary = ranked[index]
