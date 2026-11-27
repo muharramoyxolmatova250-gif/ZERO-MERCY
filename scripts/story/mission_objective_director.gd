@@ -42,7 +42,9 @@ func _on_objective_completed(mission_id: String, objective_id: String) -> void:
         "confront_biological_father": ["father_reveal", "res://data/story/dialogue_father_reveal.json"],
         "make_throne_decision": ["throne_offer", "res://data/story/dialogue_throne_offer.json"],
         "choose_network_fate": ["final_choice", "res://data/story/dialogue_final_choice.json"],
-        "watch_unknown_transmission": ["golden_finger", "res://data/story/dialogue_golden_finger.json"]
+        "watch_unknown_transmission": ["golden_finger", "res://data/story/dialogue_golden_finger.json"],
+        "meet_simulation_witness": ["simulation_witness", "res://data/story/dialogue_simulation_witness.json"],
+        "decode_boundary_recording": ["simulation_evidence", "res://data/story/dialogue_simulation_evidence.json"]
     }
     if dialogue_routes.has(event_id) and DialogueManager.dialogue_id == "":
         var route: Array = dialogue_routes[event_id]
