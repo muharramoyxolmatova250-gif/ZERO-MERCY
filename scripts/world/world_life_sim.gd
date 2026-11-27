@@ -1956,6 +1956,50 @@ func get_phone_network_feed(citizen_id: String, limit: int = 30, following_only:
     return result.slice(0, mini(result.size(), maxi(1, limit)))
 
 
+func get_phone_trending_feed(citizen_id: String, limit: int = 20) -> Array:
+    if not resident_profiles.has(citizen_id):
+        return []
+    var ranked: Array = []
+    for post_value in _social_feed:
+        var post: Dictionary = post_value
+        var author_id := str(post.get("author_id", ""))
+        if author_id.is_empty() or not resident_profiles.has(author_id):
+            continue
+        if author_id == citizen_id:
+            continue
+        var age_days := maxi(0, simulation_day - int(post.get("day", simulation_day)))
+        var engagement := float(post.get("likes", 0)) + float(post.get("comments", 0)) * 2.5
+        var score := engagement / (1.0 + float(age_days) * 0.7)
+        var copy: Dictionary = post.duplicate(true)
+        copy["trend_score"] = snappedf(score, 0.01)
+        ranked.append(copy)
+    ranked.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.get("trend_score", 0.0)) > float(b.get("trend_score", 0.0)))
+    return ranked.slice(0, mini(ranked.size(), maxi(1, limit)))
+
+
+func search_phone_social_posts(citizen_id: String, query: String, limit: int = 20) -> Array:
+    if not resident_profiles.has(citizen_id):
+        return []
+    var needle := query.strip_edges().to_lower()
+    if needle.is_empty():
+        return []
+    var matches: Array = []
+    for post_value in _social_feed:
+        var post: Dictionary = post_value
+        var author_id := str(post.get("author_id", ""))
+        if author_id.is_empty() or not resident_profiles.has(author_id):
+            continue
+        var author := _ensure_phone_profile(author_id)
+        var searchable := " ".join([
+            str(post.get("text", "")), str(post.get("topic", "")),
+            str(post.get("mood", "")), str(post.get("author", author.get("name", "")))
+        ]).to_lower()
+        if needle in searchable:
+            matches.append(post.duplicate(true))
+    matches.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.get("day", 0)) > int(b.get("day", 0)))
+    return matches.slice(0, mini(matches.size(), maxi(1, limit)))
+
+
 func get_phone_suggested_residents(citizen_id: String, limit: int = 12) -> Array:
     if not resident_profiles.has(citizen_id):
         return []
