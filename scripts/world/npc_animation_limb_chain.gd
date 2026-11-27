@@ -1,4 +1,5 @@
 extends RefCounted
+const NPCAnimationIK = preload("res://scripts/world/npc_animation_ik.gd")
 ## Converts a 2D two-bone solution into pivot rotations for a segmented limb.
 static func solve(root: Vector2, target: Vector2, upper_length: float, lower_length: float, bend_sign: float = 1.0) -> Dictionary:
 	var result: Dictionary = NPCAnimationIK.solve_two_bone(root,target,upper_length,lower_length,bend_sign)
