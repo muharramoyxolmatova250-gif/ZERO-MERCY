@@ -219,3 +219,9 @@ func get_stability_label() -> String:
 	if stability >= 0.48:
 		return "UNSTEADY"
 	return "CRITICAL"
+
+
+func can_release_safely() -> bool:
+	if not has_item():
+		return true
+	return stability >= 0.12 and actor != null and actor.is_inside_tree()
