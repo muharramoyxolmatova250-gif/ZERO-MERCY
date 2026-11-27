@@ -148,3 +148,11 @@ func get_most_supported_hypothesis() -> Dictionary:
 			confidence = value
 			best = item
 	return best.duplicate(true)
+
+
+func get_evidence_by_kind(kind: String) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for item in evidence:
+		if str(item.get("kind", "")) == kind:
+			result.append(item.duplicate(true))
+	return result
