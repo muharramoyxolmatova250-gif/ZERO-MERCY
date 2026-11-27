@@ -167,3 +167,9 @@ func create_goal_from_experience(event: String, activity: String, motivation: fl
 	var goal := {"id":"experience_" + str(abs(hash(event))),"activity":activity,"drive":"curiosity","weight":clampf(motivation,0.1,1.0),"need":"growth","origin_event":event,"self_chosen":true,"status":"chosen"}
 	active_personal_goal = goal.duplicate(true)
 	return goal
+func is_goal_feasible(goal: Dictionary, context: Dictionary = {}) -> bool:
+	if goal.is_empty() or bool(context.get("danger", false)):
+		return false
+	if bool(context.get("has_dependents", false)) and str(goal.get("need", "")) == "discovery" and float(context.get("responsibility_pressure", 0.0)) > 0.8:
+		return false
+	return float(context.get("available_time", 1.0)) > 0.05 and not bool(context.get("unavailable", false))
