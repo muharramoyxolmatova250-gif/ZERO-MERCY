@@ -199,3 +199,11 @@ static func get_wrist_error_vector(actual: Vector3, desired: Vector3) -> Vector3
 
 static func get_wrist_error_weight(actual: Vector3, desired: Vector3, tolerance: float = 0.05) -> float:
 	return clampf(actual.distance_to(desired) / maxf(tolerance, 0.001), 0.0, 1.0)
+
+static func solve_with_constraints(shoulder: Vector3, target: Vector3, upper_length: float, lower_length: float, bend_normal: Vector3, minimum_reach: float = 0.025) -> Dictionary:
+	if not validate_segment_lengths(upper_length, lower_length):
+		return {"shoulder": shoulder, "elbow": shoulder, "wrist": shoulder, "valid": false}
+	var wrist := clamp_reach_target(shoulder, target, upper_length, lower_length, minimum_reach)
+	var pole := get_bend_normal(wrist - shoulder, bend_normal)
+	var elbow := solve_elbow(shoulder, wrist, upper_length, lower_length, pole)
+	return {"shoulder": shoulder, "elbow": elbow, "wrist": wrist, "valid": true, "target_clamped": not wrist.is_equal_approx(target)}
