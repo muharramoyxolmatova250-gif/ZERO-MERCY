@@ -214,3 +214,8 @@ func preferred_activity_window(activity: String) -> Dictionary:
 	if activity in ["work","learn_skill"]: return {"start":7.0 + (1.0-morning_bias)*2.0,"end":16.0 + morning_bias*2.0}
 	if activity in ["social","practice_hobby"]: return {"start":16.0 + (1.0-evening_bias)*2.0,"end":22.0}
 	return {"start":0.0,"end":24.0}
+func relationship_initiative(context: Dictionary = {}) -> String:
+	if float(context.get("loneliness", 0.0)) > 0.7 and _trait("sociability") > 0.45: return "seek_company"
+	if float(context.get("conflict", 0.0)) > 0.55 and _trait("kindness") > 0.5: return "repair_relationship"
+	if _trait("kindness") > 0.8: return "check_on_friend"
+	return "keep_in_touch"
