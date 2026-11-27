@@ -415,7 +415,7 @@ func _update_bots(delta: float) -> void:
 		var remembered_position: Vector3 = bot.get_meta("last_known_player_position", player.global_position)
 		var steering_target := player.global_position if sees_player else (remembered_position if search_time > 0.0 else bot.global_position)
 		if not sees_player and search_time > 0.0:
-			var search_phase := float(Time.get_ticks_msec()) * 0.00075 + phase
+			var search_phase := float(Time.get_ticks_msec()) * 0.00075 + float(bot.get_meta("strafe_phase", 0.0))
 			var search_radius := 2.0 + (1.0 - search_time / 4.0) * 3.0
 			steering_target += Vector3(cos(search_phase), 0.0, sin(search_phase)) * search_radius
 		var steering_offset := steering_target - bot.global_position
