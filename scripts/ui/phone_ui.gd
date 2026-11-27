@@ -79,13 +79,21 @@ func _build_phone() -> void:
     outer.add_theme_constant_override("separation", 10)
     _panel.add_child(outer)
 
+    var device_strip := ColorRect.new()
+    device_strip.custom_minimum_size = Vector2(0, 3)
+    device_strip.color = Color(0.0, 0.9, 1.0, 0.95)
+    outer.add_child(device_strip)
+
     var header := HBoxContainer.new()
     outer.add_child(header)
     var brand := Label.new()
-    brand.text = "ZERO LINK  //  DARA OS"
+    brand.text = "◈ ZERO LINK  /  DARA OS"
     brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     brand.add_theme_color_override("font_color", Color(0.15, 0.92, 1.0))
-    brand.add_theme_font_size_override("font_size", 18)
+    brand.add_theme_font_size_override("font_size", 19)
+    brand.add_theme_color_override("font_shadow_color", Color(0.0, 0.8, 1.0, 0.55))
+    brand.add_theme_constant_override("shadow_offset_x", 1)
+    brand.add_theme_constant_override("shadow_offset_y", 1)
     header.add_child(brand)
     var close := Button.new()
     close.text = "×"
