@@ -609,13 +609,25 @@ func _update_allies(delta: float) -> void:
 		if downed:
 			ally.velocity = Vector3.ZERO
 			var revive_progress := float(ally.get_meta("revive_progress", 0.0))
-			if ally.global_position.distance_to(player.global_position) <= 2.4:
+			var rescuer_nearby := ally.global_position.distance_to(player.global_position) <= 2.4
+			var rescuer_name := "DARA"
+			for rescuer in allies:
+				if rescuer == ally or not is_instance_valid(rescuer) or bool(rescuer.get_meta("downed", false)):
+					continue
+				if rescuer.global_position.distance_to(ally.global_position) <= 2.4:
+					rescuer_nearby = true
+					rescuer_name = str(rescuer.get_meta("display_name", "SQUAD"))
+					break
+			if rescuer_nearby:
 				revive_progress += delta
+				ally.set_meta("being_revived_by", rescuer_name)
 			else:
 				revive_progress = maxf(0.0, revive_progress - delta * 0.5)
+				ally.set_meta("being_revived_by", "")
 			if revive_progress >= 4.0:
 				ally.set_meta("health", 45.0)
 				ally.set_meta("downed", false)
+				ally.set_meta("morale", 0.65)
 				revive_progress = 0.0
 			ally.set_meta("revive_progress", revive_progress)
 			ally.set_meta("fire_wait", 0.0)
