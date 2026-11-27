@@ -427,7 +427,8 @@ func _update_bots(delta: float) -> void:
 			desired_range = 13.0
 		if not squad_leader_alive:
 			desired_range = maxf(6.0, desired_range - 2.0)
-		var approach := direction * clampf((distance - desired_range) / 5.0, -0.65, 1.0)
+		var target_distance := steering_offset.length()
+		var approach := direction * clampf((target_distance - desired_range) / 5.0, -0.65, 1.0) if (sees_player or search_time > 0.0) else Vector3.ZERO
 		var separation := Vector3.ZERO
 		var squad_center := Vector3.ZERO
 		var squad_count := 0
@@ -448,8 +449,8 @@ func _update_bots(delta: float) -> void:
 			if center_offset.length() > 5.0:
 				cohesion = center_offset.normalized() * 0.35
 		var flank_steering := Vector3.ZERO
-		if role == "flanker" and distance > 4.0:
-			var flank_target := player.global_position + Vector3(-direction.z, 0.0, direction.x) * flank_sign * 7.0 - direction * 2.0
+		if role == "flanker" and (sees_player or search_time > 0.0) and target_distance > 4.0:
+			var flank_target := steering_target + Vector3(-direction.z, 0.0, direction.x) * flank_sign * 7.0 - direction * 2.0
 			var flank_offset := flank_target - bot.global_position
 			flank_offset.y = 0.0
 			flank_steering = flank_offset.normalized() * 0.7
