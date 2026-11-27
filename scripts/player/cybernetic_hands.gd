@@ -72,6 +72,8 @@ func _process(delta: float) -> void:
 					target.x += sin(_clock * 1.8) * 0.018 * (1.0 - _secondary_grip_weight)
 					target.y = clampf(atan2(-reach_vector.z, reach_vector.x), -0.95, 0.95)
 					target.z = -0.04 if _carry_fragile else 0.0
+				else:
+					_secondary_grip_weight = move_toward(_secondary_grip_weight, 0.0, delta * 4.0)
 		else:
 			if side > 0.0:
 				target += _reach_rotation * _reach_weight
