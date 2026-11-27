@@ -196,3 +196,6 @@ static func get_elbow_plane(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -
 
 static func get_wrist_error_vector(actual: Vector3, desired: Vector3) -> Vector3:
 	return desired - actual
+
+static func get_wrist_error_weight(actual: Vector3, desired: Vector3, tolerance: float = 0.05) -> float:
+	return clampf(actual.distance_to(desired) / maxf(tolerance, 0.001), 0.0, 1.0)
