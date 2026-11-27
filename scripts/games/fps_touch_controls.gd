@@ -129,6 +129,7 @@ func reset_controls() -> void:
 
 func _reset_touches() -> void:
 	var was_firing := _fire_touch != -1
+	var was_sprinting := _sprint_touch != -1
 	_move_touch = -1
 	_aim_touch = -1
 	_sprint_touch = -1
@@ -137,7 +138,8 @@ func _reset_touches() -> void:
 	movement_changed.emit(Vector2.ZERO)
 	if was_firing:
 		fire_held_changed.emit(false)
-	sprint_held_changed.emit(false)
+	if was_sprinting:
+		sprint_held_changed.emit(false)
 	queue_redraw()
 
 func _sprint_center() -> Vector2:
