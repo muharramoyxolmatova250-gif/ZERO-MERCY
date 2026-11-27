@@ -224,3 +224,7 @@ func goal_urgency(context: Dictionary = {}) -> float:
 	urgency += float(context.get("need_pressure", 0.0)) * 0.4
 	urgency += float(context.get("emotional_importance", 0.0)) * 0.25
 	return clampf(urgency, 0.0, 1.0)
+func should_change_personal_goal(candidate_score: float, context: Dictionary = {}) -> bool:
+	if active_personal_goal.is_empty(): return true
+	var current_score := float(active_personal_goal.get("chosen_score", 0.0))
+	return candidate_score > current_score + 0.18 or goal_urgency(context) > 0.85
