@@ -374,3 +374,7 @@ static func get_solution_is_clamped(solution: Dictionary) -> bool:
 
 static func get_solution_joint_angle(solution: Dictionary) -> float:
 	return get_elbow_angle(get_solution_shoulder(solution), get_solution_elbow(solution), get_solution_endpoint(solution))
+
+static func get_solution_direction_alignment(solution: Dictionary, desired_direction: Vector3) -> float:
+	var actual := get_target_direction(get_solution_shoulder(solution), get_solution_endpoint(solution))
+	return clampf(actual.dot(safe_normalize(desired_direction)), -1.0, 1.0)
