@@ -690,7 +690,8 @@ func _update_allies(delta: float) -> void:
 			var hit := get_world_3d().direct_space_state.intersect_ray(sight)
 			if wait <= 0.0 and not hit.is_empty() and hit.get("collider") == nearest:
 				var skill := float(ally.get_meta("combat_skill", 0.72))
-				var damage := 10.0 + skill * 10.0
+				var morale := float(ally.get_meta("morale", 1.0))
+				var damage := (10.0 + skill * 10.0) * lerpf(0.65, 1.0, morale)
 				var remaining := float(nearest.get_meta("health", 100.0)) - damage
 				nearest.set_meta("health", remaining)
 				nearest.set_meta("suppressed_time", maxf(float(nearest.get_meta("suppressed_time", 0.0)), 0.85))
