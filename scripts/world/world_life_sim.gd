@@ -1930,13 +1930,14 @@ const PHONE_GAMES := ["Last Circle", "Counter Sector", "Neon Strike", "Dropzone 
 
 
 func get_phone_games_catalog() -> Array:
+    # Production targets, not claims that these full games are already implemented.
     return [
-        {"id":"last_circle","title":"Last Circle","genre":"battle_royale","mode":"solo_duo_squad","max_players":100,"description":"A last-team-standing survival arena."},
-        {"id":"counter_sector","title":"Counter Sector","genre":"tactical_shooter","mode":"5v5_objective","max_players":10,"description":"Round-based tactical team combat."},
-        {"id":"neon_strike","title":"Neon Strike","genre":"arena_shooter","mode":"team_deathmatch","max_players":12,"description":"Fast futuristic arena matches."},
-        {"id":"dropzone_royale","title":"Dropzone Royale","genre":"battle_royale","mode":"squad","max_players":60,"description":"Squad survival across a shrinking zone."},
-        {"id":"tactical_breach","title":"Tactical Breach","genre":"tactical_shooter","mode":"5v5_objective","max_players":10,"description":"Coordinated attack and defense rounds."},
-        {"id":"cyber_ops","title":"Cyber Ops","genre":"strategy_action","mode":"ranked_team","max_players":8,"description":"Team tactics and objective control."}
+        {"id":"last_circle","title":"Last Circle","genre":"battle_royale","mode":"solo_duo_squad","max_players":100,"description":"Large-scale survival shooter with persistent world events.","world_scale":"100-player open battlefield","visual_target":"high-fidelity 3D, dynamic weather, day/night, advanced effects","systems":["vehicles","loot economy","ballistics","squad AI","safe-zone simulation"],"production_tier":"AAA target","playable":false},
+        {"id":"counter_sector","title":"Counter Sector","genre":"tactical_shooter","mode":"5v5_objective","max_players":10,"description":"Competitive tactical combat with coordinated operator roles.","world_scale":"multi-map 5v5 tactical arenas","visual_target":"high-fidelity materials, lighting and character animation","systems":["weapon handling","destructible cover","objective rounds","team tactics","ranked progression"],"production_tier":"AAA target","playable":false},
+        {"id":"neon_strike","title":"Neon Strike","genre":"arena_shooter","mode":"team_deathmatch","max_players":12,"description":"High-speed cyberpunk arena combat.","world_scale":"large multi-level arenas","visual_target":"neon global illumination, VFX, advanced movement animation","systems":["parkour","weapon classes","arena hazards","team modes","matchmaking"],"production_tier":"AAA target","playable":false},
+        {"id":"dropzone_royale","title":"Dropzone Royale","genre":"battle_royale","mode":"squad","max_players":60,"description":"Squad survival across a huge evolving combat zone.","world_scale":"60-player large terrain map","visual_target":"detailed landscapes, weather, vehicles and effects","systems":["drop insertion","large map","loot","vehicles","shrinking zone","squad commands"],"production_tier":"AAA target","playable":false},
+        {"id":"tactical_breach","title":"Tactical Breach","genre":"tactical_shooter","mode":"5v5_objective","max_players":10,"description":"Coordinated attack and defense rounds.","world_scale":"multi-map tactical combat","visual_target":"high-fidelity 3D target; current prototype uses procedural greybox assets","systems":["squad AI","weapon handling","cover","objectives","round economy"],"production_tier":"AAA target","playable":true},
+        {"id":"cyber_ops","title":"Cyber Ops","genre":"strategy_action","mode":"ranked_team","max_players":8,"description":"Team tactics and objective control in a cybernetic battlefield.","world_scale":"large connected combat zones","visual_target":"high-detail environments, character rigs and tactical effects","systems":["class builds","team strategy","dynamic objectives","ranked seasons","AI commanders"],"production_tier":"AAA target","playable":false}
     ]
 
 
