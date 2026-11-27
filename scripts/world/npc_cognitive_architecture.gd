@@ -265,3 +265,14 @@ func consider_curiosity_goal(discoveries: Array[Dictionary]) -> int:
 		if score > best_score: best_score = score; best = discovery
 	if best.is_empty(): return -1
 	return generate_goal("Investigate " + str(best.get("name", "an unfamiliar place")), "exploration", best_score, best)
+
+func reconsider_goals(context: Dictionary = {}) -> Dictionary:
+	var changed := 0
+	for i in range(goals.size()):
+		if goals[i].get("status") != "active": continue
+		var category := str(goals[i].get("category", ""))
+		var drive := float(needs.get(category, 0.0))
+		var priority := float(goals[i].get("priority", 0.5))
+		var revised := clampf(priority * 0.82 + drive * 0.18,0.0,1.0)
+		if absf(revised-priority) > 0.04: goals[i]["priority"] = revised; changed += 1
+	return {"revised_goals":changed,"conflicts":detect_goal_conflicts().size()}
