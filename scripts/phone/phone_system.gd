@@ -52,3 +52,12 @@ func _apply_audio() -> void:
     AudioServer.set_bus_mute(master, false)
     var volume := float(_settings.get("volume", 0.75))
     AudioServer.set_bus_volume_db(master, linear_to_db(maxf(volume, 0.001)))
+
+func reset_settings() -> bool:
+    _settings = DEFAULTS.duplicate(true)
+    var config := ConfigFile.new()
+    for key in _settings:
+        config.set_value("device", key, _settings[key])
+    var error := config.save(CONFIG_PATH)
+    _apply_audio()
+    return error == OK
