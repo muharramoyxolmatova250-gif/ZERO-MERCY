@@ -885,6 +885,7 @@ func _update_allies(delta: float) -> void:
 			ally.velocity.x = combat_move.x * (3.0 if role == "assault" else 2.4)
 			ally.velocity.z = combat_move.z * (3.0 if role == "assault" else 2.4)
 		ally.velocity.y = 0.0
+		_apply_ally_blast_impulse(ally, delta)
 		ally.move_and_slide()
 		ally.set_meta("fire_wait", wait)
 
