@@ -98,3 +98,5 @@ func get_turn_blend(delta: float) -> float:
 	return clampf(turn_rate * minf(delta, 0.05), 0.0, 1.0)
 func _safe_delta(delta: float) -> float:
 	return clampf(delta, 0.0, 0.05)
+func get_motion_state() -> String:
+	return motion_state
