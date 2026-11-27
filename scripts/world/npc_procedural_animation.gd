@@ -181,7 +181,7 @@ func get_rig_status() -> Dictionary:
 		"right_leg":is_instance_valid(right_leg),
 		"phone":is_instance_valid(phone),
 		"procedural_layers":["locomotion","idle_gesture","activity","reaction","combat_stance"],
-		"catalog_clips":director.Catalog.get_clip_names()
+		"catalog_clips":director.get_catalog_names()
 	}
 
 func get_pose_snapshot() -> Dictionary:
