@@ -1,6 +1,7 @@
 extends RefCounted
 const NPCAnimationDirector = preload("res://scripts/world/npc_animation_director.gd")
 const NPCAnimationGaze = preload("res://scripts/world/npc_animation_gaze.gd")
+const NPCAnimationIK = preload("res://scripts/world/npc_animation_ik.gd")
 const NPCAnimationLOD = preload("res://scripts/world/npc_animation_lod.gd")
 const NPCAnimationStateMachine = preload("res://scripts/world/npc_animation_state_machine.gd")
 const NPCAnimationFootPlacement = preload("res://scripts/world/npc_animation_foot_placement.gd")
@@ -59,6 +60,7 @@ func setup(body_node: Node3D, head_node: Node3D, left_arm_node: Node3D, right_ar
 
 func configure_profile(identity: String, traits: Dictionary) -> void:
 	director.configure(identity, traits)
+	configure_resident_variation(identity, traits)
 
 func trigger_reaction(kind: String, intensity: float = 0.7) -> void:
 	reaction_name = kind
@@ -67,6 +69,8 @@ func trigger_reaction(kind: String, intensity: float = 0.7) -> void:
 
 func update_pose(delta: float, speed: float, motion_state: String, activity: String, using_phone: bool, stress: float, goal: String, traits: Dictionary, preferred_speed: float = 1.25, urgent: bool = false) -> void:
 	var dt := clampf(delta, 0.0, 0.05)
+	_dispatch_animation_events(dt)
+	animation_state.update(dt)
 	last_director_pose = director.update(dt, speed, motion_state, activity, using_phone, stress, goal, traits, preferred_speed, urgent)
 	idle_gesture = str(last_director_pose.get("gesture", ""))
 	idle_gesture_remaining = float(last_director_pose.get("gesture_state", {}).get("remaining", 0.0))
@@ -186,6 +190,8 @@ func update_pose(delta: float, speed: float, motion_state: String, activity: Str
 				if is_instance_valid(body): body.position.y += 0.025 * reaction_weight
 	if is_instance_valid(phone):
 		phone.rotation.x = -0.08 if using_phone else 0.0
+	_apply_attention_gaze(dt)
+	animation_diagnostics.record_update(dt * 1000.0)
 
 func get_rig_status() -> Dictionary:
 	return {
@@ -264,3 +270,6 @@ func _apply_attention_gaze(delta: float) -> void:
 		desired = Vector2(clampf(-pitch, -0.45, 0.45), clampf(yaw, -0.85, 0.85))
 	head.rotation.x = lerpf(head.rotation.x, desired.x, clampf(delta * 3.0, 0.0, 1.0))
 	head.rotation.y = lerpf(head.rotation.y, desired.y, clampf(delta * 3.0, 0.0, 1.0))
+
+func solve_limb_ik(root: Vector2, target: Vector2, upper_length: float, lower_length: float, bend_sign: float = 1.0) -> Dictionary:
+	return NPCAnimationIK.solve_two_bone(root, target, upper_length, lower_length, bend_sign)
