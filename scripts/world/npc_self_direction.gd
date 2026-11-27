@@ -219,3 +219,8 @@ func relationship_initiative(context: Dictionary = {}) -> String:
 	if float(context.get("conflict", 0.0)) > 0.55 and _trait("kindness") > 0.5: return "repair_relationship"
 	if _trait("kindness") > 0.8: return "check_on_friend"
 	return "keep_in_touch"
+func goal_urgency(context: Dictionary = {}) -> float:
+	var urgency := float(context.get("deadline_pressure", 0.0)) * 0.35
+	urgency += float(context.get("need_pressure", 0.0)) * 0.4
+	urgency += float(context.get("emotional_importance", 0.0)) * 0.25
+	return clampf(urgency, 0.0, 1.0)
