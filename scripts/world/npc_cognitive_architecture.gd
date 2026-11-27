@@ -332,3 +332,13 @@ func select_goal_for_activity(activity: String) -> Dictionary:
 			if str(goal.get("category", "")) == str(category):
 				return goal
 	return {}
+
+
+func get_next_plan_step(plan_id: int) -> Dictionary:
+	for plan in plans:
+		if int(plan.get("id", -1)) == plan_id and str(plan.get("status", "")) in ["ready", "running"]:
+			var index := int(plan.get("step_index", 0))
+			var steps: Array = plan.get("steps", [])
+			if index >= 0 and index < steps.size():
+				return steps[index].duplicate(true)
+	return {}
