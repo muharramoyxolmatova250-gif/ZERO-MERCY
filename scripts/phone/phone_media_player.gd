@@ -14,6 +14,16 @@ func _ready() -> void:
 	video.finished.connect(_on_video_finished)
 	$Layout/Actions/Open.pressed.connect(_on_open_pressed)
 	$Layout/Actions/Stop.pressed.connect(_on_stop_pressed)
+	var previous := Button.new()
+	previous.name = "Previous"
+	previous.text = "PREVIOUS"
+	previous.pressed.connect(_show_previous)
+	$Layout/Actions.add_child(previous)
+	var next := Button.new()
+	next.name = "Next"
+	next.text = "NEXT"
+	next.pressed.connect(_show_next)
+	$Layout/Actions.add_child(next)
 	$Layout/Actions/Close.pressed.connect(func() -> void: close_requested.emit())
 	status.text = "Choose an imported video (.ogv) or image asset."
 	image.hide()
