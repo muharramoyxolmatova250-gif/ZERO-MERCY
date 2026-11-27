@@ -220,3 +220,13 @@ func score_affordances(affordances: Array[Dictionary], context: Dictionary = {})
   scored.append(item)
  scored.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.score)>float(b.score))
  return scored
+
+
+func novelty_score(action: String) -> float:
+ var repeats := 0
+ for entry in recent_actions:
+  if str(entry.get("action","")) == action:
+   repeats += 1
+ return clampf(1.0-float(repeats)*0.22,0.12,1.0)
+func record_habit(action: String, success: float) -> void:
+ habits[action] = float(habits.get(action,0.0))*0.82 + clampf(success,0.0,1.0)*0.18
