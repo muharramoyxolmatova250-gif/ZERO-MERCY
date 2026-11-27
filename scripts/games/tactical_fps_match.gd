@@ -522,6 +522,13 @@ func _detonate_tactical_grenade(blast_position: Vector3) -> void:
 		if distance < 5.0:
 			var remaining := maxf(0.0, float(ally.get_meta("health", 100.0)) - 42.0 * (1.0 - distance / 5.0))
 			ally.set_meta("health", remaining)
+			var blast_escape := ally.global_position - blast_position
+			blast_escape.y = 0.0
+			if blast_escape.length() < 0.1:
+				blast_escape = Vector3.RIGHT.rotated(Vector3.UP, float(ally.get_instance_id()) * 0.01)
+			var blast_impulse: Vector3 = ally.get_meta("blast_impulse", Vector3.ZERO)
+			blast_impulse += blast_escape.normalized() * (6.0 * (1.0 - distance / 5.0))
+			ally.set_meta("blast_impulse", blast_impulse)
 			if remaining <= 0.0:
 				ally.set_meta("downed", true)
 				ally.set_meta("revive_progress", 0.0)
