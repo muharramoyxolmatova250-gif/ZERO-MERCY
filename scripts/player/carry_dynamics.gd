@@ -175,3 +175,8 @@ func get_gait_sway() -> Vector3:
 		speed = Vector2(actor.velocity.x, actor.velocity.z).length()
 	var amount := minf(speed / 8.0, 1.0) * get_sway_factor()
 	return Vector3(sin(sway_phase) * 0.018, absf(cos(sway_phase)) * 0.012, sin(sway_phase * 0.5) * 0.014) * amount
+
+
+func get_support_hand_profile() -> Dictionary:
+	var weight := get_secondary_grip_weight()
+	return {"weight": weight, "active": weight > 0.05, "reach_speed": lerpf(7.0, 12.0, weight), "wrist_stiffness": lerpf(0.35, 0.9, weight)}
