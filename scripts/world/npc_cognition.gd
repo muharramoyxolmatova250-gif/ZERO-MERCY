@@ -236,3 +236,14 @@ func compare_decision_outcomes(options: Array[Dictionary], context: Dictionary) 
 	scored.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.get("expected_utility",0.0)) > float(b.get("expected_utility",0.0)))
 	return {"best":best,"ranked":scored,"confidence":decision_confidence(scored)}
 
+
+
+func decision_confidence(ranked_options: Array[Dictionary]) -> float:
+	if ranked_options.is_empty():
+		return 0.0
+	if ranked_options.size() == 1:
+		return 0.55
+	var first := float(ranked_options[0].get("expected_utility",0.0))
+	var second := float(ranked_options[1].get("expected_utility",0.0))
+	return clampf(0.5+absf(first-second)*0.8,0.5,0.98)
+
