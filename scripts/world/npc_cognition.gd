@@ -92,3 +92,16 @@ func update_emotions(delta: float, safe: bool, social_support: float = 0.0) -> v
 	emotional_state["joy"] = move_toward(float(emotional_state.get("joy",0.5)),0.5,recovery*0.2)
 	emotional_state["curiosity"] = move_toward(float(emotional_state.get("curiosity",0.5)),0.5,recovery*0.08)
 
+
+
+func remember_episode(kind: String, summary: String, importance: float, location: Vector3 = Vector3.ZERO, other_id: String = "") -> void:
+	if kind.is_empty() or summary.is_empty():
+		return
+	episodic_memory.append({"kind":kind,"summary":summary,"importance":clampf(importance,0.0,1.0),"location":location,"other_id":other_id,"tick":Time.get_ticks_msec()})
+	while episodic_memory.size() > 80:
+		var weakest := 0
+		for index in range(1,episodic_memory.size()):
+			if float(episodic_memory[index].get("importance",0.0)) < float(episodic_memory[weakest].get("importance",0.0)):
+				weakest = index
+		episodic_memory.remove_at(weakest)
+
