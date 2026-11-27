@@ -361,6 +361,24 @@ func _decide_goal() -> void:
 	scores = _cognition.evaluate_goal_scores(scores, cognition_context, _personality_traits, _memory)
 	var agency_context := {"stress":_stress,"loneliness":_social_need,"boredom":_curiosity,"financial_pressure":float(life_profile.get("debt",0.0))/1000.0,"profile":life_profile,"available_time":1.0}
 	if _rng.randf() < 0.08:
+		var agency_memories: Array[Dictionary] = []
+		for memory_entry in _memory:
+			agency_memories.append({"id":str(abs(hash(memory_entry))),"event":memory_entry,"importance":0.45,"emotional_intensity":0.35,"unresolved":false,"suggested_activity":"reflect"})
+		agency_context["memories"] = agency_memories
+		var nearby_affordances: Array[Dictionary] = []
+		var affordance_nodes := get_tree().get_nodes_in_group("npc_affordance")
+		for affordance_node in affordance_nodes:
+			if nearby_affordances.size() >= 16:
+				break
+			if not is_instance_valid(affordance_node) or not affordance_node.has_method("get_npc_affordance"):
+				continue
+			var affordance: Dictionary = affordance_node.call("get_npc_affordance", citizen_id)
+			if not affordance.is_empty():
+				var affordance_position: Vector3 = affordance.get("position", global_position)
+				if global_position.distance_to(affordance_position) <= 35.0:
+					affordance["distance"] = global_position.distance_to(affordance_position)
+					nearby_affordances.append(affordance)
+		agency_context["affordances"] = nearby_affordances
 		var previous_personal_goal := str(_self_direction.active_personal_goal.get("id", ""))
 		var chosen_personal_goal: Dictionary = _self_direction.choose_personal_goal(agency_context)
 		var chosen_goal_id := str(chosen_personal_goal.get("id", ""))
