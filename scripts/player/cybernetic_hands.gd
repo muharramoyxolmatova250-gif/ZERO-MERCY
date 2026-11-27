@@ -13,6 +13,8 @@ var _grip_anchor: Marker3D
 var _reach_rotation := Vector3.ZERO
 var _reach_weight := 0.0
 var _is_gripping := false
+var _carry_mass_kg := 0.0
+var _carry_fragile := false
 var _clock := 0.0
 
 func _ready() -> void:
@@ -43,8 +45,14 @@ func _process(delta: float) -> void:
 		var side := -1.0 if index == 0 else 1.0
 		var phase := gait * side
 		var target := Vector3(-0.10 - phase * 0.34 * gait_weight + breathing, 0.0, side * 0.035 * gait_weight)
-		if side > 0.0:
-			target += _reach_rotation * _reach_weight
+		if _is_gripping and _carry_mass_kg > 0.0:
+			if side > 0.0:
+				target = Vector3(-0.24 - minf(_carry_mass_kg * 0.006, 0.16), 0.0, 0.045)
+			else:
+				target = Vector3(-0.16 - minf(_carry_mass_kg * 0.004, 0.10), 0.0, -0.025)
+		else:
+			if side > 0.0:
+				target += _reach_rotation * _reach_weight
 		pivot.rotation = pivot.rotation.lerp(target, clampf(delta * (16.0 if _reach_weight > 0.01 else 12.0), 0.0, 1.0))
 	for hinge_index in range(_finger_hinges.size()):
 		var curl := 0.08 + sprint_weight * 0.22 + sin(_clock * 3.0 + float(hinge_index) * 0.45) * 0.025
@@ -136,8 +144,14 @@ func close_grip() -> void:
 	_is_gripping = true
 	_reach_weight = 1.0
 
+func set_carry_profile(mass_kg: float, fragile: bool = false) -> void:
+	_carry_mass_kg = maxf(0.0, mass_kg)
+	_carry_fragile = fragile
+
 func release_object() -> void:
 	_is_gripping = false
+	_carry_mass_kg = 0.0
+	_carry_fragile = false
 	_reach_weight = 0.0
 	_reach_rotation = Vector3.ZERO
 
