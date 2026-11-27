@@ -2,6 +2,8 @@ extends RefCounted
 const NPCAnimationDirector = preload("res://scripts/world/npc_animation_director.gd")
 const NPCAnimationGaze = preload("res://scripts/world/npc_animation_gaze.gd")
 const NPCAnimationIK = preload("res://scripts/world/npc_animation_ik.gd")
+const NPCAnimationLimbChain = preload("res://scripts/world/npc_animation_limb_chain.gd")
+const NPCAnimationHandPose = preload("res://scripts/world/npc_animation_hand_pose.gd")
 const NPCAnimationLOD = preload("res://scripts/world/npc_animation_lod.gd")
 const NPCAnimationStateMachine = preload("res://scripts/world/npc_animation_state_machine.gd")
 const NPCAnimationFootPlacement = preload("res://scripts/world/npc_animation_foot_placement.gd")
@@ -264,12 +266,17 @@ func _apply_attention_gaze(delta: float) -> void:
 		return
 	var desired := Vector2.ZERO
 	if is_instance_valid(attention_target):
-		var local_direction := global_transform.basis.inverse() * (attention_target.global_position - head.global_position).normalized()
-		var yaw := atan2(local_direction.x, -local_direction.z)
-		var pitch := atan2(local_direction.y, Vector2(local_direction.x, local_direction.z).length())
-		desired = Vector2(clampf(-pitch, -0.45, 0.45), clampf(yaw, -0.85, 0.85))
+		var facing_basis := body.global_transform.basis if is_instance_valid(body) else Basis.IDENTITY
+		var gaze: Dictionary = NPCAnimationGaze.solve_gaze(head.global_position, attention_target.global_position, facing_basis)
+		desired = Vector2(float(gaze.get("pitch", 0.0)), float(gaze.get("yaw", 0.0)))
 	head.rotation.x = lerpf(head.rotation.x, desired.x, clampf(delta * 3.0, 0.0, 1.0))
 	head.rotation.y = lerpf(head.rotation.y, desired.y, clampf(delta * 3.0, 0.0, 1.0))
 
 func solve_limb_ik(root: Vector2, target: Vector2, upper_length: float, lower_length: float, bend_sign: float = 1.0) -> Dictionary:
 	return NPCAnimationIK.solve_two_bone(root, target, upper_length, lower_length, bend_sign)
+
+func solve_segmented_limb(root: Vector2, target: Vector2, upper_length: float, lower_length: float, bend_sign: float = 1.0) -> Dictionary:
+	return NPCAnimationLimbChain.solve(root, target, upper_length, lower_length, bend_sign)
+
+func get_hand_pose(name: String) -> Dictionary:
+	return NPCAnimationHandPose.get_pose(name)
