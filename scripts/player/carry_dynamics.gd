@@ -289,3 +289,6 @@ func get_fragile_gait_envelope() -> Vector2:
 func get_sway_offset() -> Vector3:
 	var factor := get_sway_factor() * clampf(1.0 - stability * 0.25, 0.55, 1.0)
 	return Vector3(sin(sway_phase) * 0.014, absf(cos(sway_phase)) * 0.009, sin(sway_phase * 0.5) * 0.012) * factor
+
+func get_hand_tension() -> float:
+	return clampf(mass_kg / 24.0, 0.08, 1.0) if has_item() else 0.0
