@@ -112,3 +112,6 @@ func reset_motion(position: Vector3) -> void:
 	motion_state = "idle"
 func get_speed_ratio() -> float:
 	return clampf(velocity.length() / maxf(preferred_speed, 0.01), 0.0, 2.0)
+func choose_sidestep(offset: Vector3) -> Vector3:
+	var side := Vector3(-offset.z, 0.0, offset.x) * sidestep_sign
+	return side.normalized() if side.length_squared() > 0.0001 else Vector3.ZERO
