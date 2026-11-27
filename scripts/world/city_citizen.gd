@@ -1053,3 +1053,9 @@ func _apply_indoor_need_outcomes(goal_id: String) -> void:
 		"learn_skill", "advance_career": _stress = minf(1.0, _stress + 0.025)
 		"find_quiet_place": _stress = maxf(0.0, _stress - 0.14)
 		"practice_hobby", "create_something": _curiosity = maxf(0.0, _curiosity - 0.12)
+
+func _remember_personal_activity_outcome(goal_id: String, satisfaction: float) -> void:
+	if goal_id.is_empty(): return
+	var result := "satisfied" if satisfaction >= 0.58 else "unsatisfied"
+	remember_event("personal_goal:" + goal_id + ":" + result)
+	_self_direction.learn_from_satisfaction(goal_id, satisfaction)
