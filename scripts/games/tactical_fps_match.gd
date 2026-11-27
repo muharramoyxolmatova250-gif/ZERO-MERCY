@@ -389,8 +389,12 @@ func _update_bots(delta: float) -> void:
 			sight.exclude = [bot.get_rid()]
 			var obstruction := get_world_3d().direct_space_state.intersect_ray(sight)
 			if not obstruction.is_empty() and obstruction.get("collider") == player:
-				health = maxf(0.0, health - 4.0)
-			wait = 1.5 + float(bot.get_instance_id() % 10) * 0.08
+				var skill := float(bot.get_meta("combat_skill", 0.8))
+				var damage := 2.5 + skill * 2.5
+				health = maxf(0.0, health - damage)
+				wait = 1.15 + (1.0 - skill) * 0.9
+			else:
+				wait = 0.3
 		bot.set_meta("fire_wait", wait)
 
 	# Round outcome is also actionable on touch-only devices.
