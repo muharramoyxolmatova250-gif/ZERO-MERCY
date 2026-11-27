@@ -201,3 +201,9 @@ func get_setdown_transform(position: Vector3, facing: Vector3) -> Transform3D:
 		forward = Vector3.FORWARD
 	var basis := Basis.looking_at(forward, Vector3.UP)
 	return Transform3D(basis, position + Vector3.UP * get_setdown_clearance())
+
+
+func get_handling_factor() -> float:
+	if not is_instance_valid(held_item):
+		return 1.0
+	return clampf(float(held_item.get_meta("handling_sensitivity", 1.0)), 0.35, 2.0)
