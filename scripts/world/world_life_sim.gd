@@ -1687,6 +1687,25 @@ func get_phone_unread_count(citizen_id: String) -> int:
     return count
 
 
+func mark_all_phone_messages_read(citizen_id: String) -> int:
+    if not resident_profiles.has(citizen_id):
+        return 0
+    var profile := _ensure_phone_profile(citizen_id)
+    var inbox: Array = profile.get("phone_inbox", [])
+    var changed := 0
+    for index in range(inbox.size()):
+        var message: Dictionary = inbox[index]
+        if not bool(message.get("read", false)):
+            message["read"] = true
+            inbox[index] = message
+            changed += 1
+    profile["phone_inbox"] = inbox
+    resident_profiles[citizen_id] = profile
+    if changed > 0:
+        _dirty = true
+    return changed
+
+
 func send_phone_message(sender_id: String, recipient_id: String, message_text: String, message_kind: String = "text") -> bool:
     message_text = message_text.strip_edges()
     if message_text.length() > 500:
