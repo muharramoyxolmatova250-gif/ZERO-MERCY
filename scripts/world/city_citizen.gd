@@ -1009,3 +1009,9 @@ func _resolve_personal_indoor_activity() -> String:
 	var mapped := _get_personal_goal_activity(goal_id)
 	if not mapped.is_empty(): return mapped
 	return ""
+
+func _record_personal_activity_progress(goal_id: String, amount: float) -> void:
+	if goal_id.is_empty(): return
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	if life_sim != null and life_sim.has_method("update_resident_goal_progress"):
+		life_sim.call("update_resident_goal_progress", citizen_id, goal_id, amount)
