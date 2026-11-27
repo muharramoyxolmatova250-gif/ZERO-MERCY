@@ -1768,6 +1768,26 @@ func mark_phone_message_read(citizen_id: String, message_id: String) -> bool:
     return false
 
 
+func delete_phone_message(citizen_id: String, message_id: String) -> bool:
+    if not resident_profiles.has(citizen_id) or message_id.is_empty():
+        return false
+    var profile := _ensure_phone_profile(citizen_id)
+    var changed := false
+    for field in ["phone_inbox", "phone_outbox"]:
+        var messages: Array = profile.get(field, [])
+        var kept: Array = []
+        for message in messages:
+            if str(message.get("id", "")) == message_id:
+                changed = true
+            else:
+                kept.append(message)
+        profile[field] = kept
+    if changed:
+        resident_profiles[citizen_id] = profile
+        _dirty = true
+    return changed
+
+
 func _add_phone_contact(owner_id: String, contact_id: String) -> void:
     var owner := _ensure_phone_profile(owner_id)
     if owner.is_empty():
