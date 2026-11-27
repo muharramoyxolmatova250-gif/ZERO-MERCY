@@ -1266,6 +1266,12 @@ func receive_simulation_rumor(payload: Dictionary, trust: float = 0.35) -> bool:
 func get_simulation_awareness_snapshot() -> Dictionary:
 	return _simulation_awareness.get_snapshot()
 
+func get_simulation_awareness_state() -> Dictionary:
+	return _simulation_awareness.export_persistent_state()
+
+func restore_simulation_awareness_state(payload: Dictionary) -> void:
+	_simulation_awareness.restore_persistent_state(payload)
+
 func test_simulation_hypothesis(question: String, expected: String, risk: float = 0.1) -> int:
 	return _simulation_awareness.create_experiment(question, expected, risk)
 
