@@ -262,6 +262,34 @@ func get_family_members(citizen_id: String) -> Array:
                 "relationship": relationship, "life_stage": str(member.get("life_stage", "adult"))})
     return members
 
+func get_family_snapshot(citizen_id: String) -> Dictionary:
+    if not resident_profiles.has(citizen_id):
+        return {}
+    var profile: Dictionary = resident_profiles[citizen_id]
+    var members: Array = []
+    for member_data in get_family_members(citizen_id):
+        var member_id := str(member_data.get("id", ""))
+        var bond := get_social_bond(citizen_id, member_id)
+        var item: Dictionary = member_data.duplicate(true)
+        item["trust"] = float(bond.get("trust", 0.0))
+        item["friendship"] = float(bond.get("friendship", 0.0))
+        item["familiarity"] = float(bond.get("familiarity", 0.0))
+        item["last_interaction_day"] = int(bond.get("last_interaction_day", 0))
+        members.append(item)
+    return {
+        "citizen_id": citizen_id,
+        "name": str(profile.get("name", citizen_id)),
+        "family_id": str(profile.get("family_id", "")),
+        "household_id": str(profile.get("household_id", "")),
+        "marital_status": str(profile.get("marital_status", "single")),
+        "members": members,
+        "member_count": members.size(),
+        "children_count": int(profile.get("children_count", 0)),
+        "family_stress": float(profile.get("family_stress", 0.0)),
+        "happiness": float(profile.get("happiness", 0.5))
+    }
+
+
 func record_family_interaction(citizen_id: String, activity: String = "family_time") -> void:
     if not resident_profiles.has(citizen_id):
         return
@@ -279,6 +307,7 @@ func record_family_interaction(citizen_id: String, activity: String = "family_ti
         member["happiness"] = clampf(float(member.get("happiness", 0.5)) + boost, 0.0, 1.0)
         _append_event(member, "shared_" + activity + ":" + citizen_id)
         resident_profiles[member_id] = member
+        record_social_interaction(citizen_id, member_id, "shared_activity")
     _dirty = true
 
 
@@ -314,6 +343,7 @@ func record_childcare(parent_id: String, child_id: String, care_action: String =
     parent["family_stress"] = clampf(float(parent.get("family_stress", 0.0)) - 0.025, 0.0, 1.0)
     _append_event(parent, "provided_childcare:" + child_id)
     resident_profiles[parent_id] = parent
+    record_social_interaction(parent_id, child_id, "help")
     _dirty = true
     return true
 
