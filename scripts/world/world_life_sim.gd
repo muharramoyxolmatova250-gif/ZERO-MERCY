@@ -1990,6 +1990,10 @@ func make_phone_call(caller_id: String, recipient_id: String, duration_seconds: 
         return false
     var caller := _ensure_phone_profile(caller_id)
     var recipient := _ensure_phone_profile(recipient_id)
+    if (caller.get("phone_blocked_contacts", []) as Array).has(recipient_id):
+        return false
+    if (recipient.get("phone_blocked_contacts", []) as Array).has(caller_id):
+        return false
     var safe_duration := clampi(duration_seconds, 0, 3600)
     var call_record := {
         "id": "call_" + str(Time.get_unix_time_from_system()) + "_" + str(_rng.randi()),
