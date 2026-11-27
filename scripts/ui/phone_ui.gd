@@ -103,7 +103,7 @@ func _build_phone() -> void:
     tabs.add_theme_constant_override("separation", 4)
     tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     tab_scroll.add_child(tabs)
-    for tab in ["feed", "media", "games", "news", "contacts", "life", "missions", "map"]:
+    for tab in ["feed", "media", "games", "news", "contacts", "sms", "life", "missions", "map"]:
         var button := Button.new()
         button.text = tab.to_upper()
         button.custom_minimum_size = Vector2(76, 34)
