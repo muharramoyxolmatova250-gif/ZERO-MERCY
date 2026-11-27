@@ -205,6 +205,14 @@ func _build_news() -> void:
         _add_body("World news satellite connection unavailable.")
     _add_body("Live reports are generated from city institutions, residents and events. News updates as the simulation advances.")
 
+func _get_phone_owner_id() -> String:
+    var player := get_parent().get_node_or_null("Dara")
+    if player != null and player.has_method("get_ai_snapshot"):
+        var snapshot: Dictionary = player.call("get_ai_snapshot")
+        return str(snapshot.get("id", ""))
+    return ""
+
+
 func _build_contacts() -> void:
     _add_section_title("NEARBY CONTACTS")
     var citizens := get_tree().get_nodes_in_group("city_citizen")
