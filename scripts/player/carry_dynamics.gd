@@ -278,3 +278,6 @@ func get_turn_sensitivity() -> float:
 
 func get_lateral_balance() -> float:
 	return clampf(turn_load * mass_kg * 0.0025, 0.0, 0.22)
+
+func get_forward_lean() -> float:
+	return clampf(impact_load * mass_kg * 0.0018, 0.0, 0.18)
