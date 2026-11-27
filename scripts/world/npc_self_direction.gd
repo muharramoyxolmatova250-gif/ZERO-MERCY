@@ -233,3 +233,9 @@ func update_aspiration_progress(goal_id: String, progress: float) -> void:
 		if str(aspirations[index].get("id", "")) == goal_id:
 			aspirations[index]["progress"] = clampf(float(aspirations[index].get("progress", 0.0)) + progress, 0.0, 1.0)
 			break
+func respect_personal_boundaries(context: Dictionary = {}) -> bool:
+	if bool(context.get("sleeping", false)) or bool(context.get("injured", false)):
+		return false
+	if float(context.get("stress", 0.0)) > 0.96 and _trait("risk_tolerance") < 0.3:
+		return false
+	return true
