@@ -545,17 +545,33 @@ func _update_bots(delta: float) -> void:
 		bot.velocity.z = pursuit.z * move_speed
 		bot.move_and_slide()
 		var wait := float(bot.get_meta("fire_wait", 1.0)) - delta
-		if wait <= 0.0 and distance < 24.0:
+		var enemy_target: Node3D = player
+		var target_distance := bot.global_position.distance_to(player.global_position)
+		for ally_target in allies:
+			if not is_instance_valid(ally_target) or bool(ally_target.get_meta("downed", false)):
+				continue
+			var ally_distance := bot.global_position.distance_to(ally_target.global_position)
+			if ally_distance < target_distance and ally_distance < 24.0:
+				enemy_target = ally_target
+				target_distance = ally_distance
+		if wait <= 0.0 and target_distance < 24.0:
 			var eye := bot.global_position + Vector3.UP * 0.55
-			var target := camera.global_position
+			var target := enemy_target.global_position + Vector3.UP * 0.55
 			var sight := PhysicsRayQueryParameters3D.create(eye, target)
 			sight.exclude = [bot.get_rid()]
 			var obstruction := get_world_3d().direct_space_state.intersect_ray(sight)
-			if not obstruction.is_empty() and obstruction.get("collider") == player:
+			if not obstruction.is_empty() and obstruction.get("collider") == enemy_target:
 				var skill := float(bot.get_meta("combat_skill", 0.8))
 				var damage := 2.5 + skill * 2.5
 				if randf() <= skill * (0.55 if is_suppressed else 1.0):
-					health = maxf(0.0, health - damage)
+					if enemy_target == player:
+						health = maxf(0.0, health - damage)
+					else:
+						var ally_health := maxf(0.0, float(enemy_target.get_meta("health", 100.0)) - damage)
+						enemy_target.set_meta("health", ally_health)
+						if ally_health <= 0.0:
+							enemy_target.set_meta("downed", true)
+							enemy_target.set_meta("revive_progress", 0.0)
 				var role_delay := 0.18 if role == "support" else (-0.12 if role == "flanker" else 0.0)
 				wait = maxf(0.55, 1.15 + (1.0 - skill) * 0.9 + role_delay)
 			else:
