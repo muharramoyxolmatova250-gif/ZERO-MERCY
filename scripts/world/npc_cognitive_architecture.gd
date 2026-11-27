@@ -238,3 +238,12 @@ func detect_goal_conflicts() -> Array[Dictionary]:
 			if (a == "energy" and b == "purpose") or (b == "energy" and a == "purpose") or (a == "safety" and b == "exploration") or (b == "safety" and a == "exploration"):
 				conflicts.append({"first":goals[i].id,"second":goals[j].id,"reason":"limited_time_or_risk_tradeoff"})
 	return conflicts
+
+func deliberate(options: Array[Dictionary], context: Dictionary = {}) -> Dictionary:
+	var examined: Array[Dictionary] = []
+	var count := mini(options.size(), MAX_REASONING_STEPS)
+	for i in range(count):
+		var option: Dictionary = options[i]
+		examined.append({"action":str(option.get("action", "")),"utility":evaluate_opportunity(option, context),"risk":float(option.get("risk", 0.5))})
+	examined.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.utility) > float(b.utility))
+	return {"best":examined[0] if not examined.is_empty() else {},"examined":examined,"limited_by_reasoning_budget":options.size()>MAX_REASONING_STEPS}
