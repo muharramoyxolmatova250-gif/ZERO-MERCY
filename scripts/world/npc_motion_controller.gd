@@ -100,3 +100,5 @@ func _safe_delta(delta: float) -> float:
 	return clampf(delta, 0.0, 0.05)
 func get_motion_state() -> String:
 	return motion_state
+func get_gait_sway() -> float:
+	return sin(gait_phase) * 0.035
