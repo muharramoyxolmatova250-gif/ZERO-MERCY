@@ -145,4 +145,4 @@ func update_pose(delta: float, speed: float, motion_state: String, activity: Str
 		phone.rotation.x = -0.08 if using_phone else 0.0
 
 func get_pose_snapshot() -> Dictionary:
-	return {"gait_phase":phase,"idle_phase":idle_phase,"gesture_phase":gesture_phase}
+	return {"gait_phase":phase,"idle_phase":idle_phase,"gesture_phase":gesture_phase,"idle_gesture":idle_gesture,"reaction":reaction_name if reaction_remaining > 0.0 else "","reaction_remaining":reaction_remaining}
