@@ -1922,7 +1922,7 @@ func get_phone_suggested_residents(citizen_id: String, limit: int = 12) -> Array
         var other := _ensure_phone_profile(other_id)
         if other.is_empty():
             continue
-        var bond: Dictionary = (profile.get("social_bonds", {}) as Dictionary).get(other_id, {})
+        var bond: Dictionary = get_social_bond(citizen_id, other_id)
         var follower_count := (other.get("phone_followers", []) as Array).size()
         var influence := _get_phone_social_influence(other)
         var score := float(bond.get("trust", 0.0)) * 2.0 + float(bond.get("familiarity", 0.0)) + minf(float(follower_count) * 0.015, 2.0) + minf(float(influence) * 0.002, 1.5)
