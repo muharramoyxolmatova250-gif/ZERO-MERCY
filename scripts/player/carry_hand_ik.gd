@@ -122,3 +122,6 @@ static func is_chain_stretched(shoulder: Vector3, elbow: Vector3, wrist: Vector3
 
 static func get_joint_balance(upper_length: float, lower_length: float) -> float:
 	return clampf(minf(upper_length, lower_length) / maxf(maxf(upper_length, lower_length), 0.001), 0.0, 1.0)
+
+static func get_target_direction_local(origin: Vector3, target: Vector3, basis: Basis) -> Vector3:
+	return basis.inverse() * safe_normalize(target - origin)
