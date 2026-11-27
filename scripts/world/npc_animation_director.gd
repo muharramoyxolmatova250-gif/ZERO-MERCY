@@ -22,6 +22,11 @@ func initialize(identity: String, traits: Dictionary) -> void:
 	gesture.setup(abs(hash(identity + ":micro-gesture")))
 	initialized = true
 
+func configure(identity: String, traits: Dictionary) -> void:
+	profile.initialize(identity, traits)
+	gesture.setup(abs(hash(identity + ":micro-gesture")))
+	initialized = true
+
 func update(delta: float, speed: float, motion_state: String, activity: String, using_phone: bool, stress: float, goal: String, traits: Dictionary, preferred_speed: float, urgent: bool = false) -> Dictionary:
 	if not initialized:
 		initialize("resident", traits)
