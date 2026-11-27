@@ -461,7 +461,7 @@ func _decide_goal() -> void:
 	var cognitive_drives: Array[Dictionary] = _independent_mind.evaluate_need_drives()
 	for drive in cognitive_drives:
 		var drive_key := str(drive.get("need", ""))
-		var drive_goal := {"hunger":"food","energy":"rest","social":"social","curiosity":"explore","safety":"avoid_crowd","purpose":"work"}.get(drive_key, "")
+		var drive_goal: String = str({"hunger":"food","energy":"rest","social":"social","curiosity":"explore","safety":"avoid_crowd","purpose":"work"}.get(drive_key, ""))
 		if not str(drive_goal).is_empty() and scores.has(drive_goal): scores[drive_goal] = float(scores[drive_goal]) + float(drive.get("urgency", 0.0)) * 0.22
 	var previous_goal := current_goal
 	var best: String = "commute"
