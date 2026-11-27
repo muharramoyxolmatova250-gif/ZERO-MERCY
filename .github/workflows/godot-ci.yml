@@ -33,3 +33,6 @@ jobs:
 
       - name: Run headless startup smoke test
         run: godot --headless --path . --quit-after 5
+
+      - name: Run carry hand IK geometry tests
+        run: godot --headless --path . --script res://tests/test_carry_hand_ik.gd
