@@ -472,12 +472,17 @@ func _update_bots(delta: float) -> void:
 		var is_suppressed := suppressed_time > 0.0
 		if bot_health <= 65.0 and not cover_positions.is_empty():
 			var best_cover := cover_positions[0]
-			var best_distance := INF
+			var best_score := INF
 			for cover_point in cover_positions:
 				var retreat_point := cover_point + (cover_point - player.global_position).normalized() * 2.4
 				var cover_distance := bot.global_position.distance_to(retreat_point)
-				if cover_distance < best_distance:
-					best_distance = cover_distance
+				var cover_ray := PhysicsRayQueryParameters3D.create(player.global_position + Vector3.UP * 0.55, cover_point + Vector3.UP * 0.65)
+				cover_ray.exclude = [player.get_rid(), bot.get_rid()]
+				var cover_hit := get_world_3d().direct_space_state.intersect_ray(cover_ray)
+				var protection_bonus := -5.0 if not cover_hit.is_empty() else 7.0
+				var candidate_score := cover_distance + protection_bonus
+				if candidate_score < best_score:
+					best_score = candidate_score
 					best_cover = retreat_point
 			var cover_offset := best_cover - bot.global_position
 			var cover_direction := cover_offset.normalized()
