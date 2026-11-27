@@ -41,6 +41,7 @@ func _ready() -> void:
 	_start_region_streaming()
 	_start_global_world_simulation()
 	_start_society_simulation()
+	_start_simulation_awareness_network()
 	_start_phone_ui()
 	_start_dialogue_ui()
 	_start_mission_objective_director()
