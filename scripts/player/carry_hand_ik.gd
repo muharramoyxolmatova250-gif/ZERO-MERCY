@@ -85,3 +85,6 @@ static func get_elbow_angle(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -
 	if upper.length_squared() < 0.001 or lower.length_squared() < 0.001:
 		return 0.0
 	return acos(clampf(upper.dot(lower), -1.0, 1.0))
+
+static func get_wrist_distance(shoulder: Vector3, wrist: Vector3) -> float:
+	return shoulder.distance_to(wrist)
