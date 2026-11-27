@@ -1,7 +1,7 @@
 extends RefCounted
 ## Stable per-resident variation without per-frame random-number noise.
 static func make_profile(identity: String, personality: Dictionary = {}) -> Dictionary:
-	var seed_value := abs(hash(identity))
+	var seed_value: int = absi(hash(identity))
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
 	var expressiveness := clampf(float(personality.get("expressiveness", 0.5)), 0.0, 1.0)
