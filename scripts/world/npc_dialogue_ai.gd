@@ -385,3 +385,13 @@ func discuss_rumor(topic: String, source_reliability: float) -> String:
 		return "There are stories about %s, but I haven't confirmed them." % topic
 	return "I heard a credible report about %s, though I'd still like to verify the details." % topic
 
+
+
+func ask_follow_up(topic: String) -> String:
+	var questions: Array[String] = ["What happened next?","How did you feel about that?","What do you think should happen now?","Have you experienced something similar before?"]
+	if speaking_style == "curious":
+		questions.append_array(["How does that work?","Where did you learn that?","What surprised you most?"])
+	elif speaking_style == "warm":
+		questions.append_array(["Would you like some advice?","Do you have someone supporting you?"])
+	return questions[_rng.randi_range(0,questions.size()-1)]
+
