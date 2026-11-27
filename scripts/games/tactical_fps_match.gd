@@ -379,7 +379,12 @@ func _update_bots(delta: float) -> void:
 		bot.look_at(Vector3(player.global_position.x, bot.global_position.y, player.global_position.z), Vector3.UP)
 		var direction := offset.normalized()
 		var phase := float(bot.get_meta("strafe_phase", 0.0))
-		var side := Vector3(-direction.z, 0.0, direction.x) * sin(float(Time.get_ticks_msec()) * 0.0012 + phase)
+		var role := str(bot.get_meta("squad_role", "support"))
+		var flank_sign := -1.0 if int(bot.get_meta("squad_slot", 0)) % 2 == 0 else 1.0
+		var side_strength := 0.9 if role == "flanker" else 0.42
+		var side := Vector3(-direction.z, 0.0, direction.x) * sin(float(Time.get_ticks_msec()) * 0.0012 + phase) * side_strength
+		if role == "flanker":
+			side += Vector3(-direction.z, 0.0, direction.x) * flank_sign * 0.3
 		var desired_range := 10.0 + float(int(bot.get_instance_id()) % 4)
 		var approach := direction * clampf((distance - desired_range) / 5.0, -0.65, 1.0)
 		var separation := Vector3.ZERO
