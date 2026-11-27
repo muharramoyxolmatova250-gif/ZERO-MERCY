@@ -257,3 +257,7 @@ static func get_chain_orientation(shoulder: Vector3, wrist: Vector3, up_hint: Ve
 	var right := safe_normalize(direction.cross(up_hint), Vector3.RIGHT)
 	var corrected_up := safe_normalize(right.cross(direction), Vector3.UP)
 	return Basis(right, corrected_up, -direction).orthonormalized()
+
+static func get_target_distance_weight(shoulder: Vector3, target: Vector3, start_distance: float, end_distance: float) -> float:
+	var distance := shoulder.distance_to(target)
+	return clampf(inverse_lerp(start_distance, maxf(end_distance, start_distance + 0.001), distance), 0.0, 1.0)
