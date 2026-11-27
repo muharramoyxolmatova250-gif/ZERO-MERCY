@@ -416,7 +416,8 @@ func _update_bots(delta: float) -> void:
 			if not obstruction.is_empty() and obstruction.get("collider") == player:
 				var skill := float(bot.get_meta("combat_skill", 0.8))
 				var damage := 2.5 + skill * 2.5
-				health = maxf(0.0, health - damage)
+				if randf() <= skill:
+					health = maxf(0.0, health - damage)
 				wait = 1.15 + (1.0 - skill) * 0.9
 			else:
 				wait = 0.3
