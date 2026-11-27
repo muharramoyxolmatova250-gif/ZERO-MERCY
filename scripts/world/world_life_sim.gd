@@ -1791,7 +1791,18 @@ func react_to_phone_post(citizen_id: String, post_id: String) -> bool:
             continue
         post["likes"] = int(post.get("likes", 0)) + 1
         _social_feed[index] = post
-        record_social_interaction(citizen_id, str(post.get("author_id", "")), "social_post_like")
+        var author_id := str(post.get("author_id", ""))
+        if resident_profiles.has(author_id):
+            var author_profile := _ensure_phone_profile(author_id)
+            var author_posts: Array = author_profile.get("phone_social_posts", [])
+            for own_index in range(author_posts.size() - 1, -1, -1):
+                if str(author_posts[own_index].get("id", "")) == post_id:
+                    author_posts[own_index] = post.duplicate(true)
+                    break
+            author_profile["phone_social_posts"] = author_posts
+            resident_profiles[author_id] = author_profile
+            _add_phone_notification(author_id, "social_like", str(_ensure_phone_profile(citizen_id).get("name", citizen_id)) + " liked your post")
+        record_social_interaction(citizen_id, author_id, "social_post_like")
         _dirty = true
         return true
     return false
@@ -1911,8 +1922,18 @@ func add_phone_social_comment(citizen_id: String, post_id: String, comment_text:
         post["comments"] = int(post.get("comments", 0)) + 1
         _social_feed[index] = post
         var author_id := str(post.get("author_id", ""))
+        if resident_profiles.has(author_id):
+            var author_profile := _ensure_phone_profile(author_id)
+            var author_posts: Array = author_profile.get("phone_social_posts", [])
+            for own_index in range(author_posts.size() - 1, -1, -1):
+                if str(author_posts[own_index].get("id", "")) == post_id:
+                    author_posts[own_index] = post.duplicate(true)
+                    break
+            author_profile["phone_social_posts"] = author_posts
+            resident_profiles[author_id] = author_profile
         if not author_id.is_empty() and author_id != citizen_id:
             _add_phone_notification(author_id, "social_comment", str(profile.get("name", citizen_id)) + " commented on your post")
+            record_social_interaction(citizen_id, author_id, "social_comment")
         record_event(citizen_id, "commented_on_social_post")
         _dirty = true
         return true
