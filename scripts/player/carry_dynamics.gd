@@ -193,3 +193,11 @@ func get_camera_motion_factor() -> float:
 
 func get_setdown_clearance() -> float:
 	return 0.34 + clampf(mass_kg * 0.004, 0.0, 0.24)
+
+
+func get_setdown_transform(position: Vector3, facing: Vector3) -> Transform3D:
+	var forward := Vector3(facing.x, 0.0, facing.z).normalized()
+	if forward.length_squared() < 0.001:
+		forward = Vector3.FORWARD
+	var basis := Basis.looking_at(forward, Vector3.UP)
+	return Transform3D(basis, position + Vector3.UP * get_setdown_clearance())
