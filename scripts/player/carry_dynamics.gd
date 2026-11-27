@@ -309,3 +309,6 @@ func get_place_duration() -> float:
 
 func get_clearance_radius() -> float:
 	return clampf(0.35 + mass_kg * 0.006, 0.35, 0.85)
+
+func get_recovery_rate(is_standing: bool) -> float:
+	return balance_recovery * (1.7 if is_standing else 1.0)
