@@ -693,6 +693,8 @@ func _update_allies(delta: float) -> void:
 				var damage := 10.0 + skill * 10.0
 				var remaining := float(nearest.get_meta("health", 100.0)) - damage
 				nearest.set_meta("health", remaining)
+				nearest.set_meta("suppressed_time", maxf(float(nearest.get_meta("suppressed_time", 0.0)), 0.85))
+				nearest.set_meta("morale", maxf(0.2, float(nearest.get_meta("morale", 1.0)) - 0.08))
 				wait = 1.25 - skill * 0.45
 				if remaining <= 0.0:
 					nearest.queue_free()
