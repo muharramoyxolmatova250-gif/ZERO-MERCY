@@ -1876,7 +1876,8 @@ func _add_phone_notification(citizen_id: String, kind: String, title: String) ->
     if profile.is_empty():
         return
     var notifications: Array = profile.get("phone_notifications", [])
-    notifications.append({"kind": kind, "title": title, "day": simulation_day, "read": false})
+    notifications.append({"id": "notice_" + str(Time.get_unix_time_from_system()) + "_" + str(_rng.randi()),
+        "kind": kind, "title": title, "day": simulation_day, "read": false})
     while notifications.size() > 40:
         notifications.pop_front()
     profile["phone_notifications"] = notifications
