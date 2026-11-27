@@ -752,6 +752,31 @@ func _create_limb_pivot(node_name: String, pivot_position: Vector3, material: Ma
 	mesh_instance.position.y = -height * 0.43
 	mesh_instance.material_override = material
 	pivot.add_child(mesh_instance)
+	var joint := MeshInstance3D.new()
+	var joint_mesh := SphereMesh.new()
+	joint_mesh.radius = radius * 1.04
+	joint_mesh.height = radius * 2.08
+	joint.mesh = joint_mesh
+	joint.position.y = -height * 0.52
+	joint.material_override = material
+	joint.name = "ElbowJoint" if "Arm" in node_name else "KneeJoint"
+	pivot.add_child(joint)
+	var end_part := MeshInstance3D.new()
+	end_part.material_override = material
+	if "Arm" in node_name:
+		var hand_mesh := SphereMesh.new()
+		hand_mesh.radius = radius * 1.22
+		hand_mesh.height = radius * 2.44
+		end_part.mesh = hand_mesh
+		end_part.position = Vector3(0.0, -height * 0.88, -0.015)
+		end_part.name = "Hand"
+	else:
+		var foot_mesh := BoxMesh.new()
+		foot_mesh.size = Vector3(radius * 1.8, radius * 0.9, radius * 2.4)
+		end_part.mesh = foot_mesh
+		end_part.position = Vector3(0.0, -height * 0.88, -0.09)
+		end_part.name = "Foot"
+	pivot.add_child(end_part)
 	add_child(pivot)
 	return pivot
 
