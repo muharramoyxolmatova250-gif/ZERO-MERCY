@@ -252,3 +252,19 @@ func mark_step_result(action: String, success: bool, detail: String = "") -> voi
    active_plan[index]["detail"] = detail
    learn_outcome(action,0.82 if success else 0.2)
    break
+
+
+func rank_relevant_memories(memories: Array[Dictionary], context: Dictionary = {}) -> Array[Dictionary]:
+ var ranked: Array[Dictionary] = []
+ var topic := str(context.get("topic","")).to_lower()
+ for memory in memories:
+  var item := memory.duplicate(true)
+  var summary := str(item.get("summary","")).to_lower()
+  var relevance := 0.0
+  if not topic.is_empty() and topic in summary:
+   relevance += 0.55
+  relevance += float(item.get("importance",0.0))*0.45
+  item["relevance"] = relevance
+  ranked.append(item)
+ ranked.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.relevance)>float(b.relevance))
+ return ranked
