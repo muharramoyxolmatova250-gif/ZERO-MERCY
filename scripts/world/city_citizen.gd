@@ -1,4 +1,5 @@
 extends Node3D
+const NPCCognition = preload("res://scripts/world/npc_cognition.gd")
 ## Lightweight ambient pedestrian that loops a local sidewalk route.
 @export var route: PackedVector3Array = PackedVector3Array()
 @export_range(0.2, 5.0, 0.1) var walk_speed := 1.25
@@ -48,6 +49,7 @@ var _phone_brain_timer := 0.0
 var _phone_action_cooldown := 0.0
 var _phone_battery_visual := 1.0
 var _last_browser_topic := ""
+var _cognition: RefCounted = NPCCognition.new()
 @export var citizen_id := ""
 @export var city_id := ""
 @export var occupation := "resident"
@@ -91,6 +93,8 @@ func _on_emergency_incident_created(incident_id: String, payload: Dictionary) ->
 	if distance > 38.0:
 		return
 	var severity := float(payload.get("severity", 0.5))
+	_cognition.appraise_event("threat", severity, clampf(1.0 - distance / 38.0, 0.0, 1.0))
+	_cognition.remember_episode("emergency", "Nearby " + str(payload.get("kind", "incident")), severity, incident_position, incident_id)
 	var courage := float(_personality_traits.get("courage", 0.5))
 	var curiosity := float(_personality_traits.get("curiosity", 0.5))
 	_stress = clampf(_stress + severity * (0.45 + (1.0 - courage) * 0.25), 0.0, 1.0)
@@ -144,6 +148,7 @@ func _physics_process(delta: float) -> void:
 			current_goal = "avoid_crowd"
 			_pause_remaining = 1.5
 		return
+	_cognition.update_emotions(delta, _stress < 0.45, 0.35 if _social_need < 0.35 else 0.0)
 	_age_refresh_timer += delta
 	if _age_refresh_timer >= 10.0:
 		_age_refresh_timer = 0.0
@@ -268,6 +273,7 @@ func _initialize_personality() -> void:
 		_long_term_goal = "build_relationships"
 	else:
 		_long_term_goal = "build_a_stable_life"
+	_cognition.initialize(citizen_id, _personality_traits)
 
 
 func _update_needs() -> void:
@@ -329,6 +335,8 @@ func _decide_goal() -> void:
 		scores["leisure"] = 0.85
 	if str(life_profile.get("marital_status", "single")) == "partnered":
 		scores["family"] = 0.35 + _social_need * 0.2
+	var cognition_context := {"stress":_stress,"energy":_energy,"hunger":_hunger,"hour":hour,"day":int(life_profile.get("simulation_day",0)),"risk_tolerance":risk_tolerance}
+	scores = _cognition.evaluate_goal_scores(scores, cognition_context, _personality_traits, _memory)
 	var previous_goal := current_goal
 	var best := "commute"
 	var best_score := -1.0
@@ -339,7 +347,8 @@ func _decide_goal() -> void:
 			best_score = score
 			best = goal
 	current_goal = best
-	_decision_reason = "needs_personality_memory_and_schedule"
+	_decision_reason = "needs_personality_memory_emotion_learning_and_schedule"
+	_cognition.record_decision(best, _decision_reason, best_score, cognition_context)
 	if _last_routed_goal != best:
 		var route_network := get_tree().get_first_node_in_group("pedestrian_route_network")
 		if route_network != null:
@@ -854,7 +863,9 @@ func get_ai_decision_snapshot() -> Dictionary:
 		"recent_memories": _memory.duplicate(),
 		"life_stage": str(life_profile.get("life_stage", "unknown")),
 		"transport": "taxi" if _taxi_riding else "walking",
-		"emergency_flee_remaining": _crime_flee_timer
+		"emergency_flee_remaining": _crime_flee_timer,
+		"cognition": _cognition.get_cognition_snapshot(),
+		"decision_explanation": _cognition.explain_last_decision()
 	}
 
 func evaluate_local_risk(threat_position: Vector3, threat_severity: float = 0.5) -> Dictionary:
