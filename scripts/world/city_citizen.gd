@@ -141,6 +141,7 @@ func _on_crime_reported(crime_id: String, crime_position: Vector3, severity: int
 	_stress = clampf(_stress + 0.35, 0.0, 1.0)
 	current_goal = "flee"
 	remember_event("witnessed_crime:" + crime_id)
+	_independent_mind.observe_world_fact("crime:" + crime_id, "A crime was reported nearby", clampf(float(severity) / 5.0, 0.2, 1.0), "crime_report", {"distance":distance,"position":crime_position})
 	var dispatch := get_tree().get_first_node_in_group("emergency_dispatch_ai")
 	var courage := float(_personality_traits.get("courage", 0.5))
 	var severity_factor := clampf(float(severity) / 5.0, 0.0, 1.0)
