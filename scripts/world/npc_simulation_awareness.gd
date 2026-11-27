@@ -156,3 +156,7 @@ func get_evidence_by_kind(kind: String) -> Array[Dictionary]:
 		if str(item.get("kind", "")) == kind:
 			result.append(item.duplicate(true))
 	return result
+
+
+func export_persistent_state() -> Dictionary:
+	return {"resident_id":resident_id,"evidence":evidence.duplicate(true),"hypotheses":hypotheses.duplicate(true),"experiments":experiments.duplicate(true),"suspicion":suspicion,"curiosity":curiosity}
