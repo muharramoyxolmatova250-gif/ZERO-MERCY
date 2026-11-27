@@ -1611,6 +1611,17 @@ func get_phone_contacts(citizen_id: String) -> Array:
     return contacts.duplicate(true)
 
 
+func get_phone_unread_count(citizen_id: String) -> int:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return 0
+    var count := 0
+    for message in profile.get("phone_inbox", []):
+        if not bool(message.get("read", false)):
+            count += 1
+    return count
+
+
 func send_phone_message(sender_id: String, recipient_id: String, message_text: String, message_kind: String = "text") -> bool:
     if sender_id == recipient_id or message_text.strip_edges().is_empty():
         return false
