@@ -2036,8 +2036,13 @@ func play_phone_party_game(game_id: String, invited_ids: Array, match_minutes: i
         member_game_stats["rank_points"] = maxi(0, int(member_game_stats.get("rank_points", 0)) + (18 if won else -7))
         member_stats[game_id] = member_game_stats
         member_profile["phone_game_stats"] = member_stats
+        member_profile["energy"] = clampf(float(member_profile.get("energy", 0.7)) - 0.035, 0.0, 1.0)
+        member_profile["social_need"] = maxf(0.0, float(member_profile.get("social_need", 0.5)) - 0.12)
         resident_profiles[member_id] = member_profile
         record_event(member_id, "phone_party_result:" + ("won" if won else "lost"))
+    for first_index in range(roster.size()):
+        for second_index in range(first_index + 1, roster.size()):
+            record_social_interaction(str(roster[first_index].get("id", "")), str(roster[second_index].get("id", "")), "shared_activity")
     _dirty = true
     return {"started": true, "game_id": game_id, "game_title": str(game_data.get("title", "Game")), "won": won, "team_score": snappedf(team_score, 0.01), "accepted_count": accepted, "roster": roster, "invited_count": invited_ids.size(), "match_minutes": maxi(1, match_minutes)}
 
