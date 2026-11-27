@@ -245,6 +245,8 @@ func _refresh_content() -> void:
             _build_contacts()
         "sms":
             _build_sms_inbox()
+        "notifications":
+            _build_notifications_center()
         "life":
             _build_life()
         "missions":
@@ -278,6 +280,7 @@ func _build_home_screen() -> void:
     _add_phone_app_tile(grid, "NEWS", "⌁", "news")
     _add_phone_app_tile(grid, "CONTACTS", "◎", "contacts")
     _add_phone_app_tile(grid, "MESSAGES", "✉", "sms")
+    _add_phone_app_tile(grid, "ALERTS", "⚑", "notifications")
     _add_phone_app_tile(grid, "LIFE", "◇", "life")
     _add_phone_app_tile(grid, "MISSIONS", "✦", "missions")
     _add_phone_app_tile(grid, "WORLD MAP", "⌖", "map")
