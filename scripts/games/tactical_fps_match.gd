@@ -580,6 +580,7 @@ func _update_bots(delta: float) -> void:
 			sight.exclude = [bot.get_rid()]
 			var obstruction := get_world_3d().direct_space_state.intersect_ray(sight)
 			if not obstruction.is_empty() and obstruction.get("collider") == enemy_target:
+				bot.set_meta("magazine_ammo", maxi(0, int(bot.get_meta("magazine_ammo", 18)) - 1))
 				var skill := float(bot.get_meta("combat_skill", 0.8))
 				var damage := 2.5 + skill * 2.5
 				if randf() <= skill * (0.55 if is_suppressed else 1.0):
