@@ -820,7 +820,7 @@ func _start_independent_life(profile: Dictionary) -> void:
 
 func _career_specialization(education: String, performance: float, rng: RandomNumberGenerator) -> String:
     var fields := JOBS.duplicate()
-	if education in ["university", "postgraduate", "graduated"]:
+    if education in ["university", "postgraduate", "graduated"]:
         fields = ["engineer", "doctor", "scientist", "designer", "pilot"]
     elif education == "technical":
         fields = ["mechanic", "courier", "security", "merchant", "engineer"]
