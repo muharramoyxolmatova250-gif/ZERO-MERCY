@@ -136,3 +136,8 @@ static func project_point_on_segment(point: Vector3, start: Vector3, finish: Vec
 
 static func get_point_segment_distance(point: Vector3, start: Vector3, finish: Vector3) -> float:
 	return point.distance_to(project_point_on_segment(point, start, finish))
+
+static func get_chain_bend_direction(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> Vector3:
+	var axis := safe_normalize(wrist - shoulder)
+	var offset := elbow - project_point_on_segment(elbow, shoulder, wrist)
+	return safe_normalize(offset, Vector3.UP)
