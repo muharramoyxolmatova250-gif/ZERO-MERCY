@@ -438,6 +438,11 @@ func record_social_interaction(first_id: String, second_id: String, interaction:
     if interaction in ["friendly_chat", "help", "shared_activity"]:
         bond["trust"] = clampf(float(bond.get("trust", 0.0)) + 0.025, -1.0, 1.0)
         bond["friendship"] = clampf(float(bond.get("friendship", 0.0)) + 0.035, -1.0, 1.0)
+    elif interaction == "social_comment":
+        bond["trust"] = clampf(float(bond.get("trust", 0.0)) + 0.012, -1.0, 1.0)
+        bond["friendship"] = clampf(float(bond.get("friendship", 0.0)) + 0.01, -1.0, 1.0)
+    elif interaction == "social_post_like":
+        bond["trust"] = clampf(float(bond.get("trust", 0.0)) + 0.004, -1.0, 1.0)
     elif interaction in ["argument", "threat", "betrayal"]:
         bond["trust"] = clampf(float(bond.get("trust", 0.0)) - 0.12, -1.0, 1.0)
         bond["friendship"] = clampf(float(bond.get("friendship", 0.0)) - 0.08, -1.0, 1.0)
@@ -1820,8 +1825,27 @@ func get_phone_social_profile(citizen_id: String) -> Dictionary:
         "following": (profile.get("phone_following", []) as Array).duplicate(),
         "followers": (profile.get("phone_followers", []) as Array).duplicate(),
         "posts": (profile.get("phone_social_posts", []) as Array).duplicate(true),
+        "post_count": (profile.get("phone_social_posts", []) as Array).size(),
+        "total_likes": _get_phone_social_engagement(profile, "likes"),
+        "total_comments": _get_phone_social_engagement(profile, "comments"),
+        "influence_score": _get_phone_social_influence(profile),
         "privacy": str(profile.get("phone_privacy", "friends"))
     }
+
+
+func _get_phone_social_engagement(profile: Dictionary, field: String) -> int:
+    var total := 0
+    for post_value in profile.get("phone_social_posts", []):
+        var post: Dictionary = post_value
+        total += int(post.get(field, 0))
+    return total
+
+
+func _get_phone_social_influence(profile: Dictionary) -> int:
+    var followers := (profile.get("phone_followers", []) as Array).size()
+    var likes := _get_phone_social_engagement(profile, "likes")
+    var comments := _get_phone_social_engagement(profile, "comments")
+    return followers * 3 + likes + comments * 2
 
 
 func follow_phone_resident(follower_id: String, target_id: String) -> bool:
@@ -1899,8 +1923,10 @@ func get_phone_suggested_residents(citizen_id: String, limit: int = 12) -> Array
         if other.is_empty():
             continue
         var bond: Dictionary = (profile.get("social_bonds", {}) as Dictionary).get(other_id, {})
-        var score := float(bond.get("trust", 0.0)) * 2.0 + float(bond.get("familiarity", 0.0))
-        candidates.append({"id":other_id,"name":str(other.get("name", other_id)),"occupation":str(other.get("occupation", "Resident")),"followers":(other.get("phone_followers", []) as Array).size(),"score":score})
+        var follower_count := (other.get("phone_followers", []) as Array).size()
+        var influence := _get_phone_social_influence(other)
+        var score := float(bond.get("trust", 0.0)) * 2.0 + float(bond.get("familiarity", 0.0)) + minf(float(follower_count) * 0.015, 2.0) + minf(float(influence) * 0.002, 1.5)
+        candidates.append({"id":other_id,"name":str(other.get("name", other_id)),"occupation":str(other.get("occupation", "Resident")),"followers":follower_count,"posts":(other.get("phone_social_posts", []) as Array).size(),"influence":influence,"score":score})
     candidates.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.get("score", 0.0)) > float(b.get("score", 0.0)))
     return candidates.slice(0, mini(candidates.size(), maxi(1, limit)))
 
