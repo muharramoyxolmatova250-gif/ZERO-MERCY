@@ -56,3 +56,6 @@ static func make_debug_solution(shoulder: Vector3, target: Vector3, upper_length
 
 static func validate_segment_lengths(upper_length: float, lower_length: float) -> bool:
 	return upper_length > 0.001 and lower_length > 0.001
+
+static func get_max_reach(upper_length: float, lower_length: float, margin: float = 0.025) -> float:
+	return maxf(0.0, upper_length + lower_length - margin)
