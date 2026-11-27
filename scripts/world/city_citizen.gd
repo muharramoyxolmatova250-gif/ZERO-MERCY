@@ -300,6 +300,8 @@ func _initialize_personality() -> void:
 	_action_planner.initialize(citizen_id, _personality_traits)
 	_motion_controller.initialize(citizen_id, _personality_traits, walk_speed)
 	_self_direction.initialize(citizen_id, _personality_traits, life_profile)
+	_independent_mind.initialize(citizen_id, _personality_traits)
+	_independent_mind.form_belief("self", "I am " + str(life_profile.get("name", citizen_id)), 0.95, "identity_profile")
 
 
 func _update_needs() -> void:
