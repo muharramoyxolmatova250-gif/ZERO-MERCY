@@ -182,3 +182,7 @@ static func get_joint_limit_weight(angle: float, minimum: float, maximum: float,
 
 static func get_chain_lengths(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> Vector2:
 	return Vector2(shoulder.distance_to(elbow), elbow.distance_to(wrist))
+
+static func get_chain_error(shoulder: Vector3, elbow: Vector3, wrist: Vector3, upper_length: float, lower_length: float) -> float:
+	var lengths := get_chain_lengths(shoulder, elbow, wrist)
+	return absf(lengths.x - upper_length) + absf(lengths.y - lower_length)
