@@ -1000,3 +1000,6 @@ func _score_personal_activity_satisfaction(goal_id: String) -> float:
 	elif goal_id in ["learn_skill", "advance_career", "find_better_job"]: score += float(_personality_traits.get("ambition", 0.5)) * 0.18 + float(_personality_traits.get("discipline", 0.5)) * 0.1
 	elif goal_id in ["practice_hobby", "create_something", "explore_unknown_place"]: score += float(_personality_traits.get("curiosity", 0.5)) * 0.2
 	return clampf(score, 0.0, 1.0)
+
+func _get_indoor_action_context() -> Dictionary:
+	return {"goal_id":_get_active_personal_goal_id(),"activity":_indoor_activity,"elapsed":_indoor_activity_time,"energy":_energy,"hunger":_hunger,"stress":_stress,"social_need":_social_need,"occupation":occupation}
