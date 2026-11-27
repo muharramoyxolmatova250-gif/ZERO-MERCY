@@ -851,7 +851,7 @@ func _consider_vehicle_purchase(profile: Dictionary) -> void:
     var total_funds := money + savings + bank_balance
     if total_funds < 18000 or float(profile.get("financial_stability", 0.0)) < 0.55:
         return
-	if _rng.randf() > 0.035:
+    if _rng.randf() > 0.035:
         return
     var vehicle_types := ["compact_car", "sedan", "motorcycle", "electric_car"]
     var vehicle_prices := {"compact_car": 18000, "sedan": 26000, "motorcycle": 8500, "electric_car": 34000}
