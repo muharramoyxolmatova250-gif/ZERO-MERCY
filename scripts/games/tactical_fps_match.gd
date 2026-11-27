@@ -389,11 +389,18 @@ func _update_bots(delta: float) -> void:
 		var side := Vector3(-direction.z, 0.0, direction.x) * sin(float(Time.get_ticks_msec()) * 0.0012 + phase) * side_strength
 		if role == "flanker":
 			side += Vector3(-direction.z, 0.0, direction.x) * flank_sign * 0.3
+		var squad_leader_alive := false
+		for squad_member in bots:
+			if is_instance_valid(squad_member) and str(squad_member.get_meta("squad_role", "")) == "leader" and float(squad_member.get_meta("health", 0.0)) > 0.0:
+				squad_leader_alive = true
+				break
 		var desired_range := 10.0 + float(int(bot.get_instance_id()) % 4)
 		if role == "leader":
 			desired_range = 8.5
 		elif role == "support":
 			desired_range = 13.0
+		if not squad_leader_alive:
+			desired_range = maxf(6.0, desired_range - 2.0)
 		var approach := direction * clampf((distance - desired_range) / 5.0, -0.65, 1.0)
 		var separation := Vector3.ZERO
 		var squad_center := Vector3.ZERO
