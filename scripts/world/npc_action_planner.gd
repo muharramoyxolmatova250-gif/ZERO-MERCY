@@ -230,3 +230,16 @@ func novelty_score(action: String) -> float:
  return clampf(1.0-float(repeats)*0.22,0.12,1.0)
 func record_habit(action: String, success: float) -> void:
  habits[action] = float(habits.get(action,0.0))*0.82 + clampf(success,0.0,1.0)*0.18
+
+
+func rank_urgent_goals(goals: Array[Dictionary], context: Dictionary = {}) -> Array[Dictionary]:
+ var ranked: Array[Dictionary] = []
+ for goal in goals:
+  var item := goal.duplicate(true)
+  var urgency := float(item.get("urgency",0.0))
+  var importance := float(item.get("importance",0.5))
+  var deadline := float(item.get("deadline_pressure",0.0))
+  item["priority"] = urgency*0.48 + importance*0.32 + deadline*0.2
+  ranked.append(item)
+ ranked.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.priority)>float(b.priority))
+ return ranked
