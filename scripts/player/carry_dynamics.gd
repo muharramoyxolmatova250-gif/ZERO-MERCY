@@ -211,3 +211,11 @@ func get_handling_factor() -> float:
 
 func get_pickup_reach_duration() -> float:
 	return clampf(0.22 + mass_kg * 0.008, 0.22, 0.72)
+
+
+func get_stability_label() -> String:
+	if stability >= 0.78:
+		return "STABLE"
+	if stability >= 0.48:
+		return "UNSTEADY"
+	return "CRITICAL"
