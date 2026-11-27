@@ -723,7 +723,18 @@ func _consider_autonomous_phone_use() -> void:
 				life_sim.call("react_to_phone_post", citizen_id, selected_post_id)
 				remember_event("liked_social_post:" + selected_author)
 				if _curiosity > 0.82 and life_sim.has_method("add_phone_social_comment") and _rng.randf() < 0.18:
-					var short_replies := ["Zo'r fikr!", "Men ham shuni ko'rdim.", "Bu haqda ko'proq bilmoqchiman.", "Ajoyib yangilik!"]
+					var short_replies: Array[String] = []
+					var kindness := float(_personality_traits.get("kindness", 0.5))
+					var courage := float(_personality_traits.get("courage", 0.5))
+					var post_mood := str(selected_post.get("mood", "neutral"))
+					if post_mood in ["sad", "worried", "stress", "negative"]:
+						short_replies = ["Hammasi yaxshi bo'lishiga umid qilaman.", "Yordam kerak bo'lsa, ayting.", "O'zingizni ehtiyot qiling."]
+					elif kindness > 0.68:
+						short_replies = ["Zo'r fikr, qo'llab-quvvatlayman!", "Buni ko'rib xursand bo'ldim.", "Ajoyib! Omad sizga!"]
+					elif courage > 0.68:
+						short_replies = ["Bu fikrga qanday keldingiz?", "Boshqa odamlar bunga qanday qaraydi?", "Qiziq, bunga dalilingiz bormi?"]
+					else:
+						short_replies = ["Men ham shuni ko'rdim.", "Bu haqda ko'proq bilmoqchiman.", "Qiziqarli yangilik."]
 					life_sim.call("add_phone_social_comment", citizen_id, selected_post_id, short_replies[_rng.randi_range(0, short_replies.size() - 1)])
 				_phone_action_cooldown = _rng.randf_range(35.0, 90.0)
 				_set_phone_visible(true)
