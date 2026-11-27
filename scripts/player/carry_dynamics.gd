@@ -167,3 +167,11 @@ func get_acceleration_factor() -> float:
 
 func get_braking_factor() -> float:
 	return clampf(1.0 - mass_kg * 0.012, 0.55, 1.0)
+
+
+func get_gait_sway() -> Vector3:
+	var speed := 0.0
+	if actor != null:
+		speed = Vector2(actor.velocity.x, actor.velocity.z).length()
+	var amount := minf(speed / 8.0, 1.0) * get_sway_factor()
+	return Vector3(sin(sway_phase) * 0.018, absf(cos(sway_phase)) * 0.012, sin(sway_phase * 0.5) * 0.014) * amount
