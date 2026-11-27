@@ -324,3 +324,23 @@ func adjust_verbosity(line: String) -> String:
 		return line + " There's usually more to the story, though."
 	return line
 
+
+
+func answer_uzbek(question: String, context: Dictionary = {}) -> String:
+	var q := question.to_lower()
+	if _contains_any(q,["qandaysan","qalaysan","yaxshimisan"]):
+		return "Yaxshiman, rahmat! O'zingizda nima gap?"
+	if _contains_any(q,["isming nima","kimsan"]):
+		return "Mening ismim %s. Men ham shu shaharda yashayman." % str(context.get("my_name",resident_id))
+	if _contains_any(q,["qayerda ishlaysan","kasbing nima","nima ish qilasan"]):
+		return "Men %s bo'lib ishlayman. Ishimning yaxshi va qiyin tomonlari bor." % str(context.get("occupation","rezident"))
+	if _contains_any(q,["oilangg","farzanding","bolalaring"]):
+		return _family_answer(context)
+	if _contains_any(q,["nima deb o'ylaysan","fikring qanday"]):
+		return "Bu haqda hali o'ylab ko'ryapman. Sizning fikringiz qanday?"
+	if _contains_any(q,["rahmat"]):
+		return "Arzimaydi! Yana yordam kerak bo'lsa, ayting."
+	if _contains_any(q,["kechir","uzr"]):
+		return _apology_answer()
+	return "Qiziq savol ekan. Buni birgalikda muhokama qilsak bo'ladi. Siz nima deb o'ylaysiz?"
+
