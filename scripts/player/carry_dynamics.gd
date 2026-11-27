@@ -315,3 +315,10 @@ func get_recovery_rate(is_standing: bool) -> float:
 
 func should_emergency_release() -> bool:
 	return has_item() and stability <= 0.04 and mass_kg >= heavy_mass_limit
+
+func get_posture_state() -> String:
+	if not has_item(): return "free"
+	if fragile: return "careful"
+	if mass_kg >= heavy_mass_limit: return "heavy"
+	if mass_kg >= sprint_mass_limit: return "braced"
+	return "light"
