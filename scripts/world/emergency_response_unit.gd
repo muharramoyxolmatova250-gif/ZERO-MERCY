@@ -47,6 +47,8 @@ func _physics_process(delta: float) -> void:
 		return
 	_arrival_timer += delta
 	if _arrival_timer >= 4.0:
+		if _dispatch != null and _dispatch.has_method("report_responder_arrival"):
+			_dispatch.call("report_responder_arrival", responder_id, _incident_id)
 		_active = false
 		visible = false
 		if _dispatch != null and _dispatch.has_method("release_responder"):
