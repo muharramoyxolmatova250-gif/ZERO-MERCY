@@ -1944,6 +1944,47 @@ func unblock_phone_contact(citizen_id: String, contact_id: String) -> bool:
     return true
 
 
+func get_phone_notifications(citizen_id: String, unread_only: bool = false, limit: int = 40) -> Array:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return []
+    var result: Array = []
+    for item in profile.get("phone_notifications", []):
+        if unread_only and bool(item.get("read", false)):
+            continue
+        result.append(item.duplicate(true))
+    result.reverse()
+    return result.slice(0, mini(result.size(), maxi(1, limit)))
+
+
+func mark_phone_notification_by_id(citizen_id: String, notification_id: String) -> bool:
+    var profile := _ensure_phone_profile(citizen_id)
+    var notifications: Array = profile.get("phone_notifications", [])
+    for index in range(notifications.size()):
+        var item: Dictionary = notifications[index]
+        if str(item.get("id", "")) == notification_id:
+            item["read"] = true
+            notifications[index] = item
+            profile["phone_notifications"] = notifications
+            resident_profiles[citizen_id] = profile
+            _dirty = true
+            return true
+    return false
+
+
+func clear_phone_notifications(citizen_id: String) -> int:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return 0
+    var notifications: Array = profile.get("phone_notifications", [])
+    var removed := notifications.size()
+    profile["phone_notifications"] = []
+    resident_profiles[citizen_id] = profile
+    if removed > 0:
+        _dirty = true
+    return removed
+
+
 func make_phone_call(caller_id: String, recipient_id: String, duration_seconds: int = 30) -> bool:
     if caller_id == recipient_id or not resident_profiles.has(caller_id) or not resident_profiles.has(recipient_id):
         return false
