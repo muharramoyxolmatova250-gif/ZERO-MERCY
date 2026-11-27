@@ -171,3 +171,6 @@ static func smooth_weight(current: float, target: float, delta: float, speed: fl
 
 static func smooth_vector(current: Vector3, target: Vector3, delta: float, speed: float) -> Vector3:
 	return current.lerp(target, clampf(maxf(delta, 0.0) * maxf(speed, 0.0), 0.0, 1.0))
+
+static func clamp_joint_angle(angle: float, minimum: float, maximum: float) -> float:
+	return clampf(angle, minf(minimum, maximum), maxf(minimum, maximum))
