@@ -62,3 +62,6 @@ static func get_max_reach(upper_length: float, lower_length: float, margin: floa
 
 static func get_min_reach(upper_length: float, lower_length: float, margin: float = 0.025) -> float:
 	return absf(upper_length - lower_length) + margin
+
+static func get_reach_ratio(shoulder: Vector3, target: Vector3, upper_length: float, lower_length: float) -> float:
+	return clampf(shoulder.distance_to(target) / maxf(upper_length + lower_length, 0.001), 0.0, 1.5)
