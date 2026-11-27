@@ -413,6 +413,10 @@ func _restart_round() -> void:
 	time_left = ROUND_SECONDS
 	reloading = false
 	reload_left = 0.0
+	fire_cooldown = 0.0
+	recoil_recovery = 0.0
+	if touch_controls != null:
+		touch_controls.reset_controls()
 	player.global_position = Vector3(0, 1, 19)
 	player.velocity = Vector3.ZERO
 	player.rotation = Vector3.ZERO
