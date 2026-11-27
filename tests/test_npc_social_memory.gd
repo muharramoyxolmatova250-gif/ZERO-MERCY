@@ -7,7 +7,9 @@ func _initialize() -> void:
 	_test_hostility_creates_conflict()
 	_test_relationship_history_is_bounded()
 	_test_snapshots_are_isolated()
-	print("PASS NPC social memory: trust, conflict, relationship tiers and bounded history.")
+	_test_promises_change_relationships()
+	_test_pending_promises_are_filtered()
+	print("PASS NPC social memory: trust, conflict, relationship tiers, promises and bounded history.")
 	quit()
 
 func _make_mind(identity: String):
@@ -46,3 +48,26 @@ func _test_snapshots_are_isolated() -> void:
 	var snapshot: Dictionary = mind.get_relationship_snapshot("person_4")
 	snapshot["trust"] = 0.0
 	assert(float(mind.get_relationship_snapshot("person_4").get("trust", 0.0)) > 0.0)
+
+func _test_promises_change_relationships() -> void:
+	var mind = _make_mind("promise_keeper")
+	var promise: Dictionary = mind.make_personal_promise("friend_5", "Return the borrowed toolkit", 12, 0.9)
+	assert(not promise.is_empty())
+	assert(str(promise.get("status", "")) == "pending")
+	var resolved: Dictionary = mind.resolve_personal_promise(str(promise.get("id", "")), true, 10)
+	assert(str(resolved.get("status", "")) == "fulfilled")
+	assert(float(mind.get_relationship_snapshot("friend_5").get("trust", 0.0)) > 0.5)
+	var broken: Dictionary = mind.make_personal_promise("friend_5", "Attend the meeting", 14, 0.8)
+	mind.resolve_personal_promise(str(broken.get("id", "")), false, 15)
+	assert(str(mind.get_relationship_snapshot("friend_5").get("last_promise", {}).get("status", "")) == "broken")
+	assert(float(mind.get_relationship_snapshot("friend_5").get("trust", 1.0)) < 0.5)
+
+func _test_pending_promises_are_filtered() -> void:
+	var mind = _make_mind("promise_filter")
+	var first: Dictionary = mind.make_personal_promise("friend_a", "Bring food", 8)
+	mind.make_personal_promise("friend_b", "Repair bike", 4)
+	var pending: Array[Dictionary] = mind.get_pending_promises("friend_a")
+	assert(pending.size() == 1)
+	assert(str(pending[0].get("id", "")) == str(first.get("id", "")))
+	mind.resolve_personal_promise(str(first.get("id", "")), true, 7)
+	assert(mind.get_pending_promises("friend_a").is_empty())
