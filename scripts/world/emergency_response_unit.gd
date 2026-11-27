@@ -39,7 +39,10 @@ func _physics_process(delta: float) -> void:
 	var distance := offset.length()
 	if distance > 2.5:
 		var direction := offset.normalized()
-		global_position += direction * response_speed * delta
+		var desired_speed := response_speed
+		if not _has_green_path(direction):
+			desired_speed *= 0.35
+		global_position += direction * desired_speed * delta
 		look_at(global_position + direction, Vector3.UP)
 		return
 	_arrival_timer += delta
@@ -80,3 +83,15 @@ func _build_vehicle() -> void:
 func _exit_tree() -> void:
 	if _dispatch != null and is_instance_valid(_dispatch):
 		_dispatch.call("unregister_responder", responder_id)
+
+ 
+func _has_green_path(direction: Vector3) -> bool:
+	for signal_node in get_tree().get_nodes_in_group("traffic_signals"):
+		if not is_instance_valid(signal_node) or not signal_node.has_method("is_green_for"):
+			continue
+		var offset: Vector3 = signal_node.global_position - global_position
+		offset.y = 0.0
+		if offset.length() <= 7.0 and offset.length_squared() > 0.01 and direction.dot(offset.normalized()) > 0.55:
+			if not bool(signal_node.call("is_green_for", direction)):
+				return false
+	return true
