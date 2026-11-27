@@ -81,3 +81,14 @@ func appraise_event(event_kind: String, intensity: float, personal_relevance: fl
 			emotional_state["curiosity"] = clampf(float(emotional_state.get("curiosity",0.5)) + impact * 0.3, 0.0, 1.0)
 	return emotional_state.duplicate(true)
 
+
+
+func update_emotions(delta: float, safe: bool, social_support: float = 0.0) -> void:
+	var recovery := delta * (0.0025 + clampf(social_support,0.0,1.0) * 0.006)
+	if safe:
+		emotional_state["fear"] = maxf(0.0,float(emotional_state.get("fear",0.0))-recovery)
+		emotional_state["anger"] = maxf(0.0,float(emotional_state.get("anger",0.0))-recovery*0.55)
+		emotional_state["sadness"] = maxf(0.0,float(emotional_state.get("sadness",0.0))-recovery*0.35)
+	emotional_state["joy"] = move_toward(float(emotional_state.get("joy",0.5)),0.5,recovery*0.2)
+	emotional_state["curiosity"] = move_toward(float(emotional_state.get("curiosity",0.5)),0.5,recovery*0.08)
+
