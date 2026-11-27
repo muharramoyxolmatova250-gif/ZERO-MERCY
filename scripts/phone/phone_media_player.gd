@@ -29,12 +29,15 @@ func _ready() -> void:
 	image.hide()
 
 func load_feed(items: Array) -> void:
+	_feed_items.clear()
+	_current_index = -1
 	for child in feed_list.get_children():
 		child.queue_free()
 	for item in items:
 		if not item is Dictionary:
 			continue
 		var record: Dictionary = item
+		_feed_items.append(record.duplicate(true))
 		var title := str(record.get("title", record.get("caption", "Untitled media")))
 		var path := str(record.get("asset_path", record.get("file_path", "")))
 		var entry := Button.new()
@@ -42,8 +45,10 @@ func load_feed(items: Array) -> void:
 		entry.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		entry.pressed.connect(func() -> void: open_media(record))
 		feed_list.add_child(entry)
-	if items.is_empty():
+	if _feed_items.is_empty():
 		status.text = "No media items in this feed yet."
+	else:
+		status.text = str(_feed_items.size()) + " feed items loaded. Select an installed asset to play."
 
 func open_media(media: Dictionary) -> bool:
 	var path := str(media.get("asset_path", media.get("file_path", ""))).strip_edges()
