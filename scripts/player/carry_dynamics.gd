@@ -312,3 +312,6 @@ func get_clearance_radius() -> float:
 
 func get_recovery_rate(is_standing: bool) -> float:
 	return balance_recovery * (1.7 if is_standing else 1.0)
+
+func should_emergency_release() -> bool:
+	return has_item() and stability <= 0.04 and mass_kg >= heavy_mass_limit
