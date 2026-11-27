@@ -161,3 +161,9 @@ func evaluate_opportunity(opportunity: Dictionary, context: Dictionary = {}) -> 
 	var risk := float(opportunity.get("risk", 0.2))
 	var interest := float(preferences.get(str(opportunity.get("type", "")), 0.0)) + 0.5
 	return benefit * 0.38 + interest * 0.24 + _trait("curiosity") * 0.12 - effort * (1.0 - _trait("discipline")) * 0.12 - risk * (1.0 - _trait("risk_tolerance")) * 0.28
+func create_goal_from_experience(event: String, activity: String, motivation: float = 0.6) -> Dictionary:
+	if event.is_empty() or activity.is_empty():
+		return {}
+	var goal := {"id":"experience_" + str(abs(hash(event))),"activity":activity,"drive":"curiosity","weight":clampf(motivation,0.1,1.0),"need":"growth","origin_event":event,"self_chosen":true,"status":"chosen"}
+	active_personal_goal = goal.duplicate(true)
+	return goal
