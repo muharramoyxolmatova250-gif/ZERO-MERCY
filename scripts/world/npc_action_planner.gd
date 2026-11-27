@@ -107,3 +107,16 @@ func learn_outcome(action: String, satisfaction: float) -> void:
 
 func get_plan_snapshot() -> Dictionary:
  return {"citizen_id":citizen_id,"plan":active_plan.duplicate(true),"next_index":plan_index,"reason":plan_reason,"confidence":plan_confidence,"decisions":decision_count,"last_action":last_action,"last_target":last_target,"learned_actions":learned.size()}
+
+
+func expand_action_variants(action: String, context: Dictionary) -> Array[String]:
+ var variants: Array[String] = [action]
+ var weather := str(context.get("weather","clear"))
+ var crowd := float(context.get("crowd_density",0.0))
+ if action in ["travel","visit_place"] and weather in ["rain","storm","snow"]:
+  variants.append("seek_shelter_then_" + action)
+ if action in ["greet","talk"] and crowd > 0.7:
+  variants.append("wait_for_quieter_moment")
+ if action in ["investigate","observe"] and float(context.get("risk",0.0)) > 0.6:
+  variants.append("observe_from_cover")
+ return variants
