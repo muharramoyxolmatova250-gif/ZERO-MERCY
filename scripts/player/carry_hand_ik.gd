@@ -368,3 +368,6 @@ static func get_solution_reach_margin(solution: Dictionary, upper_length: float,
 
 static func get_solution_fold_margin(solution: Dictionary, upper_length: float, lower_length: float) -> float:
 	return get_fold_margin(upper_length, lower_length, get_solution_endpoint(solution), get_solution_shoulder(solution))
+
+static func get_solution_is_clamped(solution: Dictionary) -> bool:
+	return bool(solution.get("target_clamped", false))
