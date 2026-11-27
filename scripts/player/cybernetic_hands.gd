@@ -60,7 +60,8 @@ func _process(delta: float) -> void:
 				target = Vector3(-0.24 - minf(_carry_mass_kg * 0.006, 0.16), 0.0, 0.045)
 			else:
 				target = Vector3(-0.16 - minf(_carry_mass_kg * 0.004, 0.10), 0.0, -0.025)
-				if _carry_mass_kg >= 8.0 and _carry_two_hand_enabled and is_instance_valid(_carry_object):
+				var two_hand_threshold := 8.0 if not is_instance_valid(_carry_object) else float(_carry_object.get_meta("two_hand_mass_threshold_kg", 8.0))
+				if _carry_mass_kg >= two_hand_threshold and _carry_two_hand_enabled and is_instance_valid(_carry_object):
 					var grip_offset: Vector3 = _carry_object.get_meta("secondary_grip_offset", Vector3(-0.24, -0.05, -0.10))
 					var grip_world: Vector3 = _carry_object.global_transform * grip_offset
 					var target_local := to_local(grip_world)
