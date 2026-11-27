@@ -160,3 +160,10 @@ func get_turn_sensitivity() -> float:
 	var load := clampf(mass_kg / 30.0, 0.0, 1.0)
 	var fragile_factor := 0.78 if fragile else 1.0
 	return clampf((1.0 - load * 0.22) * fragile_factor * lerpf(0.82, 1.0, stability), 0.58, 1.0)
+
+
+func get_acceleration_factor() -> float:
+	return clampf(1.0 - mass_kg * 0.018, 0.48, 1.0)
+
+func get_braking_factor() -> float:
+	return clampf(1.0 - mass_kg * 0.012, 0.55, 1.0)
