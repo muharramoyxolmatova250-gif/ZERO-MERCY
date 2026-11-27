@@ -561,6 +561,7 @@ func _start_indoor_activity() -> void:
 
 func _update_indoor_activity(delta: float) -> void:
 	_indoor_activity_time += delta
+	_advance_indoor_life_action()
 	var wave := sin(_indoor_activity_time * (2.8 if _indoor_activity == "working" else 1.7))
 	if _body != null:
 		_body.position = _body_rest_position
