@@ -1023,3 +1023,18 @@ func _record_personal_skill_practice(goal_id: String) -> void:
 	var skill := str(life_profile.get("career_field", occupation))
 	if goal_id == "practice_hobby": skill = _self_direction.discover_hobby({})
 	life_sim.call("record_resident_skill_mastery", citizen_id, skill, "autonomous_practice")
+
+func _complete_indoor_personal_action() -> void:
+	if _indoor_action_completed: return
+	_indoor_action_completed = true
+	var goal_id := _get_active_personal_goal_id()
+	var satisfaction := _score_personal_activity_satisfaction(goal_id)
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	if life_sim != null:
+		if life_sim.has_method("record_activity"): life_sim.call("record_activity", citizen_id, _indoor_activity)
+		if life_sim.has_method("record_autonomous_goal_result") and not goal_id.is_empty(): life_sim.call("record_autonomous_goal_result", citizen_id, goal_id, true, "completed_indoor_activity")
+	_record_personal_skill_practice(goal_id)
+	_record_personal_activity_progress(goal_id, 0.2)
+	if not goal_id.is_empty(): _self_direction.record_goal_outcome(goal_id, satisfaction, true)
+	_memory.append("completed_personal_activity:" + goal_id)
+	if _memory.size() > 24: _memory.pop_front()
