@@ -982,3 +982,13 @@ func _get_personal_goal_activity(goal_id: String) -> String:
 
 func _make_indoor_action_token() -> String:
 	return citizen_id + ":" + _get_active_personal_goal_id() + ":" + str(int(Time.get_ticks_msec() / 1000.0))
+
+func _get_personal_activity_duration(goal_id: String) -> float:
+	match goal_id:
+		"learn_skill", "advance_career": return 18.0
+		"start_small_business", "find_better_job": return 16.0
+		"spend_time_with_family", "repair_relationship": return 14.0
+		"exercise_for_health": return 20.0
+		"practice_hobby", "create_something": return 17.0
+		"save_money": return 10.0
+	return 12.0
