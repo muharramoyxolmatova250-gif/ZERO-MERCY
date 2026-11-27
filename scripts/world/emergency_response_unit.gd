@@ -8,6 +8,8 @@ var _incident_id := ""
 var _target := Vector3.ZERO
 var _active := false
 var _arrival_timer := 0.0
+var _beacon: MeshInstance3D
+var _beacon_timer := 0.0
 
 func _ready() -> void:
 	add_to_group("emergency_response_units")
@@ -22,6 +24,12 @@ func respond_to_incident(incident_id: String, target: Vector3, severity: float) 
 	_active = true
 	_arrival_timer = 0.0
 	visible = true
+
+func _process(delta: float) -> void:
+	if _beacon == null:
+		return
+	_beacon_timer += delta
+	_beacon.visible = fposmod(_beacon_timer, 0.42) < 0.21
 
 func _physics_process(delta: float) -> void:
 	if not _active:
@@ -56,7 +64,8 @@ func _build_vehicle() -> void:
 	material.metallic = 0.65
 	body.material_override = material
 	add_child(body)
-	var light := MeshInstance3D.new()
+	_beacon = MeshInstance3D.new()
+	var light := _beacon
 	var light_mesh := BoxMesh.new()
 	light_mesh.size = Vector3(1.0, 0.18, 0.3)
 	light.mesh = light_mesh
