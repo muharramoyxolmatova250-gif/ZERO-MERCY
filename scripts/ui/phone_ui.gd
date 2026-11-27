@@ -23,6 +23,8 @@ var _browser_status := "READY"
 var _browser_view_mode := "search"
 var _last_camera_message := "READY TO CAPTURE"
 var _last_call_message := ""
+var _social_feed_mode := "all"
+var _social_comment_post_id := ""
 
 func _ready() -> void:
     layer = 30
@@ -166,7 +168,7 @@ func _build_phone() -> void:
     tabs.add_theme_constant_override("separation", 4)
     tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     tab_scroll.add_child(tabs)
-    for tab in ["home", "feed", "media", "games", "news", "contacts", "sms", "notifications", "life", "missions", "map", "camera", "gallery", "settings", "calls", "browser"]:
+    for tab in ["home", "feed", "media", "games", "news", "contacts", "sms", "notifications", "life", "missions", "map", "camera", "gallery", "settings", "calls", "browser", "social"]:
         var button := Button.new()
         button.text = tab.to_upper()
         button.custom_minimum_size = Vector2(76, 36)
@@ -274,6 +276,8 @@ func _refresh_content() -> void:
             _build_phone_calls()
         "browser":
             _build_browser()
+        "social":
+            _build_social_network()
 
 
 func _build_home_screen() -> void:
@@ -295,7 +299,7 @@ func _build_home_screen() -> void:
     grid.add_theme_constant_override("h_separation", 8)
     grid.add_theme_constant_override("v_separation", 8)
     _content.add_child(grid)
-    _add_phone_app_tile(grid, "SOCIAL", "◉", "feed")
+    _add_phone_app_tile(grid, "SOCIAL", "◉", "social")
     _add_phone_app_tile(grid, "MEDIA", "▶", "media")
     _add_phone_app_tile(grid, "GAMES", "▣", "games")
     _add_phone_app_tile(grid, "NEWS", "⌁", "news")
