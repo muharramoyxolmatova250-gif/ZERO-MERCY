@@ -107,6 +107,22 @@ func update_pose(delta: float, speed: float, motion_state: String, activity: Str
 			left_arm.rotation.x = 0.18
 		if is_instance_valid(right_arm):
 			right_arm.rotation.x = 0.18
+	var activity_pose: Dictionary = last_director_pose.get("activity_pose", {})
+	if not activity_pose.is_empty():
+		if is_instance_valid(body):
+			body.rotation.x += float(activity_pose.get("torso", 0.0)) * 0.15
+		if is_instance_valid(left_arm):
+			left_arm.rotation.x = lerpf(left_arm.rotation.x, float(activity_pose.get("left_arm", left_arm.rotation.x)), 0.35)
+		if is_instance_valid(right_arm):
+			right_arm.rotation.x = lerpf(right_arm.rotation.x, float(activity_pose.get("right_arm", right_arm.rotation.x)), 0.35)
+	if goal in ["combat", "fight", "self_defense"]:
+		var stance: Dictionary = director.get_combat_stance("unarmed")
+		if is_instance_valid(body):
+			body.rotation.x -= float(stance.get("lean", 0.0))
+		if is_instance_valid(left_arm):
+			left_arm.rotation.x = minf(left_arm.rotation.x, -float(stance.get("guard", 0.0)))
+		if is_instance_valid(right_arm):
+			right_arm.rotation.x = minf(right_arm.rotation.x, -float(stance.get("guard", 0.0)))
 	if is_instance_valid(left_leg):
 		left_leg.rotation.x = leg_swing if moving else sin(idle_phase + variation_seed) * 0.012
 	if is_instance_valid(right_leg):
