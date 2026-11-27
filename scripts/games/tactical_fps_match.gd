@@ -570,7 +570,10 @@ func _update_bots(delta: float) -> void:
 			if ally_distance < enemy_target_distance and ally_distance < 24.0:
 				enemy_target = ally_target
 				enemy_target_distance = ally_distance
-		if wait <= 0.0 and enemy_target_distance < 24.0:
+		if int(bot.get_meta("magazine_ammo", 18)) <= 0 and reload_time <= 0.0:
+			reload_time = 2.1
+			bot.set_meta("reload_time", reload_time)
+		if wait <= 0.0 and reload_time <= 0.0 and int(bot.get_meta("magazine_ammo", 18)) > 0 and enemy_target_distance < 24.0:
 			var eye := bot.global_position + Vector3.UP * 0.55
 			var target := enemy_target.global_position + Vector3.UP * 0.55
 			var sight := PhysicsRayQueryParameters3D.create(eye, target)
