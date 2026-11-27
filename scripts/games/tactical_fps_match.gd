@@ -393,7 +393,10 @@ func _update_bots(delta: float) -> void:
 		var vision_query := PhysicsRayQueryParameters3D.create(vision_origin, camera.global_position)
 		vision_query.exclude = [bot.get_rid()]
 		var vision_hit := get_world_3d().direct_space_state.intersect_ray(vision_query)
-		var sees_player := distance < 28.0 and not vision_hit.is_empty() and vision_hit.get("collider") == player
+		var facing := -bot.global_transform.basis.z
+		var to_player := offset.normalized()
+		var inside_vision_cone := offset.length() > 0.01 and facing.dot(to_player) >= 0.574
+		var sees_player := distance < 28.0 and inside_vision_cone and not vision_hit.is_empty() and vision_hit.get("collider") == player
 		var search_time := maxf(0.0, float(bot.get_meta("search_time", 0.0)) - delta)
 		if sees_player:
 			bot.set_meta("last_known_player_position", player.global_position)
