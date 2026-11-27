@@ -453,6 +453,31 @@ func _start_reload() -> void:
 		reloading = true
 		reload_left = 1.8
 
+func _throw_tactical_grenade(thrower: CharacterBody3D, target_position: Vector3) -> void:
+	var grenade := Node3D.new()
+	grenade.name = "EnemyGrenade"
+	var visual := MeshInstance3D.new()
+	var sphere := SphereMesh.new()
+	sphere.radius = 0.16
+	sphere.height = 0.32
+	visual.mesh = sphere
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(0.16, 0.19, 0.12)
+	material.metallic = 0.72
+	material.roughness = 0.32
+	visual.material_override = material
+	grenade.add_child(visual)
+	grenade.global_position = thrower.global_position + Vector3.UP * 1.1
+	add_child(grenade)
+	var landing := target_position + Vector3.UP * 0.2
+	var flight := create_tween()
+	flight.tween_property(grenade, "global_position", landing, 1.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	await get_tree().create_timer(1.15).timeout
+	if is_instance_valid(grenade):
+		var blast_position := grenade.global_position
+		grenade.queue_free()
+		_detonate_tactical_grenade(blast_position)
+
 func _update_bots(delta: float) -> void:
 	for bot in bots:
 		if not is_instance_valid(bot):
