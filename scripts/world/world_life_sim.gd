@@ -2066,6 +2066,29 @@ func get_phone_social_feed(limit: int = 30) -> Array:
     return result.slice(start)
 
 
+func delete_phone_social_post(citizen_id: String, post_id: String) -> bool:
+    if not resident_profiles.has(citizen_id) or post_id.is_empty():
+        return false
+    var profile := _ensure_phone_profile(citizen_id)
+    var posts: Array = profile.get("phone_social_posts", [])
+    var kept: Array = []
+    var removed := false
+    for post in posts:
+        if str(post.get("id", "")) == post_id and str(post.get("author_id", "")) == citizen_id:
+            removed = true
+        else:
+            kept.append(post)
+    if not removed:
+        return false
+    profile["phone_social_posts"] = kept
+    resident_profiles[citizen_id] = profile
+    for index in range(_social_feed.size() - 1, -1, -1):
+        if str(_social_feed[index].get("id", "")) == post_id and str(_social_feed[index].get("author_id", "")) == citizen_id:
+            _social_feed.remove_at(index)
+    _dirty = true
+    return true
+
+
 func react_to_phone_post(citizen_id: String, post_id: String) -> bool:
     if not resident_profiles.has(citizen_id):
         return false
