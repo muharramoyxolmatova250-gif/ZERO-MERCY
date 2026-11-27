@@ -311,3 +311,15 @@ func get_active_goals(limit: int = 8) -> Array[Dictionary]:
 	if active.size() > maxi(1, limit):
 		active.resize(maxi(1, limit))
 	return active
+
+
+func complete_goal(goal_id: int, outcome: String = "achieved") -> bool:
+	for index in range(goals.size()):
+		if int(goals[index].get("id", -1)) != goal_id:
+			continue
+		goals[index]["status"] = "completed"
+		goals[index]["progress"] = 1.0
+		goals[index]["outcome"] = outcome
+		add_memory("goal_completed:" + str(goals[index].get("category", "")), {"goal_id":goal_id,"outcome":outcome}, 0.72, 0.95)
+		return true
+	return false
