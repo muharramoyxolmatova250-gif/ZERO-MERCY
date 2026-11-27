@@ -137,3 +137,23 @@ func update_belief(topic: String, evidence: float, reliability: float = 0.5) -> 
 	old["observations"] = int(old.get("observations",0))+1
 	beliefs[topic] = old
 
+
+
+func set_intention(action: String, target_id: String, priority: float, duration_seconds: float) -> void:
+	if action.is_empty():
+		return
+	for index in range(active_intentions.size()-1,-1,-1):
+		if str(active_intentions[index].get("action","")) == action and str(active_intentions[index].get("target_id","")) == target_id:
+			active_intentions.remove_at(index)
+	active_intentions.append({"action":action,"target_id":target_id,"priority":clampf(priority,0.0,1.0),"expires_msec":Time.get_ticks_msec()+int(maxf(1.0,duration_seconds)*1000.0)})
+	active_intentions.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.get("priority",0.0)) > float(b.get("priority",0.0)))
+	while active_intentions.size() > 8:
+		active_intentions.pop_back()
+
+func get_active_intention() -> Dictionary:
+	var now := Time.get_ticks_msec()
+	for index in range(active_intentions.size()-1,-1,-1):
+		if int(active_intentions[index].get("expires_msec",0)) <= now:
+			active_intentions.remove_at(index)
+	return active_intentions[0].duplicate(true) if not active_intentions.is_empty() else {}
+
