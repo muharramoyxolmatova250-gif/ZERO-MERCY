@@ -6,6 +6,7 @@ const NPCMotionController = preload("res://scripts/world/npc_motion_controller.g
 const NPCSelfDirection = preload("res://scripts/world/npc_self_direction.gd")
 const NPCCognitiveArchitecture = preload("res://scripts/world/npc_cognitive_architecture.gd")
 const NPCSimulationAwareness = preload("res://scripts/world/npc_simulation_awareness.gd")
+const NPCProceduralAnimation = preload("res://scripts/world/npc_procedural_animation.gd")
 ## Lightweight ambient pedestrian that loops a local sidewalk route.
 @export var route: PackedVector3Array = PackedVector3Array()
 @export_range(0.2, 5.0, 0.1) var walk_speed := 1.25
@@ -13,6 +14,11 @@ const NPCSimulationAwareness = preload("res://scripts/world/npc_simulation_aware
 var _target_index := 0
 var _body: MeshInstance3D
 var _head: MeshInstance3D
+var _left_arm: Node3D
+var _right_arm: Node3D
+var _left_leg: Node3D
+var _right_leg: Node3D
+var _animation_controller = NPCProceduralAnimation.new()
 var _phone: MeshInstance3D
 var _indoor_activity := ""
 var _indoor_activity_time := 0.0
@@ -77,6 +83,7 @@ func _ready() -> void:
 	add_to_group("city_citizen")
 	_rng.seed = int(absf(position.x * 97.0 + position.z * 131.0)) + 20261122
 	_build_appearance()
+	_animation_controller.setup(_body, _head, _left_arm, _right_arm, _left_leg, _right_leg, _phone, _rng.randi())
 	if citizen_id.is_empty():
 		citizen_id = "citizen_" + str(abs(hash(str(position) + ":" + city_id)))
 	_register_life_profile()
@@ -161,6 +168,7 @@ func _on_crime_reported(crime_id: String, crime_position: Vector3, severity: int
 func _physics_process(delta: float) -> void:
 	_spatial_update_timer += delta
 	_simulation_scan_timer += delta
+	_update_procedural_animation(delta)
 	if _simulation_scan_timer >= 2.0:
 		_simulation_scan_timer = 0.0
 		_scan_simulation_anomalies()
@@ -728,6 +736,28 @@ func remember_event(event_name: String) -> void:
 func get_memory_snapshot() -> PackedStringArray:
 	return PackedStringArray(_memory)
 
+
+func _create_limb_pivot(node_name: String, pivot_position: Vector3, material: Material, radius: float, height: float) -> Node3D:
+	var pivot := Node3D.new()
+	pivot.name = node_name
+	pivot.position = pivot_position
+	var mesh_instance := MeshInstance3D.new()
+	var capsule := CapsuleMesh.new()
+	capsule.radius = radius
+	capsule.height = height
+	mesh_instance.mesh = capsule
+	mesh_instance.position.y = -height * 0.43
+	mesh_instance.material_override = material
+	pivot.add_child(mesh_instance)
+	add_child(pivot)
+	return pivot
+
+func _update_procedural_animation(delta: float) -> void:
+	if _animation_controller == null:
+		return
+	var motion: Dictionary = _motion_controller.snapshot()
+	_animation_controller.update_pose(delta, float(motion.get("speed", 0.0)), str(motion.get("state", "idle")), _indoor_activity, is_using_phone, _stress, current_goal, _personality_traits)
+
 func _build_appearance() -> void:
 	var coat := StandardMaterial3D.new()
 	coat.albedo_color = Color(0.025, 0.035, 0.065)
@@ -755,6 +785,10 @@ func _build_appearance() -> void:
 	add_child(_head)
 	_body_rest_position = _body.position
 	_head_rest_rotation = _head.rotation
+	_left_arm = _create_limb_pivot("LeftArm", Vector3(-0.37, 1.35, 0.0), coat, 0.105, 0.72)
+	_right_arm = _create_limb_pivot("RightArm", Vector3(0.37, 1.35, 0.0), coat, 0.105, 0.72)
+	_left_leg = _create_limb_pivot("LeftLeg", Vector3(-0.16, 0.62, 0.0), coat, 0.13, 0.82)
+	_right_leg = _create_limb_pivot("RightLeg", Vector3(0.16, 0.62, 0.0), coat, 0.13, 0.82)
 	_phone = MeshInstance3D.new()
 	_phone.name = "Phone"
 	var phone_mesh := BoxMesh.new()
