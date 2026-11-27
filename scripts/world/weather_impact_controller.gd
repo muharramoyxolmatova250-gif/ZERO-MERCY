@@ -68,5 +68,5 @@ func get_driving_condition_snapshot() -> Dictionary:
 		"rain": risk = intensity * 0.25
 		"storm": risk = intensity * 0.55
 		"snow": risk = intensity * 0.7
-        "fog": risk = intensity * 0.18
-    return {"weather": weather, "intensity": intensity, "driving_risk": risk, "visibility": get_visibility_multiplier(), "traction": get_movement_multiplier()}
+		"fog": risk = intensity * 0.18
+	return {"weather": weather, "intensity": intensity, "driving_risk": risk, "visibility": get_visibility_multiplier(), "traction": get_movement_multiplier()}
