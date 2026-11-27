@@ -182,7 +182,6 @@ func resolve_personal_promise(promise_id: String, fulfilled: bool, resolution_da
 	personal_promises[promise_id] = record
 	var other_id := str(record.get("other_id",""))
 	var importance := float(record.get("importance",0.5))
-	var impact := clampf(0.55 + importance * 0.45,0.0,1.0)
 	update_social_impression(other_id, "keep_promise" if fulfilled else "break_promise", 1.0 if fulfilled else 0.0)
 	var impression: Dictionary = social_model.get(other_id,{})
 	impression["last_promise"] = record.duplicate(true)
