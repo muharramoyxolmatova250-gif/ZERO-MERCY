@@ -4,12 +4,22 @@ extends StaticBody3D
 @export var display_title := "MISSION OBJECTIVE"
 @export var current := 0
 @export var target := 1
+@export var anomaly_id := ""
+@export var anomaly_kind := ""
+@export_multiline var anomaly_detail := ""
+@export_range(0.0, 1.0, 0.01) var evidence_strength := 0.65
 var _cooldown := 0.0
 var _label: Label3D
 var _progress_label: Label3D
 
 func _ready() -> void:
     add_to_group("mission_objective")
+    if event_id in ["collect_repeating_faces", "decode_boundary_recording"]:
+        add_to_group("simulation_anomaly")
+        if anomaly_id.is_empty(): anomaly_id = event_id
+        if anomaly_kind.is_empty(): anomaly_kind = "repeating_identity" if event_id == "collect_repeating_faces" else "boundary_signal"
+        if anomaly_detail.is_empty(): anomaly_detail = display_title
+
     collision_layer = 1
     collision_mask = 1
     var shape_node := CollisionShape3D.new()
@@ -20,6 +30,8 @@ func _ready() -> void:
     add_child(shape_node)
 
     var color := Color(0.05, 0.9, 1.0)
+    if event_id == "collect_repeating_faces": color = Color(0.72, 0.28, 1.0)
+    elif event_id == "decode_boundary_recording": color = Color(1.0, 0.55, 0.12)
     if event_id.contains("defeat") or event_id.contains("disable") or event_id.contains("destroy"):
         color = Color(1.0, 0.18, 0.32)
     elif event_id.contains("escort") or event_id.contains("rescue"):
@@ -76,12 +88,14 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
     _cooldown = maxf(0.0, _cooldown - delta)
-    rotate_y(delta * 0.55)
+    rotate_y(delta * (0.55 if event_id not in ["collect_repeating_faces", "decode_boundary_recording"] else 0.22))
 
 func interact() -> void:
     if _cooldown > 0.0 or event_id.is_empty():
         return
     _cooldown = 0.8
+    if event_id in ["collect_repeating_faces", "decode_boundary_recording"]:
+        evidence_strength = clampf(evidence_strength + 0.08, 0.0, 1.0)
     MissionManager.report_event(event_id, 1)
 
 func set_progress(value: int, total: int) -> void:
