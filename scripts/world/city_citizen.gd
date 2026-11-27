@@ -4,6 +4,7 @@ const NPCDialogueAI = preload("res://scripts/world/npc_dialogue_ai.gd")
 const NPCActionPlanner = preload("res://scripts/world/npc_action_planner.gd")
 const NPCMotionController = preload("res://scripts/world/npc_motion_controller.gd")
 const NPCSelfDirection = preload("res://scripts/world/npc_self_direction.gd")
+const NPCCognitiveArchitecture = preload("res://scripts/world/npc_cognitive_architecture.gd")
 ## Lightweight ambient pedestrian that loops a local sidewalk route.
 @export var route: PackedVector3Array = PackedVector3Array()
 @export_range(0.2, 5.0, 0.1) var walk_speed := 1.25
@@ -60,6 +61,7 @@ var _dialogue = NPCDialogueAI.new()
 var _action_planner = NPCActionPlanner.new()
 var _motion_controller = NPCMotionController.new()
 var _self_direction = NPCSelfDirection.new()
+var _independent_mind = NPCCognitiveArchitecture.new()
 var _planned_action: Dictionary = {}
 var _last_economic_goal_id := ""
 @export var citizen_id := ""
