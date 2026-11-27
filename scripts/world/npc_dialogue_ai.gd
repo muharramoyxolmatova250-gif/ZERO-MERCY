@@ -295,3 +295,9 @@ func respond_to_personal_boundary(request: String) -> String:
 		return "Understood. Thanks for being clear with me."
 	return "Alright, no pressure. Let's leave it there."
 
+
+
+func set_conversation_mood(mood: String, intensity: float = 0.5) -> void:
+	voice_profile["current_mood"] = mood
+	voice_profile["mood_intensity"] = clampf(intensity,0.0,1.0)
+
