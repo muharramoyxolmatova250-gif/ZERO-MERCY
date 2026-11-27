@@ -194,7 +194,9 @@ func _build_bots() -> void:
 		var bot := CharacterBody3D.new()
 		bot.name = "Enemy_%02d" % i
 		bot.set_meta("health", 100.0)
-		bot.set_meta("fire_wait", 1.0 + float(i) * 0.3)
+		bot.set_meta("fire_wait", 0.8 + float(i) * 0.25)
+		bot.set_meta("strafe_phase", float(i) * 1.7)
+		bot.set_meta("combat_skill", 0.75 + float(i % 3) * 0.12)
 		bot.position = Vector3(-13.0 + float(i) * 6.5, 1, -10.0 - float(i % 2) * 8.0)
 		var body := MeshInstance3D.new()
 		var mesh := CapsuleMesh.new()
