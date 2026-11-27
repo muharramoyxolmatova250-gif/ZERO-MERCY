@@ -208,6 +208,7 @@ func _build_bots() -> void:
 		bot.set_meta("fire_wait", 0.8 + float(i) * 0.25)
 		bot.set_meta("magazine_ammo", 18)
 		bot.set_meta("reload_time", 0.0)
+		bot.set_meta("grenade_cooldown", 5.0 + float(i % 4) * 1.5)
 		bot.set_meta("strafe_phase", float(i) * 1.7)
 		bot.set_meta("combat_skill", 0.75 + float(i % 3) * 0.12)
 		bot.set_meta("squad_role", "leader" if i == 0 else ("flanker" if i % 2 == 1 else "support"))
