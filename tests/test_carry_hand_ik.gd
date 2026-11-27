@@ -18,6 +18,14 @@ func _initialize() -> void:
 	_test_joint_balance()
 	_test_wrist_direction()
 	_test_solution_points()
+	_test_closest_reachable_point()
+	_test_direction_plane_projection()
+	_test_target_distance_weight()
+	_test_angle_limits()
+	_test_orientation_finite()
+	_test_lower_basis_finite()
+	_test_upper_basis_finite()
+	_test_solution_quality()
 	_test_invalid_solver_lengths()
 	_test_solution_lengths()
 	_test_solution_directions()
@@ -104,3 +112,36 @@ func _test_invalid_solver_lengths() -> void:
 func _test_solution_points() -> void:
 	var result: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
 	assert(CarryHandIK.get_joint_positions(result).size() == 3)
+
+func _test_solution_quality() -> void:
+	var result: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	assert(CarryHandIK.get_solution_quality(result, Vector3(0.5, 0.0, 0.0)) > 0.9)
+
+func _test_upper_basis_finite() -> void:
+	var basis: Basis = CarryHandIK.get_upper_segment_basis(Vector3.ZERO, Vector3.UP)
+	assert(basis.is_finite())
+
+func _test_lower_basis_finite() -> void:
+	var basis: Basis = CarryHandIK.get_lower_segment_basis(Vector3.ZERO, Vector3.RIGHT)
+	assert(basis.is_finite())
+
+func _test_orientation_finite() -> void:
+	var basis: Basis = CarryHandIK.get_chain_orientation(Vector3.ZERO, Vector3.FORWARD)
+	assert(basis.is_finite())
+
+func _test_angle_limits() -> void:
+	var result: Dictionary = CarryHandIK.get_joint_angle_limit(4.0, -1.0, 1.0)
+	assert(is_equal_approx(float(result["angle"]), 1.0))
+	assert(bool(result["was_clamped"]))
+
+func _test_target_distance_weight() -> void:
+	var weight := CarryHandIK.get_target_distance_weight(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.0, 1.0)
+	assert(weight > 0.4 and weight < 0.6)
+
+func _test_direction_plane_projection() -> void:
+	var direction := CarryHandIK.project_direction_on_plane(Vector3(1.0, 1.0, 0.0), Vector3.UP)
+	assert(absf(direction.y) < 0.001)
+
+func _test_closest_reachable_point() -> void:
+	var point := CarryHandIK.get_closest_reachable_point(Vector3.ZERO, Vector3(4.0, 0.0, 0.0), 0.4, 0.4)
+	assert(point.length() < 0.8)
