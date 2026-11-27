@@ -6,6 +6,9 @@ var _active_tab := "feed"
 var _refresh_elapsed := 0.0
 var _society: Node
 var _life: Node
+var _party_invites: Array[String] = []
+var _party_game_id := "tactical_breach"
+var _last_party_result: Dictionary = {}
 
 func _ready() -> void:
     layer = 30
