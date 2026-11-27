@@ -112,6 +112,25 @@ func _build_phone() -> void:
     status.add_theme_font_size_override("font_size", 10)
     outer.add_child(status)
 
+    var system_bar := HBoxContainer.new()
+    system_bar.add_theme_constant_override("separation", 8)
+    outer.add_child(system_bar)
+    _phone_clock_label = Label.new()
+    _phone_clock_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    _phone_clock_label.add_theme_color_override("font_color", Color(0.12, 0.94, 1.0))
+    _phone_clock_label.add_theme_font_size_override("font_size", 12)
+    system_bar.add_child(_phone_clock_label)
+    _phone_network_label = Label.new()
+    _phone_network_label.text = "▰ 5G"
+    _phone_network_label.add_theme_color_override("font_color", Color(0.2, 0.9, 0.78))
+    _phone_network_label.add_theme_font_size_override("font_size", 10)
+    system_bar.add_child(_phone_network_label)
+    _phone_battery_label = Label.new()
+    _phone_battery_label.add_theme_color_override("font_color", Color(0.55, 0.94, 0.72))
+    _phone_battery_label.add_theme_font_size_override("font_size", 10)
+    system_bar.add_child(_phone_battery_label)
+    _update_phone_system_bar()
+
     var tab_scroll := ScrollContainer.new()
     tab_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
     tab_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
