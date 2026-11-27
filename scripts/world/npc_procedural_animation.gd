@@ -171,5 +171,18 @@ func update_pose(delta: float, speed: float, motion_state: String, activity: Str
 	if is_instance_valid(phone):
 		phone.rotation.x = -0.08 if using_phone else 0.0
 
+func get_rig_status() -> Dictionary:
+	return {
+		"body":is_instance_valid(body),
+		"head":is_instance_valid(head),
+		"left_arm":is_instance_valid(left_arm),
+		"right_arm":is_instance_valid(right_arm),
+		"left_leg":is_instance_valid(left_leg),
+		"right_leg":is_instance_valid(right_leg),
+		"phone":is_instance_valid(phone),
+		"procedural_layers":["locomotion","idle_gesture","activity","reaction","combat_stance"],
+		"catalog_clips":director.Catalog.get_clip_names()
+	}
+
 func get_pose_snapshot() -> Dictionary:
-	return {"gait_phase":phase,"idle_phase":idle_phase,"gesture_phase":gesture_phase,"idle_gesture":idle_gesture,"reaction":reaction_name if reaction_remaining > 0.0 else "","reaction_remaining":reaction_remaining,"director":director.get_snapshot(),"style":director.profile.style}
+	return {"gait_phase":phase,"idle_phase":idle_phase,"gesture_phase":gesture_phase,"idle_gesture":idle_gesture,"reaction":reaction_name if reaction_remaining > 0.0 else "","reaction_remaining":reaction_remaining,"director":director.get_snapshot(),"style":director.profile.style,"rig":get_rig_status()}
