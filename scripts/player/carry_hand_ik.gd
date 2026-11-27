@@ -271,3 +271,6 @@ static func get_closest_reachable_point(shoulder: Vector3, target: Vector3, uppe
 static func get_joint_angle_limit(angle: float, minimum: float, maximum: float) -> Dictionary:
 	var clamped := clamp_joint_angle(angle, minimum, maximum)
 	return {"angle": clamped, "was_clamped": not is_equal_approx(angle, clamped), "limit_weight": get_joint_limit_weight(clamped, minimum, maximum)}
+
+static func get_bend_plane_distance(point: Vector3, plane: Plane) -> float:
+	return absf(plane.distance_to(point))
