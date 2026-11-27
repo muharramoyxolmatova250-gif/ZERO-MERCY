@@ -190,3 +190,19 @@ func validate_plan(context: Dictionary = {}) -> Dictionary:
  active_plan = accepted
  plan_index = mini(plan_index,active_plan.size())
  return {"valid":accepted.size(),"rejected":rejected}
+
+
+func plan_social_intent(other: Dictionary, context: Dictionary = {}) -> Dictionary:
+ var trust := float(other.get("trust",0.35))
+ var familiarity := float(other.get("familiarity",0.0))
+ var mood := str(context.get("mood","neutral"))
+ var intent := "greet"
+ if trust < 0.18 or mood in ["angry","afraid"]:
+  intent = "keep_distance"
+ elif familiarity > 0.65 and _trait("sociability") > 0.55:
+  intent = "continue_shared_topic"
+ elif _trait("kindness") > 0.72:
+  intent = "offer_help"
+ elif _trait("curiosity") > 0.72:
+  intent = "ask_about_experience"
+ return {"intent":intent,"target_id":str(other.get("id","")),"trust":trust,"familiarity":familiarity}
