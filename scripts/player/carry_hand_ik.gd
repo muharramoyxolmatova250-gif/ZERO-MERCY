@@ -78,3 +78,10 @@ static func mirror_bend_normal(normal: Vector3, mirror_axis: Vector3) -> Vector3
 static func get_segment_direction(start: Vector3, finish: Vector3, fallback: Vector3 = Vector3.DOWN) -> Vector3:
 	var delta := finish - start
 	return delta.normalized() if delta.length_squared() > 0.000001 else fallback.normalized()
+
+static func get_elbow_angle(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> float:
+	var upper := (shoulder - elbow).normalized()
+	var lower := (wrist - elbow).normalized()
+	if upper.length_squared() < 0.001 or lower.length_squared() < 0.001:
+		return 0.0
+	return acos(clampf(upper.dot(lower), -1.0, 1.0))
