@@ -236,6 +236,39 @@ func _build_bots() -> void:
 		add_child(bot)
 		bots.append(bot)
 
+func _build_allies() -> void:
+	allies.clear()
+	var count := mini(party_roster.size(), 4)
+	for i in range(count):
+		var profile: Dictionary = party_roster[i]
+		var ally := CharacterBody3D.new()
+		ally.name = "Ally_%02d" % i
+		ally.set_meta("display_name", str(profile.get("name", "Squadmate")))
+		ally.set_meta("combat_skill", clampf(float(profile.get("skill", 0.72)), 0.35, 0.98))
+		ally.set_meta("fire_wait", 0.5 + float(i) * 0.35)
+		ally.set_meta("squad_slot", i)
+		ally.position = Vector3(-2.2 + float(i % 2) * 4.4, 1.0, 15.0 + float(i / 2) * 2.2)
+		var body := MeshInstance3D.new()
+		var mesh := CapsuleMesh.new()
+		mesh.radius = 0.36
+		mesh.height = 1.8
+		body.mesh = mesh
+		var material := StandardMaterial3D.new()
+		material.albedo_color = Color(0.08, 0.42, 0.72)
+		material.metallic = 0.28
+		material.roughness = 0.48
+		material.emission_enabled = true
+		material.emission = Color(0.015, 0.09, 0.2)
+		body.material_override = material
+		ally.add_child(body)
+		var collision := CollisionShape3D.new()
+		var capsule := CapsuleShape3D.new()
+		capsule.height = 1.8
+		collision.shape = capsule
+		ally.add_child(collision)
+		add_child(ally)
+		allies.append(ally)
+
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
