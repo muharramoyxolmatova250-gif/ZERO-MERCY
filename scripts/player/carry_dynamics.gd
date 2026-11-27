@@ -273,9 +273,6 @@ func get_acceleration_response() -> float:
 func get_braking_response() -> float:
 	return clampf(1.0 - mass_kg * 0.012 - (0.08 if fragile else 0.0), 0.5, 1.0)
 
-func get_turn_sensitivity() -> float:
-	return clampf(1.0 - minf(mass_kg / 32.0, 0.32) - (0.12 if fragile else 0.0), 0.52, 1.0)
-
 func get_lateral_balance() -> float:
 	return clampf(turn_load * mass_kg * 0.0025, 0.0, 0.22)
 
