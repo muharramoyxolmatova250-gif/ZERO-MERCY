@@ -386,6 +386,10 @@ func _update_bots(delta: float) -> void:
 		if role == "flanker":
 			side += Vector3(-direction.z, 0.0, direction.x) * flank_sign * 0.3
 		var desired_range := 10.0 + float(int(bot.get_instance_id()) % 4)
+		if role == "leader":
+			desired_range = 8.5
+		elif role == "support":
+			desired_range = 13.0
 		var approach := direction * clampf((distance - desired_range) / 5.0, -0.65, 1.0)
 		var separation := Vector3.ZERO
 		var squad_center := Vector3.ZERO
