@@ -6,6 +6,7 @@ signal incident_resolved(incident_id: String)
 var _responders: Dictionary = {}
 var _incidents: Dictionary = {}
 var _next_incident := 1
+var _response_samples: Array[float] = []
 
 func _ready() -> void:
 	add_to_group("emergency_dispatch_ai")
@@ -148,7 +149,7 @@ func get_dispatch_snapshot() -> Dictionary:
 	for responder in _responders.values():
 		if bool(responder.get("available", false)):
 			available += 1
-	return {"responders": _responders.size(), "available": available, "incidents": _incidents.size(), "active_incidents": _count_active_incidents()}
+	return {"responders": _responders.size(), "available": available, "incidents": _incidents.size(), "active_incidents": _count_active_incidents(), "average_response_seconds": snappedf(get_average_response_seconds(), 0.1)}
 
 func _count_active_incidents() -> int:
 	var count := 0
@@ -202,3 +203,27 @@ func get_incidents_near(position: Vector3, radius: float = 100.0) -> Array[Dicti
 		return float(a.get("distance", INF)) < float(b.get("distance", INF))
 	)
 	return nearby
+
+ 
+func report_responder_arrival(responder_id: String, incident_id: String) -> void:
+	if not _incidents.has(incident_id):
+		return
+	var incident: Dictionary = _incidents[incident_id]
+	var elapsed := float(Time.get_ticks_msec() - int(incident.get("created_msec", Time.get_ticks_msec()))) / 1000.0
+	incident["last_arrival_seconds"] = elapsed
+	incident["status"] = "on_scene"
+	var arrivals: Array = incident.get("arrivals", [])
+	arrivals.append({"responder_id": responder_id, "seconds": elapsed})
+	incident["arrivals"] = arrivals
+	_incidents[incident_id] = incident
+	_response_samples.append(elapsed)
+	if _response_samples.size() > 100:
+		_response_samples.pop_front()
+
+func get_average_response_seconds() -> float:
+	if _response_samples.is_empty():
+		return 0.0
+	var total := 0.0
+	for sample in _response_samples:
+		total += sample
+	return total / float(_response_samples.size())
