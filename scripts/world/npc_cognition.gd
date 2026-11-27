@@ -182,3 +182,19 @@ func score_social_approach(other_id: String, kindness: float, current_stress: fl
 	var fear := float(emotional_state.get("fear",0.0))
 	return clampf(0.28+trust*0.38+familiarity*0.2+kindness*0.14-current_stress*0.28-fear*0.2,0.0,1.0)
 
+
+
+func choose_threat_response(distance: float, severity: float, courage: float, protect_dependents: bool = false) -> String:
+	var urgency := clampf((1.0-maxf(0.0,distance)/70.0)*severity,0.0,1.0)
+	var fear := float(emotional_state.get("fear",0.0))
+	var bravery := clampf(courage*0.58+float(emotional_state.get("anger",0.0))*0.12-fear*0.38,0.0,1.0)
+	if protect_dependents and urgency > 0.18:
+		return "protect_and_evacuate"
+	if urgency > 0.72 and bravery < 0.62:
+		return "flee"
+	if urgency > 0.4 and bravery > 0.72:
+		return "assist_from_cover"
+	if urgency > 0.2:
+		return "seek_safety_and_observe"
+	return "continue_cautiously"
+
