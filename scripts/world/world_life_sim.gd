@@ -2075,6 +2075,28 @@ func publish_phone_post(citizen_id: String, post_text: String, mood: String = "n
     return true
 
 
+func recharge_phone_battery(citizen_id: String, amount: float = 25.0) -> float:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return 0.0
+    var battery := clampf(float(profile.get("phone_battery", 100.0)) + maxf(0.0, amount), 0.0, 100.0)
+    profile["phone_battery"] = battery
+    resident_profiles[citizen_id] = profile
+    _dirty = true
+    return battery
+
+
+func consume_phone_battery(citizen_id: String, amount: float = 1.0) -> float:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return 0.0
+    var battery := clampf(float(profile.get("phone_battery", 100.0)) - maxf(0.0, amount), 0.0, 100.0)
+    profile["phone_battery"] = battery
+    resident_profiles[citizen_id] = profile
+    _dirty = true
+    return battery
+
+
 func get_phone_social_feed(limit: int = 30) -> Array:
     var result: Array = _social_feed.duplicate(true)
     var start := maxi(0, result.size() - maxi(1, limit))
