@@ -155,3 +155,9 @@ func career_preference(context: Dictionary = {}) -> Dictionary:
 	for option in scores:
 		if float(scores[option]) > float(scores[best]): best = option
 	return {"choice":best,"scores":scores}
+func evaluate_opportunity(opportunity: Dictionary, context: Dictionary = {}) -> float:
+	var benefit := float(opportunity.get("benefit", 0.5))
+	var effort := float(opportunity.get("effort", 0.5))
+	var risk := float(opportunity.get("risk", 0.2))
+	var interest := float(preferences.get(str(opportunity.get("type", "")), 0.0)) + 0.5
+	return benefit * 0.38 + interest * 0.24 + _trait("curiosity") * 0.12 - effort * (1.0 - _trait("discipline")) * 0.12 - risk * (1.0 - _trait("risk_tolerance")) * 0.28
