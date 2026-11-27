@@ -313,3 +313,18 @@ func adapt_routine(activity: String, disruption: float, importance: float) -> Di
 		response = "shorten_activity"
 	return {"activity":activity,"response":response,"disruption":severity,"priority":clampf(importance,0.0,1.0)}
 
+
+
+func explain_last_decision() -> Dictionary:
+	return {"citizen_id":citizen_id,"decision":last_decision.duplicate(true),"dominant_emotion":_dominant_emotion(),"active_intention":get_active_intention(),"recalled_memories":recall_episodes(str(last_decision.get("goal","")),3),"belief_topics":beliefs.keys()}
+
+func _dominant_emotion() -> String:
+	var selected := "joy"
+	var highest := -INF
+	for emotion in emotional_state:
+		var value := float(emotional_state[emotion])
+		if value > highest:
+			highest = value
+			selected = str(emotion)
+	return selected
+
