@@ -575,25 +575,6 @@ func _interact_with_world() -> void:
 func _pick_up_item(item: Node3D, contact_point: Vector3 = Vector3.ZERO) -> void:
 	if not is_instance_valid(item) or _held_item != null:
 		return
-	# Collectible pickups enter the stack inventory; physical props remain carryable.
-	if str(item.get_meta("pickup_mode", "")) == "collect":
-		var item_id := str(item.get_meta("item_id", ""))
-		var amount := maxi(1, int(item.get_meta("item_amount", 1)))
-		if item_id.is_empty():
-			return
-		var bridge := _get_gameplay_bridge()
-		if bridge == null or not bridge.has_method("give_item"):
-			return
-		var remaining := int(bridge.call("give_item", item_id, amount))
-		var collected := amount - remaining
-		if collected <= 0:
-			return
-		if remaining > 0:
-			item.set_meta("item_amount", remaining)
-		else:
-			item.queue_free()
-		_award_gameplay_xp("crafting", 1.0)
-		return
 	if _pickup_in_progress:
 		return
 	if not is_instance_valid(_cybernetic_hands) or not _cybernetic_hands.has_method("get_grip_anchor"):
@@ -601,12 +582,79 @@ func _pick_up_item(item: Node3D, contact_point: Vector3 = Vector3.ZERO) -> void:
 	_pickup_in_progress = true
 	if _cybernetic_hands.has_method("begin_pickup"):
 		_cybernetic_hands.call("begin_pickup", contact_point if contact_point != Vector3.ZERO else item.global_position)
+	if str(item.get_meta("pickup_mode", "")) == "collect":
+		var item_id := str(item.get_meta("item_id", ""))
+		var amount := maxi(1, int(item.get_meta("item_amount", 1)))
+		var bridge := _get_gameplay_bridge()
+		if item_id.is_empty() or bridge == null or not bridge.has_method("give_item"):
+			_pickup_in_progress = false
+			_cybernetic_hands.call("release_object")
+			return
+		if _pickup_tween != null and _pickup_tween.is_running():
+			_pickup_tween.kill()
+		_pickup_tween = create_tween()
+		_pickup_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		_pickup_tween.tween_interval(0.24)
+		_pickup_tween.tween_callback(Callable(self, "_attach_collectible_item").bind(item, item_id, amount, bridge))
+		return
 	if _pickup_tween != null and _pickup_tween.is_running():
 		_pickup_tween.kill()
 	_pickup_tween = create_tween()
 	_pickup_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_pickup_tween.tween_interval(0.24)
 	_pickup_tween.tween_callback(Callable(self, "_attach_pickup_item").bind(item))
+
+
+func _attach_collectible_item(item: Node3D, item_id: String, amount: int, bridge: Node) -> void:
+	if not is_instance_valid(item) or not is_instance_valid(bridge):
+		_pickup_in_progress = false
+		_cybernetic_hands.call("release_object")
+		return
+	var grip := _cybernetic_hands.call("get_grip_anchor") as Node3D
+	if not is_instance_valid(grip):
+		_pickup_in_progress = false
+		return
+	var original_transform := item.global_transform
+	item.set_meta("pickup_original_transform", original_transform)
+	if item is CollisionObject3D:
+		item.set_meta("original_collision_layer", item.collision_layer)
+		item.set_meta("original_collision_mask", item.collision_mask)
+		item.collision_layer = 0
+		item.collision_mask = 0
+	item.reparent(grip, true)
+	var offset: Vector3 = item.get_meta("grip_offset", Vector3(0.0, -0.06, -0.13))
+	var rotation: Vector3 = item.get_meta("grip_rotation", Vector3.ZERO)
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(item, "position", offset, 0.18)
+	tween.parallel().tween_property(item, "rotation", rotation, 0.18)
+	tween.tween_callback(Callable(self, "_complete_collectible_pickup").bind(item, item_id, amount, bridge))
+
+func _complete_collectible_pickup(item: Node3D, item_id: String, amount: int, bridge: Node) -> void:
+	if not is_instance_valid(item) or not is_instance_valid(bridge):
+		_pickup_in_progress = false
+		_cybernetic_hands.call("release_object")
+		return
+	_cybernetic_hands.call("close_grip")
+	var remaining := int(bridge.call("give_item", item_id, amount))
+	var collected := amount - remaining
+	if collected <= 0:
+		item.reparent(get_tree().current_scene, true)
+		item.global_transform = item.get_meta("pickup_original_transform", item.global_transform)
+		_restore_pickup_collision(item)
+	elif remaining > 0:
+		item.set_meta("item_amount", remaining)
+		item.reparent(get_tree().current_scene, true)
+		item.global_transform = item.get_meta("pickup_original_transform", item.global_transform)
+		_restore_pickup_collision(item)
+	else:
+		item.queue_free()
+	if is_instance_valid(item) and item.has_method("set_being_held"):
+		item.call("set_being_held", false)
+	_cybernetic_hands.call("release_object")
+	_pickup_in_progress = false
+	if collected > 0:
+		_award_gameplay_xp("crafting", 1.0)
 
 
 func _attach_pickup_item(item: Node3D) -> void:
