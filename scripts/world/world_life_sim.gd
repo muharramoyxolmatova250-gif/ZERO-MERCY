@@ -939,7 +939,7 @@ func _process_monthly_finances(profile: Dictionary) -> void:
     var transport_cost := _process_npc_transport(profile)
     var balance := income - rent - food_and_services - transport_cost
     profile["monthly_income"] = income
-	profile["monthly_housing_cost"] = rent
+    profile["monthly_housing_cost"] = rent
     profile["monthly_living_cost"] = food_and_services
     profile["monthly_transport_cost"] = transport_cost
     profile["money"] = maxi(0, int(profile.get("money", 0)) + balance)
