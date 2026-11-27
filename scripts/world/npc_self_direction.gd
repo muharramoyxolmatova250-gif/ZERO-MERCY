@@ -176,3 +176,18 @@ func is_goal_feasible(goal: Dictionary, context: Dictionary = {}) -> bool:
 func learn_from_satisfaction(goal_id: String, satisfaction: float) -> void:
 	var value := clampf(satisfaction, 0.0, 1.0)
 	preferences[goal_id] = lerpf(float(preferences.get(goal_id, 0.0)), (value - 0.5) * 1.5, 0.16)
+func choose_idle_initiative(context: Dictionary = {}) -> Dictionary:
+	var candidates := ["practice_hobby","explore_unknown_place","make_friend","create_something","exercise_for_health","learn_skill"]
+	var best := candidates[0]
+	var score := -INF
+	for candidate in candidates:
+		var item: Dictionary = {}
+		for entry in GOAL_CATALOG:
+			if str(entry.id) == candidate: item = entry
+		var value := _trait(str(item.get("drive", "curiosity"))) * float(item.get("weight", 0.5)) + _rng.randf_range(0.0, 0.12)
+		if value > score: score = value; best = candidate
+	return create_goal_from_experience("idle_initiative", str(_catalog_activity(best)), score)
+func _catalog_activity(goal_id: String) -> String:
+	for entry in GOAL_CATALOG:
+		if str(entry.id) == goal_id: return str(entry.activity)
+	return "leisure"
