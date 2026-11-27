@@ -106,6 +106,16 @@ func _spawn_current_objective() -> void:
     marker.set("display_title", str(objective.get("title", "MISSION OBJECTIVE")))
     marker.set("current", int(objective.get("current", 0)))
     marker.set("target", int(objective.get("target", 1)))
+	if str(objective.get("event", "")) == "collect_repeating_faces":
+		marker.set("anomaly_id", "metro_repeating_faces")
+		marker.set("anomaly_kind", "repeating_identity")
+		marker.set("anomaly_detail", "Three separate metro cameras recorded the same face at the same second")
+		marker.set("evidence_strength", 0.72)
+	elif str(objective.get("event", "")) == "decode_boundary_recording":
+		marker.set("anomaly_id", "metro_boundary_recording")
+		marker.set("anomaly_kind", "boundary_signal")
+		marker.set("anomaly_detail", "A recording loses its signal at the mapped city boundary")
+		marker.set("evidence_strength", 0.58)
     add_child(marker)
     marker.global_position = player.global_position + forward * distance + right * side_offset + Vector3.UP * 0.4
     _target = marker
