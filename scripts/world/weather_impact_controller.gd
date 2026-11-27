@@ -6,6 +6,10 @@ var intensity := 0.0
 var _change_timer := 0.0
 @export_range(20.0, 900.0, 10.0) var weather_interval := 180.0
 
+func _ready() -> void:
+	add_to_group("weather_impact_controller")
+	_apply_traffic_weather()
+
 func _process(delta: float) -> void:
 	_change_timer += delta
 	if _change_timer < weather_interval:
@@ -20,6 +24,7 @@ func set_weather(next_weather: String, next_intensity: float = 0.5) -> void:
 	weather = next_weather
 	intensity = clampf(next_intensity, 0.0, 1.0)
 	weather_changed.emit(weather, intensity)
+	_apply_traffic_weather()
 
 func _roll_weather() -> void:
 	var choices := ["clear", "cloudy", "rain", "fog", "storm"]
@@ -50,3 +55,18 @@ func get_visibility_multiplier() -> float:
 
 func get_weather_snapshot() -> Dictionary:
 	return {"weather": weather, "intensity": intensity, "movement_multiplier": get_movement_multiplier(), "visibility_multiplier": get_visibility_multiplier()}
+
+ 
+func _apply_traffic_weather() -> void:
+    var manager := get_tree().get_first_node_in_group("road_traffic_manager")
+    if manager != null and manager.has_method("set_weather_effect"):
+        manager.call("set_weather_effect", weather, intensity)
+
+func get_driving_condition_snapshot() -> Dictionary:
+    var risk := 0.0
+    match weather:
+        "rain": risk = intensity * 0.25
+        "storm": risk = intensity * 0.55
+        "snow": risk = intensity * 0.7
+        "fog": risk = intensity * 0.18
+    return {"weather": weather, "intensity": intensity, "driving_risk": risk, "visibility": get_visibility_multiplier(), "traction": get_movement_multiplier()}
