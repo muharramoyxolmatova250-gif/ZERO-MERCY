@@ -1,6 +1,8 @@
 extends Control
 
 signal close_requested
+var _feed_items: Array[Dictionary] = []
+var _current_index := -1
 ## Plays actual imported video and image assets; metadata-only feed entries are rejected.
 @onready var video: VideoStreamPlayer = $Layout/MediaFrame/Video
 @onready var image: TextureRect = $Layout/MediaFrame/Image
