@@ -303,3 +303,6 @@ static func get_solution_transforms(solution: Dictionary) -> Dictionary:
 	var elbow := get_solution_elbow(solution)
 	var wrist := get_solution_endpoint(solution)
 	return {"upper": get_segment_transform(shoulder, elbow), "lower": get_segment_transform(elbow, wrist)}
+
+static func get_solution_center(solution: Dictionary) -> Vector3:
+	return get_chain_midpoint(get_solution_shoulder(solution), get_solution_elbow(solution), get_solution_endpoint(solution))
