@@ -84,3 +84,7 @@ func snapshot() -> Dictionary:
 		"gait_phase": gait_phase,
 		"stuck_time": stuck_time
 	}
+func set_speed_profile(walk: float, run: float, cautious: float) -> void:
+	preferred_speed = clampf(walk, 0.45, 2.8)
+	acceleration_rate = clampf(2.4 + run * 1.1, 2.4, 4.2)
+	braking_rate = clampf(4.2 + cautious * 1.8, 4.2, 6.2)
