@@ -284,3 +284,8 @@ func build_autobiographical_summary(max_items: int = 12) -> Array[String]:
 		var event := str(memories[i].get("event", ""))
 		if not event.is_empty(): summary.append(event)
 	return summary
+
+func reinforce_preference(key: String, outcome: float, learning_rate: float = 0.08) -> void:
+	if key.is_empty(): return
+	var old := float(preferences.get(key, 0.5))
+	preferences[key] = clampf(old + (clampf(outcome,0.0,1.0)-old)*clampf(learning_rate,0.0,0.5),0.0,1.0)
