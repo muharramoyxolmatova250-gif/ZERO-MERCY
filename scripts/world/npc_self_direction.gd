@@ -239,3 +239,6 @@ func respect_personal_boundaries(context: Dictionary = {}) -> bool:
 	if float(context.get("stress", 0.0)) > 0.96 and _trait("risk_tolerance") < 0.3:
 		return false
 	return true
+func explain_choice() -> String:
+	if active_personal_goal.is_empty(): return "No personal goal selected"
+	return "Self-selected " + str(active_personal_goal.get("id", "goal")) + " because of personal drives, learned preferences and current circumstances"
