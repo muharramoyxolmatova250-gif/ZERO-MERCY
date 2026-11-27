@@ -20,6 +20,7 @@ func _initialize() -> void:
 	_test_solution_points()
 	_test_asymmetric_limb_lengths()
 	_test_solution_stability()
+	_test_solution_world_local_roundtrip()
 	_test_solution_center()
 	_test_solution_error_report()
 	_test_solution_report()
@@ -183,3 +184,11 @@ func _test_solution_center() -> void:
 func _test_solution_stability() -> void:
 	var solution: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
 	assert(CarryHandIK.get_solution_is_stable(solution))
+
+func _test_solution_world_local_roundtrip() -> void:
+	var solution: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	var transform := Transform3D(Basis.IDENTITY, Vector3(2.0, 1.0, -3.0))
+	var world_solution: Dictionary = CarryHandIK.get_solution_world(solution, transform)
+	var local_solution: Dictionary = CarryHandIK.get_solution_local(world_solution, transform)
+	assert(CarryHandIK.get_solution_shoulder(local_solution).is_equal_approx(Vector3.ZERO))
+	assert(CarryHandIK.get_solution_endpoint(local_solution).is_equal_approx(CarryHandIK.get_solution_endpoint(solution)))
