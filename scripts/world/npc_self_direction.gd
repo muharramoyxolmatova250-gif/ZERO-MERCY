@@ -228,3 +228,8 @@ func should_change_personal_goal(candidate_score: float, context: Dictionary = {
 	if active_personal_goal.is_empty(): return true
 	var current_score := float(active_personal_goal.get("chosen_score", 0.0))
 	return candidate_score > current_score + 0.18 or goal_urgency(context) > 0.85
+func update_aspiration_progress(goal_id: String, progress: float) -> void:
+	for index in range(aspirations.size()):
+		if str(aspirations[index].get("id", "")) == goal_id:
+			aspirations[index]["progress"] = clampf(float(aspirations[index].get("progress", 0.0)) + progress, 0.0, 1.0)
+			break
