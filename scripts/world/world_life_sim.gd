@@ -1823,6 +1823,54 @@ func _add_phone_contact(owner_id: String, contact_id: String) -> void:
     resident_profiles[owner_id] = owner
 
 
+func search_phone_contacts(citizen_id: String, query: String, limit: int = 30) -> Array:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return []
+    var needle := query.strip_edges().to_lower()
+    var result: Array = []
+    for contact_value in profile.get("phone_contacts", []):
+        var contact: Dictionary = contact_value
+        var alias := str(profile.get("phone_contact_aliases", {}).get(str(contact.get("id", "")), ""))
+        var haystack := (str(contact.get("name", "")) + " " + str(contact.get("number", "")) + " " + alias).to_lower()
+        if needle.is_empty() or haystack.contains(needle):
+            var copy := contact.duplicate(true)
+            if not alias.is_empty():
+                copy["display_name"] = alias
+            result.append(copy)
+    return result.slice(0, mini(result.size(), maxi(1, limit)))
+
+
+func remove_phone_contact(citizen_id: String, contact_id: String) -> bool:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return false
+    var contacts: Array = profile.get("phone_contacts", [])
+    var before := contacts.size()
+    contacts = contacts.filter(func(item: Dictionary) -> bool: return str(item.get("id", "")) != contact_id)
+    profile["phone_contacts"] = contacts
+    resident_profiles[citizen_id] = profile
+    if contacts.size() != before:
+        _dirty = true
+        return true
+    return false
+
+
+func set_phone_contact_alias(citizen_id: String, contact_id: String, alias: String) -> bool:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty() or not resident_profiles.has(contact_id):
+        return false
+    var aliases: Dictionary = profile.get("phone_contact_aliases", {})
+    if alias.strip_edges().is_empty():
+        aliases.erase(contact_id)
+    else:
+        aliases[contact_id] = alias.strip_edges().left(32)
+    profile["phone_contact_aliases"] = aliases
+    resident_profiles[citizen_id] = profile
+    _dirty = true
+    return true
+
+
 func _add_phone_notification(citizen_id: String, kind: String, title: String) -> void:
     var profile := _ensure_phone_profile(citizen_id)
     if profile.is_empty():
