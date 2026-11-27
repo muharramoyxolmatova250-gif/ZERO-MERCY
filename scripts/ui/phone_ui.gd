@@ -4,6 +4,10 @@ var _panel: PanelContainer
 var _content: VBoxContainer
 var _active_tab := "feed"
 var _sms_target_id := ""
+var _phone_clock_label: Label
+var _phone_battery_label: Label
+var _phone_network_label: Label
+var _system_refresh_elapsed := 0.0
 var _refresh_elapsed := 0.0
 var _society: Node
 var _life: Node
