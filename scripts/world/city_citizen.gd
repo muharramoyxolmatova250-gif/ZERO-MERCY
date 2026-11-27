@@ -975,6 +975,7 @@ func get_ai_decision_snapshot() -> Dictionary:
 		"decision_explanation": _cognition.explain_last_decision(),
 		"dialogue": _dialogue.get_dialogue_snapshot(),
 		"action_planner": _action_planner.get_plan_snapshot(),
+		"independent_mind": _independent_mind.get_cognitive_snapshot(),
 		"planned_action": _planned_action.duplicate(true)
 	}
 
