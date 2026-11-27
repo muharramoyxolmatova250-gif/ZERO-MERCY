@@ -372,15 +372,15 @@ func _update_bots(delta: float) -> void:
 		var offset := player.global_position - bot.global_position
 		offset.y = 0.0
 		var distance := offset.length()
-		if distance > 7.0:
-			var direction := offset.normalized()
-			var side := Vector3(-direction.z, 0.0, direction.x) * sin(float(Time.get_ticks_msec()) * 0.0012 + float(bot.get_instance_id() % 17))
-			var pursuit := (direction + side * 0.48).normalized()
-			bot.velocity.x = pursuit.x * 2.0
-			bot.velocity.z = pursuit.z * 2.0
-			bot.move_and_slide()
-		else:
-			bot.velocity = Vector3.ZERO
+		var direction := offset.normalized()
+		var phase := float(bot.get_meta("strafe_phase", 0.0))
+		var side := Vector3(-direction.z, 0.0, direction.x) * sin(float(Time.get_ticks_msec()) * 0.0012 + phase)
+		var desired_range := 10.0 + float(int(bot.get_instance_id()) % 4)
+		var approach := direction * clampf((distance - desired_range) / 5.0, -0.65, 1.0)
+		var pursuit := (approach + side * 0.58).normalized()
+		bot.velocity.x = pursuit.x * 2.15
+		bot.velocity.z = pursuit.z * 2.15
+		bot.move_and_slide()
 		var wait := float(bot.get_meta("fire_wait", 1.0)) - delta
 		if wait <= 0.0 and distance < 24.0:
 			var eye := bot.global_position + Vector3.UP * 0.55
