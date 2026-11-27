@@ -630,6 +630,10 @@ func _restart_round() -> void:
 		if is_instance_valid(bot):
 			bot.queue_free()
 	bots.clear()
+	for ally in allies:
+		if is_instance_valid(ally):
+			ally.queue_free()
+	allies.clear()
 	health = 100.0
 	ammo = 30
 	reserve_ammo = 90
@@ -662,10 +666,11 @@ func _restart_round() -> void:
 	touch_sprinting = false
 	touch_move = Vector2.ZERO
 	_build_bots()
+	_build_allies()
 
 func _update_hud() -> void:
 	if hud == null:
 		return
 	var state := ("RELOADING %.1fs" % reload_left) if reloading else ("AMMO %d / %d" % [ammo, reserve_ammo])
 	var outcome := " • YOU ARE DOWN" if health <= 0.0 else (" • TIME EXPIRED" if time_left <= 0.0 else (" • ROUND WON" if bots.is_empty() else ""))
-	hud.text = "ZERO MERCY // TACTICAL BREACH\nHP %.0f   %s\nENEMIES %d   ELIMINATIONS %d   W/L %d/%d\nTIME %03d:%02d%s\nWASD move • Shift sprint • C crouch • Right-click ADS • Mouse aim/fire • R reload • Space jump • T restart after round • Esc release mouse" % [health, state, bots.size(), score, rounds_won, rounds_lost, int(time_left) / 60, int(time_left) % 60, outcome]
+	hud.text = "ZERO MERCY // TACTICAL BREACH\nHP %.0f   %s\nENEMIES %d   SQUAD %d   ELIMINATIONS %d   W/L %d/%d\nTIME %03d:%02d%s\nWASD move • Shift sprint • C crouch • Right-click ADS • Mouse aim/fire • R reload • Space jump • T restart after round • Esc release mouse" % [health, state, bots.size(), allies.size(), score, rounds_won, rounds_lost, int(time_left) / 60, int(time_left) % 60, outcome]
