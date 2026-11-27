@@ -20,6 +20,7 @@ var _is_gripping := false
 var _carry_mass_kg := 0.0
 var _carry_fragile := false
 var _carry_two_hand_enabled := true
+var _carry_handling_sensitivity := 1.0
 var _secondary_grip_weight := 0.0
 var _carry_sway := 0.0
 var _clock := 0.0
@@ -66,10 +67,10 @@ func _process(delta: float) -> void:
 					_secondary_ik_solution = CarryHandIK.solve_with_constraints(pivot.position, target_local, 0.38, 0.43, bend_normal)
 					var solved_wrist: Vector3 = _secondary_ik_solution.get("wrist", target_local)
 					var reach_vector := solved_wrist - pivot.position
-					_secondary_grip_weight = CarryHandIK.smooth_weight(_secondary_grip_weight, 1.0, delta, 3.0)
+					_secondary_grip_weight = CarryHandIK.smooth_weight(_secondary_grip_weight, 1.0, delta, 3.0 * _carry_handling_sensitivity)
 					var target_horizontal := Vector2(reach_vector.x, reach_vector.z).length()
 					target.x = clampf(atan2(reach_vector.y, maxf(0.001, target_horizontal)) + 0.45, -0.8, 0.55)
-					target.x += sin(_clock * 1.8) * 0.018 * (1.0 - _secondary_grip_weight)
+					target.x += sin(_clock * 1.8) * 0.018 * clampf(_carry_handling_sensitivity, 0.25, 2.0) * (1.0 - _secondary_grip_weight)
 					target.y = clampf(atan2(-reach_vector.z, reach_vector.x), -0.95, 0.95)
 					target.z = -0.04 if _carry_fragile else 0.0
 				else:
@@ -179,11 +180,13 @@ func set_carry_profile(mass_kg: float, fragile: bool = false) -> void:
 func set_carry_object(item: Node3D) -> void:
 	_carry_object = item
 	_carry_two_hand_enabled = true if not is_instance_valid(item) else bool(item.get_meta("can_be_two_hand_carried", true))
+	_carry_handling_sensitivity = 1.0 if not is_instance_valid(item) else clampf(float(item.get_meta("handling_sensitivity", 1.0)), 0.1, 2.0)
 
 func release_object() -> void:
 	_is_gripping = false
 	_carry_mass_kg = 0.0
 	_carry_fragile = false
+	_carry_handling_sensitivity = 1.0
 	_carry_object = null
 	_secondary_grip_weight = 0.0
 	_secondary_ik_solution.clear()
