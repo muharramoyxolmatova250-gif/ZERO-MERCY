@@ -603,14 +603,29 @@ func _update_allies(delta: float) -> void:
 			ally.set_meta("fire_wait", 0.0)
 			continue
 		var nearest: CharacterBody3D
-		var nearest_distance := 36.0
+		var best_target_score := INF
+		var role := str(ally.get_meta("squad_role", "assault"))
 		for enemy in bots:
 			if not is_instance_valid(enemy):
 				continue
 			var enemy_distance := ally.global_position.distance_to(enemy.global_position)
-			if enemy_distance < nearest_distance:
+			if enemy_distance > 36.0:
+				continue
+			var target_score := enemy_distance
+			if role == "marksman":
+				target_score = 36.0 - enemy_distance
+			elif role == "support":
+				var pressure := 0.0
+				for squad_ally in allies:
+					if is_instance_valid(squad_ally) and not bool(squad_ally.get_meta("downed", false)):
+						if squad_ally.global_position.distance_to(enemy.global_position) < 10.0:
+							pressure += 3.0
+				target_score -= pressure
+			var enemy_health := float(enemy.get_meta("health", 100.0))
+			target_score -= (100.0 - enemy_health) * 0.025
+			if target_score < best_target_score:
+				best_target_score = target_score
 				nearest = enemy
-				nearest_distance = enemy_distance
 		var wait := maxf(0.0, float(ally.get_meta("fire_wait", 0.5)) - delta)
 		if ally_health < 55.0 and not cover_positions.is_empty():
 			var safest := cover_positions[0]
