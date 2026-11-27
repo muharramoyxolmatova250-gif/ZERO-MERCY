@@ -597,6 +597,15 @@ func _update_allies(delta: float) -> void:
 			continue
 		var ally_health := float(ally.get_meta("health", 100.0))
 		var downed := bool(ally.get_meta("downed", false))
+		var status_label := ally.get_node_or_null("SquadStatus") as Label3D
+		if status_label != null:
+			var member_name := str(ally.get_meta("display_name", "SQUADMATE"))
+			if downed:
+				status_label.modulate = Color(1.0, 0.35, 0.25)
+				status_label.text = member_name + "\nDOWN // REVIVE"
+			else:
+				status_label.modulate = Color(0.55, 0.9, 1.0) if ally_health >= 55.0 else Color(1.0, 0.72, 0.25)
+				status_label.text = member_name + "\nHP %.0f" % ally_health
 		if downed:
 			ally.velocity = Vector3.ZERO
 			var revive_progress := float(ally.get_meta("revive_progress", 0.0))
@@ -758,10 +767,21 @@ func _update_hud() -> void:
 		return
 	var state := ("RELOADING %.1fs" % reload_left) if reloading else ("AMMO %d / %d" % [ammo, reserve_ammo])
 	var outcome := " • YOU ARE DOWN" if health <= 0.0 else (" • TIME EXPIRED" if time_left <= 0.0 else (" • ROUND WON" if bots.is_empty() else ""))
-	hud.text = "ZERO MERCY // TACTICAL BREACH\nHP %.0f   %s\nENEMIES %d   SQUAD %d   DOWN %d   ELIMINATIONS %d   W/L %d/%d\nTIME %03d:%02d%s\nWASD move • Shift sprint • C crouch • Right-click ADS • Mouse aim/fire • R reload • Space jump • T restart after round • Esc release mouse" % [health, state, bots.size(), allies.size(), _count_downed_allies(), score, rounds_won, rounds_lost, int(time_left) / 60, int(time_left) % 60, outcome]
+	var revive_status := _get_revive_status()\n	hud.text = "ZERO MERCY // TACTICAL BREACH\\nHP %.0f   %s\\nENEMIES %d   SQUAD %d   DOWN %d   ELIMINATIONS %d   W/L %d/%d\\nTIME %03d:%02d%s\\n%s\\nWASD move • Shift sprint • C crouch • Right-click ADS • Mouse aim/fire • R reload • Space jump • T restart after round • Esc release mouse" % [health, state, bots.size(), allies.size(), _count_downed_allies(), score, rounds_won, rounds_lost, int(time_left) / 60, int(time_left) % 60, outcome, revive_status]
 func _count_downed_allies() -> int:
 	var total := 0
 	for ally in allies:
 		if is_instance_valid(ally) and bool(ally.get_meta("downed", false)):
 			total += 1
 	return total
+
+
+func _get_revive_status() -> String:
+	for ally in allies:
+		if not is_instance_valid(ally) or not bool(ally.get_meta("downed", false)):
+			continue
+		var progress := float(ally.get_meta("revive_progress", 0.0))
+		if ally.global_position.distance_to(player.global_position) <= 2.4:
+			return "REVIVING %s  %.0f%%" % [str(ally.get_meta("display_name", "ALLY")), progress / 4.0 * 100.0]
+		return "ALLY DOWN: %s  — MOVE CLOSER TO REVIVE" % str(ally.get_meta("display_name", "ALLY"))
+	return "SQUAD READY"
