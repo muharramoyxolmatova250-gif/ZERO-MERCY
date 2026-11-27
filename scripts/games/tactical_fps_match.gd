@@ -230,6 +230,15 @@ func _build_bots() -> void:
 		mat.emission = Color(0.18, 0.025, 0.01)
 		body.material_override = mat
 		bot.add_child(body)
+		var status := Label3D.new()
+		status.name = "WeaponStatus"
+		status.position = Vector3(0.0, 1.35, 0.0)
+		status.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		status.font_size = 22
+		status.pixel_size = 0.006
+		status.modulate = Color(1.0, 0.58, 0.42)
+		status.text = "OPERATOR 18/18"
+		bot.add_child(status)
 		var collision := CollisionShape3D.new()
 		var bot_capsule := CapsuleShape3D.new()
 		bot_capsule.height = 1.8
