@@ -695,6 +695,8 @@ func _finish_pickup() -> void:
 		_carried_item_fragile = bool(_held_item.get_meta("is_fragile", false)) or bool(_held_item.get_meta("requires_careful_carry", false))
 		if _held_item.has_method("set_being_held"):
 			_held_item.call("set_being_held", true)
+	if is_instance_valid(_cybernetic_hands) and _cybernetic_hands.has_method("set_carry_profile"):
+		_cybernetic_hands.call("set_carry_profile", _carried_mass_kg, _carried_item_fragile)
 	if is_instance_valid(_weapon_visual):
 		_weapon_visual.visible = false
 	_pickup_in_progress = false
