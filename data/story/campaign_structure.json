@@ -184,7 +184,8 @@
     "side_memory_market",
     "side_satellite_fall",
     "side_yelena_echo",
-    "side_denni_debt"
+    "side_denni_debt",
+    "side_simulation_witness"
   ],
   "characters": [
     {
