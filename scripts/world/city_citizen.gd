@@ -64,6 +64,8 @@ var _self_direction = NPCSelfDirection.new()
 var _independent_mind = NPCCognitiveArchitecture.new()
 var _planned_action: Dictionary = {}
 var _last_economic_goal_id := ""
+var _cognitive_reflection_timer := 0.0
+var _cognitive_plan_id := -1
 @export var citizen_id := ""
 @export var city_id := ""
 @export var occupation := "resident"
@@ -410,6 +412,9 @@ func _decide_goal() -> void:
 	for activity_key in personal_biases:
 		if scores.has(activity_key):
 			scores[activity_key] = float(scores[activity_key]) + float(personal_biases[activity_key])
+
+	_sync_independent_goal_state(cognition_context)
+	_apply_independent_goal_bias(scores)
 	var cognitive_drives: Array[Dictionary] = _independent_mind.evaluate_need_drives()
 	for drive in cognitive_drives:
 		var drive_key := str(drive.get("need", ""))
@@ -428,6 +433,7 @@ func _decide_goal() -> void:
 	if best != previous_goal or _planned_action.is_empty():
 		_action_planner.build_plan(best, cognition_context)
 		_planned_action = _action_planner.next_action()
+		_create_cognitive_plan_from_action_plan(best)
 	_decision_reason = "needs_personality_memory_emotion_schedule_and_combinatorial_action_planning"
 	_independent_mind.add_memory("selected_goal:" + best, {"reason":_decision_reason,"score":best_score,"hour":hour}, 0.35, 0.95)
 	_independent_mind.form_belief("current_goal", best, 0.85, "personal_decision")
@@ -1118,3 +1124,69 @@ func get_independent_mind_snapshot() -> Dictionary:
 
 func reflect_on_recent_life(topic: String = "") -> Dictionary:
 	return _independent_mind.simulate_reflection({"topic":topic,"goal":current_goal,"stress":_stress})
+
+
+func _sync_independent_goal_state(context: Dictionary) -> void:
+	_cognitive_reflection_timer += 2.5
+	if _cognitive_reflection_timer >= 10.0:
+		_cognitive_reflection_timer = 0.0
+		_independent_mind.reconsider_goals(context)
+	var active_categories: Dictionary = {}
+	var active_count := 0
+	for goal in _independent_mind.goals:
+		if str(goal.get("status", "")) == "active":
+			active_categories[str(goal.get("category", ""))] = true
+			active_count += 1
+	if active_count >= 6:
+		return
+	var descriptions := {"hunger":"Find food","energy":"Recover energy","social":"Build a meaningful connection","safety":"Find a safer situation","curiosity":"Discover something new","comfort":"Improve living comfort","purpose":"Make progress toward a personal ambition"}
+	for drive in _independent_mind.evaluate_need_drives():
+		var category := str(drive.get("need", ""))
+		if float(drive.get("urgency", 0.0)) < 0.48 or active_categories.has(category):
+			continue
+		_independent_mind.generate_goal(str(descriptions.get(category, "Improve life")), category, float(drive.get("urgency", 0.5)), context)
+		active_categories[category] = true
+		active_count += 1
+		if active_count >= 6:
+			break
+
+func _apply_independent_goal_bias(scores: Dictionary) -> void:
+	var activity_map := {"hunger":"food","energy":"rest","social":"social","safety":"avoid_crowd","curiosity":"explore","comfort":"rest","purpose":"work","exploration":"explore"}
+	var ranked: Array[Dictionary] = []
+	for goal in _independent_mind.goals:
+		if str(goal.get("status", "")) == "active":
+			ranked.append(goal)
+	ranked.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.get("priority", 0.0)) > float(b.get("priority", 0.0)))
+	for index in range(mini(3, ranked.size())):
+		var goal: Dictionary = ranked[index]
+		var activity := str(activity_map.get(str(goal.get("category", "")), ""))
+		if scores.has(activity):
+			var progress := float(goal.get("progress", 0.0))
+			scores[activity] = float(scores[activity]) + float(goal.get("priority", 0.0)) * (0.16 + (1.0-progress)*0.12)
+
+func _create_cognitive_plan_from_action_plan(goal: String) -> void:
+	var snapshot: Dictionary = _action_planner.get_plan_snapshot()
+	var planner_steps: Array = snapshot.get("plan", [])
+	var steps: Array[Dictionary] = []
+	for item in planner_steps:
+		if steps.size() >= 8:
+			break
+		steps.append({"action":str(item.get("action", "")), "goal":goal, "status":"pending"})
+	if steps.is_empty():
+		return
+	var active_goal_id := -1
+	for cognitive_goal in _independent_mind.goals:
+		if str(cognitive_goal.get("status", "")) == "active" and str(cognitive_goal.get("category", "")) in [goal, "purpose" if goal == "work" else goal]:
+			active_goal_id = int(cognitive_goal.get("id", -1))
+			break
+	_cognitive_plan_id = _independent_mind.create_plan(active_goal_id, steps, "translated_from_world_action_planner")
+
+func _record_cognitive_activity_outcome(activity: String, success: bool, satisfaction: float) -> void:
+	_independent_mind.reflect_on_outcome(activity, success, satisfaction, {"goal":current_goal,"position":global_position})
+	if _cognitive_plan_id >= 0:
+		var advanced: Dictionary = _independent_mind.advance_plan(_cognitive_plan_id, success, "world_activity:" + activity)
+		if not advanced.is_empty() and str(advanced.get("status", "")) == "completed":
+			var completed_goal_id := int(advanced.get("goal_id", -1))
+			if completed_goal_id >= 0:
+				_independent_mind.update_goal_progress(completed_goal_id, 0.25)
+	_cognitive_plan_id = -1
