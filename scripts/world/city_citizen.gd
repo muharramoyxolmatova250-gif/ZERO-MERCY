@@ -497,7 +497,7 @@ func _choose_next_waypoint() -> void:
 			route = PackedVector3Array([global_position])
 			_target_index = 0
 			_start_indoor_activity()
-			_pause_remaining = _rng.randf_range(8.0, 22.0)
+			_pause_remaining = maxf(_rng.randf_range(8.0, 22.0), _get_personal_activity_duration(_get_active_personal_goal_id()) + 1.0)
 			remember_event("entered_building:" + _last_routed_goal + ":" + _indoor_activity)
 			return
 		if _building_visit_phase == "exiting":
@@ -1041,6 +1041,7 @@ func _complete_indoor_personal_action() -> void:
 	_record_personal_skill_practice(goal_id)
 	_record_personal_activity_progress(goal_id, 0.2)
 	if not goal_id.is_empty(): _self_direction.record_goal_outcome(goal_id, satisfaction, true)
+	_finalize_personal_activity_effects(goal_id, satisfaction)
 	_memory.append("completed_personal_activity:" + goal_id)
 	if _memory.size() > 24: _memory.pop_front()
 
