@@ -14,6 +14,7 @@ func register_responder(responder_id: String, service_type: String, node: Node3D
 	if responder_id.is_empty() or service_type.is_empty() or not is_instance_valid(node):
 		return false
 	_responders[responder_id] = {"id": responder_id, "type": service_type, "node": node, "available": true, "speed": clampf(response_speed, 0.25, 3.0), "calls": 0}
+	_retry_waiting_incidents()
 	return true
 
 func unregister_responder(responder_id: String) -> void:
@@ -147,3 +148,33 @@ func _count_active_incidents() -> int:
 		if str(incident.get("status", "")) != "resolved":
 			count += 1
 	return count
+
+ 
+func _retry_waiting_incidents() -> void:
+	var waiting: Array[String] = []
+	for incident_id in _incidents:
+		if str(_incidents[incident_id].get("status", "")) == "awaiting_units":
+			waiting.append(str(incident_id))
+	waiting.sort_custom(func(a: String, b: String) -> bool:
+		return _incident_priority(_incidents[a]) > _incident_priority(_incidents[b])
+	)
+	for incident_id in waiting:
+		_dispatch_for_incident(incident_id)
+
+func _incident_priority(incident: Dictionary) -> float:
+	var age := float(Time.get_ticks_msec() - int(incident.get("created_msec", 0))) / 1000.0
+	return float(incident.get("severity", 0.0)) * 100.0 + minf(age, 120.0) * 0.15
+
+func get_priority_queue() -> Array[Dictionary]:
+	var queue: Array[Dictionary] = []
+	for incident_id in _incidents:
+		var incident: Dictionary = _incidents[incident_id]
+		if str(incident.get("status", "")) == "resolved":
+			continue
+		var item := incident.duplicate(true)
+		item["priority_score"] = _incident_priority(incident)
+		queue.append(item)
+	queue.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("priority_score", 0.0)) > float(b.get("priority_score", 0.0))
+	)
+	return queue
