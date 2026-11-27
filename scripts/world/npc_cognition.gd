@@ -125,3 +125,15 @@ func recall_episodes(query: String, limit: int = 5) -> Array[Dictionary]:
 		matches.resize(limit)
 	return matches
 
+
+
+func update_belief(topic: String, evidence: float, reliability: float = 0.5) -> void:
+	if topic.is_empty():
+		return
+	var old: Dictionary = beliefs.get(topic,{"value":0.5,"confidence":0.0,"observations":0})
+	var weight := clampf(reliability,0.05,1.0)
+	old["value"] = lerpf(float(old.get("value",0.5)),clampf(evidence,0.0,1.0),weight*0.35)
+	old["confidence"] = clampf(float(old.get("confidence",0.0))+weight*0.12,0.0,1.0)
+	old["observations"] = int(old.get("observations",0))+1
+	beliefs[topic] = old
+
