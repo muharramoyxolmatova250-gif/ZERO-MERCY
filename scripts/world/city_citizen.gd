@@ -1059,3 +1059,9 @@ func _remember_personal_activity_outcome(goal_id: String, satisfaction: float) -
 	var result := "satisfied" if satisfaction >= 0.58 else "unsatisfied"
 	remember_event("personal_goal:" + goal_id + ":" + result)
 	_self_direction.learn_from_satisfaction(goal_id, satisfaction)
+
+func _record_autonomous_family_time(goal_id: String) -> void:
+	if goal_id != "spend_time_with_family": return
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	if life_sim != null and life_sim.has_method("record_family_interaction"):
+		life_sim.call("record_family_interaction", citizen_id, "autonomous_family_time")
