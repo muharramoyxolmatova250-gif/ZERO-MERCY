@@ -173,3 +173,6 @@ func is_goal_feasible(goal: Dictionary, context: Dictionary = {}) -> bool:
 	if bool(context.get("has_dependents", false)) and str(goal.get("need", "")) == "discovery" and float(context.get("responsibility_pressure", 0.0)) > 0.8:
 		return false
 	return float(context.get("available_time", 1.0)) > 0.05 and not bool(context.get("unavailable", false))
+func learn_from_satisfaction(goal_id: String, satisfaction: float) -> void:
+	var value := clampf(satisfaction, 0.0, 1.0)
+	preferences[goal_id] = lerpf(float(preferences.get(goal_id, 0.0)), (value - 0.5) * 1.5, 0.16)
