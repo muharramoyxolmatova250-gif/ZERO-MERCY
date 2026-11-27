@@ -1015,3 +1015,11 @@ func _record_personal_activity_progress(goal_id: String, amount: float) -> void:
 	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
 	if life_sim != null and life_sim.has_method("update_resident_goal_progress"):
 		life_sim.call("update_resident_goal_progress", citizen_id, goal_id, amount)
+
+func _record_personal_skill_practice(goal_id: String) -> void:
+	if goal_id not in ["learn_skill", "advance_career", "practice_hobby"]: return
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	if life_sim == null or not life_sim.has_method("record_resident_skill_mastery"): return
+	var skill := str(life_profile.get("career_field", occupation))
+	if goal_id == "practice_hobby": skill = _self_direction.discover_hobby({})
+	life_sim.call("record_resident_skill_mastery", citizen_id, skill, "autonomous_practice")
