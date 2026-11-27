@@ -3030,3 +3030,6 @@ func record_autonomous_goal_result(citizen_id: String, goal_id: String, success:
 	_append_event(p,"autonomous_goal_" + ("success:" if success else "attempt:") + goal_id + (":" + note if not note.is_empty() else ""))
 	resident_profiles[citizen_id] = p
 	_dirty = true
+
+
+undefined
