@@ -242,3 +242,5 @@ func respect_personal_boundaries(context: Dictionary = {}) -> bool:
 func explain_choice() -> String:
 	if active_personal_goal.is_empty(): return "No personal goal selected"
 	return "Self-selected " + str(active_personal_goal.get("id", "goal")) + " because of personal drives, learned preferences and current circumstances"
+func get_agency_metrics() -> Dictionary:
+	return {"autonomy_score":autonomy_score,"decision_count":decision_count,"personal_goal_count":completed_goals.size(),"preference_count":preferences.size(),"aspiration_count":aspirations.size(),"self_directed":not active_personal_goal.is_empty()}
