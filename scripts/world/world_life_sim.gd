@@ -1638,6 +1638,24 @@ func send_phone_message(sender_id: String, recipient_id: String, message_text: S
     return true
 
 
+func mark_phone_message_read(citizen_id: String, message_id: String) -> bool:
+    if not resident_profiles.has(citizen_id) or message_id.is_empty():
+        return false
+    var profile := _ensure_phone_profile(citizen_id)
+    var inbox: Array = profile.get("phone_inbox", [])
+    for index in range(inbox.size()):
+        var message: Dictionary = inbox[index]
+        if str(message.get("id", "")) != message_id:
+            continue
+        message["read"] = true
+        inbox[index] = message
+        profile["phone_inbox"] = inbox
+        resident_profiles[citizen_id] = profile
+        _dirty = true
+        return true
+    return false
+
+
 func _add_phone_contact(owner_id: String, contact_id: String) -> void:
     var owner := _ensure_phone_profile(owner_id)
     if owner.is_empty():
