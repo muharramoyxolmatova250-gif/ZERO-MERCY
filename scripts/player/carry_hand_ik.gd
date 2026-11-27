@@ -162,3 +162,6 @@ static func get_reach_comfort(shoulder: Vector3, target: Vector3, upper_length: 
 
 static func get_elbow_plane_normal(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> Vector3:
 	return safe_normalize((elbow - shoulder).cross(wrist - elbow), Vector3.FORWARD)
+
+static func get_wrist_to_target_direction(wrist: Vector3, target: Vector3) -> Vector3:
+	return safe_normalize(target - wrist, Vector3.FORWARD)
