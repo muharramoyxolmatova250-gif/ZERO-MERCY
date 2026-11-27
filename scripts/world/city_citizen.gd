@@ -369,7 +369,8 @@ func _decide_goal() -> void:
 		scores["leisure"] = 0.85
 	if str(life_profile.get("marital_status", "single")) == "partnered":
 		scores["family"] = 0.35 + _social_need * 0.2
-	var cognition_context := {"stress":_stress,"energy":_energy,"hunger":_hunger,"hour":hour,"day":int(life_profile.get("simulation_day",0)),"risk_tolerance":risk_tolerance}
+	var recalled_experiences: Array[Dictionary] = _independent_mind.recall_memories("", 5)
+	var cognition_context := {"recalled_experiences":recalled_experiences,"stress":_stress,"energy":_energy,"hunger":_hunger,"hour":hour,"day":int(life_profile.get("simulation_day",0)),"risk_tolerance":risk_tolerance}
 	scores = _cognition.evaluate_goal_scores(scores, cognition_context, _personality_traits, _memory)
 	var agency_context := {"stress":_stress,"loneliness":_social_need,"boredom":_curiosity,"financial_pressure":float(life_profile.get("debt",0.0))/1000.0,"profile":life_profile,"available_time":1.0}
 	if _rng.randf() < 0.08:
