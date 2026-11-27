@@ -109,6 +109,9 @@ func _on_emergency_incident_created(incident_id: String, payload: Dictionary) ->
 	if distance > 38.0:
 		return
 	var severity := float(payload.get("severity", 0.5))
+	if _cognitive_plan_id >= 0 and severity >= 0.55:
+		_independent_mind.advance_plan(_cognitive_plan_id, false, "high_severity_emergency")
+		_cognitive_plan_id = -1
 	_cognition.appraise_event("threat", severity, clampf(1.0 - distance / 38.0, 0.0, 1.0))
 	_cognition.remember_episode("emergency", "Nearby " + str(payload.get("kind", "incident")), severity, incident_position, incident_id)
 	var courage := float(_personality_traits.get("courage", 0.5))
