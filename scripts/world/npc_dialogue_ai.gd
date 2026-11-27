@@ -313,3 +313,14 @@ func vary_expression(line: String) -> String:
 		return line + " I want to be clear about that."
 	return line
 
+
+
+func adjust_verbosity(line: String) -> String:
+	var verbosity := float(voice_profile.get("verbosity",0.6))
+	if verbosity < 0.35:
+		var parts := line.split(". ",false)
+		return str(parts[0]) + ("." if not str(parts[0]).ends_with(".") else "")
+	if verbosity > 0.82 and line.length() < 100:
+		return line + " There's usually more to the story, though."
+	return line
+
