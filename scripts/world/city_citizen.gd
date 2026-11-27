@@ -59,6 +59,7 @@ var _action_planner = NPCActionPlanner.new()
 var _motion_controller = NPCMotionController.new()
 var _self_direction = NPCSelfDirection.new()
 var _planned_action: Dictionary = {}
+var _last_economic_goal_id := ""
 @export var citizen_id := ""
 @export var city_id := ""
 @export var occupation := "resident"
@@ -360,7 +361,20 @@ func _decide_goal() -> void:
 	scores = _cognition.evaluate_goal_scores(scores, cognition_context, _personality_traits, _memory)
 	var agency_context := {"stress":_stress,"loneliness":_social_need,"boredom":_curiosity,"financial_pressure":float(life_profile.get("debt",0.0))/1000.0,"profile":life_profile,"available_time":1.0}
 	if _rng.randf() < 0.08:
-		_self_direction.choose_personal_goal(agency_context)
+		var previous_personal_goal := str(_self_direction.active_personal_goal.get("id", ""))
+		var chosen_personal_goal: Dictionary = _self_direction.choose_personal_goal(agency_context)
+		var chosen_goal_id := str(chosen_personal_goal.get("id", ""))
+		if not chosen_goal_id.is_empty() and chosen_goal_id != previous_personal_goal and chosen_goal_id != _last_economic_goal_id:
+			_last_economic_goal_id = chosen_goal_id
+			var economy_sim := get_tree().get_first_node_in_group("world_life_sim")
+			if economy_sim != null and economy_sim.has_method("execute_autonomous_resident_goal"):
+				var execution: Dictionary = economy_sim.call("execute_autonomous_resident_goal", citizen_id, chosen_goal_id, _personality_traits)
+				var succeeded := bool(execution.get("executed", false))
+				_self_direction.record_goal_outcome(chosen_goal_id, 0.72 if succeeded else 0.38, succeeded)
+				if economy_sim.has_method("update_resident_autonomy_goal"):
+					economy_sim.call("update_resident_autonomy_goal", citizen_id, chosen_goal_id, succeeded, _personality_traits)
+			if economy_sim != null and economy_sim.has_method("process_resident_autonomy_economy") and _rng.randf() < 0.03:
+				economy_sim.call("process_resident_autonomy_economy", citizen_id, _personality_traits)
 	var personal_biases: Dictionary = _self_direction.activity_biases(agency_context)
 	for activity_key in personal_biases:
 		if scores.has(activity_key):
