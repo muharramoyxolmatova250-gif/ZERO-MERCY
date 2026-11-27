@@ -457,6 +457,9 @@ func _throw_tactical_grenade(thrower: CharacterBody3D, target_position: Vector3)
 	var grenade := Node3D.new()
 	grenade.name = "EnemyGrenade"
 	grenade.add_to_group("enemy_grenades")
+	grenade.set_meta("landing_position", target_position)
+	grenade.set_meta("fuse_seconds", 1.25)
+	grenade.set_meta("thrower_name", thrower.name)
 	var visual := MeshInstance3D.new()
 	var sphere := SphereMesh.new()
 	sphere.radius = 0.16
