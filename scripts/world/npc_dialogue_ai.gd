@@ -357,3 +357,13 @@ func get_conversation_summary(other_id: String) -> Dictionary:
 			topics[last_topic] = int(topics.get(last_topic,0))+1
 	return {"other_id":other_id,"conversation_count":count,"topics":topics,"last_topic":last_topic}
 
+
+
+func set_relationship_context(score: float, familiar: bool) -> void:
+	voice_profile["relationship_score"] = clampf(score,-1.0,1.0)
+	voice_profile["familiar"] = familiar
+	if score < -0.45:
+		voice_profile["directness"] = minf(1.0,float(voice_profile.get("directness",0.5))+0.15)
+	elif score > 0.65:
+		voice_profile["verbosity"] = minf(1.0,float(voice_profile.get("verbosity",0.6))+0.12)
+
