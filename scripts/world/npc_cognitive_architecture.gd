@@ -247,3 +247,9 @@ func deliberate(options: Array[Dictionary], context: Dictionary = {}) -> Diction
 		examined.append({"action":str(option.get("action", "")),"utility":evaluate_opportunity(option, context),"risk":float(option.get("risk", 0.5))})
 	examined.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.utility) > float(b.utility))
 	return {"best":examined[0] if not examined.is_empty() else {},"examined":examined,"limited_by_reasoning_budget":options.size()>MAX_REASONING_STEPS}
+
+func get_decision_caution(action: Dictionary) -> float:
+	var uncertainty := float(beliefs.get("uncertainty", 0.5))
+	var risk := clampf(float(action.get("risk", 0.5)),0.0,1.0)
+	var courage := float(preferences.get("courage", 0.5))
+	return clampf(uncertainty * 0.45 + risk * (1.0-courage) * 0.55,0.0,1.0)
