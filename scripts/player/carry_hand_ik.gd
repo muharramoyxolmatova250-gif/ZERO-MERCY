@@ -179,3 +179,6 @@ static func get_joint_limit_weight(angle: float, minimum: float, maximum: float,
 	var span := maxf(absf(maximum - minimum), 0.001)
 	var edge := minf(angle - minimum, maximum - angle)
 	return clampf(edge / maxf(span * margin, 0.001), 0.0, 1.0)
+
+static func get_chain_lengths(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> Vector2:
+	return Vector2(shoulder.distance_to(elbow), elbow.distance_to(wrist))
