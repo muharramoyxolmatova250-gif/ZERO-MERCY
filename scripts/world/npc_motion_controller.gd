@@ -94,3 +94,5 @@ func arrival_speed(distance: float, radius: float, maximum: float) -> float:
 	if radius <= 0.0:
 		return maximum
 	return maximum * smoothstep(0.0, radius, maxf(0.0, distance))
+func get_turn_blend(delta: float) -> float:
+	return clampf(turn_rate * minf(delta, 0.05), 0.0, 1.0)
