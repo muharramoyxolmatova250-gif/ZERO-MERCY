@@ -384,16 +384,71 @@ func _open_media_player() -> void:
 
 func _build_games_hub() -> void:
     _add_section_title("ZERO PLAY // GAME CENTER")
-    _add_body("Tactical Breach is the first playable in-world phone game prototype. It is a local single-player match, not online PUBG or Counter-Strike multiplayer.")
-    var game := Button.new()
-    game.text = "LAUNCH TACTICAL BREACH"
-    game.custom_minimum_size = Vector2(0, 48)
-    game.pressed.connect(_launch_tactical_breach)
-    _content.add_child(game)
-    _add_body("Controls: WASD / touch joystick, mouse or touch aim, fire, reload, sprint, crouch. Five training opponents.")
-    if _life != null and _life.has_method("get_phone_game_stats"):
-        var stats: Dictionary = _life.call("get_phone_game_stats", "player")
-        _add_stat("MATCHES PLAYED", str(stats.get("matches", 0)))
+    _add_body("Connect with nearby residents and invite them into a phone party. NPCs decide whether to join based on their availability and phone battery.")
+    var catalog: Array = _life.call("get_phone_games_catalog") if _life != null and _life.has_method("get_phone_games_catalog") else []
+    var game_picker := OptionButton.new()
+    game_picker.custom_minimum_size = Vector2(0, 40)
+    for game_data in catalog:
+        game_picker.add_item(str(game_data.get("title", "Game")))
+        if str(game_data.get("id", "")) == _party_game_id:
+            game_picker.select(game_picker.item_count - 1)
+    game_picker.item_selected.connect(func(index: int) -> void:
+        if index >= 0 and index < catalog.size():
+            _party_game_id = str(catalog[index].get("id", "tactical_breach"))
+    )
+    _content.add_child(game_picker)
+    _add_section_title("NEARBY PLAYERS  •  " + str(_party_invites.size()) + " INVITED")
+    var player := get_parent().get_node_or_null("Dara") as Node3D
+    var citizens := get_tree().get_nodes_in_group("city_citizen")
+    var shown := 0
+    for citizen in citizens:
+        if not is_instance_valid(citizen) or not citizen.has_method("get_ai_snapshot"):
+            continue
+        if player != null and citizen.global_position.distance_to(player.global_position) > 120.0:
+            continue
+        var person: Dictionary = citizen.call("get_ai_snapshot")
+        var citizen_id := str(person.get("id", person.get("citizen_id", "")))
+        if citizen_id.is_empty():
+            continue
+        var person_name := str(person.get("name", "Resident"))
+        var invite := Button.new()
+        var selected := _party_invites.has(citizen_id)
+        invite.text = ("✓  " if selected else "+  ") + person_name + "  •  " + str(person.get("occupation", "resident"))
+        invite.custom_minimum_size = Vector2(0, 38)
+        invite.toggle_mode = true
+        invite.button_pressed = selected
+        invite.pressed.connect(_toggle_party_invite.bind(citizen_id))
+        _content.add_child(invite)
+        shown += 1
+        if shown >= 16:
+            break
+    if shown == 0:
+        _add_body("No nearby NPC phones detected. Move closer to residents to invite them.")
+    var party := Button.new()
+    party.text = "START PARTY MATCH  (" + str(_party_invites.size()) + " INVITES)"
+    party.custom_minimum_size = Vector2(0, 48)
+    party.pressed.connect(_start_phone_party_match)
+    _content.add_child(party)
+    var solo := Button.new()
+    solo.text = "LAUNCH PLAYABLE TACTICAL BREACH"
+    solo.custom_minimum_size = Vector2(0, 44)
+    solo.pressed.connect(_launch_tactical_breach)
+    _content.add_child(solo)
+    _add_body("Party matches currently run through the world-life phone game simulation. Tactical Breach below remains the separate playable first-person training prototype.")
+    if not _last_party_result.is_empty():
+        _add_section_title("LAST PARTY RESULT")
+        _add_stat("GAME", str(_last_party_result.get("game_title", "Game")))
+        _add_stat("TEAM RESULT", "VICTORY" if bool(_last_party_result.get("won", false)) else "DEFEAT")
+        _add_stat("NPCs JOINED", str(_last_party_result.get("accepted_count", 0)) + " / " + str(_last_party_result.get("invited_count", 0)))
+        for member in _last_party_result.get("roster", []):
+            _add_body("• " + str(member.get("name", "NPC")) + "  |  skill " + str(member.get("skill", 0.0)))
+
+func _toggle_party_invite(citizen_id: String) -> void:
+    if _party_invites.has(citizen_id):
+        _party_invites.erase(citizen_id)
+    else:
+        _party_invites.append(citizen_id)
+    _refresh_content()
 
 func _launch_tactical_breach() -> void:
     var scene := load("res://scenes/games/tactical_fps_match.tscn") as PackedScene
