@@ -20,6 +20,7 @@ var _phone_browser = preload("res://scripts/phone/phone_browser.gd").new()
 var _browser_query := ""
 var _browser_page_id := ""
 var _browser_status := "READY"
+var _browser_view_mode := "search"
 var _last_camera_message := "READY TO CAPTURE"
 var _last_call_message := ""
 
@@ -44,7 +45,8 @@ func _process(delta: float) -> void:
     _refresh_elapsed += delta
     if _refresh_elapsed >= 2.0:
         _refresh_elapsed = 0.0
-        _refresh_content()
+        if _active_tab != "browser":
+            _refresh_content()
 
 func set_phone_open(open: bool) -> void:
     visible = open
@@ -980,7 +982,7 @@ func _build_browser() -> void:
     var search_button := Button.new()
     search_button.text = "GO"
     search_button.custom_minimum_size = Vector2(54, 42)
-    search_button.pressed.connect(_submit_browser_search.bind(query_input.text))
+    search_button.pressed.connect(func() -> void: _submit_browser_search(query_input.text))
     search_row.add_child(search_button)
     _content.add_child(search_row)
     var quick_row := HBoxContainer.new()
@@ -989,6 +991,7 @@ func _build_browser() -> void:
     home_button.pressed.connect(func() -> void:
         _browser_page_id = ""
         _browser_query = ""
+        _browser_view_mode = "search"
         _refresh_content()
     )
     quick_row.add_child(home_button)
@@ -1004,7 +1007,21 @@ func _build_browser() -> void:
     if not _browser_page_id.is_empty():
         _render_browser_page(_browser_page_id)
         return
-    if not _browser_query.is_empty():
+    if _browser_view_mode == "history":
+        _add_section_title("RECENTLY VISITED")
+        var history_items: Array = _phone_browser.get_history()
+        if history_items.is_empty():
+            _add_body("No browsing history yet.")
+        for history_item in history_items:
+            _add_browser_result(_phone_browser.get_page(str(history_item.get("id", ""))))
+    elif _browser_view_mode == "bookmarks":
+        _add_section_title("SAVED PAGES")
+        var saved_items: Array = _phone_browser.get_bookmarks()
+        if saved_items.is_empty():
+            _add_body("No saved pages yet.")
+        for saved_item in saved_items:
+            _add_browser_result(saved_item)
+    elif not _browser_query.is_empty():
         _add_section_title("SEARCH RESULTS // " + _browser_query.to_upper())
         var results: Array = _phone_browser.search(_browser_query, 12)
         if results.is_empty():
@@ -1021,6 +1038,7 @@ func _build_browser() -> void:
 
 func _submit_browser_search(query: String) -> void:
     _browser_query = query.strip_edges()
+    _browser_view_mode = "search"
     _browser_page_id = ""
     _browser_status = "SEARCH COMPLETE"
     _refresh_content()
@@ -1079,24 +1097,12 @@ func _render_browser_page(page_id: String) -> void:
 func _show_browser_history() -> void:
     _browser_page_id = ""
     _browser_query = ""
+    _browser_view_mode = "history"
     _refresh_content()
-    _add_section_title("RECENTLY VISITED")
-    var history: Array = _phone_browser.get_history()
-    if history.is_empty():
-        _add_body("No browsing history yet.")
-        return
-    for item in history:
-        _add_browser_result(_phone_browser.get_page(str(item.get("id", ""))))
 
 
 func _show_browser_bookmarks() -> void:
     _browser_page_id = ""
     _browser_query = ""
+    _browser_view_mode = "bookmarks"
     _refresh_content()
-    _add_section_title("SAVED PAGES")
-    var saved: Array = _phone_browser.get_bookmarks()
-    if saved.is_empty():
-        _add_body("No saved pages yet.")
-        return
-    for item in saved:
-        _add_browser_result(item)
