@@ -306,3 +306,6 @@ func get_reach_duration() -> float:
 
 func get_place_duration() -> float:
 	return clampf(0.24 + mass_kg * 0.009 + (0.18 if fragile else 0.0), 0.24, 1.1)
+
+func get_clearance_radius() -> float:
+	return clampf(0.35 + mass_kg * 0.006, 0.35, 0.85)
