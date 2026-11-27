@@ -1,5 +1,6 @@
 extends Node3D
 const NPCCognition = preload("res://scripts/world/npc_cognition.gd")
+const NPCDialogueAI = preload("res://scripts/world/npc_dialogue_ai.gd")
 ## Lightweight ambient pedestrian that loops a local sidewalk route.
 @export var route: PackedVector3Array = PackedVector3Array()
 @export_range(0.2, 5.0, 0.1) var walk_speed := 1.25
@@ -50,6 +51,7 @@ var _phone_action_cooldown := 0.0
 var _phone_battery_visual := 1.0
 var _last_browser_topic := ""
 var _cognition = NPCCognition.new()
+var _dialogue = NPCDialogueAI.new()
 @export var citizen_id := ""
 @export var city_id := ""
 @export var occupation := "resident"
@@ -198,6 +200,14 @@ func _physics_process(delta: float) -> void:
 			var other_id := str(_social_target.get("citizen_id"))
 			_social_target.call("remember_event", "met:" + citizen_id)
 			remember_event("conversation:" + other_id)
+			var own_name := str(life_profile.get("name", citizen_id))
+			var other_name := str(_social_target.get("life_profile", {}).get("name", other_id))
+			var greeting := _dialogue.generate_greeting(other_name, relationship_score, "night" if int(Time.get_time_dict_from_system().get("hour",12)) >= 21 else "day")
+			var other_reply := str(_social_target.call("talk_to_npc", greeting, citizen_id, own_name))
+			var own_reply := _dialogue.answer_question(other_reply, {"speaker_name":other_name,"my_name":own_name,"occupation":occupation,"city":str(life_profile.get("city","this city")),"goal":_long_term_goal,"children":int(life_profile.get("children_count",0)),"relationship":relationship_score})
+			_dialogue.remember_conversation(other_id, _dialogue.suggest_topic(), greeting, other_reply)
+			_cognition.update_social_impression(other_id, "friendly_chat", 0.62)
+			_social_target.call("remember_event", "dialogue:" + citizen_id)
 			var life_sim := get_tree().get_first_node_in_group("world_life_sim")
 			if life_sim != null and life_sim.has_method("record_social_interaction"):
 				life_sim.call("record_social_interaction", citizen_id, other_id, "friendly_chat")
@@ -274,6 +284,7 @@ func _initialize_personality() -> void:
 	else:
 		_long_term_goal = "build_a_stable_life"
 	_cognition.initialize(citizen_id, _personality_traits)
+	_dialogue.initialize(citizen_id, _personality_traits, life_profile)
 
 
 func _update_needs() -> void:
@@ -845,6 +856,24 @@ func _consider_autonomous_phone_use() -> void:
 		_set_phone_visible(true)
 
 
+func talk_to_npc(question: String, other_id: String = "", speaker_name: String = "friend") -> String:
+	var context := {"speaker_name":speaker_name,"my_name":str(life_profile.get("name",citizen_id)),"occupation":occupation,"city":str(life_profile.get("city","this city")),"goal":_long_term_goal,"children":int(life_profile.get("children_count",0)),"relationship":relationship_score,"other_id":other_id}
+	var normalized := question.to_lower()
+	var reply := _dialogue.answer_uzbek(question,context) if _contains_dialogue_uzbek(normalized) else _dialogue.answer_question(question,context)
+	_dialogue.remember_conversation(other_id,_dialogue.suggest_topic(),reply,question)
+	_cognition.update_social_impression(other_id,"conversation",0.58)
+	remember_event("dialogue:" + other_id)
+	return reply
+
+func _contains_dialogue_uzbek(value: String) -> bool:
+	for word in ["qandaysan","qalaysan","isming","kimsan","rahmat","kechir","o'ylaysan","fikring","qayerda","kasbing","oilangg"]:
+		if word in value:
+			return true
+	return false
+
+func get_dialogue_snapshot() -> Dictionary:
+	return _dialogue.get_dialogue_snapshot()
+
 func _set_phone_visible(show_phone: bool) -> void:
 	is_using_phone = show_phone
 	if _phone != null:
@@ -865,7 +894,8 @@ func get_ai_decision_snapshot() -> Dictionary:
 		"transport": "taxi" if _taxi_riding else "walking",
 		"emergency_flee_remaining": _crime_flee_timer,
 		"cognition": _cognition.get_cognition_snapshot(),
-		"decision_explanation": _cognition.explain_last_decision()
+		"decision_explanation": _cognition.explain_last_decision(),
+		"dialogue": _dialogue.get_dialogue_snapshot()
 	}
 
 func evaluate_local_risk(threat_position: Vector3, threat_severity: float = 0.5) -> Dictionary:
