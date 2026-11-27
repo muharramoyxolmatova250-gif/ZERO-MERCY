@@ -119,3 +119,6 @@ static func get_joint_chain_length(shoulder: Vector3, elbow: Vector3, wrist: Vec
 static func is_chain_stretched(shoulder: Vector3, elbow: Vector3, wrist: Vector3, threshold: float = 0.96) -> bool:
 	var chain := get_joint_chain_length(shoulder, elbow, wrist)
 	return chain > 0.001 and shoulder.distance_to(wrist) / chain >= threshold
+
+static func get_joint_balance(upper_length: float, lower_length: float) -> float:
+	return clampf(minf(upper_length, lower_length) / maxf(maxf(upper_length, lower_length), 0.001), 0.0, 1.0)
