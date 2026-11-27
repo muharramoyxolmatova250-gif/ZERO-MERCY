@@ -162,7 +162,7 @@ func learn_from_satisfaction(goal_id: String, satisfaction: float) -> void:
 	preferences[goal_id] = lerpf(float(preferences.get(goal_id, 0.0)), (value - 0.5) * 1.5, 0.16)
 func choose_idle_initiative(context: Dictionary = {}) -> Dictionary:
 	var candidates := ["practice_hobby","explore_unknown_place","make_friend","create_something","exercise_for_health","learn_skill"]
-	var best := candidates[0]
+	var best: String = str(candidates[0])
 	var score := -INF
 	for candidate in candidates:
 		var item: Dictionary = {}
@@ -185,7 +185,7 @@ func wants_business(context: Dictionary = {}) -> bool:
 	return _trait("risk_tolerance") * 0.38 + _trait("ambition") * 0.28 + capital * 0.18 + opportunity * 0.16 > 0.68
 func discover_hobby(context: Dictionary = {}) -> String:
 	var hobbies := ["music","photography","sports","cooking","reading","crafting","gaming","gardening"]
-	var best := hobbies[0]
+	var best: String = str(hobbies[0])
 	var best_score := -INF
 	for hobby in hobbies:
 		var score := _trait("curiosity") * 0.4 + float(preferences.get("hobby_" + hobby, 0.0)) + _rng.randf_range(0.0, 0.3)
@@ -396,7 +396,7 @@ func choose_value_aligned_goal(context: Dictionary = {}) -> Dictionary:
 	for goal in GOAL_CATALOG:
 		var need := str(goal.get("need",""))
 		var value_key := "knowledge" if need in ["growth","discovery"] else ("family" if need=="belonging" else ("security" if need=="security" else ("community" if need=="purpose" else "freedom")))
-		var candidate := goal.duplicate(true)
+		var candidate: Dictionary = goal.duplicate(true)
 		candidate["interest"]=float(values.get(value_key,0.0))*0.25+0.25
 		candidates.append(candidate)
 	return choose_from_candidates(candidates,context)
