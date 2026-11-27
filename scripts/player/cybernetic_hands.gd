@@ -19,6 +19,7 @@ var _reach_weight := 0.0
 var _is_gripping := false
 var _carry_mass_kg := 0.0
 var _carry_fragile := false
+var _carry_two_hand_enabled := true
 var _secondary_grip_weight := 0.0
 var _carry_sway := 0.0
 var _clock := 0.0
@@ -57,7 +58,7 @@ func _process(delta: float) -> void:
 				target = Vector3(-0.24 - minf(_carry_mass_kg * 0.006, 0.16), 0.0, 0.045)
 			else:
 				target = Vector3(-0.16 - minf(_carry_mass_kg * 0.004, 0.10), 0.0, -0.025)
-				if _carry_mass_kg >= 8.0 and is_instance_valid(_carry_object):
+				if _carry_mass_kg >= 8.0 and _carry_two_hand_enabled and is_instance_valid(_carry_object):
 					var grip_offset: Vector3 = _carry_object.get_meta("secondary_grip_offset", Vector3(-0.24, -0.05, -0.10))
 					var grip_world: Vector3 = _carry_object.global_transform * grip_offset
 					var target_local := to_local(grip_world)
@@ -173,6 +174,7 @@ func set_carry_profile(mass_kg: float, fragile: bool = false) -> void:
 
 func set_carry_object(item: Node3D) -> void:
 	_carry_object = item
+	_carry_two_hand_enabled = true if not is_instance_valid(item) else bool(item.get_meta("can_be_two_hand_carried", true))
 
 func release_object() -> void:
 	_is_gripping = false
