@@ -159,7 +159,7 @@ func _build_phone() -> void:
     tabs.add_theme_constant_override("separation", 4)
     tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     tab_scroll.add_child(tabs)
-    for tab in ["home", "feed", "media", "games", "news", "contacts", "sms", "notifications", "life", "missions", "map", "camera", "gallery", "settings"]:
+    for tab in ["home", "feed", "media", "games", "news", "contacts", "sms", "notifications", "life", "missions", "map", "camera", "gallery", "settings", "calls"]:
         var button := Button.new()
         button.text = tab.to_upper()
         button.custom_minimum_size = Vector2(76, 36)
@@ -263,6 +263,8 @@ func _refresh_content() -> void:
             _build_phone_gallery()
         "settings":
             _build_phone_settings()
+        "calls":
+            _build_phone_calls()
 
 
 func _build_home_screen() -> void:
@@ -297,6 +299,7 @@ func _build_home_screen() -> void:
     _add_phone_app_tile(grid, "CAMERA", "◎", "camera")
     _add_phone_app_tile(grid, "GALLERY", "▧", "gallery")
     _add_phone_app_tile(grid, "SETTINGS", "⚙", "settings")
+    _add_phone_app_tile(grid, "CALLS", "☎", "calls")
 
 
 func _add_phone_app_tile(parent: GridContainer, title: String, glyph: String, target_tab: String) -> void:
