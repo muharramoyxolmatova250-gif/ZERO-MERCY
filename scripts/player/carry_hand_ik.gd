@@ -264,3 +264,6 @@ static func get_target_distance_weight(shoulder: Vector3, target: Vector3, start
 
 static func offset_target_along_direction(target: Vector3, direction: Vector3, distance: float) -> Vector3:
 	return target + safe_normalize(direction) * distance
+
+static func get_closest_reachable_point(shoulder: Vector3, target: Vector3, upper_length: float, lower_length: float) -> Vector3:
+	return clamp_reach_target(shoulder, target, upper_length, lower_length)
