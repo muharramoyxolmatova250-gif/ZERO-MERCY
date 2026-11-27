@@ -247,3 +247,18 @@ func decision_confidence(ranked_options: Array[Dictionary]) -> float:
 	var second := float(ranked_options[1].get("expected_utility",0.0))
 	return clampf(0.5+absf(first-second)*0.8,0.5,0.98)
 
+
+
+func choose_conflict_response(other_id: String, provocation: float, courage: float, kindness: float) -> String:
+	var impression := get_social_impression(other_id)
+	var trust := float(impression.get("trust",0.35))
+	var anger := float(emotional_state.get("anger",0.0))
+	var threat := clampf(provocation*0.55+anger*0.3-trust*0.15,0.0,1.0)
+	if threat > 0.78 and courage < 0.4:
+		return "withdraw_and_seek_help"
+	if kindness > 0.72 or trust > 0.68:
+		return "calm_dialogue"
+	if threat > 0.62 and courage > 0.72:
+		return "defend_boundaries"
+	return "question_and_deescalate"
+
