@@ -342,3 +342,12 @@ func get_next_plan_step(plan_id: int) -> Dictionary:
 			if index >= 0 and index < steps.size():
 				return steps[index].duplicate(true)
 	return {}
+
+
+func update_goal_priority(goal_id: int, priority: float, reason: String = "") -> bool:
+	for index in range(goals.size()):
+		if int(goals[index].get("id", -1)) == goal_id and str(goals[index].get("status", "")) == "active":
+			goals[index]["priority"] = clampf(priority, 0.0, 1.0)
+			goals[index]["last_priority_reason"] = reason
+			return true
+	return false
