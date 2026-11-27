@@ -1920,5 +1920,37 @@
     "reward": {
       "credits": 610
     }
+  },
+  "side_simulation_witness": {
+    "id": "side_simulation_witness",
+    "title": "Yon topshiriq — Haqiqatdagi yoriq",
+    "chapter": "Yashirin voqealar — Simulyatsiya izlari",
+    "description": "Ko‘z osti ko‘kimtir implantli notanish odamning ogohlantirishini tekshir: takrorlanuvchi yuzlar, yopiq chegaralar va buzilgan yozuvlar ortidagi sirni och.",
+    "estimated_minutes": 45,
+    "side_mission": true,
+    "objectives": [
+      {
+        "id": "sim_obj_1",
+        "title": "Implantli notanish odam bilan uchrash",
+        "event": "meet_simulation_witness",
+        "target": 1
+      },
+      {
+        "id": "sim_obj_2",
+        "title": "Takrorlanuvchi yuzlar dalilini top",
+        "event": "collect_repeating_faces",
+        "target": 1
+      },
+      {
+        "id": "sim_obj_3",
+        "title": "Chegara yozuvini dekodla",
+        "event": "decode_boundary_recording",
+        "target": 1
+      }
+    ],
+    "reward": {
+      "credits": 900,
+      "story_flag": "simulation_witness_investigated"
+    }
   }
 }
