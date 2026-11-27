@@ -2862,3 +2862,171 @@ func train_resident_skill(citizen_id: String, skill: String, effort: float = 0.1
 	resident_profiles[citizen_id] = profile
 	_dirty = true
 	return {"skill":skill,"level":float(skills[skill]),"gain":gain}
+
+
+func get_business_opportunities(city_id: String, citizen_id: String = "") -> Array:
+	var opportunities: Array = []
+	var hub: Dictionary = hub_state.get(city_id,{})
+	var market: Dictionary = hub.get("market",{})
+	for good_id in market:
+		var item: Dictionary = market[good_id]
+		var stock := int(item.get("stock",0))
+		var demand := int(item.get("demand",0))
+		var shortage := clampf(float(demand-stock)/maxf(1.0,float(demand)),0.0,1.0)
+		opportunities.append({"sector":str(good_id),"shortage":shortage,"demand":demand,"stock":stock,"benefit":shortage * 0.8 + 0.15,"risk":0.25 + float(stock)/maxf(1.0,float(demand))*0.12})
+	opportunities.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.benefit) > float(b.benefit))
+	return opportunities
+
+func start_resident_business(citizen_id: String, business_type: String, startup_cost: int = 30000) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {"started":false,"reason":"resident_missing"}
+	var profile: Dictionary = resident_profiles[citizen_id]
+	if not str(profile.get("business_id","")).is_empty(): return {"started":false,"reason":"already_owns_business"}
+	var cost := maxi(5000,startup_cost)
+	var available := int(profile.get("savings",0)) + int(profile.get("bank_balance",0))
+	if available < cost: return {"started":false,"reason":"insufficient_capital","required":cost,"available":available}
+	var types := ["food_store","pharmacy","electronics_shop","clothing_store","fuel_station"]
+	if business_type not in types: return {"started":false,"reason":"unsupported_sector"}
+	var from_savings := mini(cost,int(profile.get("savings",0)))
+	profile["savings"] = int(profile.get("savings",0)) - from_savings
+	profile["bank_balance"] = int(profile.get("bank_balance",0)) - (cost-from_savings)
+	var business_id := "business_" + str(abs(hash(citizen_id + ":" + str(simulation_day) + ":" + business_type)))
+	profile["business_id"] = business_id
+	profile["business_type"] = business_type
+	profile["business_city"] = str(profile.get("city",""))
+	profile["business_capital"] = cost
+	profile["business_inventory"] = 120
+	profile["business_restock_budget"] = 1200
+	profile["business_months"] = 0
+	profile["business_workers"] = 0
+	profile["business_capacity"] = 2
+	profile["business_revenue"] = 0
+	profile["business_last_profit"] = 0
+	profile["business_health"] = 0.5
+	profile["financial_goal"] = "grow_business"
+	_append_event(profile,"founded_business:" + business_id)
+	resident_profiles[citizen_id] = profile
+	_dirty = true
+	return {"started":true,"business_id":business_id,"type":business_type,"capital":cost}
+
+func invest_in_resident_business(citizen_id: String, amount: int, purpose: String = "inventory") -> Dictionary:
+	if not resident_profiles.has(citizen_id) or amount <= 0: return {"invested":false}
+	var profile: Dictionary = resident_profiles[citizen_id]
+	if str(profile.get("business_id","")).is_empty(): return {"invested":false,"reason":"no_business"}
+	var capital := int(profile.get("business_capital",0))
+	if int(profile.get("money",0)) < amount: return {"invested":false,"reason":"insufficient_cash"}
+	profile["money"] = int(profile.get("money",0)) - amount
+	profile["business_capital"] = capital + amount
+	if purpose == "inventory": profile["business_inventory"] = mini(1000,int(profile.get("business_inventory",0)) + amount / 20)
+	elif purpose == "capacity": profile["business_capacity"] = mini(20,int(profile.get("business_capacity",2)) + maxi(1,amount / 5000))
+	elif purpose == "marketing": profile["business_marketing_budget"] = int(profile.get("business_marketing_budget",0)) + amount
+	else: profile["business_capital"] = capital
+	_append_event(profile,"business_investment:" + purpose + ":" + str(amount))
+	resident_profiles[citizen_id] = profile
+	_dirty = true
+	return {"invested":true,"capital":int(profile["business_capital"]),"purpose":purpose}
+
+func choose_business_strategy(citizen_id: String, personality: Dictionary = {}) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {}
+	var profile: Dictionary = resident_profiles[citizen_id]
+	if str(profile.get("business_id","")).is_empty(): return {}
+	var opportunities := get_business_opportunities(str(profile.get("business_city",profile.get("city",""))),citizen_id)
+	var risk_tolerance := float(personality.get("risk_tolerance",0.5))
+	var ambition := float(personality.get("ambition",0.5))
+	var strategy := "protect_cash"
+	var score := float(profile.get("business_health",0.5))
+	if not opportunities.is_empty() and float(opportunities[0].get("benefit",0.0)) > 0.48 and risk_tolerance > 0.45: strategy = "expand_inventory"
+	elif score > 0.72 and ambition > 0.7: strategy = "expand_capacity"
+	elif int(profile.get("business_last_profit",0)) < 0: strategy = "cut_costs"
+	profile["business_strategy"] = strategy
+	resident_profiles[citizen_id] = profile
+	_dirty = true
+	return {"strategy":strategy,"market_opportunity":opportunities[0] if not opportunities.is_empty() else {}}
+
+func set_resident_financial_goal(citizen_id: String, goal: String) -> bool:
+	if not resident_profiles.has(citizen_id) or goal not in ["build_savings","buy_home","pay_debt","start_business","grow_business","buy_vehicle","education"]: return false
+	var profile: Dictionary = resident_profiles[citizen_id]
+	profile["financial_goal"] = goal
+	_append_event(profile,"financial_goal_changed:" + goal)
+	resident_profiles[citizen_id] = profile
+	_dirty = true
+	return true
+
+func get_resident_financial_pressure(citizen_id: String) -> float:
+	if not resident_profiles.has(citizen_id): return 0.0
+	var profile: Dictionary = resident_profiles[citizen_id]
+	var debt := float(profile.get("debt",0))
+	var money := float(profile.get("money",0))
+	var income := maxf(1.0,float(profile.get("monthly_income",0)))
+	var savings := float(profile.get("savings",0))
+	return clampf(debt / 12000.0 + maxf(0.0,1.0-money/1500.0)*0.35 - minf(0.25,savings/40000.0),0.0,1.0)
+
+func get_resident_career_snapshot(citizen_id: String) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {}
+	var p: Dictionary = resident_profiles[citizen_id]
+	return {"occupation":str(p.get("occupation","unemployed")),"career_field":str(p.get("career_field","")),"career_level":int(p.get("career_level",1)),"career_progress":float(p.get("career_progress",0.0)),"satisfaction":float(p.get("career_satisfaction",0.5)),"education":str(p.get("education","secondary")),"skills":(p.get("skills",{}) as Dictionary).duplicate(true),"job_search_status":str(p.get("job_search_status","none"))}
+
+func get_resident_employment_snapshot(citizen_id: String) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {}
+	var p: Dictionary = resident_profiles[citizen_id]
+	var employer := str(p.get("employer_id",""))
+	return {"employed":str(p.get("occupation","")) not in ["unemployed","resident","student","retired","child"],"occupation":str(p.get("occupation","")),"employer_id":employer,"monthly_income":int(p.get("monthly_income",0)),"contract_salary":int(p.get("contract_salary",0)),"application":(p.get("job_application",{}) as Dictionary).duplicate(true)}
+
+func get_resident_opportunity_snapshot(citizen_id: String) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {}
+	var p: Dictionary = resident_profiles[citizen_id]
+	var city := str(p.get("city",""))
+	var jobs := get_job_market_options(city,citizen_id)
+	var businesses := get_business_opportunities(city,citizen_id)
+	return {"best_job":jobs[0] if not jobs.is_empty() else {},"best_business_opportunity":businesses[0] if not businesses.is_empty() else {},"financial_pressure":get_resident_financial_pressure(citizen_id)}
+
+func evaluate_resident_life_decision(citizen_id: String, action: String, personality: Dictionary = {}) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {"score":0.0,"feasible":false}
+	var p: Dictionary = resident_profiles[citizen_id]
+	var pressure := get_resident_financial_pressure(citizen_id)
+	var ambition := float(personality.get("ambition",0.5))
+	var risk := float(personality.get("risk_tolerance",0.5))
+	var score := 0.0
+	match action:
+		"seek_job": score = pressure * 0.55 + ambition * 0.3 + (0.15 if str(p.get("occupation","")) in ["unemployed","resident"] else 0.0)
+		"start_business": score = risk * 0.32 + ambition * 0.3 + clampf(float(p.get("savings",0))/80000.0,0.0,0.38)
+		"learn_skill": score = float(p.get("career_satisfaction",0.5)) * 0.2 + float(personality.get("curiosity",0.5)) * 0.5
+		"save_money": score = pressure * 0.35 + float(personality.get("discipline",0.5)) * 0.45
+	return {"score":clampf(score,0.0,1.0),"feasible":str(p.get("life_stage","")) == "adult" and action in ["seek_job","start_business","learn_skill","save_money"],"financial_pressure":pressure}
+
+func execute_autonomous_resident_goal(citizen_id: String, goal_id: String, personality: Dictionary = {}) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {"executed":false,"reason":"resident_missing"}
+	var p: Dictionary = resident_profiles[citizen_id]
+	match goal_id:
+		"find_better_job":
+			var options := get_job_market_options(str(p.get("city","")),citizen_id)
+			for option in options:
+				if str(option.job) != str(p.get("occupation","")) and float(option.qualification) >= 0.5:
+					var result := submit_job_application(citizen_id,str(option.job))
+					return {"executed":bool(result.get("submitted",false)),"action":"job_application","result":result}
+		"advance_career":
+			var result := process_autonomous_career_choice(citizen_id,{"choice":"seek_promotion"})
+			return {"executed":bool(result.get("changed",false)),"action":"promotion_effort","result":result}
+		"learn_skill":
+			var skill := str(p.get("career_field",p.get("occupation","general")))
+			return {"executed":not train_resident_skill(citizen_id,skill,0.08).is_empty(),"action":"skill_training"}
+		"start_small_business":
+			var choices := get_business_opportunities(str(p.get("city","")),citizen_id)
+			if not choices.is_empty() and int(p.get("savings",0))+int(p.get("bank_balance",0)) >= 30000:
+				var sector := str(choices[0].sector)
+				var type_map := {"food":"food_store","medicine":"pharmacy","electronics":"electronics_shop","clothing":"clothing_store","fuel":"fuel_station"}
+				var result := start_resident_business(citizen_id,str(type_map.get(sector,"food_store")),30000)
+				return {"executed":bool(result.get("started",false)),"action":"business_startup","result":result}
+		"save_money":
+			set_resident_financial_goal(citizen_id,"build_savings")
+			return {"executed":true,"action":"savings_plan"}
+		"spend_time_with_family":
+			record_family_interaction(citizen_id,"self_directed_family_time")
+			return {"executed":true,"action":"family_time"}
+	return {"executed":false,"reason":"goal_has_no_economic_action","goal":goal_id}
+
+func record_autonomous_goal_result(citizen_id: String, goal_id: String, success: bool, note: String = "") -> void:
+	if not resident_profiles.has(citizen_id): return
+	var p: Dictionary = resident_profiles[citizen_id]
+	_append_event(p,"autonomous_goal_" + ("success:" if success else "attempt:") + goal_id + (":" + note if not note.is_empty() else ""))
+	resident_profiles[citizen_id] = p
+	_dirty = true
