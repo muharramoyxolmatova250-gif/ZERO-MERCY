@@ -34,6 +34,8 @@ static func get_reach_weight(shoulder: Vector3, target: Vector3, upper_length: f
 	return clampf(distance / maxf(reach, 0.001), 0.0, 1.0)
 
 static func get_elbow_flex(shoulder: Vector3, elbow: Vector3, wrist: Vector3, upper_length: float, lower_length: float) -> float:
+	if not validate_segment_lengths(upper_length, lower_length):
+		return 0.0
 	var a := shoulder.distance_to(elbow)
 	var b := elbow.distance_to(wrist)
 	var c := shoulder.distance_to(wrist)
