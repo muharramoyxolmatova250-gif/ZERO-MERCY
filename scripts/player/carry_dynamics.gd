@@ -266,3 +266,6 @@ func get_debug_snapshot() -> Dictionary:
 		"speed_factor": get_speed_factor(),
 		"can_sprint": can_sprint()
 	}
+
+func get_acceleration_response() -> float:
+	return clampf(1.0 - mass_kg * 0.018, 0.42, 1.0)
