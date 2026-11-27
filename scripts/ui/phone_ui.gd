@@ -614,6 +614,43 @@ func _build_phone_gallery() -> void:
         _content.add_child(entry)
 
 
+func _show_gallery_photo(photo_path: String) -> void:
+    var photo: Image = _phone_camera.load_photo(photo_path)
+    for child in _content.get_children():
+        child.queue_free()
+    _add_section_title("PHOTO VIEWER // ZERO GALLERY")
+    if photo == null:
+        _add_body("This photo could not be opened.")
+        var retry := Button.new()
+        retry.text = "BACK TO GALLERY"
+        retry.pressed.connect(_set_tab.bind("gallery"))
+        _content.add_child(retry)
+        return
+    var preview := TextureRect.new()
+    preview.texture = ImageTexture.create_from_image(photo)
+    preview.custom_minimum_size = Vector2(0, 260)
+    preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+    preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+    _content.add_child(preview)
+    _add_body(photo_path.get_file())
+    _add_stat("RESOLUTION", "%d × %d" % [photo.get_width(), photo.get_height()])
+    var remove := Button.new()
+    remove.text = "DELETE PHOTO"
+    remove.pressed.connect(_delete_gallery_photo.bind(photo_path))
+    _content.add_child(remove)
+    var back := Button.new()
+    back.text = "BACK TO GALLERY"
+    back.pressed.connect(_set_tab.bind("gallery"))
+    _content.add_child(back)
+
+
+func _delete_gallery_photo(photo_path: String) -> void:
+    _phone_camera.delete_photo(photo_path)
+    _active_tab = "gallery"
+    _refresh_content()
+
+
 func _build_media_hub() -> void:
     _add_section_title("ZERO MEDIA // REAL ASSETS")
     _add_body("Open the media library. Only imported video and image files can play; feed entries without licensed local assets remain metadata.")
