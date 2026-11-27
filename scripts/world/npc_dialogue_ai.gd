@@ -301,3 +301,15 @@ func set_conversation_mood(mood: String, intensity: float = 0.5) -> void:
 	voice_profile["current_mood"] = mood
 	voice_profile["mood_intensity"] = clampf(intensity,0.0,1.0)
 
+
+
+func vary_expression(line: String) -> String:
+	var mood := str(voice_profile.get("current_mood","neutral"))
+	if mood == "excited" and not line.ends_with("!"):
+		return line + "!"
+	if mood == "sad" and _rng.randf() < 0.3:
+		return line + " I guess that's how things are sometimes."
+	if mood == "angry" and float(voice_profile.get("directness",0.5)) > 0.65:
+		return line + " I want to be clear about that."
+	return line
+
