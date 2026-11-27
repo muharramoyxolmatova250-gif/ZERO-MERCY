@@ -17,6 +17,7 @@ var _last_party_result: Dictionary = {}
 var _phone_camera = preload("res://scripts/phone/phone_camera.gd").new()
 var _phone_system = preload("res://scripts/phone/phone_system.gd").new()
 var _last_camera_message := "READY TO CAPTURE"
+var _last_call_message := ""
 
 func _ready() -> void:
     layer = 30
@@ -445,6 +446,52 @@ func _build_contacts() -> void:
             call_button.custom_minimum_size.y = 38
             call_button.pressed.connect(_place_phone_call.bind(contact_id, str(person.get("name", "Resident"))))
             _content.add_child(call_button)
+
+
+func _place_phone_call(contact_id: String, contact_name: String) -> void:
+    var owner_id := _get_phone_owner_id()
+    if owner_id.is_empty() or _life == null or not _life.has_method("make_phone_call"):
+        _last_call_message = "CALL FAILED  •  PHONE SERVICE OFFLINE"
+        _active_tab = "calls"
+        _refresh_content()
+        return
+    var connected := bool(_life.call("make_phone_call", owner_id, contact_id, 30))
+    _last_call_message = ("CALL COMPLETED  •  " + contact_name + "  •  00:30") if connected else ("CALL FAILED  •  " + contact_name + " UNAVAILABLE")
+    _active_tab = "calls"
+    _refresh_content()
+
+
+func _build_phone_calls() -> void:
+    _add_section_title("ZERO CALL // SECURE LINE")
+    _add_body("Place an in-game simulated call to a resident. Calls update NPC relationship history and both phones' call logs.")
+    if not _last_call_message.is_empty():
+        _add_body(_last_call_message)
+    var owner_id := _get_phone_owner_id()
+    if owner_id.is_empty() or _life == null:
+        _add_body("Phone identity is unavailable.")
+        return
+    var history: Array = _life.call("get_phone_call_history", owner_id, 30) if _life.has_method("get_phone_call_history") else []
+    _add_stat("RECENT CALLS", str(history.size()))
+    if history.is_empty():
+        _add_body("No calls recorded yet. Open CONTACTS to call a resident.")
+    for call_data in history:
+        var direction := "OUTGOING" if str(call_data.get("from", "")) == owner_id else "INCOMING"
+        var other_id := str(call_data.get("to", "")) if direction == "OUTGOING" else str(call_data.get("from", ""))
+        var status := str(call_data.get("status", "completed")).to_upper()
+        var duration := maxi(0, int(call_data.get("duration_seconds", 0)))
+        _add_stat(direction + "  •  " + status, other_id + "  /  " + str(duration) + " sec")
+    var contacts: Array = _life.call("get_phone_contacts", owner_id) if _life.has_method("get_phone_contacts") else []
+    _add_section_title("SAVED CONTACTS")
+    for contact in contacts.slice(0, 20):
+        var target_id := str(contact.get("id", ""))
+        if target_id.is_empty():
+            continue
+        var target_name := str(contact.get("name", target_id))
+        var call_button := Button.new()
+        call_button.text = "☎  " + target_name.to_upper()
+        call_button.custom_minimum_size.y = 40
+        call_button.pressed.connect(_place_phone_call.bind(target_id, target_name))
+        _content.add_child(call_button)
 
 func _build_life() -> void:
     _add_section_title("GLOBAL LIFE SIMULATION")
