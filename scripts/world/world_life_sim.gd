@@ -3204,3 +3204,5 @@ func update_resident_autonomy_goal(citizen_id: String, goal_id: String, success:
 
 
 undefined
+
+undefined
