@@ -51,6 +51,9 @@ func update(delta: float, speed: float, motion_state: String, activity: String, 
 	pose_buffer.record(last_pose)
 	return pose
 
+func get_catalog_names() -> PackedStringArray:
+	return Catalog.get_clip_names()
+
 func get_snapshot() -> Dictionary:
 	return {"initialized":initialized,"last_pose":last_pose.duplicate(true),"gait":gait.snapshot(),"gesture":gesture.snapshot(),"profile":profile.snapshot(),"history":pose_buffer.snapshot()}
 
