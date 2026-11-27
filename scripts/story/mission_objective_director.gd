@@ -5,6 +5,7 @@ const SIMULATION_WITNESS_SCRIPT := preload("res://scripts/story/simulation_witne
 var _target: StaticBody3D
 var _current_objective_id := ""
 var _spawn_serial := 0
+var _witness_actor: Node3D
 
 func _ready() -> void:
     MissionManager.mission_started.connect(_on_mission_started)
