@@ -131,6 +131,9 @@ func _on_crime_reported(crime_id: String, crime_position: Vector3, severity: int
 	var distance := global_position.distance_to(crime_position)
 	if distance > 55.0:
 		return
+	if _cognitive_plan_id >= 0:
+		_independent_mind.advance_plan(_cognitive_plan_id, false, "crime_interrupt")
+		_cognitive_plan_id = -1
 	_last_crime_id = crime_id
 	_crime_flee_timer = maxf(_crime_flee_timer, 5.0 + float(severity) * 2.0)
 	_crime_flee_direction = global_position - crime_position
