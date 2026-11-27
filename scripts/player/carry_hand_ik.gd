@@ -213,3 +213,6 @@ static func get_limb_directions(solution: Dictionary) -> Dictionary:
 	var elbow: Vector3 = solution.get("elbow", Vector3.ZERO)
 	var wrist: Vector3 = solution.get("wrist", Vector3.ZERO)
 	return {"upper": safe_normalize(elbow - shoulder), "lower": safe_normalize(wrist - elbow)}
+
+static func get_joint_positions(solution: Dictionary) -> PackedVector3Array:
+	return PackedVector3Array([solution.get("shoulder", Vector3.ZERO), solution.get("elbow", Vector3.ZERO), solution.get("wrist", Vector3.ZERO)])
