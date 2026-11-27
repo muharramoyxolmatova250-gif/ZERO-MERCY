@@ -1141,6 +1141,27 @@ func _build_social_network() -> void:
         _add_stat("RESIDENT ID", owner_id)
         _add_stat("OCCUPATION", str(profile.get("occupation", "Resident")))
         _add_stat("CITY", str(profile.get("city", "Unknown")))
+        _add_section_title("FOLLOWING")
+        var following_ids: Array = profile.get("following", [])
+        if following_ids.is_empty():
+            _add_body("You are not following anyone yet. Open DISCOVER to find residents.")
+        for followed_id_value in following_ids:
+            var followed_id := str(followed_id_value)
+            var followed_profile: Dictionary = _life.call("get_phone_social_profile", followed_id)
+            var following_row := HBoxContainer.new()
+            var following_name := Label.new()
+            following_name.text = str(followed_profile.get("name", followed_id))
+            following_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+            following_row.add_child(following_name)
+            var unfollow_button := Button.new()
+            unfollow_button.text = "UNFOLLOW"
+            unfollow_button.pressed.connect(func() -> void:
+                _life.call("unfollow_phone_resident", owner_id, followed_id)
+                _refresh_content()
+            )
+            following_row.add_child(unfollow_button)
+            _content.add_child(following_row)
+        _add_section_title("MY POSTS")
         var own_posts: Array = profile.get("posts", [])
         own_posts.reverse()
         for post in own_posts:
