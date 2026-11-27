@@ -14,6 +14,8 @@ var _life: Node
 var _party_invites: Array[String] = []
 var _party_game_id := "tactical_breach"
 var _last_party_result: Dictionary = {}
+var _phone_camera = preload("res://scripts/phone/phone_camera.gd").new()
+var _last_camera_message := "READY TO CAPTURE"
 
 func _ready() -> void:
     layer = 30
@@ -155,7 +157,7 @@ func _build_phone() -> void:
     tabs.add_theme_constant_override("separation", 4)
     tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     tab_scroll.add_child(tabs)
-    for tab in ["home", "feed", "media", "games", "news", "contacts", "sms", "notifications", "life", "missions", "map"]:
+    for tab in ["home", "feed", "media", "games", "news", "contacts", "sms", "notifications", "life", "missions", "map", "camera", "gallery"]:
         var button := Button.new()
         button.text = tab.to_upper()
         button.custom_minimum_size = Vector2(76, 36)
@@ -253,6 +255,10 @@ func _refresh_content() -> void:
             _build_missions()
         "map":
             _build_map()
+        "camera":
+            _build_camera_app()
+        "gallery":
+            _build_phone_gallery()
 
 
 func _build_home_screen() -> void:
@@ -284,6 +290,8 @@ func _build_home_screen() -> void:
     _add_phone_app_tile(grid, "LIFE", "◇", "life")
     _add_phone_app_tile(grid, "MISSIONS", "✦", "missions")
     _add_phone_app_tile(grid, "WORLD MAP", "⌖", "map")
+    _add_phone_app_tile(grid, "CAMERA", "◎", "camera")
+    _add_phone_app_tile(grid, "GALLERY", "▧", "gallery")
 
 
 func _add_phone_app_tile(parent: GridContainer, title: String, glyph: String, target_tab: String) -> void:
