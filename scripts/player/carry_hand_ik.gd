@@ -145,3 +145,7 @@ static func get_chain_bend_direction(shoulder: Vector3, elbow: Vector3, wrist: V
 static func get_chain_straightness(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> float:
 	var total := shoulder.distance_to(elbow) + elbow.distance_to(wrist)
 	return clampf(shoulder.distance_to(wrist) / maxf(total, 0.001), 0.0, 1.0)
+
+static func get_elbow_pole_weight(shoulder: Vector3, elbow: Vector3, wrist: Vector3, minimum: float = 0.03) -> float:
+	var offset := get_point_segment_distance(elbow, shoulder, wrist)
+	return clampf(offset / maxf(minimum, 0.001), 0.0, 1.0)
