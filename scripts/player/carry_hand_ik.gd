@@ -342,3 +342,6 @@ static func get_solution_is_stable(solution: Dictionary, maximum_error: float = 
 	var elbow := get_solution_elbow(solution)
 	var wrist := get_solution_endpoint(solution)
 	return get_chain_straightness(shoulder, elbow, wrist) < 0.995 and get_chain_error(shoulder, elbow, wrist, lengths.x, lengths.y) <= maximum_error
+
+static func get_solution_lerp(from_solution: Dictionary, to_solution: Dictionary, weight: float) -> Dictionary:
+	return blend_solution(from_solution, to_solution, weight)
