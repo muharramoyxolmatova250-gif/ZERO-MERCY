@@ -1554,7 +1554,7 @@ func _ensure_phone_profile(citizen_id: String) -> Dictionary:
         "phone_number":_generate_phone_number(citizen_id),
         "phone_contacts":[], "phone_inbox":[], "phone_outbox":[],
         "phone_call_history":[], "phone_notifications":[],
-        "phone_social_posts":[], "phone_watch_history":[],
+        "phone_social_posts":[], "phone_watch_history":[], "phone_browser_history":[],
         "phone_game_stats":{}, "phone_topic_interests":{},
         "phone_saved_media":[], "phone_last_used_day":simulation_day,
         "phone_battery":100.0, "phone_privacy":"friends"
@@ -1584,6 +1584,7 @@ func get_phone_snapshot(citizen_id: String) -> Dictionary:
         "notifications": (profile.get("phone_notifications", []) as Array).duplicate(true),
         "battery": float(profile.get("phone_battery", 100.0)),
         "watch_history": (profile.get("phone_watch_history", []) as Array).duplicate(true),
+        "browser_history": (profile.get("phone_browser_history", []) as Array).duplicate(true),
         "game_stats": (profile.get("phone_game_stats", {}) as Dictionary).duplicate(true),
         "saved_media": (profile.get("phone_saved_media", []) as Array).duplicate(true)
     }
@@ -1990,6 +1991,67 @@ func publish_phone_media(citizen_id: String, media_type: String, title: String, 
     record_event(citizen_id, "uploaded_phone_" + media_type)
     _dirty = true
     return true
+
+
+func get_phone_browser_recommendation(citizen_id: String, preferred_topic: String = "") -> Dictionary:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return {}
+    var pages := [
+        {"id":"net_news","title":"NEO WORLD NEWS","topic":"news"},
+        {"id":"net_jobs","title":"WORKFORCE EXCHANGE","topic":"work"},
+        {"id":"net_market","title":"GLOBAL MARKET INDEX","topic":"economy"},
+        {"id":"net_transit","title":"CITY TRANSIT GRID","topic":"travel"},
+        {"id":"net_education","title":"OPEN KNOWLEDGE CAMPUS","topic":"education"},
+        {"id":"net_health","title":"CIVIC HEALTH DIRECTORY","topic":"health"},
+        {"id":"net_culture","title":"CULTURE STREAM","topic":"culture"},
+        {"id":"net_vehicles","title":"MOTOR DISTRICT","topic":"vehicles"},
+        {"id":"net_tech","title":"TECHNOLOGY FRONTIER","topic":"technology"},
+        {"id":"net_safety","title":"CIVIC SAFETY ALERTS","topic":"safety"},
+        {"id":"net_realestate","title":"URBAN PROPERTY EXCHANGE","topic":"property"},
+        {"id":"net_wildlife","title":"PLANET BIOSPHERE","topic":"nature"}
+    ]
+    var interests: Dictionary = profile.get("phone_topic_interests", {})
+    var best: Dictionary = {}
+    var best_score := -INF
+    for page in pages:
+        var topic := str(page.get("topic", ""))
+        var score := float(interests.get(topic, 0.0)) + _rng.randf_range(0.0, 0.45)
+        if topic == preferred_topic:
+            score += 1.2
+        if score > best_score:
+            best_score = score
+            best = page.duplicate(true)
+    return best
+
+
+func record_phone_browser_visit(citizen_id: String, page_id: String, page_title: String, topic: String, seconds: float = 30.0) -> bool:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty() or page_id.is_empty():
+        return false
+    var history: Array = profile.get("phone_browser_history", [])
+    history.append({"page_id":page_id,"title":page_title,"topic":topic,"day":simulation_day,"seconds":maxf(1.0, seconds)})
+    while history.size() > 80:
+        history.pop_front()
+    profile["phone_browser_history"] = history
+    var interests: Dictionary = profile.get("phone_topic_interests", {})
+    interests[topic] = float(interests.get(topic, 0.0)) + minf(1.0, maxf(1.0, seconds) / 60.0)
+    profile["phone_topic_interests"] = interests
+    profile["phone_battery"] = maxf(0.0, float(profile.get("phone_battery", 100.0)) - maxf(1.0, seconds) * 0.0007)
+    profile["phone_last_used_day"] = simulation_day
+    resident_profiles[citizen_id] = profile
+    record_event(citizen_id, "browsed_web:" + topic)
+    _dirty = true
+    return true
+
+
+func get_phone_browser_activity(citizen_id: String, limit: int = 12) -> Array:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return []
+    var history: Array = profile.get("phone_browser_history", []).duplicate(true)
+    history.reverse()
+    return history.slice(0, mini(history.size(), maxi(1, limit)))
 
 
 const PHONE_GAMES := ["Last Circle", "Counter Sector", "Neon Strike", "Dropzone Royale", "Tactical Breach", "Cyber Ops"]
