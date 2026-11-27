@@ -137,3 +137,14 @@ func get_hypothesis_confidence(hypothesis_id: String) -> float:
 
 func is_anomaly_known(anomaly_id: String) -> bool:
 	return known_anomalies.has(anomaly_id)
+
+
+func get_most_supported_hypothesis() -> Dictionary:
+	var best: Dictionary = {}
+	var confidence := -1.0
+	for item in hypotheses:
+		var value := float(item.get("confidence", 0.0))
+		if value > confidence:
+			confidence = value
+			best = item
+	return best.duplicate(true)
