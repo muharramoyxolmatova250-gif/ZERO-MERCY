@@ -394,6 +394,11 @@ func _decide_goal() -> void:
 					affordance["distance"] = global_position.distance_to(affordance_position)
 					nearby_affordances.append(affordance)
 		agency_context["affordances"] = nearby_affordances
+		if not _independent_mind.has_active_goal("exploration") and not nearby_affordances.is_empty():
+			var discoveries: Array[Dictionary] = []
+			for affordance in nearby_affordances:
+				discoveries.append({"name":str(affordance.get("name", affordance.get("kind", "nearby opportunity"))),"novelty":float(affordance.get("novelty", affordance.get("relevance", 0.55))),"risk":float(affordance.get("danger", affordance.get("risk", 0.25))),"position":affordance.get("position", global_position)})
+			_independent_mind.consider_curiosity_goal(discoveries)
 		var previous_personal_goal := str(_self_direction.active_personal_goal.get("id", ""))
 		var chosen_personal_goal: Dictionary = _self_direction.choose_personal_goal(agency_context)
 		var chosen_goal_id := str(chosen_personal_goal.get("id", ""))
