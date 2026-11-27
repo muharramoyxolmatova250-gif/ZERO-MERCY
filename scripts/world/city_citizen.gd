@@ -549,6 +549,10 @@ func _start_indoor_activity() -> void:
 		"social", "leisure": _indoor_activity = "socializing"
 		"play": _indoor_activity = "playing"
 		_: _indoor_activity = "browsing"
+	var personal_activity := _resolve_personal_indoor_activity()
+	if not personal_activity.is_empty(): _indoor_activity = personal_activity
+	_indoor_action_completed = false
+	_indoor_action_token = _make_indoor_action_token()
 	is_using_phone = _indoor_activity in ["socializing", "browsing"]
 	if _phone != null:
 		_phone.visible = is_using_phone
