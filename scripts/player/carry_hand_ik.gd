@@ -314,3 +314,7 @@ static func get_solution_total_length(solution: Dictionary) -> float:
 static func get_solution_validity_report(solution: Dictionary) -> Dictionary:
 	var valid := get_solution_is_valid(solution)
 	return {"valid": valid, "has_shoulder": solution.has("shoulder"), "has_elbow": solution.has("elbow"), "has_wrist": solution.has("wrist")}
+
+static func get_solution_error_report(solution: Dictionary, target: Vector3) -> Dictionary:
+	var wrist := get_solution_endpoint(solution)
+	return {"endpoint_error": wrist.distance_to(target), "target_clamped": bool(solution.get("target_clamped", false)), "valid": get_solution_is_valid(solution)}
