@@ -428,17 +428,39 @@ func _build_sms_inbox() -> void:
         return
     for message in messages:
         var message_id := str(message.get("id", ""))
-        var sender_id := str(message.get("sender_id", "Unknown"))
+        var sender_id := str(message.get("from", message.get("sender_id", "")))
+        var sender_name := sender_id
+        if _life.has_method("get_phone_social_profile"):
+            var sender_profile: Dictionary = _life.call("get_phone_social_profile", sender_id)
+            sender_name = str(sender_profile.get("name", sender_id))
         var preview := str(message.get("text", ""))
         var status := "READ" if bool(message.get("read", false)) else "NEW"
-        var entry := Button.new()
-        entry.text = status + "  " + sender_id + "\n" + preview.left(90)
-        entry.custom_minimum_size = Vector2(0, 58)
-        entry.pressed.connect(func() -> void:
-            _life.call("mark_phone_message_read", owner_id, message_id)
-            _refresh_content()
+        _add_section_title(status + "  •  " + sender_name)
+        _add_body(preview)
+        var reply_row := HBoxContainer.new()
+        var reply_input := LineEdit.new()
+        reply_input.placeholder_text = "Reply to " + sender_name + "..."
+        reply_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        reply_row.add_child(reply_input)
+        var reply_button := Button.new()
+        reply_button.text = "SEND"
+        reply_button.pressed.connect(func() -> void:
+            var reply_text := reply_input.text.strip_edges()
+            if not reply_text.is_empty() and _life.has_method("send_phone_message"):
+                if _life.call("send_phone_message", owner_id, sender_id, reply_text, "text"):
+                    _life.call("mark_phone_message_read", owner_id, message_id)
+                    _refresh_content()
         )
-        _content.add_child(entry)
+        reply_row.add_child(reply_button)
+        _content.add_child(reply_row)
+        if not bool(message.get("read", false)):
+            var read_button := Button.new()
+            read_button.text = "MARK AS READ"
+            read_button.pressed.connect(func() -> void:
+                _life.call("mark_phone_message_read", owner_id, message_id)
+                _refresh_content()
+            )
+            _content.add_child(read_button)
 
 
 func _build_contacts() -> void:
