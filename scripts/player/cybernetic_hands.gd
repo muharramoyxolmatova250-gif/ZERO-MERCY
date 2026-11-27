@@ -214,5 +214,3 @@ func get_secondary_ik_solution() -> Dictionary:
 func is_support_hand_engaged() -> bool:
 	return _secondary_grip_weight > 0.05 and not _secondary_ik_solution.is_empty()
 
-func get_support_grip_anchor() -> Marker3D:
-	return _support_grip_anchor
