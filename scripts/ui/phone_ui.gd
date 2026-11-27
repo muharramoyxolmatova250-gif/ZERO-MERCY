@@ -450,6 +450,15 @@ func _toggle_party_invite(citizen_id: String) -> void:
         _party_invites.append(citizen_id)
     _refresh_content()
 
+func _start_phone_party_match() -> void:
+    if _life == null or not _life.has_method("play_phone_party_game"):
+        _last_party_result = {"started": false, "reason": "life_sim_offline"}
+        _add_body("Phone party service is offline.")
+        return
+    _last_party_result = _life.call("play_phone_party_game", _party_game_id, _party_invites, 12)
+    _party_invites.clear()
+    _refresh_content()
+
 func _launch_tactical_breach() -> void:
     var scene := load("res://scenes/games/tactical_fps_match.tscn") as PackedScene
     if scene == null:
