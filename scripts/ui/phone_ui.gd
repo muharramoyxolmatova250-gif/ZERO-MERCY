@@ -562,6 +562,37 @@ func _format_number(value: int) -> String:
     return result
 
 
+func _build_camera_app() -> void:
+    _add_section_title("ZERO CAMERA // WORLD CAPTURE")
+    _add_body("Capture the live game view. Photos are saved locally in your ZERO LINK gallery.")
+    _add_stat("CAMERA MODE", "WORLD VIEW")
+    var shutter := Button.new()
+    shutter.text = "◎   TAKE PHOTO"
+    shutter.custom_minimum_size = Vector2(0, 58)
+    shutter.add_theme_font_size_override("font_size", 18)
+    shutter.pressed.connect(_capture_phone_photo)
+    _content.add_child(shutter)
+    _add_body(_last_camera_message)
+    var gallery := Button.new()
+    gallery.text = "OPEN PHOTO GALLERY"
+    gallery.custom_minimum_size.y = 42
+    gallery.pressed.connect(_set_tab.bind("gallery"))
+    _content.add_child(gallery)
+
+
+func _capture_phone_photo() -> void:
+    set_phone_open(false)
+    await get_tree().process_frame
+    var result: Dictionary = _phone_camera.capture_viewport(get_viewport())
+    set_phone_open(true)
+    _active_tab = "camera"
+    if bool(result.get("ok", false)):
+        _last_camera_message = "SAVED  •  %s × %s" % [str(result.get("width", 0)), str(result.get("height", 0))]
+    else:
+        _last_camera_message = "CAPTURE FAILED  •  " + str(result.get("error", "unknown_error"))
+    _refresh_content()
+
+
 func _build_media_hub() -> void:
     _add_section_title("ZERO MEDIA // REAL ASSETS")
     _add_body("Open the media library. Only imported video and image files can play; feed entries without licensed local assets remain metadata.")
