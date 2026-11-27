@@ -632,3 +632,6 @@ func update_goal_from_new_information(information: Dictionary, context: Dictiona
 		interrupt_goal("new_information",context)
 		return select_next_autonomous_intention(context)
 	return active_personal_goal.duplicate(true)
+
+
+undefined
