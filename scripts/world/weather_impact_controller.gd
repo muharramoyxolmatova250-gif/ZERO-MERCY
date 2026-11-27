@@ -58,9 +58,9 @@ func get_weather_snapshot() -> Dictionary:
 
  
 func _apply_traffic_weather() -> void:
-    var manager := get_tree().get_first_node_in_group("road_traffic_manager")
-    if manager != null and manager.has_method("set_weather_effect"):
-        manager.call("set_weather_effect", weather, intensity)
+	var manager := get_tree().get_first_node_in_group("road_traffic_manager")
+	if manager != null and manager.has_method("set_weather_effect"):
+		manager.call("set_weather_effect", weather, intensity)
 
 func get_driving_condition_snapshot() -> Dictionary:
     var risk := 0.0
