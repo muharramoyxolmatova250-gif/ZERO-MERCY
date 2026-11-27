@@ -1,5 +1,15 @@
 extends RefCounted
 const NPCAnimationDirector = preload("res://scripts/world/npc_animation_director.gd")
+const NPCAnimationGaze = preload("res://scripts/world/npc_animation_gaze.gd")
+const NPCAnimationLOD = preload("res://scripts/world/npc_animation_lod.gd")
+const NPCAnimationStateMachine = preload("res://scripts/world/npc_animation_state_machine.gd")
+const NPCAnimationFootPlacement = preload("res://scripts/world/npc_animation_foot_placement.gd")
+const NPCAnimationVariation = preload("res://scripts/world/npc_animation_variation.gd")
+const NPCAnimationEventQueue = preload("res://scripts/world/npc_animation_event_queue.gd")
+const NPCAnimationSpring = preload("res://scripts/world/npc_animation_spring.gd")
+const NPCAnimationContact = preload("res://scripts/world/npc_animation_contact.gd")
+const NPCAnimationRootMotion = preload("res://scripts/world/npc_animation_root_motion.gd")
+const NPCAnimationDiagnostics = preload("res://scripts/world/npc_animation_diagnostics.gd")
 ## Lightweight procedural pose layers for the current capsule-based resident rig.
 ## A future imported humanoid skeleton can consume the same motion/activity signals.
 var body: Node3D
@@ -24,6 +34,12 @@ var idle_gesture_cooldown := 3.0
 var rng := RandomNumberGenerator.new()
 var director = NPCAnimationDirector.new()
 var last_director_pose: Dictionary = {}
+var attention_target: Node3D
+var lod_accumulator := 0.0
+var animation_events = NPCAnimationEventQueue.new()
+var animation_state = NPCAnimationStateMachine.new()
+var animation_diagnostics = NPCAnimationDiagnostics.new()
+var resident_variation: Dictionary = {}
 
 func setup(body_node: Node3D, head_node: Node3D, left_arm_node: Node3D, right_arm_node: Node3D, left_leg_node: Node3D, right_leg_node: Node3D, phone_node: Node3D, seed_value: int = 1) -> void:
 	body = body_node
@@ -186,3 +202,65 @@ func get_rig_status() -> Dictionary:
 
 func get_pose_snapshot() -> Dictionary:
 	return {"gait_phase":phase,"idle_phase":idle_phase,"gesture_phase":gesture_phase,"idle_gesture":idle_gesture,"reaction":reaction_name if reaction_remaining > 0.0 else "","reaction_remaining":reaction_remaining,"director":director.get_snapshot(),"style":director.profile.style,"rig":get_rig_status()}
+
+
+func set_attention_target(target: Node3D) -> void:
+	attention_target = target
+
+func clear_attention_target() -> void:
+	attention_target = null
+
+func should_update_animation(delta: float, distance: float, important: bool = false, visible: bool = true) -> bool:
+	var interval := NPCAnimationLOD.get_interval(distance, important, visible)
+	var result: Dictionary = NPCAnimationLOD.should_update(lod_accumulator, delta, interval)
+	lod_accumulator = float(result.get("accumulator", 0.0))
+	if not bool(result.get("update", false)):
+		animation_diagnostics.record_skip()
+		return false
+	return true
+
+func queue_animation_event(kind: String, payload: Dictionary = {}, delay: float = 0.0) -> int:
+	return animation_events.push_event(kind, payload, delay)
+
+func set_animation_state(next_state: String, fade_seconds: float = 0.22) -> bool:
+	return animation_state.transition(next_state, fade_seconds)
+
+func get_animation_state_snapshot() -> Dictionary:
+	return animation_state.snapshot()
+
+func configure_resident_variation(identity: String, traits: Dictionary = {}) -> void:
+	resident_variation = NPCAnimationVariation.make_profile(identity, traits)
+	variation_seed = float(int(resident_variation.get("seed", 1)) % 1000) * 0.013
+
+func get_resident_variation() -> Dictionary:
+	return resident_variation.duplicate(true)
+
+func evaluate_hand_reach(hand_position: Vector3, target_position: Vector3, reach: float) -> Dictionary:
+	return NPCAnimationContact.evaluate_reach(hand_position, target_position, reach)
+
+func clamp_hand_target(hand_position: Vector3, target_position: Vector3, reach: float) -> Vector3:
+	return NPCAnimationContact.soften_target(hand_position, target_position, reach)
+
+func convert_root_motion(local_delta: Vector3, facing: Basis, weight: float = 1.0) -> Vector3:
+	return NPCAnimationRootMotion.to_world_delta(local_delta, facing, weight)
+
+func limit_root_motion(delta: Vector3, maximum_distance: float) -> Vector3:
+	return NPCAnimationRootMotion.clamp_planar_delta(delta, maximum_distance)
+
+func calculate_foot_target(foot_position: Vector3, ground_height: float) -> Dictionary:
+	return NPCAnimationFootPlacement.solve_foot_target(foot_position, ground_height)
+
+func get_animation_diagnostics() -> Dictionary:
+	return animation_diagnostics.snapshot()
+
+func _apply_attention_gaze(delta: float) -> void:
+	if not is_instance_valid(head):
+		return
+	var desired := Vector2.ZERO
+	if is_instance_valid(attention_target):
+		var local_direction := global_transform.basis.inverse() * (attention_target.global_position - head.global_position).normalized()
+		var yaw := atan2(local_direction.x, -local_direction.z)
+		var pitch := atan2(local_direction.y, Vector2(local_direction.x, local_direction.z).length())
+		desired = Vector2(clampf(-pitch, -0.45, 0.45), clampf(yaw, -0.85, 0.85))
+	head.rotation.x = lerpf(head.rotation.x, desired.x, clampf(delta * 3.0, 0.0, 1.0))
+	head.rotation.y = lerpf(head.rotation.y, desired.y, clampf(delta * 3.0, 0.0, 1.0))
