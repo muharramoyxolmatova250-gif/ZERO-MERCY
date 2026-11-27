@@ -490,9 +490,9 @@ func _decide_goal() -> void:
 				_target_index = 1
 				_last_routed_goal = best
 	if best != previous_goal:
-		var life_sim := get_tree().get_first_node_in_group("world_life_sim")
-		if life_sim != null:
-			life_sim.call("record_activity", citizen_id, best)
+		var activity_sim := get_tree().get_first_node_in_group("world_life_sim")
+		if activity_sim != null:
+			activity_sim.call("record_activity", citizen_id, best)
 	if best == "food": _hunger = maxf(0.0, _hunger - 0.12)
 	elif best == "social": _social_need = maxf(0.0, _social_need - 0.1)
 	elif best == "rest": _energy = minf(1.0, _energy + 0.08)
