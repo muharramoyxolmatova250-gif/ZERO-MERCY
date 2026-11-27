@@ -440,3 +440,101 @@ func goal_completion_reward(goal: Dictionary, result: Dictionary = {}) -> float:
 	reward += _trait("discipline")*0.1
 	if bool(result.get("helped_other",false)): reward += _trait("kindness")*0.1
 	return clampf(reward,0.0,1.0)
+
+
+func reflect_on_outcome(goal_id: String, outcome: Dictionary) -> Dictionary:
+	var reward := goal_completion_reward(active_personal_goal,outcome)
+	record_goal_outcome(goal_id,reward,bool(outcome.get("completed",false)))
+	var reflection := {"goal":goal_id,"reward":reward,"lesson":str(outcome.get("lesson","")),"day":int(outcome.get("day",0))}
+	var reflections: Array = preferences.get("reflections",[])
+	reflections.append(reflection)
+	while reflections.size()>24: reflections.pop_front()
+	preferences["reflections"]=reflections
+	return reflection
+
+func generate_goal_from_memory(memories: Array[Dictionary], context: Dictionary = {}) -> Dictionary:
+	var best: Dictionary={}
+	var best_score := 0.0
+	for memory in memories:
+		var emotion := absf(float(memory.get("emotional_intensity",0.0)))
+		var unresolved := bool(memory.get("unresolved",false))
+		var score := emotion*(0.65 if unresolved else 0.3)+float(memory.get("importance",0.0))*0.35
+		if score>best_score:
+			best_score=score
+			best={"id":"memory_goal_"+str(memory.get("id",_goal_counter)),"activity":str(memory.get("suggested_activity","reflect")),"drive":"curiosity","weight":score,"need":"growth","origin_memory":str(memory.get("id","")),"self_chosen":true}
+	if best_score>0.35 and is_goal_feasible(best,context):
+		_goal_counter+=1
+		best["instance_id"]=citizen_id+"_memory_"+str(_goal_counter)
+		return best
+	return {}
+
+func evaluate_conflicting_goals(goals: Array[Dictionary], context: Dictionary = {}) -> Dictionary:
+	var candidates := goals.duplicate(true)
+	candidates.sort_custom(func(a:Dictionary,b:Dictionary)->bool:
+		var sa:=score_goal_candidate(a,context)
+		var sb:=score_goal_candidate(b,context)
+		return sa>sb)
+	if candidates.is_empty(): return {}
+	var chosen: Dictionary=candidates[0]
+	var second_score := score_goal_candidate(candidates[1],context) if candidates.size()>1 else 0.0
+	return {"chosen":chosen.duplicate(true),"conflict":candidates.size()>1,"margin":score_goal_candidate(chosen,context)-second_score}
+
+func set_goal_deadline(goal_id: String, deadline_day: int) -> void:
+	if str(active_personal_goal.get("id",""))!=goal_id: return
+	active_personal_goal["deadline_day"]=deadline_day
+
+func update_goal_deadline_pressure(current_day: int) -> float:
+	var deadline := int(active_personal_goal.get("deadline_day",-1))
+	if deadline<0: return 0.0
+	var remaining := deadline-current_day
+	return clampf(1.0-float(remaining)/14.0,0.0,1.0)
+
+func serialize_agency_state() -> Dictionary:
+	return {"citizen_id":citizen_id,"traits":traits.duplicate(true),"preferences":preferences.duplicate(true),"aspirations":aspirations.duplicate(true),"active_goal":active_personal_goal.duplicate(true),"completed_goals":completed_goals.duplicate(true),"decision_count":decision_count,"goal_counter":_goal_counter}
+
+func restore_agency_state(state: Dictionary) -> void:
+	if str(state.get("citizen_id",citizen_id))!=citizen_id: return
+	traits=state.get("traits",traits).duplicate(true)
+	preferences=state.get("preferences",{}).duplicate(true)
+	aspirations=state.get("aspirations",[]).duplicate(true)
+	active_personal_goal=state.get("active_goal",{}).duplicate(true)
+	completed_goals=state.get("completed_goals",[]).duplicate(true)
+	decision_count=int(state.get("decision_count",decision_count))
+	_goal_counter=int(state.get("goal_counter",_goal_counter))
+
+func autonomy_profile() -> Dictionary:
+	return {"traits":traits.duplicate(true),"values":preferences.get("personal_values",{}).duplicate(true),"interests":preferences.duplicate(true),"aspirations":aspirations.duplicate(true),"active_goal":active_personal_goal.duplicate(true),"agency_score":autonomy_score}
+
+func record_failed_attempt(goal_id: String, reason: String) -> void:
+	var failures: Dictionary=preferences.get("failures",{})
+	failures[goal_id]=int(failures.get(goal_id,0))+1
+	preferences["failures"]=failures
+	preferences["failure_reason_"+goal_id]=reason
+	if int(failures[goal_id])>=3: rejected_goals.append(goal_id)
+
+func goal_failure_penalty(goal_id: String) -> float:
+	var failures: Dictionary=preferences.get("failures",{})
+	return minf(0.45,float(failures.get(goal_id,0))*0.12)
+
+func update_personal_interest_from_activity(activity: String, enjoyment: float) -> void:
+	if activity.is_empty(): return
+	var key: String="activity_"+activity
+	preferences[key]=clampf(float(preferences.get(key,0.0))*0.82+(clampf(enjoyment,0.0,1.0)-0.5)*0.36,-1.0,1.0)
+
+func create_long_term_ambition(value: String, activity: String, drive: String = "ambition") -> Dictionary:
+	if value.is_empty() or activity.is_empty(): return {}
+	_goal_counter+=1
+	var ambition := {"id":"ambition_"+str(_goal_counter),"value":value,"activity":activity,"drive":drive,"weight":0.8,"need":"achievement","self_chosen":true,"status":"aspiration"}
+	aspirations.append(ambition)
+	while aspirations.size()>12: aspirations.pop_front()
+	return ambition
+
+func select_next_autonomous_intention(context: Dictionary = {}) -> Dictionary:
+	var candidates: Array[Dictionary]=[]
+	for goal in GOAL_CATALOG:
+		candidates.append(goal.duplicate(true))
+	for emergent in observe_environment(context.get("affordances",[])):
+		candidates.append(emergent)
+	var memory_goal := generate_goal_from_memory(context.get("memories",[]),context)
+	if not memory_goal.is_empty(): candidates.append(memory_goal)
+	return choose_from_candidates(candidates,context)
