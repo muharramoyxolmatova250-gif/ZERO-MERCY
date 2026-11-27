@@ -3,6 +3,7 @@ extends CanvasLayer
 var _panel: PanelContainer
 var _content: VBoxContainer
 var _active_tab := "feed"
+var _sms_target_id := ""
 var _refresh_elapsed := 0.0
 var _society: Node
 var _life: Node
