@@ -215,7 +215,7 @@ func _build_bots() -> void:
 		bot.set_meta("last_known_player_position", Vector3.ZERO)
 		bot.set_meta("awareness", 0.0)
 		bot.set_meta("search_time", 0.0)
-		bot.position = Vector3(-13.0 + float(i) * 6.5, 1, -10.0 - float(i % 2) * 8.0)
+		bot.position = Vector3(-27.0 + float(i % 5) * 13.5, 1, -22.0 - float(i / 5) * 12.0)
 		bot.look_at(Vector3(player.global_position.x, bot.global_position.y, player.global_position.z), Vector3.UP)
 		var body := MeshInstance3D.new()
 		var mesh := CapsuleMesh.new()
