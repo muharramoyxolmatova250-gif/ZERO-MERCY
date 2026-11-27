@@ -181,7 +181,7 @@ func _try_form_household(citizen_id: String) -> void:
     if age < 20 or age > 60 or str(profile.get("marital_status", "single")) != "single":
         return
     # Retry with a fresh world RNG roll each month; failed attempts are not permanent.
-	if _rng.randf() > 0.22:
+    if _rng.randf() > 0.22:
         return
     var candidates: Array[String] = []
     for other_id in resident_profiles.keys():
