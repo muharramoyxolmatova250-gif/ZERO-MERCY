@@ -137,3 +137,15 @@ func choose_target(candidates: Array[Dictionary], context: Dictionary = {}) -> D
    best = candidate.duplicate(true)
  best["selection_score"] = best_score
  return best
+
+
+func should_interrupt(context: Dictionary) -> bool:
+ var danger := float(context.get("danger",0.0))
+ var urgent_need := float(context.get("urgent_need",0.0))
+ var social_pressure := float(context.get("social_pressure",0.0))
+ return danger > 0.72 or urgent_need > 0.88 or social_pressure > 0.94
+func interrupt_plan(reason: String, replacement_goal: String, context: Dictionary = {}) -> Dictionary:
+ active_plan.clear()
+ plan_index = 0
+ plan_reason = "interrupted:" + reason
+ return build_plan(replacement_goal,context)
