@@ -93,3 +93,7 @@ static func get_wrist_distance(shoulder: Vector3, wrist: Vector3) -> float:
 
 static func get_stretch_warning(shoulder: Vector3, target: Vector3, upper_length: float, lower_length: float, threshold: float = 0.92) -> bool:
 	return get_reach_ratio(shoulder, target, upper_length, lower_length) >= threshold
+
+static func get_pole_vector(shoulder: Vector3, wrist: Vector3, pole: Vector3) -> Vector3:
+	var axis := get_segment_direction(shoulder, wrist)
+	return get_bend_normal(axis, pole)
