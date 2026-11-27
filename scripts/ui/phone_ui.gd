@@ -60,10 +60,16 @@ func _build_phone() -> void:
     _panel.offset_top = -phone_height * 0.5
     _panel.offset_bottom = phone_height * 0.5
     var panel_style := StyleBoxFlat.new()
-    panel_style.bg_color = Color(0.012, 0.022, 0.04, 0.98)
+    panel_style.bg_color = Color(0.006, 0.012, 0.027, 0.995)
+    panel_style.border_color = Color(0.08, 0.92, 1.0, 0.96)
+    panel_style.set_border_width_all(2)
+    panel_style.border_width_bottom = 3
+    panel_style.border_width_top = 3
     panel_style.border_color = Color(0.0, 0.82, 0.95, 0.9)
     panel_style.set_border_width_all(2)
-    panel_style.set_corner_radius_all(18)
+    panel_style.set_corner_radius_all(24)
+    panel_style.shadow_color = Color(0.0, 0.72, 1.0, 0.32)
+    panel_style.shadow_size = 26
     panel_style.shadow_color = Color(0.0, 0.7, 0.95, 0.18)
     panel_style.shadow_size = 18
     _panel.add_theme_stylebox_override("panel", panel_style)
