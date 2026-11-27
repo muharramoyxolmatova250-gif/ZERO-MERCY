@@ -399,8 +399,9 @@ func _update_bots(delta: float) -> void:
 				if cover_distance < best_distance:
 					best_distance = cover_distance
 					best_cover = retreat_point
-			var cover_direction := (best_cover - bot.global_position).normalized()
-			pursuit = cover_direction
+			var cover_offset := best_cover - bot.global_position
+			var cover_direction := cover_offset.normalized()
+			pursuit = side * 0.18 if cover_offset.length() < 1.8 else cover_direction
 		var move_speed := 2.5 if bot_health <= 65.0 else 2.15
 		bot.velocity.x = pursuit.x * move_speed
 		bot.velocity.z = pursuit.z * move_speed
