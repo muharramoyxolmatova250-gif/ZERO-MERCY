@@ -262,3 +262,28 @@ func choose_conflict_response(other_id: String, provocation: float, courage: flo
 		return "defend_boundaries"
 	return "question_and_deescalate"
 
+
+
+func infer_observed_intent(action: String, target_id: String, context: Dictionary) -> Dictionary:
+	var confidence := 0.35
+	var inferred := "unknown"
+	match action:
+		"approach":
+			inferred = "social_contact"
+			confidence = 0.48
+		"run_away":
+			inferred = "fear_or_urgency"
+			confidence = 0.62
+		"give_item", "help":
+			inferred = "cooperation"
+			confidence = 0.78
+		"attack", "threaten":
+			inferred = "hostility"
+			confidence = 0.82
+		"trade":
+			inferred = "exchange"
+			confidence = 0.72
+	if bool(context.get("repeated",false)):
+		confidence = minf(0.96,confidence+0.12)
+	return {"target_id":target_id,"intent":inferred,"confidence":confidence,"evidence":action}
+
