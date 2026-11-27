@@ -429,6 +429,8 @@ func _decide_goal() -> void:
 		_action_planner.build_plan(best, cognition_context)
 		_planned_action = _action_planner.next_action()
 	_decision_reason = "needs_personality_memory_emotion_schedule_and_combinatorial_action_planning"
+	_independent_mind.add_memory("selected_goal:" + best, {"reason":_decision_reason,"score":best_score,"hour":hour}, 0.35, 0.95)
+	_independent_mind.form_belief("current_goal", best, 0.85, "personal_decision")
 	_cognition.record_decision(best, _decision_reason, best_score, cognition_context)
 	if _last_routed_goal != best:
 		var route_network := get_tree().get_first_node_in_group("pedestrian_route_network")
