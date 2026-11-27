@@ -1,0 +1,48 @@
+{
+  "start": "recording",
+  "nodes": {
+    "recording": {
+      "speaker": "IMPLANT YOZUVI",
+      "text": "Yozuvda bir xil yuz uch xil ko‘chada, bir xil soniyada qayd etilgan. Keyingi kadrda kamera vaqti 00:00:00 ga qaytadi. Bu montaj xatosi ham bo‘lishi mumkin — ammo uchta mustaqil qurilmada aynan bir xil takrorlanish bor.",
+      "choices": [
+        {
+          "text": "Bu tizim xatosi bo‘lishi mumkin.",
+          "next": "uncertain"
+        },
+        {
+          "text": "Kimdir bu dunyoni boshqaryapti.",
+          "next": "theory"
+        }
+      ]
+    },
+    "uncertain": {
+      "speaker": "NOTANISH ODAM",
+      "text": "To‘g‘ri. Bitta dalil bilan hukm chiqarib bo‘lmaydi. Yana tekshirishimiz kerak.",
+      "choices": [
+        {
+          "text": "Izlanishni davom ettiraman.",
+          "next": "end",
+          "choice_id": "simulation_evidence_conclusion",
+          "value": "unconfirmed"
+        }
+      ]
+    },
+    "theory": {
+      "speaker": "NOTANISH ODAM",
+      "text": "Men ham shunday o‘ylayman. Lekin nazariya — haqiqat emas. Chegara yozuvida nima borligini ko‘rmagunimizcha, aniq javob yo‘q.",
+      "choices": [
+        {
+          "text": "Hali xulosa qilishga erta.",
+          "next": "end",
+          "choice_id": "simulation_evidence_conclusion",
+          "value": "theory_only"
+        }
+      ]
+    },
+    "end": {
+      "speaker": "DARA",
+      "text": "Dara yozuvni chipiga saqlaydi. Ekranda bitta jumla paydo bo‘ladi: “Kuzatuv davom etmoqda.”",
+      "choices": []
+    }
+  }
+}
