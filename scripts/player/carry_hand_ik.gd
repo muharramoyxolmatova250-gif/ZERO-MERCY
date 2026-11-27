@@ -159,3 +159,6 @@ static func get_target_clamp_amount(shoulder: Vector3, desired: Vector3, solved:
 static func get_reach_comfort(shoulder: Vector3, target: Vector3, upper_length: float, lower_length: float, comfort_ratio: float = 0.82) -> float:
 	var ratio := get_reach_ratio(shoulder, target, upper_length, lower_length)
 	return 1.0 - clampf((ratio - comfort_ratio) / maxf(1.0 - comfort_ratio, 0.001), 0.0, 1.0)
+
+static func get_elbow_plane_normal(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> Vector3:
+	return safe_normalize((elbow - shoulder).cross(wrist - elbow), Vector3.FORWARD)
