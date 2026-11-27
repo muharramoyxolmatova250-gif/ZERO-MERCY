@@ -2780,3 +2780,85 @@ func play_phone_party_game(game_id: String, invited_ids: Array, match_minutes: i
 func get_phone_game_stats(citizen_id: String) -> Dictionary:
     var profile := _ensure_phone_profile(citizen_id)
     return (profile.get("phone_game_stats", {}) as Dictionary).duplicate(true)
+
+
+func get_job_market_options(city_id: String, citizen_id: String = "") -> Array:
+	var options: Array = []
+	var profile: Dictionary = resident_profiles.get(citizen_id, {})
+	var education := str(profile.get("education", "secondary"))
+	for job in JOBS:
+		var salary := _monthly_salary_for_job(job, int(profile.get("career_level", 1)))
+		var qualification := 0.55
+		if education in ["university", "postgraduate", "graduated"]:
+			qualification += 0.22
+		if str(profile.get("career_field", "")) == job:
+			qualification += 0.18
+		if job in ["doctor", "scientist", "engineer"] and education not in ["university", "postgraduate", "graduated"]:
+			qualification -= 0.3
+		options.append({"job":job,"city":city_id,"monthly_salary":salary,"qualification":clampf(qualification,0.05,1.0),"openings":maxi(1,int(float(hub_state.get(city_id,{}).get("population",100000))/18000.0))})
+	options.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return int(a.monthly_salary) > int(b.monthly_salary))
+	return options
+
+func evaluate_job_offer(citizen_id: String, job: String, salary: int = 0) -> Dictionary:
+	if not resident_profiles.has(citizen_id) or job not in JOBS:
+		return {"accepted":false,"reason":"invalid_resident_or_job"}
+	var profile: Dictionary = resident_profiles[citizen_id]
+	var education := str(profile.get("education","secondary"))
+	var qualification := 0.52 + (0.22 if education in ["university","postgraduate","graduated"] else 0.0)
+	if str(profile.get("career_field","")) == job: qualification += 0.18
+	if job in ["doctor","scientist","engineer"] and education not in ["university","postgraduate","graduated"]: qualification -= 0.35
+	var requested_salary := salary if salary > 0 else _monthly_salary_for_job(job,int(profile.get("career_level",1)))
+	return {"accepted":qualification >= 0.42,"qualification":clampf(qualification,0.0,1.0),"salary":requested_salary,"job":job}
+
+func submit_job_application(citizen_id: String, job: String) -> Dictionary:
+	if not resident_profiles.has(citizen_id) or job not in JOBS:
+		return {"submitted":false,"reason":"invalid_application"}
+	var profile: Dictionary = resident_profiles[citizen_id]
+	if str(profile.get("life_stage","")) != "adult" or not str(profile.get("employer_id","")).is_empty():
+		return {"submitted":false,"reason":"not_eligible"}
+	var offer := evaluate_job_offer(citizen_id,job)
+	profile["job_application"] = {"job":job,"submitted_day":simulation_day,"qualification":float(offer.get("qualification",0.0)),"status":"pending"}
+	profile["job_search_status"] = "application_pending"
+	_append_event(profile,"applied_for_job:" + job)
+	resident_profiles[citizen_id] = profile
+	_dirty = true
+	return {"submitted":true,"application":profile["job_application"]}
+
+func process_autonomous_career_choice(citizen_id: String, preference: Dictionary = {}) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {"changed":false}
+	var profile: Dictionary = resident_profiles[citizen_id]
+	if str(profile.get("life_stage","")) != "adult": return {"changed":false,"reason":"not_adult"}
+	var choice := str(preference.get("choice","stay_in_job"))
+	if choice == "seek_promotion":
+		profile["career_progress"] = minf(0.99,float(profile.get("career_progress",0.0)) + 0.12)
+		_append_event(profile,"self_directed_promotion_effort")
+		resident_profiles[citizen_id] = profile
+		_dirty = true
+		return {"changed":true,"choice":choice}
+	if choice == "change_career" or choice == "learn_new_trade":
+		var best_job := ""
+		var best_score := -INF
+		for option in get_job_market_options(str(profile.get("city","")),citizen_id):
+			var job := str(option.get("job",""))
+			var score := float(option.get("qualification",0.0)) * 0.6 + float(option.get("monthly_salary",0)) / 30000.0
+			if job == str(profile.get("occupation","")): score -= 0.35
+			if score > best_score: best_score = score; best_job = job
+		if not best_job.is_empty():
+			var application := submit_job_application(citizen_id,best_job)
+			return {"changed":bool(application.get("submitted",false)),"choice":choice,"application":application}
+	return {"changed":false,"choice":choice}
+
+func train_resident_skill(citizen_id: String, skill: String, effort: float = 0.1) -> Dictionary:
+	if not resident_profiles.has(citizen_id) or skill.is_empty(): return {}
+	var profile: Dictionary = resident_profiles[citizen_id]
+	var skills: Dictionary = profile.get("skills",{})
+	var old_value := float(skills.get(skill,0.0))
+	var gain := clampf(effort,0.01,0.25) * (1.15 if str(profile.get("education","")) in ["university","postgraduate"] else 1.0)
+	skills[skill] = clampf(old_value + gain,0.0,1.0)
+	profile["skills"] = skills
+	profile["last_skill_practice"] = skill
+	profile["career_satisfaction"] = clampf(float(profile.get("career_satisfaction",0.5)) + gain * 0.04,0.0,1.0)
+	_append_event(profile,"practiced_skill:" + skill)
+	resident_profiles[citizen_id] = profile
+	_dirty = true
+	return {"skill":skill,"level":float(skills[skill]),"gain":gain}
