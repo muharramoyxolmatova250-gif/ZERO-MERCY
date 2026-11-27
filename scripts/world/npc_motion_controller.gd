@@ -134,3 +134,10 @@ func get_urgency_speed(urgent: bool, cautious: bool) -> float:
 	return preferred_speed
 func get_idle_bob() -> float:
 	return sin(_noise_phase * 1.7) * 0.012
+func face_direction(actor: Node3D, direction: Vector3, delta: float) -> void:
+	if not is_instance_valid(actor):
+		return
+	var flat := Vector3(direction.x, 0.0, direction.z)
+	if flat.length_squared() < 0.0001:
+		return
+	actor.rotation.y = lerp_angle(actor.rotation.y, atan2(-flat.x, -flat.z), get_turn_blend(delta))
