@@ -1738,6 +1738,15 @@ func make_phone_call(caller_id: String, recipient_id: String, duration_seconds: 
     return true
 
 
+func get_phone_call_history(citizen_id: String, limit: int = 30) -> Array:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return []
+    var calls: Array = profile.get("phone_call_history", []).duplicate(true)
+    calls.reverse()
+    return calls.slice(0, mini(calls.size(), maxi(1, limit)))
+
+
 func publish_phone_post(citizen_id: String, post_text: String, mood: String = "neutral") -> bool:
     if post_text.strip_edges().is_empty() or not resident_profiles.has(citizen_id):
         return false
