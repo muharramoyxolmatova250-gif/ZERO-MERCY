@@ -42,6 +42,8 @@ var _melee_animation := 0.0
 var stamina_regen_timer := 0.0
 var is_dead := false
 var _held_item: Node3D
+var _carried_mass_kg := 0.0
+var _carried_item_fragile := false
 var _hand_anchor: Marker3D
 var _cybernetic_hands: Node3D
 var _pickup_tween: Tween
@@ -424,27 +426,28 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 	if Input.is_action_just_pressed("jump") and is_on_floor():
-		velocity.y = jump_velocity
+		velocity.y = jump_velocity * (0.82 if _carried_mass_kg >= 8.0 else 1.0)
 
 	var input_vector := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var moving := input_vector.length_squared() > 0.01
-	var sprinting := moving and Input.is_action_pressed("sprint") and stamina > 0.0
+	var sprinting := moving and Input.is_action_pressed("sprint") and stamina > 0.0 and _carried_mass_kg < 8.0
 	if sprinting:
-		stamina = maxf(stamina - stamina_drain_per_second * delta, 0.0)
+		var carry_drain := 1.0 + minf(_carried_mass_kg * 0.035, 1.8)
+		stamina = maxf(stamina - stamina_drain_per_second * carry_drain * delta, 0.0)
 		stamina_regen_timer = stamina_regen_delay
 	else:
 		stamina_regen_timer = maxf(stamina_regen_timer - delta, 0.0)
 		if stamina_regen_timer <= 0.0:
 			stamina = minf(stamina + stamina_regen_per_second * delta, stamina_max)
 	var performance := _get_gameplay_performance()
-	var speed := (sprint_speed if sprinting else walk_speed) * performance
+	var carry_speed_factor := clampf(1.0 - _carried_mass_kg * 0.025, 0.55, 1.0)
+	var speed := (sprint_speed if sprinting else walk_speed) * performance * carry_speed_factor
 	var direction := (transform.basis * Vector3(input_vector.x, 0.0, input_vector.y)).normalized()
-	if direction.length_squared() > 0.0:
-		velocity.x = direction.x * speed
-		velocity.z = direction.z * speed
-	else:
-		velocity.x = move_toward(velocity.x, 0.0, walk_speed * 7.0 * delta)
-		velocity.z = move_toward(velocity.z, 0.0, walk_speed * 7.0 * delta)
+	var movement_response := 5.5 if _carried_item_fragile else (8.0 if _carried_mass_kg >= 8.0 else 18.0)
+	var target_x := direction.x * speed if direction.length_squared() > 0.0 else 0.0
+	var target_z := direction.z * speed if direction.length_squared() > 0.0 else 0.0
+	velocity.x = move_toward(velocity.x, target_x, movement_response * delta * maxf(speed, 1.0))
+	velocity.z = move_toward(velocity.z, target_z, movement_response * delta * maxf(speed, 1.0))
 	move_and_slide()
 	stamina_changed.emit(stamina, stamina_max)
 
@@ -687,8 +690,11 @@ func _attach_pickup_item(item: Node3D) -> void:
 func _finish_pickup() -> void:
 	if is_instance_valid(_cybernetic_hands) and _cybernetic_hands.has_method("close_grip"):
 		_cybernetic_hands.call("close_grip")
-	if is_instance_valid(_held_item) and _held_item.has_method("set_being_held"):
-		_held_item.call("set_being_held", true)
+	if is_instance_valid(_held_item):
+		_carried_mass_kg = maxf(0.1, float(_held_item.get_meta("carry_mass_kg", 2.0)))
+		_carried_item_fragile = bool(_held_item.get_meta("is_fragile", false)) or bool(_held_item.get_meta("requires_careful_carry", false))
+		if _held_item.has_method("set_being_held"):
+			_held_item.call("set_being_held", true)
 	if is_instance_valid(_weapon_visual):
 		_weapon_visual.visible = false
 	_pickup_in_progress = false
@@ -706,6 +712,8 @@ func _drop_held_item() -> void:
 		return
 	var item := _held_item
 	_held_item = null
+	_carried_mass_kg = 0.0
+	_carried_item_fragile = false
 	if is_instance_valid(_weapon_visual):
 		_weapon_visual.visible = true
 	_pickup_in_progress = false
