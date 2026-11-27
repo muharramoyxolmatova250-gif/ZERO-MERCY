@@ -1676,6 +1676,27 @@ func get_phone_contacts(citizen_id: String) -> Array:
     return contacts.duplicate(true)
 
 
+func clear_phone_conversation(citizen_id: String, other_id: String) -> int:
+    if not resident_profiles.has(citizen_id) or other_id.is_empty():
+        return 0
+    var profile := _ensure_phone_profile(citizen_id)
+    var removed := 0
+    for field in ["phone_inbox", "phone_outbox"]:
+        var messages: Array = profile.get(field, [])
+        var kept: Array = []
+        for message in messages:
+            var belongs := (str(message.get("from", "")) == other_id and str(message.get("to", "")) == citizen_id) or (str(message.get("from", "")) == citizen_id and str(message.get("to", "")) == other_id)
+            if belongs:
+                removed += 1
+            else:
+                kept.append(message)
+        profile[field] = kept
+    resident_profiles[citizen_id] = profile
+    if removed > 0:
+        _dirty = true
+    return removed
+
+
 func get_phone_unread_count(citizen_id: String) -> int:
     var profile := _ensure_phone_profile(citizen_id)
     if profile.is_empty():
