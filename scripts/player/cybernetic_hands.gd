@@ -48,12 +48,12 @@ func _process(delta: float) -> void:
 		pivot.rotation = pivot.rotation.lerp(target, clampf(delta * (16.0 if _reach_weight > 0.01 else 12.0), 0.0, 1.0))
 	for hinge_index in range(_finger_hinges.size()):
 		var curl := 0.08 + sprint_weight * 0.22 + sin(_clock * 3.0 + float(hinge_index) * 0.45) * 0.025
-		if hinge_index >= 4:
-			curl = lerpf(curl, 0.88 if _is_gripping else 0.24, _reach_weight)
+		if hinge_index >= 4 and _reach_weight > 0.01:
+			curl = lerpf(curl, 0.92 if _is_gripping else 0.015, _reach_weight)
 		var hinge := _finger_hinges[hinge_index]
 		hinge.rotation.x = lerpf(hinge.rotation.x, curl, clampf(delta * 12.0, 0.0, 1.0))
 	for thumb in _thumb_hinges:
-		thumb.rotation.z = lerpf(thumb.rotation.z, -0.62 if _is_gripping else -0.12, clampf(delta * 12.0, 0.0, 1.0))
+		thumb.rotation.z = lerpf(thumb.rotation.z, -0.62 if _is_gripping else (0.0 if _reach_weight > 0.01 else -0.12), clampf(delta * 12.0, 0.0, 1.0))
 
 func _build_arm(side: float, right_hand: bool) -> void:
 	var arm := Node3D.new()
