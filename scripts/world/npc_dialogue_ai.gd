@@ -220,3 +220,14 @@ func _finish(line: String) -> String:
 	dialogue_count += 1
 	last_utterance = line
 	return line
+
+
+func learn_topic(topic: String, fact: String, confidence: float = 0.5) -> void:
+	if topic.is_empty() or fact.is_empty():
+		return
+	var entries: Array = known_topics.get(topic,[])
+	entries.append({"fact":fact,"confidence":clampf(confidence,0.0,1.0),"source":"experience"})
+	if entries.size() > 20:
+		entries.pop_front()
+	known_topics[topic] = entries
+
