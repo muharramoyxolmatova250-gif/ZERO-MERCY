@@ -409,13 +409,3 @@ static func blend_solution(from_solution: Dictionary, to_solution: Dictionary, w
 	result["valid"] = bool(from_solution.get("valid", true)) and bool(to_solution.get("valid", true))
 	result["target_clamped"] = bool(to_solution.get("target_clamped", false))
 	return result
-
-
-static func get_solution_quality(solution: Dictionary, desired_target: Vector3) -> float:
-	if not get_solution_is_valid(solution):
-		return 0.0
-	var endpoint_error := get_solution_endpoint(solution).distance_to(desired_target)
-	var lengths := get_solution_segment_lengths(solution)
-	if lengths.x < 0.001 or lengths.y < 0.001:
-		return 0.0
-	return 1.0 - clampf(endpoint_error / maxf(lengths.x + lengths.y, 0.001), 0.0, 1.0)
