@@ -705,6 +705,13 @@ func _update_bots(delta: float) -> void:
 		bot.set_meta("fire_wait", wait)
 
 	# Round outcome is also actionable on touch-only devices.
+func _apply_ally_blast_impulse(ally: CharacterBody3D, delta: float) -> void:
+	var impulse: Vector3 = ally.get_meta("blast_impulse", Vector3.ZERO)
+	impulse = impulse.move_toward(Vector3.ZERO, 12.0 * delta)
+	ally.set_meta("blast_impulse", impulse)
+	ally.velocity.x += impulse.x
+	ally.velocity.z += impulse.z
+
 func _update_allies(delta: float) -> void:
 	for ally in allies:
 		if not is_instance_valid(ally):
