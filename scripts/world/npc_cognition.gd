@@ -207,3 +207,15 @@ func learn_from_outcome(action: String, satisfaction: float, learning_rate: floa
 	var target := (clampf(satisfaction,0.0,1.0)-0.5)*2.0
 	learned_preferences[action] = clampf(lerpf(old,target,clampf(learning_rate,0.01,0.3)),-1.0,1.0)
 
+
+
+func evaluate_option_utility(option: Dictionary, context: Dictionary) -> float:
+	var benefit := float(option.get("benefit",0.5))
+	var cost := float(option.get("cost",0.2))
+	var risk := float(option.get("risk",0.1))
+	var value_alignment := float(option.get("value_alignment",0.5))
+	var urgency := float(option.get("urgency",0.0))
+	var fear := float(emotional_state.get("fear",0.0))
+	var risk_tolerance := float(context.get("risk_tolerance",0.5))
+	return benefit*0.42+value_alignment*0.24+urgency*0.18-cost*0.28-risk*(1.0-risk_tolerance)*0.32-fear*risk*0.18
+
