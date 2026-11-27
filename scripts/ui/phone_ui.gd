@@ -2,7 +2,7 @@ extends CanvasLayer
 ## Dara's in-world phone: live NPC social feed, contacts, world news, life stats and map.
 var _panel: PanelContainer
 var _content: VBoxContainer
-var _active_tab := "feed"
+var _active_tab := "home"
 var _sms_target_id := ""
 var _phone_clock_label: Label
 var _phone_battery_label: Label
