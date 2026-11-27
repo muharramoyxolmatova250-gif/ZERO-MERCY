@@ -145,3 +145,6 @@ func clamp_velocity(maximum: float) -> void:
 	var limit := clampf(maximum, 0.1, 6.0)
 	if velocity.length() > limit:
 		velocity = velocity.normalized() * limit
+func blend_separation(direction: Vector3, separation: Vector3, strength: float = 1.0) -> Vector3:
+	var combined := direction + separation * clampf(strength, 0.0, 2.0)
+	return combined.normalized() if combined.length_squared() > 0.0001 else Vector3.ZERO
