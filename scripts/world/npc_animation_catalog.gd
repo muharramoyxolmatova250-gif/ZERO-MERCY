@@ -11,9 +11,9 @@ const CLIPS := {
 	"work": {"speed":0.0,"arm_swing":0.05,"body_lean":0.08,"head_focus":0.11},
 	"combat": {"speed":0.0,"arm_swing":0.18,"body_lean":0.12,"head_focus":0.14}
 }
-func get_clip(name: String) -> Dictionary:
+static func get_clip(name: String) -> Dictionary:
 	return CLIPS.get(name, CLIPS["idle_relaxed"]).duplicate(true)
-func get_clip_names() -> PackedStringArray:
+static func get_clip_names() -> PackedStringArray:
 	var names := PackedStringArray()
 	for key in CLIPS:
 		names.append(key)
