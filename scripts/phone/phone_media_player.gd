@@ -120,4 +120,12 @@ func _on_stop_pressed() -> void:
 	status.text = "Playback stopped. Choose another feed item or open an asset."
 
 func _on_video_finished() -> void:
-	status.text = "Video finished."
+	status.text = "Video finished. Loading next installed media…"
+	if _feed_items.size() > 1:
+		for offset in range(1, _feed_items.size()):
+			var candidate := posmod(_current_index + offset, _feed_items.size())
+			var path := str(_feed_items[candidate].get("asset_path", _feed_items[candidate].get("file_path", ""))).strip_edges()
+			if not path.is_empty() and ResourceLoader.exists(path):
+				_play_feed_item(candidate)
+				return
+	status.text = "Video finished. No other installed media is available."
