@@ -115,6 +115,7 @@ func _on_emergency_incident_created(incident_id: String, payload: Dictionary) ->
 	var curiosity := float(_personality_traits.get("curiosity", 0.5))
 	_stress = clampf(_stress + severity * (0.45 + (1.0 - courage) * 0.25), 0.0, 1.0)
 	remember_event("nearby_emergency:" + incident_id)
+	_independent_mind.observe_world_fact("nearby_emergency:" + incident_id, "An emergency occurred nearby", severity, "emergency_dispatch", {"distance":distance,"position":incident_position})
 	if courage < 0.32:
 		_crime_flee_timer = maxf(_crime_flee_timer, 3.0 + severity * 5.0)
 		_crime_flee_direction = global_position - incident_position
