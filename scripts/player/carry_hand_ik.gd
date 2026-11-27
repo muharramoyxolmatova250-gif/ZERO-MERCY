@@ -174,3 +174,8 @@ static func smooth_vector(current: Vector3, target: Vector3, delta: float, speed
 
 static func clamp_joint_angle(angle: float, minimum: float, maximum: float) -> float:
 	return clampf(angle, minf(minimum, maximum), maxf(minimum, maximum))
+
+static func get_joint_limit_weight(angle: float, minimum: float, maximum: float, margin: float = 0.15) -> float:
+	var span := maxf(absf(maximum - minimum), 0.001)
+	var edge := minf(angle - minimum, maximum - angle)
+	return clampf(edge / maxf(span * margin, 0.001), 0.0, 1.0)
