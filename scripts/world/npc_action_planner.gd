@@ -172,3 +172,21 @@ func recover_from_failure(action: String, reason: String, context: Dictionary = 
  plan_index = 0
  plan_reason = "failure_recovery:" + reason
  return active_plan[0].duplicate(true)
+
+
+func validate_plan(context: Dictionary = {}) -> Dictionary:
+ var accepted: Array[Dictionary] = []
+ var rejected: Array[String] = []
+ for step in active_plan:
+  var action := str(step.get("action",""))
+  if action.is_empty():
+   rejected.append("empty_action")
+  elif bool(context.get("indoors",false)) and action in ["travel","choose_transport"]:
+   rejected.append(action + ":indoor_context")
+  elif float(context.get("danger",0.0)) > 0.8 and action in ["relax","browse","play"]:
+   rejected.append(action + ":danger_priority")
+  else:
+   accepted.append(step.duplicate(true))
+ active_plan = accepted
+ plan_index = mini(plan_index,active_plan.size())
+ return {"valid":accepted.size(),"rejected":rejected}
