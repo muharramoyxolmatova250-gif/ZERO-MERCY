@@ -2189,6 +2189,21 @@ func adjust_resident_reputation(citizen_id: String, reputation_delta: float = 0.
     _dirty = true
 
 
+func get_phone_storage_snapshot(citizen_id: String) -> Dictionary:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return {}
+    return {
+        "sms_inbox": (profile.get("phone_inbox", []) as Array).size(),
+        "sms_outbox": (profile.get("phone_outbox", []) as Array).size(),
+        "contacts": (profile.get("phone_contacts", []) as Array).size(),
+        "calls": (profile.get("phone_call_history", []) as Array).size(),
+        "notifications": (profile.get("phone_notifications", []) as Array).size(),
+        "social_posts": (profile.get("phone_social_posts", []) as Array).size(),
+        "battery": float(profile.get("phone_battery", 100.0))
+    }
+
+
 func get_phone_social_profile(citizen_id: String) -> Dictionary:
     var profile := _ensure_phone_profile(citizen_id)
     if profile.is_empty():
