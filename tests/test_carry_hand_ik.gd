@@ -19,6 +19,12 @@ func _initialize() -> void:
 	_test_wrist_direction()
 	_test_solution_points()
 	_test_asymmetric_limb_lengths()
+	_test_solution_stability()
+	_test_solution_center()
+	_test_solution_error_report()
+	_test_solution_report()
+	_test_solution_bounds()
+	_test_solution_transforms()
 	_test_closest_reachable_point()
 	_test_direction_plane_projection()
 	_test_target_distance_weight()
@@ -151,3 +157,29 @@ func _test_asymmetric_limb_lengths() -> void:
 	var elbow: Vector3 = CarryHandIK.solve_elbow(Vector3.ZERO, Vector3(0.3, 0.0, 0.0), 0.55, 0.3, Vector3.UP)
 	assert(absf(elbow.length() - 0.55) < 0.002)
 	assert(absf(elbow.distance_to(Vector3(0.3, 0.0, 0.0)) - 0.3) < 0.002)
+
+func _test_solution_transforms() -> void:
+	var solution: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	var transforms: Dictionary = CarryHandIK.get_solution_transforms(solution)
+	assert((transforms["upper"] as Transform3D).is_finite())
+
+func _test_solution_bounds() -> void:
+	var solution: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	var bounds: AABB = CarryHandIK.get_solution_bounds(solution)
+	assert(bounds.is_finite())
+
+func _test_solution_report() -> void:
+	var solution: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	assert(bool(CarryHandIK.get_solution_validity_report(solution)["valid"]))
+
+func _test_solution_error_report() -> void:
+	var solution: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	assert(float(CarryHandIK.get_solution_error_report(solution, Vector3(0.5, 0.0, 0.0))["endpoint_error"]) < 0.001)
+
+func _test_solution_center() -> void:
+	var solution: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	assert(CarryHandIK.get_solution_center(solution).is_finite())
+
+func _test_solution_stability() -> void:
+	var solution: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	assert(CarryHandIK.get_solution_is_stable(solution))
