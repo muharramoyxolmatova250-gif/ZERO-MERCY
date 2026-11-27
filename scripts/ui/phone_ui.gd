@@ -155,7 +155,7 @@ func _build_phone() -> void:
     tabs.add_theme_constant_override("separation", 4)
     tabs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     tab_scroll.add_child(tabs)
-    for tab in ["feed", "media", "games", "news", "contacts", "sms", "life", "missions", "map"]:
+    for tab in ["home", "feed", "media", "games", "news", "contacts", "sms", "life", "missions", "map"]:
         var button := Button.new()
         button.text = tab.to_upper()
         button.custom_minimum_size = Vector2(76, 36)
@@ -231,6 +231,8 @@ func _refresh_content() -> void:
     for child in _content.get_children():
         child.queue_free()
     match _active_tab:
+        "home":
+            _build_home_screen()
         "feed":
             _build_feed()
         "media":
