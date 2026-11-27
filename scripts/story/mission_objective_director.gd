@@ -72,6 +72,7 @@ func _on_objective_completed(mission_id: String, objective_id: String) -> void:
     _target = null
 
 func _on_mission_completed(_mission_id: String) -> void:
+	_clear_witness_actor()
     if is_instance_valid(_target):
         _target.queue_free()
     _target = null
