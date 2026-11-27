@@ -273,6 +273,15 @@ func _build_allies() -> void:
 		capsule.height = 1.8
 		collision.shape = capsule
 		ally.add_child(collision)
+		var status_label := Label3D.new()
+		status_label.name = "SquadStatus"
+		status_label.position = Vector3(0.0, 1.45, 0.0)
+		status_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		status_label.font_size = 30
+		status_label.pixel_size = 0.006
+		status_label.modulate = Color(0.55, 0.9, 1.0)
+		status_label.text = str(profile.get("name", "SQUADMATE")) + "\nHP 100"
+		ally.add_child(status_label)
 		add_child(ally)
 		allies.append(ally)
 
