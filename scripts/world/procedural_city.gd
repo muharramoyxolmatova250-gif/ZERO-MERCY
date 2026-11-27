@@ -38,6 +38,7 @@ func _ready() -> void:
 	_build_road_traffic_manager()
 	_build_public_transit_network()
 	_build_taxi_dispatch()
+	_build_emergency_dispatch()
 	_spawn_city_life()
 	_spawn_interactive_props()
 
@@ -707,6 +708,34 @@ func _spawn_interactive_props() -> void:
 		item.set("glow_color", entry[2])
 		item.position = entry[0]
 		add_child(item)
+
+
+func _build_emergency_dispatch() -> void:
+	var dispatch_script := load("res://scripts/world/emergency_dispatch_ai.gd")
+	var unit_script := load("res://scripts/world/emergency_response_unit.gd")
+	if dispatch_script == null or unit_script == null:
+		push_warning("Emergency response scripts missing; emergency dispatch unavailable.")
+		return
+	var dispatch := Node.new()
+	dispatch.name = "EmergencyDispatchAI"
+	dispatch.set_script(dispatch_script)
+	dispatch.add_to_group("emergency_dispatch_ai")
+	add_child(dispatch)
+	var half := blocks_per_side * block_spacing * 0.5
+	var lane := road_width * 0.5 + 4.0
+	var units := [
+		["police_01", "police", Vector3(-half + lane, 0.0, -half + lane)],
+		["medical_01", "medical", Vector3(half - lane, 0.0, -half + lane)],
+		["fire_01", "fire", Vector3(half - lane, 0.0, half - lane)],
+		["police_02", "police", Vector3(-half + lane, 0.0, half - lane)]
+	]
+	for entry in units:
+		var unit := Node3D.new()
+		unit.set_script(unit_script)
+		unit.set("responder_id", _resolved_settlement_id() + "_" + entry[0])
+		unit.set("service_type", entry[1])
+		unit.position = entry[2]
+		add_child(unit)
 
 func _build_taxi_dispatch() -> void:
 	var dispatch_script := load("res://scripts/world/city_taxi_dispatch.gd")
