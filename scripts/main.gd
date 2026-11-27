@@ -8,6 +8,7 @@ const ENEMY_SCENE := preload("res://scenes/combat/training_enemy.tscn")
 const REGION_SCENE := preload("res://scenes/world/osm_region.tscn")
 const STREAMER_SCRIPT := preload("res://scripts/world/region_streamer.gd")
 const LIFE_SIM_SCRIPT := preload("res://scripts/world/world_life_sim.gd")
+const SIMULATION_AWARENESS_NETWORK_SCRIPT := preload("res://scripts/world/simulation_awareness_network.gd")
 const CITIZEN_SPATIAL_INDEX_SCRIPT := preload("res://scripts/world/citizen_spatial_index.gd")
 const PHONE_UI_SCRIPT := preload("res://scripts/ui/phone_ui.gd")
 const MISSION_DIRECTOR_SCRIPT := preload("res://scripts/story/mission_objective_director.gd")
@@ -336,3 +337,10 @@ func _start_gameplay_system_bridge(player: Node) -> void:
  add_child(_gameplay_bridge)
  _gameplay_bridge.call("bind_player", player)
  _gameplay_bridge.call("bind_world", self)
+
+ 
+func _start_simulation_awareness_network() -> void:
+	var network := Node.new()
+	network.name = "SimulationAwarenessNetwork"
+	network.set_script(SIMULATION_AWARENESS_NETWORK_SCRIPT)
+	add_child(network)
