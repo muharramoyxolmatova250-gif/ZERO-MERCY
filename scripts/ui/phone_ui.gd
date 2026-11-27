@@ -1261,11 +1261,14 @@ func _render_social_post(post: Dictionary, owner_id: String, allow_reactions: bo
     if allow_reactions:
         var actions := HBoxContainer.new()
         var like := Button.new()
-        like.text = "♥ LIKE"
+        var liked_by: Array = post.get("liked_by", [])
+        var already_liked := liked_by.has(owner_id)
+        like.text = "♥ LIKED" if already_liked else "♥ LIKE"
+        like.disabled = already_liked
         like.pressed.connect(func() -> void:
             if _life.has_method("react_to_phone_post"):
-                _life.call("react_to_phone_post", owner_id, str(post.get("id", "")))
-                _refresh_content()
+                if _life.call("react_to_phone_post", owner_id, str(post.get("id", ""))):
+                    _refresh_content()
         )
         actions.add_child(like)
         var comment_input := LineEdit.new()
