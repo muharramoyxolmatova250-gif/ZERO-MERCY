@@ -22,10 +22,16 @@ var route_id := ""
 var stop_ids: Array[String] = []
 var transit_network: Node
 var _rng := RandomNumberGenerator.new()
+@export var traffic_segment_id := "city_transit"
+var _traffic_manager: Node
 
 func _ready() -> void:
     add_to_group("city_transit_vehicles")
     _rng.randomize()
+    _traffic_manager = get_tree().get_first_node_in_group("road_traffic_manager")
+    if _traffic_manager != null and _traffic_manager.has_method("register_segment"):
+        _traffic_manager.call("register_segment", traffic_segment_id, cruise_speed, 24)
+        _traffic_manager.call("report_vehicle", traffic_segment_id, str(get_instance_id()), true)
     _build_bus()
     if transit_network != null and not route_id.is_empty() and transit_network.has_method("report_vehicle_active"):
         transit_network.call("report_vehicle_active", route_id, true)
@@ -54,6 +60,8 @@ func _physics_process(delta: float) -> void:
         return
     var direction := offset / maxf(distance, 0.001)
     var desired_speed := cruise_speed
+    if _traffic_manager != null and _traffic_manager.has_method("get_recommended_speed"):
+        desired_speed = minf(desired_speed, float(_traffic_manager.call("get_recommended_speed", traffic_segment_id)))
     if distance < braking_distance:
         desired_speed *= clampf(distance / braking_distance, 0.18, 1.0)
     if not _has_green_path(direction):
@@ -172,5 +180,7 @@ func _build_bus() -> void:
     add_child(_door_mesh)
 
 func _exit_tree() -> void:
+    if _traffic_manager != null and is_instance_valid(_traffic_manager) and _traffic_manager.has_method("report_vehicle"):
+        _traffic_manager.call("report_vehicle", traffic_segment_id, str(get_instance_id()), false)
     if transit_network != null and not route_id.is_empty() and transit_network.has_method("report_vehicle_active"):
         transit_network.call("report_vehicle_active", route_id, false)
