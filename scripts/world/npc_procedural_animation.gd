@@ -112,7 +112,7 @@ func update_pose(delta: float, speed: float, motion_state: String, activity: Str
 		left_leg.rotation.x = leg_swing if moving else sin(idle_phase + variation_seed) * 0.012
 	if is_instance_valid(right_leg):
 		right_leg.rotation.x = -leg_swing if moving else sin(idle_phase + variation_seed + 1.2) * 0.012
- 	if idle_gesture_remaining > 0.0:
+	if idle_gesture_remaining > 0.0:
 		var gesture_weight := sin((1.0 - idle_gesture_remaining / 1.8) * PI)
 		if idle_gesture == "look_around" and is_instance_valid(head):
 			head.rotation.y += sin(gesture_phase * 0.7) * 0.24 * gesture_weight
