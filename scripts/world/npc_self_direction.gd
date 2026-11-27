@@ -247,3 +247,59 @@ func get_agency_metrics() -> Dictionary:
 func on_major_life_event(event_type: String, context: Dictionary = {}) -> void:
 	if event_type in ["job_loss","marriage","birth","retirement","relocation","business_failure","graduation"]:
 		revise_aspirations({"life_change":0.8,"profile":context})
+
+
+func observe_environment(observations: Array[Dictionary]) -> Array[Dictionary]:
+	var discovered: Array[Dictionary] = []
+	for item in observations:
+		var affordance := str(item.get("affordance",""))
+		if affordance.is_empty() or not bool(item.get("available",true)): continue
+		var interest := float(item.get("interest",0.5))
+		var risk := float(item.get("risk",0.0))
+		var score := evaluate_opportunity({"type":affordance,"benefit":float(item.get("benefit",0.5)),"effort":float(item.get("effort",0.5)),"risk":risk})
+		if score > 0.28:
+			discovered.append({"id":"world_"+affordance,"activity":str(item.get("activity","explore")),"drive":str(item.get("drive","curiosity")),"weight":score,"need":str(item.get("need","discovery")),"target":str(item.get("target","")),"self_chosen":true,"origin":"environment","interest":interest})
+	return discovered
+
+func remember_interest(topic: String, strength: float = 0.1) -> void:
+	if topic.is_empty(): return
+	preferences["interest_"+topic] = clampf(float(preferences.get("interest_"+topic,0.0))+clampf(strength,-0.25,0.25),-1.0,1.0)
+
+func generate_goal_from_affordance(affordance: Dictionary) -> Dictionary:
+	var verb := str(affordance.get("action","explore"))
+	var target := str(affordance.get("target",""))
+	if verb.is_empty(): return {}
+	_goal_counter += 1
+	return {"id":"emergent_"+str(_goal_counter),"activity":str(affordance.get("activity","explore")),"drive":str(affordance.get("drive","curiosity")),"weight":clampf(float(affordance.get("utility",0.5)),0.1,1.0),"need":"discovery","action":verb,"target":target,"origin":"self_discovery","self_chosen":true,"status":"considering"}
+
+func score_goal_candidate(goal: Dictionary, context: Dictionary = {}) -> float:
+	var score := float(goal.get("weight",0.5))*0.4
+	score += _trait(str(goal.get("drive","curiosity")))*0.24
+	score += float(preferences.get(str(goal.get("id","")),0.0))*0.2
+	score += _context_bonus(goal,context)
+	score += float(goal.get("interest",0.0))*0.16
+	score -= float(goal.get("risk",0.0))*(1.0-_trait("risk_tolerance"))*0.3
+	if str(goal.get("target","")) == str(context.get("last_target","")): score -= 0.12
+	return score
+
+func choose_from_candidates(candidates: Array[Dictionary], context: Dictionary = {}) -> Dictionary:
+	var ranked: Array[Dictionary] = []
+	for candidate in candidates:
+		if not is_goal_feasible(candidate,context): continue
+		ranked.append({"goal":candidate,"score":score_goal_candidate(candidate,context)+_rng.randf_range(0.0,0.04)})
+	ranked.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.score)>float(b.score))
+	if ranked.is_empty(): return {}
+	var chosen: Dictionary = ranked[0].goal.duplicate(true)
+	chosen["chosen_score"] = float(ranked[0].score)
+	chosen["status"] = "chosen"
+	chosen["self_chosen"] = true
+	active_personal_goal = chosen.duplicate(true)
+	autonomy_score = clampf(float(ranked[0].score),0.0,1.0)
+	decision_count += 1
+	return chosen
+
+func goal_matches_world_state(goal: Dictionary, world_state: Dictionary) -> bool:
+	var target := str(goal.get("target",""))
+	if not target.is_empty() and world_state.has("unavailable_targets") and (world_state.unavailable_targets as Array).has(target): return false
+	if bool(world_state.get("emergency",false)) and str(goal.get("need","")) not in ["security","calm","health"]: return false
+	return true
