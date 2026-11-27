@@ -1145,8 +1145,8 @@ func _build_social_network() -> void:
         _add_stat("CITY", str(profile.get("city", "Unknown")))
         var own_standing: Dictionary = _life.call("get_resident_reputation", owner_id) if _life.has_method("get_resident_reputation") else {}
         _add_stat("PUBLIC STANDING", str(own_standing.get("standing", "ordinary")).to_upper())
-        _add_stat("REPUTATION", str(snappedf(float(own_standing.get("reputation", 0.0)) * 100.0) / 100.0))
-        _add_stat("COMMUNITY RESPECT", str(snappedf(float(own_standing.get("respect", 0.0)) * 100.0) / 100.0))
+        _add_stat("REPUTATION", str(snappedf(float(own_standing.get("reputation", 0.0)), 0.01)))
+        _add_stat("COMMUNITY RESPECT", str(snappedf(float(own_standing.get("respect", 0.0)), 0.01)))
         _add_stat("TOTAL LIKES", str(profile.get("total_likes", 0)))
         _add_stat("TOTAL COMMENTS", str(profile.get("total_comments", 0)))
         _add_section_title("FOLLOWING")
