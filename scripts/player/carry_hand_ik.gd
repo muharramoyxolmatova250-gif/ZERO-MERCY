@@ -216,3 +216,8 @@ static func get_limb_directions(solution: Dictionary) -> Dictionary:
 
 static func get_joint_positions(solution: Dictionary) -> PackedVector3Array:
 	return PackedVector3Array([solution.get("shoulder", Vector3.ZERO), solution.get("elbow", Vector3.ZERO), solution.get("wrist", Vector3.ZERO)])
+
+static func get_solution_is_valid(solution: Dictionary) -> bool:
+	if not solution.has("shoulder") or not solution.has("elbow") or not solution.has("wrist"):
+		return false
+	return (solution["shoulder"] as Vector3).is_finite() and (solution["elbow"] as Vector3).is_finite() and (solution["wrist"] as Vector3).is_finite()
