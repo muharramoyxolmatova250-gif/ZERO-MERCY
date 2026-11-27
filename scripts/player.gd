@@ -43,6 +43,9 @@ var stamina_regen_timer := 0.0
 var is_dead := false
 var _held_item: Node3D
 var _hand_anchor: Marker3D
+var _cybernetic_hands: Node3D
+var _pickup_tween: Tween
+var _pickup_in_progress := false
 var _muzzle_flash: MeshInstance3D
 var _muzzle_light: OmniLight3D
 var _muzzle_flash_timer := 0.0
@@ -63,6 +66,7 @@ func _ready() -> void:
 	if Engine.has_singleton("GameSession") or get_node_or_null("/root/GameSession") != null:
 		GameSession.register_player(self)
 	_spawn_transform = global_transform
+	_cybernetic_hands = get_node_or_null("CyberneticHands") as Node3D
 	_hand_anchor = Marker3D.new()
 	_hand_anchor.name = "HeldItemAnchor"
 	camera.add_child(_hand_anchor)
@@ -590,18 +594,56 @@ func _pick_up_item(item: Node3D) -> void:
 			item.queue_free()
 		_award_gameplay_xp("crafting", 1.0)
 		return
+	if _pickup_in_progress:
+		return
+	if not is_instance_valid(_cybernetic_hands) or not _cybernetic_hands.has_method("get_grip_anchor"):
+		return
+	_pickup_in_progress = true
+	if _cybernetic_hands.has_method("begin_pickup"):
+		_cybernetic_hands.call("begin_pickup", item.global_position)
+	if _pickup_tween != null and _pickup_tween.is_running():
+		_pickup_tween.kill()
+	_pickup_tween = create_tween()
+	_pickup_tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_pickup_tween.tween_interval(0.24)
+	_pickup_tween.tween_callback(Callable(self, "_attach_pickup_item").bind(item))
+
+
+func _attach_pickup_item(item: Node3D) -> void:
+	if not is_instance_valid(item) or not _pickup_in_progress:
+		_pickup_in_progress = false
+		if is_instance_valid(_cybernetic_hands) and _cybernetic_hands.has_method("release_object"):
+			_cybernetic_hands.call("release_object")
+		return
+	var grip := _cybernetic_hands.call("get_grip_anchor") as Node3D
+	if not is_instance_valid(grip):
+		_pickup_in_progress = false
+		return
 	_held_item = item
-	item.set_meta("original_collision_layer", item.collision_layer if item is CollisionObject3D else 1)
 	if item is CollisionObject3D:
+		item.set_meta("original_collision_layer", item.collision_layer)
+		item.set_meta("original_collision_mask", item.collision_mask)
 		item.collision_layer = 0
 		item.collision_mask = 0
-	item.reparent(_hand_anchor, true)
-	var tween := create_tween()
-	tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.tween_property(item, "position", Vector3.ZERO, 0.28)
-	tween.parallel().tween_property(item, "rotation", Vector3.ZERO, 0.28)
-	if item.has_method("set_being_held"):
-		item.call("set_being_held", true)
+	item.reparent(grip, true)
+	var attach_tween := create_tween()
+	attach_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	attach_tween.tween_property(item, "position", Vector3(0.0, -0.06, -0.13), 0.18)
+	attach_tween.parallel().tween_property(item, "rotation", Vector3.ZERO, 0.18)
+	attach_tween.tween_callback(Callable(self, "_finish_pickup"))
+
+func _finish_pickup() -> void:
+	if is_instance_valid(_cybernetic_hands) and _cybernetic_hands.has_method("close_grip"):
+		_cybernetic_hands.call("close_grip")
+	if is_instance_valid(_held_item) and _held_item.has_method("set_being_held"):
+		_held_item.call("set_being_held", true)
+	_pickup_in_progress = false
+
+func _restore_pickup_collision(item: Node3D) -> void:
+	if not is_instance_valid(item) or not item is CollisionObject3D:
+		return
+	item.collision_layer = int(item.get_meta("original_collision_layer", 1))
+	item.collision_mask = int(item.get_meta("original_collision_mask", 1))
 
 
 func _drop_held_item() -> void:
@@ -610,6 +652,9 @@ func _drop_held_item() -> void:
 		return
 	var item := _held_item
 	_held_item = null
+	_pickup_in_progress = false
+	if is_instance_valid(_cybernetic_hands) and _cybernetic_hands.has_method("release_object"):
+		_cybernetic_hands.call("release_object")
 	var origin := camera.global_position
 	var end := origin + (-camera.global_transform.basis.z * 2.2)
 	var query := PhysicsRayQueryParameters3D.create(origin, end)
@@ -622,11 +667,12 @@ func _drop_held_item() -> void:
 	var world_parent := get_tree().current_scene
 	item.reparent(world_parent, true)
 	if item is CollisionObject3D:
-		item.collision_layer = int(item.get_meta("original_collision_layer", 1))
-		item.collision_mask = 1
+		item.collision_layer = 0
+		item.collision_mask = 0
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.tween_property(item, "global_position", destination, 0.32)
+	tween.tween_callback(Callable(self, "_restore_pickup_collision").bind(item))
 	if item.has_method("set_being_held"):
 		item.call("set_being_held", false)
 
