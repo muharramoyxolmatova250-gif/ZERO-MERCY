@@ -149,6 +149,12 @@ func update_pose(delta: float, speed: float, motion_state: String, activity: Str
 	if reaction_remaining > 0.0:
 		reaction_remaining = maxf(0.0, reaction_remaining - dt)
 		var reaction_weight := sin(clampf(reaction_remaining / 1.2, 0.0, 1.0) * PI * 0.5) * reaction_intensity
+		var reaction_pose: Dictionary = director.get_reaction_pose(reaction_name)
+		if not reaction_pose.is_empty():
+			if is_instance_valid(head): head.rotation.x += float(reaction_pose.get("head_pitch", 0.0)) * reaction_weight
+			if is_instance_valid(body): body.rotation.x += float(reaction_pose.get("body_lean", 0.0)) * reaction_weight
+			if is_instance_valid(left_arm): left_arm.rotation.z -= float(reaction_pose.get("arm_open", 0.0)) * reaction_weight
+			if is_instance_valid(right_arm): right_arm.rotation.z += float(reaction_pose.get("arm_open", 0.0)) * reaction_weight
 		match reaction_name:
 			"startled", "curious":
 				if is_instance_valid(head): head.rotation.x -= 0.18 * reaction_weight
