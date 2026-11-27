@@ -243,3 +243,11 @@ func get_animation_profile() -> Dictionary:
 		"camera_factor": get_camera_motion_factor(),
 		"footstep_intensity": get_footstep_intensity()
 	}
+
+
+func register_impact(strength: float) -> void:
+	impact_load = clampf(maxf(impact_load, strength), 0.0, 1.0)
+	stability = clampf(stability - impact_load * (0.16 if fragile else 0.08), 0.0, 1.0)
+	if stability < 0.4 and _warning_cooldown <= 0.0:
+		_warning_cooldown = 2.5
+		carry_warning.emit("Buyum silkinib ketdi — muvozanatni tiklang")
