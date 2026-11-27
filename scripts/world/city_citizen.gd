@@ -14,6 +14,8 @@ var _head: MeshInstance3D
 var _phone: MeshInstance3D
 var _indoor_activity := ""
 var _indoor_activity_time := 0.0
+var _indoor_action_completed := false
+var _indoor_action_token := ""
 var _body_rest_position := Vector3.ZERO
 var _head_rest_rotation := Vector3.ZERO
 var _pause_remaining := 0.0
