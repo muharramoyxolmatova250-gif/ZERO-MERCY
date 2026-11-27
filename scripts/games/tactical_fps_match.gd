@@ -389,7 +389,19 @@ func _update_bots(delta: float) -> void:
 			if gap.length() > 0.01 and gap.length() < 2.8:
 				separation += gap.normalized() * (2.8 - gap.length())
 		var pursuit := (approach + side * 0.58 + separation * 0.9).normalized()
-		bot.velocity.x = pursuit.x * 2.15
+		var bot_health := float(bot.get_meta("health", 100.0))
+		if bot_health <= 65.0 and not cover_positions.is_empty():
+			var best_cover := cover_positions[0]
+			var best_distance := INF
+			for cover_point in cover_positions:
+				var retreat_point := cover_point + (cover_point - player.global_position).normalized() * 2.4
+				var cover_distance := bot.global_position.distance_to(retreat_point)
+				if cover_distance < best_distance:
+					best_distance = cover_distance
+					best_cover = retreat_point
+			var cover_direction := (best_cover - bot.global_position).normalized()
+			pursuit = cover_direction
+		bot.velocity.x = pursuit.x * (2.5 if bot_health <= 65.0 else 2.15)
 		bot.velocity.z = pursuit.z * 2.15
 		bot.move_and_slide()
 		var wait := float(bot.get_meta("fire_wait", 1.0)) - delta
