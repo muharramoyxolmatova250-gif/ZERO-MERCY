@@ -233,3 +233,13 @@ func validate_profile(item: Node3D, mass: float) -> bool:
 	if mass <= 0.0 or mass > max_mass_kg:
 		return false
 	return item.is_in_group("world_pickup")
+
+
+func get_animation_profile() -> Dictionary:
+	return {
+		"lean": get_balance_lean(1.0 / 60.0),
+		"sway": get_gait_sway(),
+		"support": get_support_hand_profile(),
+		"camera_factor": get_camera_motion_factor(),
+		"footstep_intensity": get_footstep_intensity()
+	}
