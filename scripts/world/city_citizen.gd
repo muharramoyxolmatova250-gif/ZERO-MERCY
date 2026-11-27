@@ -3,6 +3,7 @@ const NPCCognition = preload("res://scripts/world/npc_cognition.gd")
 const NPCDialogueAI = preload("res://scripts/world/npc_dialogue_ai.gd")
 const NPCActionPlanner = preload("res://scripts/world/npc_action_planner.gd")
 const NPCMotionController = preload("res://scripts/world/npc_motion_controller.gd")
+const NPCSelfDirection = preload("res://scripts/world/npc_self_direction.gd")
 ## Lightweight ambient pedestrian that loops a local sidewalk route.
 @export var route: PackedVector3Array = PackedVector3Array()
 @export_range(0.2, 5.0, 0.1) var walk_speed := 1.25
@@ -56,6 +57,7 @@ var _cognition = NPCCognition.new()
 var _dialogue = NPCDialogueAI.new()
 var _action_planner = NPCActionPlanner.new()
 var _motion_controller = NPCMotionController.new()
+var _self_direction = NPCSelfDirection.new()
 var _planned_action: Dictionary = {}
 @export var citizen_id := ""
 @export var city_id := ""
@@ -292,6 +294,7 @@ func _initialize_personality() -> void:
 	_dialogue.initialize(citizen_id, _personality_traits, life_profile)
 	_action_planner.initialize(citizen_id, _personality_traits)
 	_motion_controller.initialize(citizen_id, _personality_traits, walk_speed)
+	_self_direction.initialize(citizen_id, _personality_traits, life_profile)
 
 
 func _update_needs() -> void:
@@ -355,6 +358,13 @@ func _decide_goal() -> void:
 		scores["family"] = 0.35 + _social_need * 0.2
 	var cognition_context := {"stress":_stress,"energy":_energy,"hunger":_hunger,"hour":hour,"day":int(life_profile.get("simulation_day",0)),"risk_tolerance":risk_tolerance}
 	scores = _cognition.evaluate_goal_scores(scores, cognition_context, _personality_traits, _memory)
+	var agency_context := {"stress":_stress,"loneliness":_social_need,"boredom":_curiosity,"financial_pressure":float(life_profile.get("debt",0.0))/1000.0,"profile":life_profile,"available_time":1.0}
+	if _rng.randf() < 0.08:
+		_self_direction.choose_personal_goal(agency_context)
+	var personal_biases: Dictionary = _self_direction.activity_biases(agency_context)
+	for activity_key in personal_biases:
+		if scores.has(activity_key):
+			scores[activity_key] = float(scores[activity_key]) + float(personal_biases[activity_key])
 	var previous_goal := current_goal
 	var best := "commute"
 	var best_score := -1.0
@@ -917,3 +927,7 @@ func evaluate_local_risk(threat_position: Vector3, threat_severity: float = 0.5)
 	var exposure := clampf(1.0 - distance / 65.0, 0.0, 1.0)
 	var perceived_risk := clampf(exposure * clampf(threat_severity, 0.0, 1.0) * (1.25 - courage * 0.45) * (1.15 - risk_tolerance * 0.3), 0.0, 1.0)
 	return {"distance": distance, "perceived_risk": perceived_risk, "should_evacuate": perceived_risk >= 0.38, "courage": courage, "risk_tolerance": risk_tolerance}
+
+
+func get_autonomy_snapshot() -> Dictionary:
+	return _self_direction.get_snapshot()
