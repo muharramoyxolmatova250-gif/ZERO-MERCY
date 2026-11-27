@@ -333,3 +333,12 @@ static func get_solution_bounds(solution: Dictionary) -> AABB:
 	for point in points:
 		bounds = bounds.expand(point)
 	return bounds
+
+static func get_solution_is_stable(solution: Dictionary, maximum_error: float = 0.08) -> bool:
+	if not get_solution_is_valid(solution):
+		return false
+	var lengths := get_solution_segment_lengths(solution)
+	var shoulder := get_solution_shoulder(solution)
+	var elbow := get_solution_elbow(solution)
+	var wrist := get_solution_endpoint(solution)
+	return get_chain_straightness(shoulder, elbow, wrist) < 0.995 and get_chain_error(shoulder, elbow, wrist, lengths.x, lengths.y) <= maximum_error
