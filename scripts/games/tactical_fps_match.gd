@@ -895,7 +895,11 @@ func _update_hud() -> void:
 	var state := ("RELOADING %.1fs" % reload_left) if reloading else ("AMMO %d / %d" % [ammo, reserve_ammo])
 	var outcome := " • YOU ARE DOWN" if health <= 0.0 else (" • TIME EXPIRED" if time_left <= 0.0 else (" • ROUND WON" if bots.is_empty() else ""))
 	var revive_status := _get_revive_status()
-	hud.text = "ZERO MERCY // TACTICAL BREACH\nHP %.0f   %s\nENEMIES %d   SQUAD %d   DOWN %d   ELIMINATIONS %d   W/L %d/%d\nTIME %03d:%02d%s\n%s\nWASD move • Shift sprint • C crouch • Right-click ADS • Mouse aim/fire • R reload • Space jump • T restart after round • Esc release mouse" % [health, state, bots.size(), allies.size(), _count_downed_allies(), score, rounds_won, rounds_lost, int(time_left) / 60, int(time_left) % 60, outcome, revive_status]
+	var grenade_count := 0
+	for grenade in get_tree().get_nodes_in_group("enemy_grenades"):
+		if is_instance_valid(grenade):
+			grenade_count += 1
+	hud.text = "ZERO MERCY // TACTICAL BREACH\nINCOMING GRENADES: %d" % grenade_count\nHP %.0f   %s\nENEMIES %d   SQUAD %d   DOWN %d   ELIMINATIONS %d   W/L %d/%d\nTIME %03d:%02d%s\n%s\nWASD move • Shift sprint • C crouch • Right-click ADS • Mouse aim/fire • R reload • Space jump • T restart after round • Esc release mouse" % [health, state, bots.size(), allies.size(), _count_downed_allies(), score, rounds_won, rounds_lost, int(time_left) / 60, int(time_left) % 60, outcome, revive_status]
 func _count_downed_allies() -> int:
 	var total := 0
 	for ally in allies:
