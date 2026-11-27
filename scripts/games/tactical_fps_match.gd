@@ -360,6 +360,8 @@ func _fire() -> void:
 		if target is CharacterBody3D and bots.has(target):
 			var remaining := float(target.get_meta("health", 100.0)) - 34.0
 			target.set_meta("health", remaining)
+			target.set_meta("suppressed_time", 1.35)
+			target.set_meta("morale", clampf(remaining / 100.0, 0.25, 1.0))
 			if remaining <= 0.0:
 				target.queue_free()
 				bots.erase(target)
