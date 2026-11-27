@@ -1980,6 +1980,68 @@ func play_phone_game(citizen_id: String, game_id: String, match_minutes: int = 1
     return {"game_id":game_id,"game_title":game_title,"genre":game_genre,"won":won,"score":snappedf(score,0.01),"stats":game_stats.duplicate(true),"match_minutes":match_minutes}
 
 
+func play_phone_party_game(game_id: String, invited_ids: Array, match_minutes: int = 12) -> Dictionary:
+    var game_data: Dictionary = {}
+    for game in get_phone_games_catalog():
+        if str(game.get("id", "")) == game_id:
+            game_data = game
+            break
+    if game_data.is_empty():
+        return {"started": false, "reason": "unknown_game"}
+    var roster: Array[Dictionary] = []
+    var total_skill := 0.62
+    var accepted := 0
+    for citizen_id_value in invited_ids:
+        var citizen_id := str(citizen_id_value)
+        if not resident_profiles.has(citizen_id):
+            continue
+        var profile := _ensure_phone_profile(citizen_id)
+        if profile.is_empty():
+            continue
+        var battery := float(profile.get("phone_battery", 100.0))
+        var energy := float(profile.get("energy", profile.get("energy_level", 0.7)))
+        var availability := clampf(0.72 + energy * 0.18 + battery * 0.001 - (1.0 - _rng.randf()) * 0.28, 0.12, 0.98)
+        if battery < 5.0 or _rng.randf() > availability:
+            _add_phone_notification(citizen_id, "game_invite", "You missed a game invite for " + str(game_data.get("title", "a game")))
+            continue
+        var skill := float(profile.get("gaming_skill", 0.45))
+        if not profile.has("gaming_skill"):
+            var skill_rng := RandomNumberGenerator.new()
+            skill_rng.seed = int(abs(hash(citizen_id + ":gaming")))
+            skill = skill_rng.randf_range(0.2, 0.92)
+            profile["gaming_skill"] = skill
+        total_skill += skill
+        accepted += 1
+        var stats: Dictionary = profile.get("phone_game_stats", {})
+        var game_stats: Dictionary = stats.get(game_id, {"matches":0,"wins":0,"losses":0,"rank_points":0,"minutes":0})
+        game_stats["matches"] = int(game_stats.get("matches", 0)) + 1
+        game_stats["minutes"] = int(game_stats.get("minutes", 0)) + maxi(1, match_minutes)
+        stats[game_id] = game_stats
+        profile["phone_game_stats"] = stats
+        profile["phone_battery"] = maxf(0.0, battery - float(match_minutes) * 0.45)
+        profile["phone_last_used_day"] = simulation_day
+        resident_profiles[citizen_id] = profile
+        record_event(citizen_id, "joined_phone_party:" + game_id)
+        _add_phone_notification(citizen_id, "game_party", "Party match started: " + str(game_data.get("title", "Game")))
+        roster.append({"id": citizen_id, "name": str(profile.get("name", citizen_id)), "skill": snappedf(skill, 0.01)})
+    var team_score := total_skill / float(accepted + 1)
+    var won := team_score + _rng.randf_range(-0.18, 0.18) >= 0.56
+    for member in roster:
+        var member_id := str(member.get("id", ""))
+        var member_profile := _ensure_phone_profile(member_id)
+        var member_stats: Dictionary = member_profile.get("phone_game_stats", {})
+        var member_game_stats: Dictionary = member_stats.get(game_id, {})
+        member_game_stats["wins"] = int(member_game_stats.get("wins", 0)) + (1 if won else 0)
+        member_game_stats["losses"] = int(member_game_stats.get("losses", 0)) + (0 if won else 1)
+        member_game_stats["rank_points"] = maxi(0, int(member_game_stats.get("rank_points", 0)) + (18 if won else -7))
+        member_stats[game_id] = member_game_stats
+        member_profile["phone_game_stats"] = member_stats
+        resident_profiles[member_id] = member_profile
+        record_event(member_id, "phone_party_result:" + ("won" if won else "lost"))
+    _dirty = true
+    return {"started": true, "game_id": game_id, "game_title": str(game_data.get("title", "Game")), "won": won, "team_score": snappedf(team_score, 0.01), "accepted_count": accepted, "roster": roster, "invited_count": invited_ids.size(), "match_minutes": maxi(1, match_minutes)}
+
+
 func get_phone_game_stats(citizen_id: String) -> Dictionary:
     var profile := _ensure_phone_profile(citizen_id)
     return (profile.get("phone_game_stats", {}) as Dictionary).duplicate(true)
