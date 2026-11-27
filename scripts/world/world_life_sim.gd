@@ -1883,6 +1883,42 @@ func _add_phone_notification(citizen_id: String, kind: String, title: String) ->
     resident_profiles[citizen_id] = profile
 
 
+func set_phone_privacy(citizen_id: String, privacy: String) -> bool:
+    if not resident_profiles.has(citizen_id) or privacy not in ["public", "friends", "private"]:
+        return false
+    var profile := _ensure_phone_profile(citizen_id)
+    profile["phone_privacy"] = privacy
+    resident_profiles[citizen_id] = profile
+    _dirty = true
+    return true
+
+
+func block_phone_contact(citizen_id: String, contact_id: String) -> bool:
+    if not resident_profiles.has(citizen_id) or not resident_profiles.has(contact_id) or citizen_id == contact_id:
+        return false
+    var profile := _ensure_phone_profile(citizen_id)
+    var blocked: Array = profile.get("phone_blocked_contacts", [])
+    if blocked.has(contact_id):
+        return false
+    blocked.append(contact_id)
+    profile["phone_blocked_contacts"] = blocked
+    resident_profiles[citizen_id] = profile
+    _dirty = true
+    return true
+
+
+func unblock_phone_contact(citizen_id: String, contact_id: String) -> bool:
+    var profile := _ensure_phone_profile(citizen_id)
+    var blocked: Array = profile.get("phone_blocked_contacts", [])
+    if not blocked.has(contact_id):
+        return false
+    blocked.erase(contact_id)
+    profile["phone_blocked_contacts"] = blocked
+    resident_profiles[citizen_id] = profile
+    _dirty = true
+    return true
+
+
 func make_phone_call(caller_id: String, recipient_id: String, duration_seconds: int = 30) -> bool:
     if caller_id == recipient_id or not resident_profiles.has(caller_id) or not resident_profiles.has(recipient_id):
         return false
