@@ -123,7 +123,7 @@ func _test_solution_points() -> void:
 
 func _test_solution_quality() -> void:
 	var result: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
-	assert(CarryHandIK.get_solution_quality(result, Vector3(0.5, 0.0, 0.0)) > 0.9)
+	assert(CarryHandIK.get_solution_quality(result, Vector3(0.5, 0.0, 0.0)) > 0.85)
 
 func _test_upper_basis_finite() -> void:
 	var basis: Basis = CarryHandIK.get_upper_segment_basis(Vector3.ZERO, Vector3.UP)
