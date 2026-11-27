@@ -106,6 +106,12 @@ func record_goal_outcome(goal_id: String, satisfaction: float, completed: bool) 
 	completed_goals.append(record)
 	while completed_goals.size() > 40:
 		completed_goals.pop_front()
+	var failures: Dictionary = preferences.get("failures", {})
+	if completed:
+		failures.erase(goal_id)
+		preferences.erase("failure_reason_" + goal_id)
+	else:
+		record_failed_attempt(goal_id, "goal_not_completed")
 	if str(active_personal_goal.get("id", "")) == goal_id:
 		active_personal_goal["status"] = "completed" if completed else "abandoned"
 
@@ -260,6 +266,7 @@ func score_goal_candidate(goal: Dictionary, context: Dictionary = {}) -> float:
 	var score := float(goal.get("weight",0.5))*0.4
 	score += _trait(str(goal.get("drive","curiosity")))*0.24
 	score += float(preferences.get(str(goal.get("id","")),0.0))*0.2
+	score += float(preferences.get("activity_" + str(goal.get("activity","")),0.0))*0.12
 	score += _context_bonus(goal,context)
 	score += float(goal.get("interest",0.0))*0.16
 	score -= float(goal.get("risk",0.0))*(1.0-_trait("risk_tolerance"))*0.3
@@ -269,8 +276,15 @@ func score_goal_candidate(goal: Dictionary, context: Dictionary = {}) -> float:
 func choose_from_candidates(candidates: Array[Dictionary], context: Dictionary = {}) -> Dictionary:
 	var ranked: Array[Dictionary] = []
 	for candidate in candidates:
-		if not is_goal_feasible(candidate,context): continue
-		ranked.append({"goal":candidate,"score":score_goal_candidate(candidate,context)+_rng.randf_range(0.0,0.04)})
+		if not is_goal_feasible(candidate,context) or not respects_goal_boundaries(candidate,context): continue
+		var goal_id := str(candidate.get("id",""))
+		var repetition_count := 0
+		for history in completed_goals:
+			if str(history.get("id","")) == goal_id:
+				repetition_count += 1
+		var repetition_penalty := minf(0.3, float(repetition_count) * 0.05)
+		var score := score_goal_candidate(candidate,context) - goal_failure_penalty(goal_id) - repetition_penalty
+		ranked.append({"goal":candidate,"score":score+_rng.randf_range(0.0,0.04)})
 	ranked.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.score)>float(b.score))
 	if ranked.is_empty(): return {}
 	var chosen: Dictionary = ranked[0].goal.duplicate(true)
