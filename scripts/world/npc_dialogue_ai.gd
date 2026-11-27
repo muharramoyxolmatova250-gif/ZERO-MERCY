@@ -286,3 +286,12 @@ func share_relevant_memory(topic: String) -> String:
 	var memory: Dictionary = matches[0]
 	return "That reminds me of our earlier conversation about %s." % str(memory.get("topic",topic))
 
+
+
+func respond_to_personal_boundary(request: String) -> String:
+	if float(traits.get("kindness",0.5)) > 0.65:
+		return "Of course. I respect that, and we can talk about something else."
+	if float(traits.get("courage",0.5)) > 0.7:
+		return "Understood. Thanks for being clear with me."
+	return "Alright, no pressure. Let's leave it there."
+
