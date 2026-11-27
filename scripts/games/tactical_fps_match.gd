@@ -402,10 +402,11 @@ func _update_bots(delta: float) -> void:
 			bot.set_meta("awareness", maxf(0.0, float(bot.get_meta("awareness", 0.0)) - delta * 0.2))
 		bot.set_meta("search_time", search_time)
 		var remembered_position: Vector3 = bot.get_meta("last_known_player_position", player.global_position)
-		var steering_target := player.global_position if sees_player else remembered_position
+		var steering_target := player.global_position if sees_player else (remembered_position if search_time > 0.0 else bot.global_position)
 		var steering_offset := steering_target - bot.global_position
 		steering_offset.y = 0.0
-		bot.look_at(Vector3(steering_target.x, bot.global_position.y, steering_target.z), Vector3.UP)
+		if steering_offset.length() > 0.05:
+			bot.look_at(Vector3(steering_target.x, bot.global_position.y, steering_target.z), Vector3.UP)
 		var direction := steering_offset.normalized()
 		var phase := float(bot.get_meta("strafe_phase", 0.0))
 		var role := str(bot.get_meta("squad_role", "support"))
