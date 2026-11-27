@@ -934,7 +934,7 @@ func _update_hud() -> void:
 			grenade_count += 1
 			nearest_grenade_distance = minf(nearest_grenade_distance, player.global_position.distance_to(grenade.global_position))
 	var grenade_warning := "  !! GRENADE NEARBY — MOVE !!" if nearest_grenade_distance < 7.0 else ""
-	hud.text = "ZERO MERCY // TACTICAL BREACH\nINCOMING GRENADES: %d\nHP %.0f   %s\nENEMIES %d   SQUAD %d   DOWN %d   ELIMINATIONS %d   W/L %d/%d\nTIME %03d:%02d%s\n%s\nWASD move • Shift sprint • C crouch • Right-click ADS • Mouse aim/fire • R reload • Space jump • T restart after round • Esc release mouse" % [grenade_count, health, state, bots.size(), allies.size(), _count_downed_allies(), score, rounds_won, rounds_lost, int(time_left) / 60, int(time_left) % 60, outcome, revive_status]
+	hud.text = "ZERO MERCY // TACTICAL BREACH\nINCOMING GRENADES: %d%s\nHP %.0f   %s\nENEMIES %d   SQUAD %d   DOWN %d   ELIMINATIONS %d   W/L %d/%d\nTIME %03d:%02d%s\n%s\nWASD move • Shift sprint • C crouch • Right-click ADS • Mouse aim/fire • R reload • Space jump • T restart after round • Esc release mouse" % [grenade_count, grenade_warning, health, state, bots.size(), allies.size(), _count_downed_allies(), score, rounds_won, rounds_lost, int(time_left) / 60, int(time_left) % 60, outcome, revive_status]
 func _count_downed_allies() -> int:
 	var total := 0
 	for ally in allies:
