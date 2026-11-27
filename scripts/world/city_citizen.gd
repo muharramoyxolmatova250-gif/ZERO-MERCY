@@ -1003,3 +1003,9 @@ func _score_personal_activity_satisfaction(goal_id: String) -> float:
 
 func _get_indoor_action_context() -> Dictionary:
 	return {"goal_id":_get_active_personal_goal_id(),"activity":_indoor_activity,"elapsed":_indoor_activity_time,"energy":_energy,"hunger":_hunger,"stress":_stress,"social_need":_social_need,"occupation":occupation}
+
+func _resolve_personal_indoor_activity() -> String:
+	var goal_id := _get_active_personal_goal_id()
+	var mapped := _get_personal_goal_activity(goal_id)
+	if not mapped.is_empty(): return mapped
+	return ""
