@@ -282,3 +282,15 @@ func choose_group_role(group_context: Dictionary) -> String:
  if _trait("curiosity") > 0.72:
   return "scout"
  return "cooperate"
+
+
+func filter_risky_actions(actions: Array[String], context: Dictionary = {}) -> Array[String]:
+ var result: Array[String] = []
+ var risk := clampf(float(context.get("risk",0.0)),0.0,1.0)
+ for action in actions:
+  if risk > 0.78 and _trait("courage") < 0.42 and action in ["confront","investigate_close","chase"]:
+   continue
+  if bool(context.get("injured",false)) and action in ["sprint","fight","carry_heavy"]:
+   continue
+  result.append(action)
+ return result
