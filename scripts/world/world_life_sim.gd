@@ -448,6 +448,14 @@ func record_social_interaction(first_id: String, second_id: String, interaction:
         bond["trust"] = clampf(float(bond.get("trust", 0.0)) - 0.12, -1.0, 1.0)
         bond["friendship"] = clampf(float(bond.get("friendship", 0.0)) - 0.08, -1.0, 1.0)
     social_bonds[pair_id] = bond
+    if interaction in ["help", "saved", "community_service"]:
+        adjust_resident_reputation(first_id, 0.025, 0.0, 0.035, interaction)
+    elif interaction in ["betrayal", "threat"]:
+        adjust_resident_reputation(first_id, -0.04, 0.045, -0.035, interaction)
+    elif interaction == "argument":
+        adjust_resident_reputation(first_id, -0.015, 0.02, -0.01, interaction)
+    elif interaction == "social_post_like":
+        adjust_resident_reputation(first_id, 0.002, 0.0, 0.001, interaction)
     _dirty = true
 
 
