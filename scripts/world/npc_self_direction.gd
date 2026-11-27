@@ -524,17 +524,11 @@ func select_next_autonomous_intention(context: Dictionary = {}) -> Dictionary:
 	return choose_from_candidates(candidates,context)
 
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
 func resume_interrupted_goal(goal_id: String, context: Dictionary = {}) -> Dictionary:
 	for record in completed_goals:
@@ -618,18 +612,9 @@ func update_goal_from_new_information(information: Dictionary, context: Dictiona
 	return active_personal_goal.duplicate(true)
 
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
-
-undefined
