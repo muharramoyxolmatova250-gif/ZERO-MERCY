@@ -1038,3 +1038,10 @@ func _complete_indoor_personal_action() -> void:
 	if not goal_id.is_empty(): _self_direction.record_goal_outcome(goal_id, satisfaction, true)
 	_memory.append("completed_personal_activity:" + goal_id)
 	if _memory.size() > 24: _memory.pop_front()
+
+func _advance_indoor_life_action() -> void:
+	if _indoor_action_completed: return
+	var goal_id := _get_active_personal_goal_id()
+	var threshold := _get_personal_activity_duration(goal_id)
+	if _indoor_activity_time >= threshold:
+		_complete_indoor_personal_action()
