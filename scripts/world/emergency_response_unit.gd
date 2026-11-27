@@ -93,7 +93,9 @@ func _has_green_path(direction: Vector3) -> bool:
 			continue
 		var offset: Vector3 = signal_node.global_position - global_position
 		offset.y = 0.0
-		if offset.length() <= 7.0 and offset.length_squared() > 0.01 and direction.dot(offset.normalized()) > 0.55:
+		if offset.length() <= 14.0 and offset.length_squared() > 0.01 and direction.dot(offset.normalized()) > 0.55:
+			if signal_node.has_method("request_emergency_green"):
+				signal_node.call("request_emergency_green", direction, 7.0)
 			if not bool(signal_node.call("is_green_for", direction)):
 				return false
 	return true
