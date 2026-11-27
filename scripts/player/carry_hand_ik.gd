@@ -15,20 +15,18 @@ static func clamp_reach_target(shoulder: Vector3, target: Vector3, upper_length:
 	return shoulder + delta / distance * clampf(distance, minimum_distance, maximum_distance)
 
 static func solve_elbow(shoulder: Vector3, wrist: Vector3, upper_length: float, lower_length: float, bend_normal: Vector3) -> Vector3:
-	var target := clamp_reach_target(shoulder, wrist, upper_length, lower_length)
+	var upper := maxf(upper_length, 0.001)
+	var lower := maxf(lower_length, 0.001)
+	var target := clamp_reach_target(shoulder, wrist, upper, lower)
 	var axis := target - shoulder
 	var distance := axis.length()
 	if distance < 0.0001:
-		return shoulder
+		return shoulder + Vector3.DOWN * upper
 	var direction := axis / distance
-	var along := (upper_length * upper_length - lower_length * lower_length + distance * distance) / (2.0 * distance)
-	var height := sqrt(maxf(upper_length * upper_length - along * along, 0.0))
-	var normal := bend_normal - direction * bend_normal.dot(direction)
-	if normal.length_squared() < 0.0001:
-		normal = direction.cross(Vector3.FORWARD)
-	if normal.length_squared() < 0.0001:
-		normal = direction.cross(Vector3.RIGHT)
-	normal = normal.normalized()
+	var along := (upper * upper - lower * lower + distance * distance) / (2.0 * distance)
+	along = clampf(along, 0.0, upper)
+	var height := sqrt(maxf(upper * upper - along * along, 0.0))
+	var normal := get_bend_normal(direction, bend_normal)
 	return shoulder + direction * along + normal * height
 
 static func get_reach_weight(shoulder: Vector3, target: Vector3, upper_length: float, lower_length: float) -> float:
