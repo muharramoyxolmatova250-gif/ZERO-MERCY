@@ -292,3 +292,10 @@ func reinforce_preference(key: String, outcome: float, learning_rate: float = 0.
 
 func get_full_cognitive_snapshot() -> Dictionary:
 	return {"base":get_cognitive_snapshot(),"goals":goals.duplicate(true),"plans":plans.duplicate(true),"preferences":preferences.duplicate(true),"autobiography":build_autobiographical_summary(),"goal_conflicts":detect_goal_conflicts(),"reflection":simulate_reflection()}
+
+
+func has_active_goal(category: String) -> bool:
+	for goal in goals:
+		if str(goal.get("status", "")) == "active" and str(goal.get("category", "")) == category:
+			return true
+	return false
