@@ -253,3 +253,15 @@ func get_decision_caution(action: Dictionary) -> float:
 	var risk := clampf(float(action.get("risk", 0.5)),0.0,1.0)
 	var courage := float(preferences.get("courage", 0.5))
 	return clampf(uncertainty * 0.45 + risk * (1.0-courage) * 0.55,0.0,1.0)
+
+func consider_curiosity_goal(discoveries: Array[Dictionary]) -> int:
+	if float(preferences.get("curiosity", 0.5)) < 0.35 or discoveries.is_empty(): return -1
+	var best: Dictionary = {}
+	var best_score := -INF
+	for discovery in discoveries:
+		var novelty := clampf(float(discovery.get("novelty", 0.5)),0.0,1.0)
+		var safe := 1.0-clampf(float(discovery.get("risk", 0.5)),0.0,1.0)
+		var score := novelty * float(preferences.get("curiosity", 0.5)) * 0.7 + safe * 0.3
+		if score > best_score: best_score = score; best = discovery
+	if best.is_empty(): return -1
+	return generate_goal("Investigate " + str(best.get("name", "an unfamiliar place")), "exploration", best_score, best)
