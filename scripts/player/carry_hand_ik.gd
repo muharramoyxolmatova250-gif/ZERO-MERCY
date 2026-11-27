@@ -371,3 +371,6 @@ static func get_solution_fold_margin(solution: Dictionary, upper_length: float, 
 
 static func get_solution_is_clamped(solution: Dictionary) -> bool:
 	return bool(solution.get("target_clamped", false))
+
+static func get_solution_joint_angle(solution: Dictionary) -> float:
+	return get_elbow_angle(get_solution_shoulder(solution), get_solution_elbow(solution), get_solution_endpoint(solution))
