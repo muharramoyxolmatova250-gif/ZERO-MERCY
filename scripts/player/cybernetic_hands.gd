@@ -7,6 +7,11 @@ var _dark_metal := StandardMaterial3D.new()
 var _gold := StandardMaterial3D.new()
 var _arm_pivots: Array[Node3D] = []
 var _finger_hinges: Array[Node3D] = []
+var _right_arm: Node3D
+var _grip_anchor: Marker3D
+var _reach_rotation := Vector3.ZERO
+var _reach_weight := 0.0
+var _is_gripping := false
 var _clock := 0.0
 
 func _ready() -> void:
@@ -37,9 +42,13 @@ func _process(delta: float) -> void:
 		var side := -1.0 if index == 0 else 1.0
 		var phase := gait * side
 		var target := Vector3(-0.10 - phase * 0.34 * gait_weight + breathing, 0.0, side * 0.035 * gait_weight)
-		pivot.rotation = pivot.rotation.lerp(target, clampf(delta * 12.0, 0.0, 1.0))
+		if side > 0.0:
+			target += _reach_rotation * _reach_weight
+		pivot.rotation = pivot.rotation.lerp(target, clampf(delta * (16.0 if _reach_weight > 0.01 else 12.0), 0.0, 1.0))
 	for hinge_index in range(_finger_hinges.size()):
 		var curl := 0.08 + sprint_weight * 0.22 + sin(_clock * 3.0 + float(hinge_index) * 0.45) * 0.025
+		if hinge_index >= 4:
+			curl = lerpf(curl, 0.88 if _is_gripping else 0.24, _reach_weight)
 		var hinge := _finger_hinges[hinge_index]
 		hinge.rotation.x = lerpf(hinge.rotation.x, curl, clampf(delta * 9.0, 0.0, 1.0))
 
@@ -48,6 +57,12 @@ func _build_arm(side: float, right_hand: bool) -> void:
 	arm.name = "LeftCyberArm" if side < 0.0 else "RightCyberArm"
 	arm.position = Vector3(side * 0.39, 1.42, 0.0)
 	add_child(arm)
+	if right_hand:
+		_right_arm = arm
+		_grip_anchor = Marker3D.new()
+		_grip_anchor.name = "ObjectGripAnchor"
+		_grip_anchor.position = Vector3(side * 0.69, -0.47, -0.11)
+		arm.add_child(_grip_anchor)
 	_arm_pivots.append(arm)
 
 	# Every part is positioned relative to the shoulder pivot.
@@ -95,3 +110,28 @@ func _add_box(parent: Node3D, node_name: String, local_position: Vector3, box_si
 	instance.material_override = material
 	instance.position = local_position
 	parent.add_child(instance)
+
+
+func begin_pickup(target_world_position: Vector3) -> void:
+	if not is_instance_valid(_right_arm): return
+	var local_target := to_local(target_world_position)
+	var direction := local_target - _right_arm.position
+	if direction.length_squared() < 0.001: return
+	var horizontal := Vector2(direction.x, direction.z).length()
+	_reach_rotation = Vector3(atan2(direction.y, maxf(0.001, horizontal)) - -0.55, atan2(-direction.z, direction.x), 0.0)
+	_reach_rotation.x = clampf(_reach_rotation.x, -0.9, 0.65)
+	_reach_rotation.y = clampf(_reach_rotation.y, -0.8, 0.8)
+	_reach_weight = 1.0
+	_is_gripping = false
+
+func close_grip() -> void:
+	_is_gripping = true
+	_reach_weight = 1.0
+
+func release_object() -> void:
+	_is_gripping = false
+	_reach_weight = 0.0
+	_reach_rotation = Vector3.ZERO
+
+func get_grip_anchor() -> Marker3D:
+	return _grip_anchor
