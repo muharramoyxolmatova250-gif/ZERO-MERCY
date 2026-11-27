@@ -1589,6 +1589,20 @@ func get_phone_snapshot(citizen_id: String) -> Dictionary:
     }
 
 
+func get_phone_inbox(citizen_id: String, unread_only: bool = false, limit: int = 40) -> Array:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return []
+    var inbox: Array = profile.get("phone_inbox", [])
+    var result: Array = []
+    for message in inbox:
+        if unread_only and bool(message.get("read", false)):
+            continue
+        result.append(message.duplicate(true))
+    result.reverse()
+    return result.slice(0, mini(result.size(), maxi(1, limit)))
+
+
 func send_phone_message(sender_id: String, recipient_id: String, message_text: String, message_kind: String = "text") -> bool:
     if sender_id == recipient_id or message_text.strip_edges().is_empty():
         return false
