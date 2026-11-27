@@ -251,3 +251,9 @@ static func get_lower_segment_basis(elbow: Vector3, wrist: Vector3, up_hint: Vec
 	var right := safe_normalize(direction.cross(up_hint), Vector3.RIGHT)
 	var corrected_up := safe_normalize(right.cross(direction), Vector3.UP)
 	return Basis(right, corrected_up, -direction).orthonormalized()
+
+static func get_chain_orientation(shoulder: Vector3, wrist: Vector3, up_hint: Vector3 = Vector3.UP) -> Basis:
+	var direction := safe_normalize(wrist - shoulder)
+	var right := safe_normalize(direction.cross(up_hint), Vector3.RIGHT)
+	var corrected_up := safe_normalize(right.cross(direction), Vector3.UP)
+	return Basis(right, corrected_up, -direction).orthonormalized()
