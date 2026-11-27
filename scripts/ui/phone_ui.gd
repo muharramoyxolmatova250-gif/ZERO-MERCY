@@ -434,7 +434,7 @@ func _build_games_hub() -> void:
     solo.custom_minimum_size = Vector2(0, 44)
     solo.pressed.connect(_launch_tactical_breach)
     _content.add_child(solo)
-    _add_body("Party matches currently run through the world-life phone game simulation. Tactical Breach below remains the separate playable first-person training prototype.")
+    _add_body("Invited residents join the playable Tactical Breach squad as AI teammates. Phone party results remain a separate simulated game mode.")
     if not _last_party_result.is_empty():
         _add_section_title("LAST PARTY RESULT")
         _add_stat("GAME", str(_last_party_result.get("game_title", "Game")))
@@ -465,6 +465,24 @@ func _launch_tactical_breach() -> void:
         _add_body("Tactical Breach scene could not be loaded.")
         return
     var game := scene.instantiate()
+    var roster: Array[Dictionary] = []
+    for citizen in get_tree().get_nodes_in_group("city_citizen"):
+        if not is_instance_valid(citizen) or not citizen.has_method("get_ai_snapshot"):
+            continue
+        var snapshot: Dictionary = citizen.call("get_ai_snapshot")
+        var citizen_id := str(snapshot.get("id", ""))
+        if not _party_invites.has(citizen_id):
+            continue
+        var traits: Dictionary = snapshot.get("personality_traits", {})
+        var courage := float(traits.get("courage", 0.55))
+        var discipline := float(traits.get("discipline", 0.55))
+        var skill := clampf(0.5 + courage * 0.28 + discipline * 0.17, 0.45, 0.95)
+        roster.append({"id": citizen_id, "name": str(snapshot.get("name", "Squadmate")), "occupation": str(snapshot.get("occupation", "resident")), "skill": skill})
+        if roster.size() >= 4:
+            break
+    if game.has_method("set_party_roster"):
+        game.call("set_party_roster", roster)
+    _party_invites.clear()
     var player := get_parent().get_node_or_null("Dara") as CharacterBody3D
     if player != null:
         player.set_physics_process(false)
