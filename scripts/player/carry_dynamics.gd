@@ -251,3 +251,18 @@ func register_impact(strength: float) -> void:
 	if stability < 0.4 and _warning_cooldown <= 0.0:
 		_warning_cooldown = 2.5
 		carry_warning.emit("Buyum silkinib ketdi — muvozanatni tiklang")
+
+
+func get_debug_snapshot() -> Dictionary:
+	return {
+		"active": has_item(),
+		"mass_kg": mass_kg,
+		"fragile": fragile,
+		"careful": careful,
+		"stability": stability,
+		"stability_label": get_stability_label(),
+		"impact_load": impact_load,
+		"turn_load": turn_load,
+		"speed_factor": get_speed_factor(),
+		"can_sprint": can_sprint()
+	}
