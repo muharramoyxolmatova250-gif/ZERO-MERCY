@@ -326,3 +326,6 @@ func get_posture_state() -> String:
 func get_secondary_grip_local() -> Vector3:
 	if not is_instance_valid(held_item): return Vector3.ZERO
 	return held_item.get_meta("secondary_grip_offset", Vector3(-0.24, -0.05, -0.10))
+
+func estimate_item_stress() -> float:
+	return clampf((impact_load * 0.55 + turn_load * 0.25) * get_handling_factor(), 0.0, 1.0)
