@@ -186,3 +186,6 @@ static func get_chain_lengths(shoulder: Vector3, elbow: Vector3, wrist: Vector3)
 static func get_chain_error(shoulder: Vector3, elbow: Vector3, wrist: Vector3, upper_length: float, lower_length: float) -> float:
 	var lengths := get_chain_lengths(shoulder, elbow, wrist)
 	return absf(lengths.x - upper_length) + absf(lengths.y - lower_length)
+
+static func get_target_direction(shoulder: Vector3, target: Vector3, fallback: Vector3 = Vector3.FORWARD) -> Vector3:
+	return safe_normalize(target - shoulder, fallback)
