@@ -716,8 +716,26 @@ func _update_allies(delta: float) -> void:
 				ally.velocity.x = move_toward(ally.velocity.x, 0.0, 8.0 * delta)
 				ally.velocity.z = move_toward(ally.velocity.z, 0.0, 8.0 * delta)
 		if nearest != null and ally_health >= 55.0 and not retreating_to_cover:
-			ally.velocity.x = move_toward(ally.velocity.x, 0.0, 8.0 * delta)
-			ally.velocity.z = move_toward(ally.velocity.z, 0.0, 8.0 * delta)
+			var enemy_offset := nearest.global_position - ally.global_position
+			enemy_offset.y = 0.0
+			var enemy_distance := enemy_offset.length()
+			var desired_range := 7.0 if role == "assault" else (18.0 if role == "marksman" else 12.0)
+			var radial := enemy_offset.normalized()
+			var lateral := Vector3(-radial.z, 0.0, radial.x) * (1.0 if int(ally.get_meta("squad_slot", 0)) % 2 == 0 else -1.0)
+			var combat_move := Vector3.ZERO
+			if enemy_distance > desired_range + 1.5:
+				combat_move = radial
+			elif enemy_distance < desired_range - 1.5:
+				combat_move = -radial
+			else:
+				combat_move = lateral * (0.42 if role == "marksman" else 0.72)
+			if role == "support":
+				var player_anchor := player.global_position - ally.global_position
+				player_anchor.y = 0.0
+				if player_anchor.length() > 8.0:
+					combat_move = (combat_move + player_anchor.normalized() * 0.45).normalized()
+			ally.velocity.x = combat_move.x * (3.0 if role == "assault" else 2.4)
+			ally.velocity.z = combat_move.z * (3.0 if role == "assault" else 2.4)
 		ally.velocity.y = 0.0
 		ally.move_and_slide()
 		ally.set_meta("fire_wait", wait)
