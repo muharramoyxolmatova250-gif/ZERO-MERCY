@@ -362,3 +362,6 @@ static func get_solution_local(solution: Dictionary, transform: Transform3D) -> 
 			var point: Vector3 = result[key]
 			result[key] = inverse * point
 	return result
+
+static func get_solution_reach_margin(solution: Dictionary, upper_length: float, lower_length: float) -> float:
+	return get_reach_margin(get_solution_shoulder(solution), get_solution_endpoint(solution), upper_length, lower_length)
