@@ -7,7 +7,9 @@ var _events: Dictionary = {}
 func schedule_event(event_id: String, start_time: float, duration: float, payload: Dictionary = {}) -> bool:
 	if event_id.is_empty() or duration <= 0.0 or _events.has(event_id):
 		return false
-	_events[event_id] = {"start": start_time, "end": start_time + duration, "payload": payload.duplicate(true), "state": "scheduled"}
+	var event_data := payload.duplicate(true)
+	event_data["priority"] = clampf(float(event_data.get("priority", 0.5)), 0.0, 1.0)
+	_events[event_id] = {"start": start_time, "end": start_time + duration, "payload": event_data, "state": "scheduled", "created_msec": Time.get_ticks_msec()}
 	return true
 
 func update_simulation_time(simulation_time: float) -> void:
@@ -32,3 +34,35 @@ func get_active_events() -> Array[String]:
 
 func get_snapshot() -> Dictionary:
 	return _events.duplicate(true)
+
+ 
+func cancel_event(event_id: String) -> bool:
+	if not _events.has(event_id):
+		return false
+	var event: Dictionary = _events[event_id]
+	if str(event.get("state", "")) == "ended":
+		return false
+	event["state"] = "cancelled"
+	event["cancelled_msec"] = Time.get_ticks_msec()
+	_events[event_id] = event
+	return true
+
+func get_upcoming_events(limit: int = 10) -> Array[Dictionary]:
+	var upcoming: Array[Dictionary] = []
+	for event_id in _events:
+		var event: Dictionary = _events[event_id]
+		if str(event.get("state", "")) != "scheduled":
+			continue
+		var item := event.duplicate(true)
+		item["id"] = str(event_id)
+		upcoming.append(item)
+	upcoming.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		var ap := float(a.get("payload", {}).get("priority", 0.5))
+		var bp := float(b.get("payload", {}).get("priority", 0.5))
+		if is_equal_approx(ap, bp):
+			return float(a.get("start", 0.0)) < float(b.get("start", 0.0))
+		return ap > bp
+	)
+	if upcoming.size() > maxi(0, limit):
+		upcoming.resize(maxi(0, limit))
+	return upcoming
