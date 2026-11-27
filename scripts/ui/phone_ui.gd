@@ -250,6 +250,56 @@ func _refresh_content() -> void:
         "map":
             _build_map()
 
+
+func _build_home_screen() -> void:
+    _add_section_title("ZERO LINK // HOME")
+    _add_body("NEURAL INTERFACE  •  PERSONAL DEVICE")
+    var owner_id := _get_phone_owner_id()
+    if owner_id != "" and _life != null and _life.has_method("get_phone_snapshot"):
+        var snapshot: Dictionary = _life.call("get_phone_snapshot", owner_id)
+        _add_stat("DEVICE", str(snapshot.get("model", "Neon One")))
+        _add_stat("PHONE NUMBER", str(snapshot.get("number", "UNASSIGNED")))
+        _add_stat("UNREAD SMS", str(_life.call("get_phone_unread_count", owner_id)))
+        var notifications: Array = snapshot.get("notifications", [])
+        _add_stat("SYSTEM ALERTS", str(notifications.size()))
+        if not notifications.is_empty():
+            var latest: Dictionary = notifications[notifications.size() - 1]
+            _add_body("LATEST ALERT  •  " + str(latest.get("text", latest.get("title", "New notification"))))
+    var grid := GridContainer.new()
+    grid.columns = 3
+    grid.add_theme_constant_override("h_separation", 8)
+    grid.add_theme_constant_override("v_separation", 8)
+    _content.add_child(grid)
+    _add_phone_app_tile(grid, "SOCIAL", "◉", "feed")
+    _add_phone_app_tile(grid, "MEDIA", "▶", "media")
+    _add_phone_app_tile(grid, "GAMES", "▣", "games")
+    _add_phone_app_tile(grid, "NEWS", "⌁", "news")
+    _add_phone_app_tile(grid, "CONTACTS", "◎", "contacts")
+    _add_phone_app_tile(grid, "MESSAGES", "✉", "sms")
+    _add_phone_app_tile(grid, "LIFE", "◇", "life")
+    _add_phone_app_tile(grid, "MISSIONS", "✦", "missions")
+    _add_phone_app_tile(grid, "WORLD MAP", "⌖", "map")
+
+
+func _add_phone_app_tile(parent: GridContainer, title: String, glyph: String, target_tab: String) -> void:
+    var tile := Button.new()
+    tile.custom_minimum_size = Vector2(104, 88)
+    tile.text = glyph + "\\n" + title
+    if target_tab == "sms":
+        var owner_id := _get_phone_owner_id()
+        if owner_id != "" and _life != null and _life.has_method("get_phone_unread_count"):
+            var unread := int(_life.call("get_phone_unread_count", owner_id))
+            if unread > 0:
+                tile.text += "  [" + str(unread) + "]"
+    tile.add_theme_font_size_override("font_size", 14)
+    tile.add_theme_color_override("font_color", Color(0.25, 0.94, 1.0))
+    tile.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 1.0))
+    tile.add_theme_stylebox_override("normal", _make_phone_button_style(Color(0.012, 0.04, 0.065, 0.98), Color(0.0, 0.48, 0.62, 0.8)))
+    tile.add_theme_stylebox_override("hover", _make_phone_button_style(Color(0.0, 0.16, 0.2, 1.0), Color(0.0, 0.95, 1.0, 1.0)))
+    tile.pressed.connect(_set_tab.bind(target_tab))
+    parent.add_child(tile)
+
+
 func _build_feed() -> void:
     _add_section_title("LIVE SOCIAL FEED")
     if _society == null:
