@@ -1261,7 +1261,7 @@ func _process_job_interview(profile: Dictionary) -> void:
     var occupation := str(profile.get("occupation", "unemployed"))
     if occupation not in ["unemployed", "resident"]:
         return
-    var education := str(profile.get("education", "secondary"))
+	var education := str(profile.get("education", "secondary"))
     var chance := 0.16 + float(profile.get("academic_performance", 0.5)) * 0.22
     if education in ["university", "postgraduate", "graduated"]:
         chance += 0.2
@@ -1285,7 +1285,7 @@ func _advance_career_month(profile: Dictionary) -> void:
         return
     var satisfaction := float(profile.get("career_satisfaction", 0.5))
     var progress := float(profile.get("career_progress", 0.0))
-    var education := str(profile.get("education", "secondary"))
+	var education := str(profile.get("education", "secondary"))
     var education_bonus := 0.12 if education in ["university", "postgraduate", "graduated"] else 0.0
     progress += _rng.randf_range(0.015, 0.045) + education_bonus * 0.1
     if progress >= 1.0:
