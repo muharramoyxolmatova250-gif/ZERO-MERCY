@@ -1554,7 +1554,7 @@ func _ensure_phone_profile(citizen_id: String) -> Dictionary:
         "phone_number":_generate_phone_number(citizen_id),
         "phone_contacts":[], "phone_inbox":[], "phone_outbox":[],
         "phone_call_history":[], "phone_notifications":[],
-        "phone_social_posts":[], "phone_watch_history":[], "phone_browser_history":[],
+        "phone_social_posts":[], "phone_following":[], "phone_followers":[], "phone_watch_history":[], "phone_browser_history":[],
         "phone_game_stats":{}, "phone_topic_interests":{},
         "phone_saved_media":[], "phone_last_used_day":simulation_day,
         "phone_battery":100.0, "phone_privacy":"friends"
@@ -1792,6 +1792,125 @@ func react_to_phone_post(citizen_id: String, post_id: String) -> bool:
         post["likes"] = int(post.get("likes", 0)) + 1
         _social_feed[index] = post
         record_social_interaction(citizen_id, str(post.get("author_id", "")), "social_post_like")
+        _dirty = true
+        return true
+    return false
+
+
+func get_phone_social_profile(citizen_id: String) -> Dictionary:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return {}
+    return {
+        "id": citizen_id,
+        "name": str(profile.get("name", citizen_id)),
+        "occupation": str(profile.get("occupation", "Resident")),
+        "city": str(profile.get("city", "Unknown city")),
+        "following": (profile.get("phone_following", []) as Array).duplicate(),
+        "followers": (profile.get("phone_followers", []) as Array).duplicate(),
+        "posts": (profile.get("phone_social_posts", []) as Array).duplicate(true),
+        "privacy": str(profile.get("phone_privacy", "friends"))
+    }
+
+
+func follow_phone_resident(follower_id: String, target_id: String) -> bool:
+    if follower_id == target_id or not resident_profiles.has(follower_id) or not resident_profiles.has(target_id):
+        return false
+    var follower := _ensure_phone_profile(follower_id)
+    var target := _ensure_phone_profile(target_id)
+    var following: Array = follower.get("phone_following", [])
+    if following.has(target_id):
+        return false
+    following.append(target_id)
+    follower["phone_following"] = following
+    var followers: Array = target.get("phone_followers", [])
+    if not followers.has(follower_id):
+        followers.append(follower_id)
+    target["phone_followers"] = followers
+    resident_profiles[follower_id] = follower
+    resident_profiles[target_id] = target
+    _add_phone_notification(target_id, "social_follow", str(follower.get("name", follower_id)) + " started following you")
+    record_social_interaction(follower_id, target_id, "social_follow")
+    _dirty = true
+    return true
+
+
+func unfollow_phone_resident(follower_id: String, target_id: String) -> bool:
+    if not resident_profiles.has(follower_id) or not resident_profiles.has(target_id):
+        return false
+    var follower := _ensure_phone_profile(follower_id)
+    var target := _ensure_phone_profile(target_id)
+    var following: Array = follower.get("phone_following", [])
+    if not following.has(target_id):
+        return false
+    following.erase(target_id)
+    follower["phone_following"] = following
+    var followers: Array = target.get("phone_followers", [])
+    followers.erase(follower_id)
+    target["phone_followers"] = followers
+    resident_profiles[follower_id] = follower
+    resident_profiles[target_id] = target
+    _dirty = true
+    return true
+
+
+func get_phone_network_feed(citizen_id: String, limit: int = 30, following_only: bool = false) -> Array:
+    if not resident_profiles.has(citizen_id):
+        return []
+    var profile := _ensure_phone_profile(citizen_id)
+    var following: Array = profile.get("phone_following", [])
+    var result: Array = []
+    for post_value in _social_feed:
+        var post: Dictionary = post_value
+        var author_id := str(post.get("author_id", ""))
+        if author_id == citizen_id:
+            result.append(post.duplicate(true))
+        elif not following_only or following.has(author_id):
+            result.append(post.duplicate(true))
+    result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.get("day", 0)) > int(b.get("day", 0)))
+    return result.slice(0, mini(result.size(), maxi(1, limit)))
+
+
+func get_phone_suggested_residents(citizen_id: String, limit: int = 12) -> Array:
+    if not resident_profiles.has(citizen_id):
+        return []
+    var profile := _ensure_phone_profile(citizen_id)
+    var following: Array = profile.get("phone_following", [])
+    var candidates: Array = []
+    for other_id_value in resident_profiles.keys():
+        var other_id := str(other_id_value)
+        if other_id == citizen_id or following.has(other_id):
+            continue
+        var other := _ensure_phone_profile(other_id)
+        if other.is_empty():
+            continue
+        var bond: Dictionary = (profile.get("social_bonds", {}) as Dictionary).get(other_id, {})
+        var score := float(bond.get("trust", 0.0)) * 2.0 + float(bond.get("familiarity", 0.0))
+        candidates.append({"id":other_id,"name":str(other.get("name", other_id)),"occupation":str(other.get("occupation", "Resident")),"followers":(other.get("phone_followers", []) as Array).size(),"score":score})
+    candidates.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.get("score", 0.0)) > float(b.get("score", 0.0)))
+    return candidates.slice(0, mini(candidates.size(), maxi(1, limit)))
+
+
+func add_phone_social_comment(citizen_id: String, post_id: String, comment_text: String) -> bool:
+    comment_text = comment_text.strip_edges()
+    if comment_text.is_empty() or comment_text.length() > 240 or not resident_profiles.has(citizen_id):
+        return false
+    for index in range(_social_feed.size() - 1, -1, -1):
+        var post: Dictionary = _social_feed[index]
+        if str(post.get("id", "")) != post_id:
+            continue
+        var comments: Array = post.get("comment_list", [])
+        var profile := _ensure_phone_profile(citizen_id)
+        comments.append({"author_id":citizen_id,"author":str(profile.get("name", citizen_id)),"text":comment_text,"day":simulation_day})
+        while comments.size() > 50:
+            comments.pop_front()
+        post["comment_list"] = comments
+        post["comments"] = int(post.get("comments", 0)) + 1
+        _social_feed[index] = post
+        var author_id := str(post.get("author_id", ""))
+        if not author_id.is_empty() and author_id != citizen_id:
+            _add_phone_notification(author_id, "social_comment", str(profile.get("name", citizen_id)) + " commented on your post")
+        record_event(citizen_id, "commented_on_social_post")
         _dirty = true
         return true
     return false
