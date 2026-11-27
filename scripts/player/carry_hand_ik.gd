@@ -74,3 +74,7 @@ static func mirror_bend_normal(normal: Vector3, mirror_axis: Vector3) -> Vector3
 	if axis.length_squared() < 0.001:
 		return normal
 	return normal - 2.0 * normal.dot(axis) * axis
+
+static func get_segment_direction(start: Vector3, finish: Vector3, fallback: Vector3 = Vector3.DOWN) -> Vector3:
+	var delta := finish - start
+	return delta.normalized() if delta.length_squared() > 0.000001 else fallback.normalized()
