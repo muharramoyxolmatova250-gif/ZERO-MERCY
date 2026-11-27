@@ -979,3 +979,6 @@ func _get_personal_goal_activity(goal_id: String) -> String:
 		"find_quiet_place": return "resting"
 		"explore_unknown_place": return "browsing"
 	return ""
+
+func _make_indoor_action_token() -> String:
+	return citizen_id + ":" + _get_active_personal_goal_id() + ":" + str(int(Time.get_ticks_msec() / 1000.0))
