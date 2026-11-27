@@ -968,3 +968,14 @@ func get_autonomy_snapshot() -> Dictionary:
 
 func _get_active_personal_goal_id() -> String:
 	return str(_self_direction.active_personal_goal.get("id", ""))
+
+func _get_personal_goal_activity(goal_id: String) -> String:
+	match goal_id:
+		"learn_skill", "advance_career", "find_better_job": return "working"
+		"start_small_business", "save_money": return "working"
+		"help_neighbor", "make_friend", "repair_relationship", "volunteer": return "socializing"
+		"spend_time_with_family": return "resting"
+		"exercise_for_health", "practice_hobby", "create_something": return "playing"
+		"find_quiet_place": return "resting"
+		"explore_unknown_place": return "browsing"
+	return ""
