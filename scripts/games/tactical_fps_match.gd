@@ -402,6 +402,13 @@ func _update_bots(delta: float) -> void:
 			bot.set_meta("last_known_player_position", player.global_position)
 			bot.set_meta("awareness", 1.0)
 			search_time = 4.0
+			for ally in bots:
+				if ally == bot or not is_instance_valid(ally):
+					continue
+				if ally.global_position.distance_to(bot.global_position) <= 18.0:
+					ally.set_meta("last_known_player_position", player.global_position)
+					ally.set_meta("awareness", maxf(float(ally.get_meta("awareness", 0.0)), 0.72))
+					ally.set_meta("search_time", maxf(float(ally.get_meta("search_time", 0.0)), 3.2))
 		else:
 			bot.set_meta("awareness", maxf(0.0, float(bot.get_meta("awareness", 0.0)) - delta * 0.2))
 		bot.set_meta("search_time", search_time)
