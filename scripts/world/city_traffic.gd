@@ -8,10 +8,16 @@ extends Node3D
 @export_range(2.0, 14.0, 0.5) var following_distance := 6.5
 var _target_index := 0
 var _current_speed := 0.0
+@export var traffic_segment_id := "city_loop"
+var _traffic_manager: Node
 
 func _ready() -> void:
     _build_vehicle()
     _current_speed = speed
+    _traffic_manager = get_tree().get_first_node_in_group("road_traffic_manager")
+    if _traffic_manager != null and _traffic_manager.has_method("register_segment"):
+        _traffic_manager.call("register_segment", traffic_segment_id, speed, 18)
+        _traffic_manager.call("report_vehicle", traffic_segment_id, str(get_instance_id()), true)
     if route.size() < 2:
         route = PackedVector3Array([Vector3(-30,0,-30), Vector3(30,0,-30), Vector3(30,0,30), Vector3(-30,0,30)])
 
@@ -26,6 +32,8 @@ func _process(delta: float) -> void:
         return
     var desired_speed := speed if _has_green_path(direction) else 0.0
     desired_speed = minf(desired_speed, _safe_follow_speed(direction))
+    if _traffic_manager != null and _traffic_manager.has_method("get_recommended_speed"):
+        desired_speed = minf(desired_speed, float(_traffic_manager.call("get_recommended_speed", traffic_segment_id)))
     if direction.length() < braking_distance:
         desired_speed *= clampf(direction.length() / braking_distance, 0.15, 1.0)
     _current_speed = move_toward(_current_speed, desired_speed, acceleration * delta)
@@ -96,3 +104,8 @@ func _build_vehicle() -> void:
         light.emission_energy_multiplier = 2.0
         lamp.material_override = light
         add_child(lamp)
+
+ 
+func _exit_tree() -> void:
+    if _traffic_manager != null and is_instance_valid(_traffic_manager) and _traffic_manager.has_method("report_vehicle"):
+        _traffic_manager.call("report_vehicle", traffic_segment_id, str(get_instance_id()), false)
