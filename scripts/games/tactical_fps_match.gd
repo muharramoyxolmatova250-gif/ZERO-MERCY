@@ -372,6 +372,7 @@ func _update_bots(delta: float) -> void:
 		var offset := player.global_position - bot.global_position
 		offset.y = 0.0
 		var distance := offset.length()
+		bot.look_at(Vector3(player.global_position.x, bot.global_position.y, player.global_position.z), Vector3.UP)
 		var direction := offset.normalized()
 		var phase := float(bot.get_meta("strafe_phase", 0.0))
 		var side := Vector3(-direction.z, 0.0, direction.x) * sin(float(Time.get_ticks_msec()) * 0.0012 + phase)
