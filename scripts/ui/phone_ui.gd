@@ -32,7 +32,8 @@ func _process(delta: float) -> void:
     if not visible:
         return
     _system_refresh_elapsed += delta
-    if _system_refresh_elapsed >= 0.5:
+    var system_interval := 2.0 if bool(_phone_system.get_setting("power_saver", false)) else 0.5
+    if _system_refresh_elapsed >= system_interval:
         _system_refresh_elapsed = 0.0
         _update_phone_system_bar()
     _refresh_elapsed += delta
@@ -204,7 +205,7 @@ func _update_phone_system_bar() -> void:
         _phone_battery_label.add_theme_color_override("font_color", Color(1.0, 0.36, 0.32) if battery < 15.0 else Color(0.55, 0.94, 0.72))
     if _phone_network_label != null:
         var owner_id := _get_phone_owner_id()
-        var connected := _life != null and owner_id != ""
+        var connected := _life != null and owner_id != "" and bool(_phone_system.get_setting("wifi_enabled", true))
         _phone_network_label.text = "▰ 5G" if connected else "◌ OFFLINE"
         _phone_network_label.add_theme_color_override("font_color", Color(0.2, 0.9, 0.78) if connected else Color(1.0, 0.55, 0.35))
 
@@ -382,6 +383,9 @@ func _build_notifications_center() -> void:
         return
     var snapshot: Dictionary = _life.call("get_phone_snapshot", owner_id)
     var notifications: Array = snapshot.get("notifications", [])
+    if not bool(_phone_system.get_setting("notifications_enabled", true)):
+        _add_body("Phone notifications are disabled in DARA OS settings.")
+        return
     _add_stat("TOTAL ALERTS", str(notifications.size()))
     if notifications.is_empty():
         _add_body("No new system alerts.")
