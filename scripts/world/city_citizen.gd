@@ -1,6 +1,7 @@
 extends Node3D
 const NPCCognition = preload("res://scripts/world/npc_cognition.gd")
 const NPCDialogueAI = preload("res://scripts/world/npc_dialogue_ai.gd")
+const NPCActionPlanner = preload("res://scripts/world/npc_action_planner.gd")
 ## Lightweight ambient pedestrian that loops a local sidewalk route.
 @export var route: PackedVector3Array = PackedVector3Array()
 @export_range(0.2, 5.0, 0.1) var walk_speed := 1.25
@@ -52,6 +53,8 @@ var _phone_battery_visual := 1.0
 var _last_browser_topic := ""
 var _cognition = NPCCognition.new()
 var _dialogue = NPCDialogueAI.new()
+var _action_planner = NPCActionPlanner.new()
+var _planned_action: Dictionary = {}
 @export var citizen_id := ""
 @export var city_id := ""
 @export var occupation := "resident"
@@ -289,6 +292,7 @@ func _initialize_personality() -> void:
 		_long_term_goal = "build_a_stable_life"
 	_cognition.initialize(citizen_id, _personality_traits)
 	_dialogue.initialize(citizen_id, _personality_traits, life_profile)
+	_action_planner.initialize(citizen_id, _personality_traits)
 
 
 func _update_needs() -> void:
@@ -362,7 +366,10 @@ func _decide_goal() -> void:
 			best_score = score
 			best = goal
 	current_goal = best
-	_decision_reason = "needs_personality_memory_emotion_learning_and_schedule"
+	if best != previous_goal or _planned_action.is_empty():
+		_action_planner.build_plan(best, cognition_context)
+		_planned_action = _action_planner.next_action()
+	_decision_reason = "needs_personality_memory_emotion_schedule_and_combinatorial_action_planning"
 	_cognition.record_decision(best, _decision_reason, best_score, cognition_context)
 	if _last_routed_goal != best:
 		var route_network := get_tree().get_first_node_in_group("pedestrian_route_network")
@@ -899,7 +906,9 @@ func get_ai_decision_snapshot() -> Dictionary:
 		"emergency_flee_remaining": _crime_flee_timer,
 		"cognition": _cognition.get_cognition_snapshot(),
 		"decision_explanation": _cognition.explain_last_decision(),
-		"dialogue": _dialogue.get_dialogue_snapshot()
+		"dialogue": _dialogue.get_dialogue_snapshot(),
+		"action_planner": _action_planner.get_plan_snapshot(),
+		"planned_action": _planned_action.duplicate(true)
 	}
 
 func evaluate_local_risk(threat_position: Vector3, threat_severity: float = 0.5) -> Dictionary:
