@@ -154,3 +154,9 @@ func get_carry_status() -> Dictionary:
 		"heavy": mass_kg >= sprint_mass_limit,
 		"very_heavy": mass_kg >= heavy_mass_limit
 	}
+
+
+func get_turn_sensitivity() -> float:
+	var load := clampf(mass_kg / 30.0, 0.0, 1.0)
+	var fragile_factor := 0.78 if fragile else 1.0
+	return clampf((1.0 - load * 0.22) * fragile_factor * lerpf(0.82, 1.0, stability), 0.58, 1.0)
