@@ -132,3 +132,5 @@ func get_urgency_speed(urgent: bool, cautious: bool) -> float:
 	if cautious:
 		return preferred_speed * 0.68
 	return preferred_speed
+func get_idle_bob() -> float:
+	return sin(_noise_phase * 1.7) * 0.012
