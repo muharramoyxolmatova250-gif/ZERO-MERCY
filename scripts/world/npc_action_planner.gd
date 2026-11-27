@@ -268,3 +268,17 @@ func rank_relevant_memories(memories: Array[Dictionary], context: Dictionary = {
   ranked.append(item)
  ranked.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.relevance)>float(b.relevance))
  return ranked
+
+
+func choose_group_role(group_context: Dictionary) -> String:
+ var danger := float(group_context.get("danger",0.0))
+ var needs_help := bool(group_context.get("needs_help",false))
+ if needs_help and _trait("kindness") > 0.58:
+  return "support"
+ if danger > 0.72 and _trait("courage") < 0.45:
+  return "evacuate"
+ if _trait("discipline") > 0.72:
+  return "coordinate"
+ if _trait("curiosity") > 0.72:
+  return "scout"
+ return "cooperate"
