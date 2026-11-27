@@ -124,6 +124,9 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
 		_reset_touches()
 
+func reset_controls() -> void:
+	_reset_touches()
+
 func _reset_touches() -> void:
 	var was_firing := _fire_touch != -1
 	_move_touch = -1
