@@ -308,3 +308,16 @@ func learn_routine_preference(activity: String, satisfaction: float, repetition:
 func should_switch_goal(current_score: float, candidate_score: float, urgency: float = 0.0) -> bool:
  var margin := 0.18 - clampf(urgency,0.0,1.0)*0.12
  return candidate_score > current_score + margin
+
+
+func personalize_action(action: String, context: Dictionary = {}) -> String:
+ if action in ["talk","greet","ask_question"]:
+  if _trait("sociability") < 0.28:
+   return "brief_" + action
+  if _trait("sociability") > 0.82 and float(context.get("trust",0.0)) > 0.45:
+   return "expressive_" + action
+ if action in ["travel","explore"] and _trait("curiosity") > 0.8:
+  return "detour_" + action
+ if action in ["help","share_food"] and _trait("kindness") < 0.25:
+  return "consider_" + action
+ return action
