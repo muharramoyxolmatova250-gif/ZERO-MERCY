@@ -811,6 +811,24 @@ func _build_appearance() -> void:
 	_head.position.y = 1.78
 	_head.material_override = glow
 	add_child(_head)
+	var neck_instance := MeshInstance3D.new()
+	var neck_mesh := CapsuleMesh.new()
+	neck_mesh.radius = 0.075
+	neck_mesh.height = 0.22
+	neck_instance.mesh = neck_mesh
+	neck_instance.position = Vector3(0.0, 1.57, 0.0)
+	neck_instance.material_override = coat
+	add_child(neck_instance)
+	for eye_side in [-1.0, 1.0]:
+		var eye := MeshInstance3D.new()
+		var eye_mesh := SphereMesh.new()
+		eye_mesh.radius = 0.035
+		eye_mesh.height = 0.05
+		eye.mesh = eye_mesh
+		eye.position = Vector3(eye_side * 0.085, 0.025, -0.185)
+		eye.material_override = glow
+		eye.name = "CyberEyeLeft" if eye_side < 0.0 else "CyberEyeRight"
+		_head.add_child(eye)
 	_body_rest_position = _body.position
 	_head_rest_rotation = _head.rotation
 	_left_arm = _create_limb_pivot("LeftArm", Vector3(-0.37, 1.35, 0.0), coat, 0.105, 0.72)
