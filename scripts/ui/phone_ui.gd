@@ -566,6 +566,47 @@ func _format_number(value: int) -> String:
     return result
 
 
+func _build_phone_settings() -> void:
+    _add_section_title("DARA OS // DEVICE SETTINGS")
+    _add_body("Manage local device connections, sound and power preferences. Changes are saved on this device.")
+    _add_section_title("WIRELESS CONNECTIONS")
+    _add_phone_setting_toggle("WI-FI", "wifi_enabled", "Connect to the simulated ZERO LINK network")
+    _add_phone_setting_toggle("BLUETOOTH", "bluetooth_enabled", "Nearby device connection preference")
+    _add_section_title("SYSTEM")
+    _add_phone_setting_toggle("SOUND", "sound_enabled", "Master game audio")
+    _add_phone_setting_toggle("NOTIFICATIONS", "notifications_enabled", "Allow phone alert banners")
+    _add_phone_setting_toggle("POWER SAVER", "power_saver", "Reduce phone refresh work when enabled")
+    _add_section_title("AUDIO LEVEL")
+    var volume := HSlider.new()
+    volume.min_value = 0.0
+    volume.max_value = 1.0
+    volume.step = 0.05
+    volume.value = float(_phone_system.get_setting("volume", 0.75))
+    volume.value_changed.connect(func(value: float) -> void:
+        _phone_system.set_setting("volume", value)
+    )
+    _content.add_child(volume)
+    _add_stat("MASTER VOLUME", "%d%%" % roundi(volume.value * 100.0))
+    _add_body("Settings are stored locally and restored when the game starts again.")
+
+
+func _add_phone_setting_toggle(title: String, setting_key: String, description: String) -> void:
+    var toggle := CheckButton.new()
+    toggle.text = title
+    toggle.button_pressed = bool(_phone_system.get_setting(setting_key, true))
+    toggle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    toggle.add_theme_color_override("font_color", Color(0.2, 0.9, 1.0))
+    toggle.toggled.connect(func(enabled: bool) -> void:
+        _phone_system.set_setting(setting_key, enabled)
+        if setting_key == "wifi_enabled":
+            _update_phone_system_bar()
+        if _active_tab == "settings":
+            _refresh_content()
+    )
+    _content.add_child(toggle)
+    _add_body(description)
+
+
 func _build_camera_app() -> void:
     _add_section_title("ZERO CAMERA // WORLD CAPTURE")
     _add_body("Capture the live game view. Photos are saved locally in your ZERO LINK gallery.")
