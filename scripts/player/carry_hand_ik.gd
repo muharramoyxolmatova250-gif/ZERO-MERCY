@@ -106,3 +106,6 @@ static func get_reach_margin(upper_length: float, lower_length: float, target: V
 
 static func get_fold_margin(upper_length: float, lower_length: float, target: Vector3, shoulder: Vector3) -> float:
 	return maxf(0.0, absf(upper_length - lower_length) - shoulder.distance_to(target))
+
+static func get_bend_side(direction: Vector3, normal: Vector3) -> float:
+	return signf(direction.cross(normal).dot(Vector3.UP))
