@@ -1587,6 +1587,18 @@ func _ensure_phone_profile(citizen_id: String) -> Dictionary:
     return profile
 
 
+func get_phone_safety_snapshot(citizen_id: String) -> Dictionary:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return {}
+    return {
+        "privacy": str(profile.get("phone_privacy", "friends")),
+        "blocked": (profile.get("phone_blocked_contacts", []) as Array).duplicate(),
+        "muted": (profile.get("phone_muted_contacts", []) as Array).duplicate(),
+        "contacts_count": (profile.get("phone_contacts", []) as Array).size()
+    }
+
+
 func get_phone_snapshot(citizen_id: String) -> Dictionary:
     var profile := _ensure_phone_profile(citizen_id)
     if profile.is_empty():
