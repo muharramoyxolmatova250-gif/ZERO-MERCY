@@ -2,6 +2,7 @@ extends Node
 ## Schedules world events against an externally supplied simulation clock.
 signal event_started(event_id: String, payload: Dictionary)
 signal event_ended(event_id: String)
+signal event_cancelled(event_id: String)
 var _events: Dictionary = {}
 
 func schedule_event(event_id: String, start_time: float, duration: float, payload: Dictionary = {}) -> bool:
@@ -45,6 +46,7 @@ func cancel_event(event_id: String) -> bool:
 	event["state"] = "cancelled"
 	event["cancelled_msec"] = Time.get_ticks_msec()
 	_events[event_id] = event
+	event_cancelled.emit(event_id)
 	return true
 
 func get_upcoming_events(limit: int = 10) -> Array[Dictionary]:
@@ -66,3 +68,20 @@ func get_upcoming_events(limit: int = 10) -> Array[Dictionary]:
 	if upcoming.size() > maxi(0, limit):
 		upcoming.resize(maxi(0, limit))
 	return upcoming
+
+ 
+func get_event_state(event_id: String) -> String:
+	if not _events.has(event_id):
+		return "missing"
+	return str(_events[event_id].get("state", "unknown"))
+
+func prune_finished_events(keep_last: int = 100) -> int:
+	var finished: Array[String] = []
+	for event_id in _events:
+		if str(_events[event_id].get("state", "")) in ["ended", "cancelled"]:
+			finished.append(str(event_id))
+	finished.sort()
+	var remove_count := maxi(0, finished.size() - maxi(0, keep_last))
+	for index in range(remove_count):
+		_events.erase(finished[index])
+	return remove_count
