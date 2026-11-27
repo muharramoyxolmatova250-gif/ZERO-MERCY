@@ -112,3 +112,6 @@ static func get_bend_side(direction: Vector3, normal: Vector3) -> float:
 
 static func safe_normalize(value: Vector3, fallback: Vector3 = Vector3.DOWN) -> Vector3:
 	return value.normalized() if value.length_squared() > 0.000001 else fallback.normalized()
+
+static func get_joint_chain_length(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> float:
+	return shoulder.distance_to(elbow) + elbow.distance_to(wrist)
