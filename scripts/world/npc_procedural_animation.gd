@@ -280,3 +280,14 @@ func solve_segmented_limb(root: Vector2, target: Vector2, upper_length: float, l
 
 func get_hand_pose(name: String) -> Dictionary:
 	return NPCAnimationHandPose.get_pose(name)
+
+
+func _dispatch_animation_events(delta: float) -> void:
+	for event in animation_events.consume_ready(delta):
+		var kind := str(event.get("kind", ""))
+		var payload: Dictionary = event.get("payload", {})
+		if kind == "reaction":
+			trigger_reaction(str(payload.get("reaction", "alert")), float(payload.get("intensity", 0.65)))
+		elif kind == "gesture":
+			idle_gesture = str(payload.get("gesture", "talk"))
+			idle_gesture_remaining = maxf(idle_gesture_remaining, float(payload.get("duration", 0.8)))
