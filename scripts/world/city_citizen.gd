@@ -1106,3 +1106,9 @@ func _finalize_personal_activity_effects(goal_id: String, satisfaction: float) -
 
 func get_indoor_action_snapshot() -> Dictionary:
 	return {"activity":_indoor_activity,"elapsed":_indoor_activity_time,"completed":_indoor_action_completed,"token":_indoor_action_token,"personal_goal":_get_active_personal_goal_id(),"context":_get_indoor_action_context()}
+
+func update_resident_belief(subject: String, claim: String, confidence: float, evidence: String = "") -> void:
+	_independent_mind.form_belief(subject, claim, confidence, evidence)
+
+func revise_resident_belief(subject: String, claim: String, evidence_quality: float) -> bool:
+	return _independent_mind.revise_belief(subject, claim, evidence_quality)
