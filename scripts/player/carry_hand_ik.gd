@@ -236,3 +236,6 @@ static func get_solution_segment_lengths(solution: Dictionary) -> Vector2:
 	if points.size() < 3:
 		return Vector2.ZERO
 	return Vector2(points[0].distance_to(points[1]), points[1].distance_to(points[2]))
+
+static func get_solution_bend_direction(solution: Dictionary) -> Vector3:
+	return get_chain_bend_direction(get_solution_shoulder(solution), get_solution_elbow(solution), get_solution_endpoint(solution))
