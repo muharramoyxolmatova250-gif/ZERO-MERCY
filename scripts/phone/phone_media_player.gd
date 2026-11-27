@@ -97,7 +97,11 @@ func _on_open_pressed() -> void:
 
 func _on_stop_pressed() -> void:
 	video.stop()
-	status.text = "Playback stopped."
+	video.stream = null
+	image.texture = null
+	image.hide()
+	video.hide()
+	status.text = "Playback stopped. Choose another feed item or open an asset."
 
 func _on_video_finished() -> void:
 	status.text = "Video finished."
