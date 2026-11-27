@@ -1709,9 +1709,12 @@ func make_phone_call(caller_id: String, recipient_id: String, duration_seconds: 
         return false
     var caller := _ensure_phone_profile(caller_id)
     var recipient := _ensure_phone_profile(recipient_id)
+    var safe_duration := clampi(duration_seconds, 0, 3600)
     var call_record := {
+        "id": "call_" + str(Time.get_unix_time_from_system()) + "_" + str(_rng.randi()),
         "to": recipient_id, "from": caller_id, "day": simulation_day,
-        "duration_seconds": maxi(0, duration_seconds), "status": "completed"
+        "timestamp": Time.get_datetime_string_from_system(),
+        "duration_seconds": safe_duration, "status": "completed"
     }
     var caller_calls: Array = caller.get("phone_call_history", [])
     caller_calls.append(call_record)
@@ -1728,8 +1731,8 @@ func make_phone_call(caller_id: String, recipient_id: String, duration_seconds: 
     _add_phone_contact(caller_id, recipient_id)
     _add_phone_contact(recipient_id, caller_id)
     _add_phone_notification(recipient_id, "call", "Incoming call from " + str(caller.get("name", caller_id)))
-    caller["phone_battery"] = maxf(0.0, float(caller.get("phone_battery", 100.0)) - 0.4)
-    recipient["phone_battery"] = maxf(0.0, float(recipient.get("phone_battery", 100.0)) - 0.2)
+    caller["phone_battery"] = maxf(0.0, float(caller.get("phone_battery", 100.0)) - maxf(0.1, float(safe_duration) / 75.0))
+    recipient["phone_battery"] = maxf(0.0, float(recipient.get("phone_battery", 100.0)) - maxf(0.05, float(safe_duration) / 150.0))
     resident_profiles[caller_id] = caller
     resident_profiles[recipient_id] = recipient
     record_social_interaction(caller_id, recipient_id, "phone_call")
