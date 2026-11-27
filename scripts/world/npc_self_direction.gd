@@ -141,3 +141,17 @@ func get_snapshot() -> Dictionary:
 func revise_aspirations(context: Dictionary = {}) -> void:
 	if float(context.get("life_change", 0.0)) > 0.6 or aspirations.is_empty():
 		_generate_initial_aspirations(context.get("profile", {}))
+func career_preference(context: Dictionary = {}) -> Dictionary:
+	var options := ["stay_in_job","seek_promotion","learn_new_trade","change_career","start_business"]
+	var scores: Dictionary = {}
+	for option in options:
+		var score := _trait("ambition") * 0.35 + _trait("discipline") * 0.2
+		if option == "start_business": score += _trait("risk_tolerance") * 0.4
+		if option == "change_career": score += float(context.get("dissatisfaction", 0.0)) * 0.5
+		if option == "seek_promotion": score += float(context.get("experience", 0.0)) * 0.35
+		if option == "learn_new_trade": score += _trait("curiosity") * 0.35
+		scores[option] = score + _rng.randf_range(0.0, 0.08)
+	var best := "stay_in_job"
+	for option in scores:
+		if float(scores[option]) > float(scores[best]): best = option
+	return {"choice":best,"scores":scores}
