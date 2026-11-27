@@ -1990,10 +1990,7 @@ func search_phone_social_posts(citizen_id: String, query: String, limit: int = 2
         if author_id.is_empty() or not resident_profiles.has(author_id):
             continue
         var author := _ensure_phone_profile(author_id)
-        var searchable := " ".join([
-            str(post.get("text", "")), str(post.get("topic", "")),
-            str(post.get("mood", "")), str(post.get("author", author.get("name", "")))
-        ]).to_lower()
+        var searchable := (str(post.get("text", "")) + " " + str(post.get("topic", "")) + " " + str(post.get("mood", "")) + " " + str(post.get("author", author.get("name", "")))).to_lower()
         if needle in searchable:
             matches.append(post.duplicate(true))
     matches.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.get("day", 0)) > int(b.get("day", 0)))
