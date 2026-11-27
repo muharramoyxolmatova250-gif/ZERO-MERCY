@@ -268,3 +268,12 @@ func continue_conversation(topic: String, previous_line: String, context: Dictio
 		return "Thanks for sharing that with me. Is there anything else on your mind?"
 	return generate_follow_up(topic,previous_line)
 
+
+
+func respond_to_disagreement(other_opinion: String, topic: String) -> String:
+	if float(traits.get("kindness",0.5)) > 0.7:
+		return "I see it differently, but I respect your view. What led you to that conclusion?"
+	if float(traits.get("courage",0.5)) > 0.72:
+		return "I disagree with that point. My reasons are different, and I'm happy to explain."
+	return "That's not quite how I see it. Maybe we can compare our reasons."
+
