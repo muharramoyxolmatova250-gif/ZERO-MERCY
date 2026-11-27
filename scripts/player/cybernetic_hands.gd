@@ -65,7 +65,9 @@ func _process(delta: float) -> void:
 					var grip_world: Vector3 = _carry_object.global_transform * grip_offset
 					var target_local := to_local(grip_world)
 					var bend_normal := Vector3(0.0, 0.0, 1.0 if target_local.x < pivot.position.x else -1.0)
-					_secondary_ik_solution = CarryHandIK.solve_with_constraints(pivot.position, target_local, 0.38, 0.43, bend_normal)
+					var upper_length := float(_carry_object.get_meta("secondary_arm_upper_length", 0.38))
+					var lower_length := float(_carry_object.get_meta("secondary_arm_lower_length", 0.43))
+					_secondary_ik_solution = CarryHandIK.solve_with_constraints(pivot.position, target_local, upper_length, lower_length, bend_normal)
 					var solved_wrist: Vector3 = _secondary_ik_solution.get("wrist", target_local)
 					var reach_vector := solved_wrist - pivot.position
 					_secondary_grip_weight = CarryHandIK.smooth_weight(_secondary_grip_weight, 1.0, delta, 3.0 * _carry_handling_sensitivity)
