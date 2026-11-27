@@ -162,16 +162,32 @@ func get_active_intention() -> Dictionary:
 func update_social_impression(other_id: String, interaction: String, outcome: float) -> void:
 	if other_id.is_empty():
 		return
-	var impression: Dictionary = social_model.get(other_id,{"trust":0.35,"familiarity":0.0,"kindness":0.5,"interactions":0})
-	var result := clampf(outcome,0.0,1.0)
-	impression["trust"] = lerpf(float(impression.get("trust",0.35)),result,0.18)
-	impression["familiarity"] = clampf(float(impression.get("familiarity",0.0))+0.08,0.0,1.0)
-	impression["interactions"] = int(impression.get("interactions",0))+1
+	var impression: Dictionary = social_model.get(other_id, {"trust":0.35,"familiarity":0.0,"warmth":0.5,"respect":0.5,"conflict":0.0,"interactions":0})
+	var result := clampf(outcome, 0.0, 1.0)
+	var change := (result - 0.5) * 0.22
+	if interaction in ["help", "give_item", "protect", "comfort", "keep_promise", "cooperate"]:
+		change += 0.12 * result
+	elif interaction in ["attack", "threaten", "steal", "betray", "insult"]:
+		change -= 0.3 * (1.0 - result)
+	impression["trust"] = clampf(float(impression.get("trust",0.35)) + change, 0.0, 1.0)
+	impression["warmth"] = clampf(float(impression.get("warmth",0.5)) + change * 0.72, 0.0, 1.0)
+	impression["respect"] = clampf(float(impression.get("respect",0.5)) + change * (0.5 + result * 0.5), 0.0, 1.0)
+	var conflict_change := 0.0
+	if interaction in ["attack", "threaten", "steal", "betray", "insult"]:
+		conflict_change = (1.0 - result) * 0.38
+	elif interaction in ["apologize", "forgive", "reconcile"]:
+		conflict_change = -result * 0.3
+	impression["conflict"] = clampf(float(impression.get("conflict",0.0)) + conflict_change, 0.0, 1.0)
+	impression["familiarity"] = clampf(float(impression.get("familiarity",0.0)) + 0.06, 0.0, 1.0)
+	impression["interactions"] = int(impression.get("interactions",0)) + 1
 	impression["last_interaction"] = interaction
+	var history: Array = impression.get("history", []).duplicate(true)
+	history.append({"interaction":interaction,"outcome":result,"trust_after":impression["trust"]})
+	while history.size() > 12:
+		history.pop_front()
+	impression["history"] = history
+	impression["relationship"] = _relationship_label(impression)
 	social_model[other_id] = impression
-
-func get_social_impression(other_id: String) -> Dictionary:
-	return social_model.get(other_id,{"trust":0.35,"familiarity":0.0}).duplicate(true)
 
 
 
