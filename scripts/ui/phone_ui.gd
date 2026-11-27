@@ -1122,6 +1122,8 @@ func _build_social_network() -> void:
     _add_body("IDENTITY VERIFIED  •  " + str(profile.get("name", "RESIDENT")).to_upper())
     _add_stat("FOLLOWERS", str((profile.get("followers", []) as Array).size()))
     _add_stat("FOLLOWING", str((profile.get("following", []) as Array).size()))
+    _add_stat("POSTS", str(profile.get("post_count", 0)))
+    _add_stat("SOCIAL INFLUENCE", str(profile.get("influence_score", 0)))
     var modes := HBoxContainer.new()
     for mode in ["all", "following", "discover", "profile"]:
         var button := Button.new()
@@ -1141,6 +1143,8 @@ func _build_social_network() -> void:
         _add_stat("RESIDENT ID", owner_id)
         _add_stat("OCCUPATION", str(profile.get("occupation", "Resident")))
         _add_stat("CITY", str(profile.get("city", "Unknown")))
+        _add_stat("TOTAL LIKES", str(profile.get("total_likes", 0)))
+        _add_stat("TOTAL COMMENTS", str(profile.get("total_comments", 0)))
         _add_section_title("FOLLOWING")
         var following_ids: Array = profile.get("following", [])
         if following_ids.is_empty():
