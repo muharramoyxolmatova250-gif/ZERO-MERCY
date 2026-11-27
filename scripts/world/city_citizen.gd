@@ -464,7 +464,7 @@ func _decide_goal() -> void:
 		var drive_goal := {"hunger":"food","energy":"rest","social":"social","curiosity":"explore","safety":"avoid_crowd","purpose":"work"}.get(drive_key, "")
 		if not str(drive_goal).is_empty() and scores.has(drive_goal): scores[drive_goal] = float(scores[drive_goal]) + float(drive.get("urgency", 0.0)) * 0.22
 	var previous_goal := current_goal
-	var best := "commute"
+	var best: String = "commute"
 	var best_score := -1.0
 	for goal in scores:
 		var score: float = float(scores[goal]) + _rng.randf_range(0.0, 0.15)
@@ -934,7 +934,7 @@ func _consider_autonomous_phone_use() -> void:
 				_pause_remaining = maxf(_pause_remaining, float(match_time) * 0.12)
 				return
 	if _curiosity > 0.58 and life_sim.has_method("publish_phone_media") and _rng.randf() < 0.24:
-		var media_kind := ["video", "image", "post"][_rng.randi_range(0, 2)]
+		var media_kind: String = ["video", "image", "post"][_rng.randi_range(0, 2)]
 		var topics := ["city_life", "music", "cars", "food", "travel", "gaming", "wildlife", "fashion", "sports", "technology"]
 		var topic: String = topics[_rng.randi_range(0, topics.size() - 1)]
 		var captions := ["Bugungi lahza!", "Shahardan yangi kadrlar.", "Buni ko'rishingiz kerak.", "Yangi taassurotlar."]
