@@ -115,3 +115,7 @@ static func safe_normalize(value: Vector3, fallback: Vector3 = Vector3.DOWN) -> 
 
 static func get_joint_chain_length(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> float:
 	return shoulder.distance_to(elbow) + elbow.distance_to(wrist)
+
+static func is_chain_stretched(shoulder: Vector3, elbow: Vector3, wrist: Vector3, threshold: float = 0.96) -> bool:
+	var chain := get_joint_chain_length(shoulder, elbow, wrist)
+	return chain > 0.001 and shoulder.distance_to(wrist) / chain >= threshold
