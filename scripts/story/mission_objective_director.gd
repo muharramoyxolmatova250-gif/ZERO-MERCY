@@ -25,6 +25,8 @@ func _on_mission_started(_mission_id: String, _title: String) -> void:
 func _start_simulation_witness_if_needed() -> void:
 	if MissionManager.active_mission_id != "side_simulation_witness":
 		return
+	if is_instance_valid(_witness_actor):
+		return
 	if MissionManager.get_current_objective().get("event", "") != "meet_simulation_witness":
 		return
 	var player := get_parent().get_node_or_null("Dara") as Node3D
@@ -32,6 +34,7 @@ func _start_simulation_witness_if_needed() -> void:
 		return
 	var actor := SIMULATION_WITNESS_SCRIPT.new() as Node3D
 	actor.name = "SimulationWitnessAmbusher"
+	_witness_actor = actor
 	get_parent().add_child(actor)
 	actor.call_deferred("perform_ambush", player)
 
@@ -77,6 +80,19 @@ func _on_mission_completed(_mission_id: String) -> void:
 		_target.queue_free()
 	_target = null
 	_current_objective_id = ""
+
+
+func _on_mission_failed(_mission_id: String) -> void:
+	_clear_witness_actor()
+	if is_instance_valid(_target):
+		_target.queue_free()
+	_target = null
+	_current_objective_id = ""
+
+func _clear_witness_actor() -> void:
+	if is_instance_valid(_witness_actor):
+		_witness_actor.queue_free()
+	_witness_actor = null
 
 func _spawn_current_objective() -> void:
 	var objective: Dictionary = MissionManager.get_current_objective()
