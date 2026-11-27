@@ -1071,3 +1071,9 @@ func _record_autonomous_social_progress(goal_id: String) -> void:
 	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
 	if life_sim != null and life_sim.has_method("record_event"):
 		life_sim.call("record_event", citizen_id, "self_directed_social_effort:" + goal_id)
+
+func _finalize_personal_activity_effects(goal_id: String, satisfaction: float) -> void:
+	_apply_indoor_need_outcomes(goal_id)
+	_record_autonomous_family_time(goal_id)
+	_record_autonomous_social_progress(goal_id)
+	_remember_personal_activity_outcome(goal_id, satisfaction)
