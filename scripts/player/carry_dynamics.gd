@@ -184,3 +184,8 @@ func get_support_hand_profile() -> Dictionary:
 
 func get_footstep_intensity() -> float:
 	return clampf(0.35 + mass_kg * 0.035 + impact_load * 0.2, 0.0, 1.0)
+
+
+func get_camera_motion_factor() -> float:
+	var weight := clampf(mass_kg / 28.0, 0.0, 1.0)
+	return clampf(1.0 - weight * 0.32 - (0.16 if fragile else 0.0), 0.48, 1.0)
