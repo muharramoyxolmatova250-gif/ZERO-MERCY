@@ -68,3 +68,9 @@ static func get_reach_ratio(shoulder: Vector3, target: Vector3, upper_length: fl
 
 static func get_endpoint_error(actual_wrist: Vector3, desired_target: Vector3) -> float:
 	return actual_wrist.distance_to(desired_target)
+
+static func mirror_bend_normal(normal: Vector3, mirror_axis: Vector3) -> Vector3:
+	var axis := mirror_axis.normalized()
+	if axis.length_squared() < 0.001:
+		return normal
+	return normal - 2.0 * normal.dot(axis) * axis
