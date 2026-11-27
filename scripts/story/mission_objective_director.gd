@@ -1,6 +1,7 @@
 extends Node3D
 ## Spawns a physical, interactable marker for each active campaign objective.
 const TARGET_SCRIPT := preload("res://scripts/story/mission_objective_target.gd")
+const SIMULATION_WITNESS_SCRIPT := preload("res://scripts/story/simulation_witness_actor.gd")
 var _target: StaticBody3D
 var _current_objective_id := ""
 var _spawn_serial := 0
@@ -12,10 +13,25 @@ func _ready() -> void:
     MissionManager.mission_completed.connect(_on_mission_completed)
     if MissionManager.active_mission_id != "":
         _spawn_current_objective()
+        _start_simulation_witness_if_needed()
 
 func _on_mission_started(_mission_id: String, _title: String) -> void:
     _current_objective_id = ""
     _spawn_current_objective()
+    _start_simulation_witness_if_needed()
+
+func _start_simulation_witness_if_needed() -> void:
+    if MissionManager.active_mission_id != "side_simulation_witness":
+        return
+    if MissionManager.get_current_objective().get("event", "") != "meet_simulation_witness":
+        return
+    var player := get_parent().get_node_or_null("Dara") as Node3D
+    if player == null:
+        return
+    var actor := SIMULATION_WITNESS_SCRIPT.new() as Node3D
+    actor.name = "SimulationWitnessAmbusher"
+    get_parent().add_child(actor)
+    actor.call_deferred("perform_ambush", player)
 
 func _on_objective_updated(_mission_id: String, objective_id: String, current: int, total: int) -> void:
     if objective_id != _current_objective_id:
