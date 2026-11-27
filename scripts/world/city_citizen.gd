@@ -992,3 +992,11 @@ func _get_personal_activity_duration(goal_id: String) -> float:
 		"practice_hobby", "create_something": return 17.0
 		"save_money": return 10.0
 	return 12.0
+
+func _score_personal_activity_satisfaction(goal_id: String) -> float:
+	var score := 0.52
+	if goal_id == "exercise_for_health": score += (1.0 - _stress) * 0.16 + _energy * 0.12
+	elif goal_id in ["make_friend", "repair_relationship", "spend_time_with_family", "help_neighbor"]: score += _social_need * 0.18 + float(_personality_traits.get("kindness", 0.5)) * 0.12
+	elif goal_id in ["learn_skill", "advance_career", "find_better_job"]: score += float(_personality_traits.get("ambition", 0.5)) * 0.18 + float(_personality_traits.get("discipline", 0.5)) * 0.1
+	elif goal_id in ["practice_hobby", "create_something", "explore_unknown_place"]: score += float(_personality_traits.get("curiosity", 0.5)) * 0.2
+	return clampf(score, 0.0, 1.0)
