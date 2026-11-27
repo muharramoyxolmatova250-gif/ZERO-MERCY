@@ -1,0 +1,88 @@
+{
+  "start": "impact",
+  "nodes": {
+    "impact": {
+      "speaker": "NOTANISH ODAM",
+      "text": "U ko‘cha chirog‘i ostidan keskin chiqib, Dara’ning yuziga mushti bilan uradi. Zarba Dara’ni bir qadam ortga uloqtiradi. Notanish odamning kulrang ko‘zlari sovuq yaltiraydi; ko‘z ostidagi ko‘kimtir implant chiziqlari bir lahza miltillaydi.",
+      "choices": [
+        {
+          "text": "Sen kimsan?!",
+          "next": "warning"
+        },
+        {
+          "text": "Yana yaqinlashma.",
+          "next": "warning"
+        }
+      ]
+    },
+    "warning": {
+      "speaker": "NOTANISH ODAM",
+      "text": "Shoshma. Men seni o‘ldirish uchun kelmadim. Sen ham buni sezyapsanmi? Ko‘chada bir xil yuzlar qayta-qayta uchraydi. Ba’zi eshiklar hech qachon ochilmaydi. Bu rostdan ham haqiqiy dunyomi yoki biz oddiy o‘yinning ichidamizmi?",
+      "choices": [
+        {
+          "text": "Bu qandaydir kasallikmi?",
+          "next": "doubt"
+        },
+        {
+          "text": "Men ham g‘alati narsalarni ko‘rdim.",
+          "next": "believe"
+        },
+        {
+          "text": "Menga dalil ko‘rsat.",
+          "next": "proof"
+        }
+      ]
+    },
+    "doubt": {
+      "speaker": "NOTANISH ODAM",
+      "text": "Balki. Balki implantim miyamga yolg‘on ko‘rsatayotgandir. Shuning uchun taxmin emas, dalil izlayapman.",
+      "choices": [
+        {
+          "text": "Dalilingni ko‘rsat.",
+          "next": "proof",
+          "choice_id": "simulation_witness_stance",
+          "value": "skeptical"
+        }
+      ]
+    },
+    "believe": {
+      "speaker": "DARA",
+      "text": "Men ham ayrim odamlarni bir xil ko‘rgandek bo‘lganman. Lekin bu hali hech narsani isbotlamaydi.",
+      "choices": [
+        {
+          "text": "Nimani tekshiramiz?",
+          "next": "proof",
+          "choice_id": "simulation_witness_stance",
+          "value": "open_minded"
+        }
+      ]
+    },
+    "proof": {
+      "speaker": "NOTANISH ODAM",
+      "text": "Eski metro bekatida uchta kuzatuv yozuvi bor. Bir xil yuzlar, takrorlangan vaqt belgisi va xarita chegarasida uzilgan signal. O‘zing tekshir. Mening gapimga ishonishing shart emas.",
+      "choices": [
+        {
+          "text": "Men dalillarni tekshiraman.",
+          "next": "end",
+          "choice_id": "simulation_witness_stance",
+          "value": "investigate",
+          "flag": "simulation_witness_met",
+          "flag_value": true
+        },
+        {
+          "text": "Hozircha senga ishonmayman.",
+          "next": "end",
+          "choice_id": "simulation_witness_stance",
+          "value": "refuse",
+          "flag": "simulation_witness_met",
+          "flag_value": true
+        }
+      ]
+    },
+    "end": {
+      "speaker": "DARA",
+      "text": "Notanish odam orqaga chekinadi. Implantidagi ko‘k nur bir zum o‘chadi. U olomon orasiga singib ketadi.",
+      "choices": []
+    }
+  }
+}
