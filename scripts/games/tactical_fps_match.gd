@@ -2,7 +2,7 @@ extends Node3D
 
 signal game_exited
 ## Standalone playable tactical FPS foundation: movement, aiming, hits, bots and round objective.
-const BOT_COUNT := 5
+const BOT_COUNT := 10
 const ROUND_SECONDS := 240.0
 var player: CharacterBody3D
 var camera: Camera3D
@@ -104,7 +104,7 @@ func _build_arena() -> void:
 	var floor := StaticBody3D.new()
 	floor.name = "ArenaFloor"
 	var floor_mesh := BoxMesh.new()
-	floor_mesh.size = Vector3(48, 1, 48)
+	floor_mesh.size = Vector3(72, 1, 72)
 	var floor_visual := MeshInstance3D.new()
 	floor_visual.mesh = floor_mesh
 	var floor_material := StandardMaterial3D.new()
