@@ -17,6 +17,8 @@ var _reach_weight := 0.0
 var _is_gripping := false
 var _carry_mass_kg := 0.0
 var _carry_fragile := false
+var _secondary_grip_weight := 0.0
+var _carry_sway := 0.0
 var _clock := 0.0
 
 func _ready() -> void:
@@ -53,10 +55,15 @@ func _process(delta: float) -> void:
 			else:
 				target = Vector3(-0.16 - minf(_carry_mass_kg * 0.004, 0.10), 0.0, -0.025)
 				if _carry_mass_kg >= 8.0 and is_instance_valid(_carry_object):
-					var target_local := to_local(_carry_object.global_position) - pivot.position
+					var grip_offset: Vector3 = _carry_object.get_meta("secondary_grip_offset", Vector3(-0.24, -0.05, -0.10))
+					var grip_world: Vector3 = _carry_object.global_transform * grip_offset
+					var target_local := to_local(grip_world) - pivot.position
+					_secondary_grip_weight = move_toward(_secondary_grip_weight, 1.0, delta * 3.0)
 					var target_horizontal := Vector2(target_local.x, target_local.z).length()
 					target.x = clampf(atan2(target_local.y, maxf(0.001, target_horizontal)) + 0.45, -0.8, 0.55)
+					target.x += sin(_clock * 1.8) * 0.018 * (1.0 - _secondary_grip_weight)
 					target.y = clampf(atan2(-target_local.z, target_local.x), -0.95, 0.95)
+					target.z = -0.04 if _carry_fragile else 0.0
 		else:
 			if side > 0.0:
 				target += _reach_rotation * _reach_weight
@@ -165,6 +172,8 @@ func release_object() -> void:
 	_carry_mass_kg = 0.0
 	_carry_fragile = false
 	_carry_object = null
+	_secondary_grip_weight = 0.0
+	_carry_sway = 0.0
 	_reach_weight = 0.0
 	_reach_rotation = Vector3.ZERO
 
