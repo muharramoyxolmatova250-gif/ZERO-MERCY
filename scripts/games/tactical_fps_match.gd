@@ -201,6 +201,8 @@ func _build_bots() -> void:
 		bot.set_meta("combat_skill", 0.75 + float(i % 3) * 0.12)
 		bot.set_meta("squad_role", "leader" if i == 0 else ("flanker" if i % 2 == 1 else "support"))
 		bot.set_meta("squad_slot", i)
+		bot.set_meta("suppressed_time", 0.0)
+		bot.set_meta("morale", 1.0)
 		bot.position = Vector3(-13.0 + float(i) * 6.5, 1, -10.0 - float(i % 2) * 8.0)
 		var body := MeshInstance3D.new()
 		var mesh := CapsuleMesh.new()
