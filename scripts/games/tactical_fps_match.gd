@@ -440,7 +440,8 @@ func _update_bots(delta: float) -> void:
 				var damage := 2.5 + skill * 2.5
 				if randf() <= skill:
 					health = maxf(0.0, health - damage)
-				wait = 1.15 + (1.0 - skill) * 0.9
+				var role_delay := 0.18 if role == "support" else (-0.12 if role == "flanker" else 0.0)
+				wait = maxf(0.55, 1.15 + (1.0 - skill) * 0.9 + role_delay)
 			else:
 				wait = 0.3
 		bot.set_meta("fire_wait", wait)
