@@ -705,6 +705,37 @@ func _consider_autonomous_phone_use() -> void:
 			var family_id := str(member.get("id", ""))
 			if not family_id.is_empty() and family_id != citizen_id:
 				possible_contacts.append(family_id)
+	# Residents independently notice and answer unread messages when they have time.
+	if life_sim.has_method("get_phone_inbox") and life_sim.has_method("send_phone_message"):
+		var unread_messages: Array = life_sim.call("get_phone_inbox", citizen_id, true, 6)
+		for incoming_value in unread_messages:
+			var incoming: Dictionary = incoming_value
+			var sender_id := str(incoming.get("from", ""))
+			if sender_id.is_empty() or sender_id == citizen_id or str(incoming.get("to", "")) != citizen_id:
+				continue
+			if _rng.randf() > 0.62:
+				break
+			var incoming_text := str(incoming.get("text", "")).to_lower()
+			var kindness := float(_personality_traits.get("kindness", 0.5))
+			var courage := float(_personality_traits.get("courage", 0.5))
+			var replies: Array[String] = []
+			if "?" in incoming_text or "qalaysan" in incoming_text or "yaxshi" in incoming_text:
+				replies = ["Yaxshiman, rahmat! O'zingiz-chi?", "Hammasi joyida. Sizda qanday yangilik?", "Yaxshi, hozir biroz bandman. Keyinroq gaplashamiz."]
+			elif "yordam" in incoming_text or "help" in incoming_text:
+				replies = ["Nima bo'ldi? Qo'limdan kelsa yordam beraman.", "Tushundim. Batafsil aytib bering."]
+			elif kindness > 0.68:
+				replies = ["Xabaringizni oldim. Rahmat!", "Sizdan xabar olganim yaxshi bo'ldi.", "Albatta, keyinroq gaplashamiz."]
+			elif courage > 0.68:
+				replies = ["Fikringiz qiziq. Buni yaxshilab o'ylab ko'raman.", "Bunga qo'shimcha ma'lumot bera olasizmi?"]
+			else:
+				replies = ["Tushunarli.", "Mayli, xabar kutaman.", "Hozir yo'ldaman, keyin yozaman."]
+			life_sim.call("mark_phone_message_read", citizen_id, str(incoming.get("id", "")))
+			if life_sim.call("send_phone_message", citizen_id, sender_id, replies[_rng.randi_range(0, replies.size() - 1)], "reply"):
+				remember_event("replied_to_phone_message:" + sender_id)
+				_phone_action_cooldown = _rng.randf_range(45.0, 95.0)
+				_phone_battery_visual = maxf(0.15, _phone_battery_visual - 0.012)
+				_set_phone_visible(true)
+				return
 	if _social_need > 0.62 and not possible_contacts.is_empty():
 		var recipient_id := possible_contacts[_rng.randi_range(0, possible_contacts.size() - 1)]
 		var messages := ["Qalaysan? Bugun ko'rishamizmi?", "Ishlaring yaxshimi?", "Keyinroq gaplashamiz.", "Bugun shaharda nima yangilik?"]
