@@ -310,6 +310,12 @@ func _update_needs() -> void:
 	_social_need = clampf(_social_need + 0.002, 0.0, 1.0)
 	_curiosity = clampf(_curiosity + 0.0015, 0.0, 1.0)
 	_stress = clampf(_stress + (0.001 if current_goal == "work" else -0.0015), 0.0, 1.0)
+	_independent_mind.update_need("hunger", _hunger)
+	_independent_mind.update_need("energy", 1.0 - _energy)
+	_independent_mind.update_need("social", _social_need)
+	_independent_mind.update_need("safety", _stress)
+	_independent_mind.update_need("curiosity", _curiosity)
+	_independent_mind.update_need("purpose", 1.0 - float(_personality_traits.get("ambition", 0.5)))
 
 func _decide_goal() -> void:
 	ai_decision_count += 1
