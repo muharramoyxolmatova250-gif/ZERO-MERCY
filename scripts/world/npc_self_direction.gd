@@ -538,3 +538,6 @@ func select_next_autonomous_intention(context: Dictionary = {}) -> Dictionary:
 	var memory_goal := generate_goal_from_memory(context.get("memories",[]),context)
 	if not memory_goal.is_empty(): candidates.append(memory_goal)
 	return choose_from_candidates(candidates,context)
+
+
+undefined
