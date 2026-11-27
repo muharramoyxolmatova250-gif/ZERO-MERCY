@@ -1863,6 +1863,9 @@ func get_phone_network_feed(citizen_id: String, limit: int = 30, following_only:
     for post_value in _social_feed:
         var post: Dictionary = post_value
         var author_id := str(post.get("author_id", ""))
+        # Media catalogue entries are videos/images, not resident-authored social posts.
+        if author_id.is_empty() or not resident_profiles.has(author_id):
+            continue
         if author_id == citizen_id:
             result.append(post.duplicate(true))
         elif not following_only or following.has(author_id):
