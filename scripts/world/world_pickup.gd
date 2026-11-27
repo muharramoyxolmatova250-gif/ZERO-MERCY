@@ -2,9 +2,13 @@ extends StaticBody3D
 ## Small world prop that can be picked up and placed with smooth tweened motion.
 @export var display_name := "World item"
 @export var glow_color := Color(0.0,0.8,1.0)
+@export var grip_offset := Vector3(0.0, -0.06, -0.13)
+@export var grip_rotation := Vector3.ZERO
 var being_held := false
 func _ready() -> void:
  add_to_group("world_pickup")
+ set_meta("grip_offset", grip_offset)
+ set_meta("grip_rotation", grip_rotation)
  var mesh := MeshInstance3D.new()
  var shape_mesh := BoxMesh.new()
  shape_mesh.size = Vector3(0.42,0.42,0.42)
