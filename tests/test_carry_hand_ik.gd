@@ -18,6 +18,7 @@ func _initialize() -> void:
 	_test_joint_balance()
 	_test_wrist_direction()
 	_test_solution_points()
+	_test_asymmetric_limb_lengths()
 	_test_closest_reachable_point()
 	_test_direction_plane_projection()
 	_test_target_distance_weight()
@@ -145,3 +146,8 @@ func _test_direction_plane_projection() -> void:
 func _test_closest_reachable_point() -> void:
 	var point := CarryHandIK.get_closest_reachable_point(Vector3.ZERO, Vector3(4.0, 0.0, 0.0), 0.4, 0.4)
 	assert(point.length() < 0.8)
+
+func _test_asymmetric_limb_lengths() -> void:
+	var elbow: Vector3 = CarryHandIK.solve_elbow(Vector3.ZERO, Vector3(0.3, 0.0, 0.0), 0.55, 0.3, Vector3.UP)
+	assert(absf(elbow.length() - 0.55) < 0.002)
+	assert(absf(elbow.distance_to(Vector3(0.3, 0.0, 0.0)) - 0.3) < 0.002)
