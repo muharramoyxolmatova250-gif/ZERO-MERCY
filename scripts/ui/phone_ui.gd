@@ -426,6 +426,7 @@ func _build_sms_inbox() -> void:
     if messages.is_empty():
         _add_body("Inbox is empty.")
         return
+    var shown_threads: Dictionary = {}
     for message in messages:
         var message_id := str(message.get("id", ""))
         var sender_id := str(message.get("from", message.get("sender_id", "")))
@@ -437,6 +438,12 @@ func _build_sms_inbox() -> void:
         var status := "READ" if bool(message.get("read", false)) else "NEW"
         _add_section_title(status + "  •  " + sender_name)
         _add_body(preview)
+        if not shown_threads.has(sender_id) and _life.has_method("get_phone_conversation"):
+            shown_threads[sender_id] = true
+            var thread: Array = _life.call("get_phone_conversation", owner_id, sender_id, 5)
+            for thread_message in thread:
+                var direction := "YOU" if str(thread_message.get("from", "")) == owner_id else sender_name.to_upper()
+                _add_body(direction + ": " + str(thread_message.get("text", "")))
         var reply_row := HBoxContainer.new()
         var reply_input := LineEdit.new()
         reply_input.placeholder_text = "Reply to " + sender_name + "..."
