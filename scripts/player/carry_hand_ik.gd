@@ -125,3 +125,11 @@ static func get_joint_balance(upper_length: float, lower_length: float) -> float
 
 static func get_target_direction_local(origin: Vector3, target: Vector3, basis: Basis) -> Vector3:
 	return basis.inverse() * safe_normalize(target - origin)
+
+static func project_point_on_segment(point: Vector3, start: Vector3, finish: Vector3) -> Vector3:
+	var segment := finish - start
+	var length_sq := segment.length_squared()
+	if length_sq < 0.000001:
+		return start
+	var weight := clampf((point - start).dot(segment) / length_sq, 0.0, 1.0)
+	return start + segment * weight
