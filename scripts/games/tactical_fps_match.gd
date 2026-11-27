@@ -478,6 +478,39 @@ func _throw_tactical_grenade(thrower: CharacterBody3D, target_position: Vector3)
 		grenade.queue_free()
 		_detonate_tactical_grenade(blast_position)
 
+func _detonate_tactical_grenade(blast_position: Vector3) -> void:
+	var flash := MeshInstance3D.new()
+	var blast_mesh := SphereMesh.new()
+	blast_mesh.radius = 0.25
+	blast_mesh.height = 0.5
+	flash.mesh = blast_mesh
+	var blast_material := StandardMaterial3D.new()
+	blast_material.albedo_color = Color(1.0, 0.42, 0.12, 0.72)
+	blast_material.emission_enabled = true
+	blast_material.emission = Color(1.0, 0.2, 0.035)
+	blast_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	flash.material_override = blast_material
+	flash.global_position = blast_position
+	add_child(flash)
+	var expand := create_tween()
+	expand.tween_property(flash, "scale", Vector3.ONE * 8.0, 0.24)
+	expand.finished.connect(func() -> void:
+		if is_instance_valid(flash):
+			flash.queue_free())
+	var player_distance := player.global_position.distance_to(blast_position)
+	if player_distance < 5.0:
+		health = maxf(0.0, health - 42.0 * (1.0 - player_distance / 6.5))
+	for ally in allies:
+		if not is_instance_valid(ally) or bool(ally.get_meta("downed", false)):
+			continue
+		var distance := ally.global_position.distance_to(blast_position)
+		if distance < 5.0:
+			var remaining := maxf(0.0, float(ally.get_meta("health", 100.0)) - 42.0 * (1.0 - distance / 6.5))
+			ally.set_meta("health", remaining)
+			if remaining <= 0.0:
+				ally.set_meta("downed", true)
+				ally.set_meta("revive_progress", 0.0)
+
 func _update_bots(delta: float) -> void:
 	for bot in bots:
 		if not is_instance_valid(bot):
