@@ -299,3 +299,15 @@ func has_active_goal(category: String) -> bool:
 		if str(goal.get("status", "")) == "active" and str(goal.get("category", "")) == category:
 			return true
 	return false
+
+
+func get_active_goals(limit: int = 8) -> Array[Dictionary]:
+	var active: Array[Dictionary] = []
+	for goal in goals:
+		if str(goal.get("status", "")) == "active":
+			active.append(goal.duplicate(true))
+	active.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("priority", 0.0)) > float(b.get("priority", 0.0)))
+	if active.size() > maxi(1, limit):
+		active.resize(maxi(1, limit))
+	return active
