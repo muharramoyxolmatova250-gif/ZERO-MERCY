@@ -377,7 +377,15 @@ func _update_bots(delta: float) -> void:
 		var side := Vector3(-direction.z, 0.0, direction.x) * sin(float(Time.get_ticks_msec()) * 0.0012 + phase)
 		var desired_range := 10.0 + float(int(bot.get_instance_id()) % 4)
 		var approach := direction * clampf((distance - desired_range) / 5.0, -0.65, 1.0)
-		var pursuit := (approach + side * 0.58).normalized()
+		var separation := Vector3.ZERO
+		for other in bots:
+			if other == bot or not is_instance_valid(other):
+				continue
+			var gap := bot.global_position - other.global_position
+			gap.y = 0.0
+			if gap.length() > 0.01 and gap.length() < 2.8:
+				separation += gap.normalized() * (2.8 - gap.length())
+		var pursuit := (approach + side * 0.58 + separation * 0.9).normalized()
 		bot.velocity.x = pursuit.x * 2.15
 		bot.velocity.z = pursuit.z * 2.15
 		bot.move_and_slide()
