@@ -3201,3 +3201,6 @@ func update_resident_autonomy_goal(citizen_id: String, goal_id: String, success:
 	resident_profiles[citizen_id] = p
 	_dirty = true
 	return {"goal":goal_id,"success":success,"happiness":float(p.get("happiness",0.5))}
+
+
+undefined
