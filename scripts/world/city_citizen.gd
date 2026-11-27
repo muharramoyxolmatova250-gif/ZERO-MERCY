@@ -783,6 +783,10 @@ func _create_limb_pivot(node_name: String, pivot_position: Vector3, material: Ma
 func _update_procedural_animation(delta: float) -> void:
 	if _animation_controller == null:
 		return
+	if current_goal == "social" and is_instance_valid(_social_target):
+		_animation_controller.set_attention_target(_social_target)
+	else:
+		_animation_controller.clear_attention_target()
 	var motion: Dictionary = _motion_controller.snapshot()
 	_animation_controller.update_pose(delta, float(motion.get("speed", 0.0)), str(motion.get("state", "idle")), _indoor_activity, is_using_phone, _stress, current_goal, _personality_traits, _motion_controller.preferred_speed, _crime_flee_timer > 0.0)
 
