@@ -109,3 +109,6 @@ static func get_fold_margin(upper_length: float, lower_length: float, target: Ve
 
 static func get_bend_side(direction: Vector3, normal: Vector3) -> float:
 	return signf(direction.cross(normal).dot(Vector3.UP))
+
+static func safe_normalize(value: Vector3, fallback: Vector3 = Vector3.DOWN) -> Vector3:
+	return value.normalized() if value.length_squared() > 0.000001 else fallback.normalized()
