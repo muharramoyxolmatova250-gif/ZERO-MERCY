@@ -213,6 +213,33 @@ func _get_phone_owner_id() -> String:
     return ""
 
 
+func _build_sms_inbox() -> void:
+    _add_section_title("MESSAGES / INBOX")
+    var owner_id := _get_phone_owner_id()
+    if owner_id.is_empty() or _life == null or not _life.has_method("get_phone_inbox"):
+        _add_body("SMS inbox is unavailable until the player phone is connected.")
+        return
+    var unread := int(_life.call("get_phone_unread_count", owner_id))
+    _add_stat("UNREAD MESSAGES", str(unread))
+    var messages: Array = _life.call("get_phone_inbox", owner_id, false, 40)
+    if messages.is_empty():
+        _add_body("Inbox is empty.")
+        return
+    for message in messages:
+        var message_id := str(message.get("id", ""))
+        var sender_id := str(message.get("sender_id", "Unknown"))
+        var preview := str(message.get("text", ""))
+        var status := "READ" if bool(message.get("read", false)) else "NEW"
+        var entry := Button.new()
+        entry.text = status + "  " + sender_id + "\n" + preview.left(90)
+        entry.custom_minimum_size = Vector2(0, 58)
+        entry.pressed.connect(func() -> void:
+            _life.call("mark_phone_message_read", owner_id, message_id)
+            _refresh_content()
+        )
+        _content.add_child(entry)
+
+
 func _build_contacts() -> void:
     _add_section_title("NEARBY CONTACTS")
     var citizens := get_tree().get_nodes_in_group("city_citizen")
