@@ -132,6 +132,7 @@ func _build_phone() -> void:
         tabs.add_child(button)
 
     var separator := HSeparator.new()
+    separator.add_theme_color_override("separator", Color(0.0, 0.72, 0.86, 0.55))
     outer.add_child(separator)
     var scroll := ScrollContainer.new()
     scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -143,9 +144,9 @@ func _build_phone() -> void:
     scroll.add_child(_content)
 
     var footer := Label.new()
-    footer.text = "P  •  CLOSE PHONE     |     WORLD SIMULATION CONTINUES"
+    footer.text = "◈ P  /  CLOSE DEVICE     •     NEURAL LINK ACTIVE"
     footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    footer.add_theme_color_override("font_color", Color(0.3, 0.56, 0.66))
+    footer.add_theme_color_override("font_color", Color(0.12, 0.72, 0.82))
     footer.add_theme_font_size_override("font_size", 9)
     outer.add_child(footer)
 
