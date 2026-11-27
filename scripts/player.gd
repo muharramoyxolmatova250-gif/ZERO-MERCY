@@ -570,9 +570,9 @@ func _interact_with_world() -> void:
 		return
 	var pickup_collider: Object = pickup_hit.get("collider")
 	if pickup_collider is StaticBody3D and pickup_collider.is_in_group("world_pickup"):
-		_pick_up_item(pickup_collider as Node3D)
+		_pick_up_item(pickup_collider as Node3D, pickup_hit.get("position", (pickup_collider as Node3D).global_position))
 
-func _pick_up_item(item: Node3D) -> void:
+func _pick_up_item(item: Node3D, contact_point: Vector3 = Vector3.ZERO) -> void:
 	if not is_instance_valid(item) or _held_item != null:
 		return
 	# Collectible pickups enter the stack inventory; physical props remain carryable.
@@ -600,7 +600,7 @@ func _pick_up_item(item: Node3D) -> void:
 		return
 	_pickup_in_progress = true
 	if _cybernetic_hands.has_method("begin_pickup"):
-		_cybernetic_hands.call("begin_pickup", item.global_position)
+		_cybernetic_hands.call("begin_pickup", contact_point if contact_point != Vector3.ZERO else item.global_position)
 	if _pickup_tween != null and _pickup_tween.is_running():
 		_pickup_tween.kill()
 	_pickup_tween = create_tween()
