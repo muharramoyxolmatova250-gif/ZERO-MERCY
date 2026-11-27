@@ -244,3 +244,6 @@ func explain_choice() -> String:
 	return "Self-selected " + str(active_personal_goal.get("id", "goal")) + " because of personal drives, learned preferences and current circumstances"
 func get_agency_metrics() -> Dictionary:
 	return {"autonomy_score":autonomy_score,"decision_count":decision_count,"personal_goal_count":completed_goals.size(),"preference_count":preferences.size(),"aspiration_count":aspirations.size(),"self_directed":not active_personal_goal.is_empty()}
+func on_major_life_event(event_type: String, context: Dictionary = {}) -> void:
+	if event_type in ["job_loss","marriage","birth","retirement","relocation","business_failure","graduation"]:
+		revise_aspirations({"life_change":0.8,"profile":context})
