@@ -364,7 +364,7 @@ static func get_solution_local(solution: Dictionary, transform: Transform3D) -> 
 	return result
 
 static func get_solution_reach_margin(solution: Dictionary, upper_length: float, lower_length: float) -> float:
-	return get_reach_margin(get_solution_shoulder(solution), get_solution_endpoint(solution), upper_length, lower_length)
+	return get_reach_margin(upper_length, lower_length, get_solution_endpoint(solution), get_solution_shoulder(solution))
 
 static func get_solution_fold_margin(solution: Dictionary, upper_length: float, lower_length: float) -> float:
 	return get_fold_margin(upper_length, lower_length, get_solution_endpoint(solution), get_solution_shoulder(solution))
@@ -378,3 +378,34 @@ static func get_solution_joint_angle(solution: Dictionary) -> float:
 static func get_solution_direction_alignment(solution: Dictionary, desired_direction: Vector3) -> float:
 	var actual := get_target_direction(get_solution_shoulder(solution), get_solution_endpoint(solution))
 	return clampf(actual.dot(safe_normalize(desired_direction)), -1.0, 1.0)
+
+
+## Stable geometric helpers used by the constrained two-bone solver.
+static func get_bend_normal(direction: Vector3, candidate: Vector3) -> Vector3:
+	var axis := safe_normalize(direction, Vector3.FORWARD)
+	var projected := candidate - axis * candidate.dot(axis)
+	if projected.length_squared() < 0.000001:
+		var fallback := Vector3.UP if absf(axis.dot(Vector3.UP)) < 0.92 else Vector3.RIGHT
+		projected = fallback - axis * fallback.dot(axis)
+	return safe_normalize(projected, Vector3.UP)
+
+static func get_pose_quality(shoulder: Vector3, elbow: Vector3, wrist: Vector3, desired_target: Vector3) -> float:
+	var upper := shoulder.distance_to(elbow)
+	var lower := elbow.distance_to(wrist)
+	if upper < 0.001 or lower < 0.001:
+		return 0.0
+	var endpoint_score := 1.0 - clampf(wrist.distance_to(desired_target) / maxf(upper + lower, 0.001), 0.0, 1.0)
+	var straightness_score := 1.0 - clampf(get_chain_straightness(shoulder, elbow, wrist), 0.0, 1.0)
+	return clampf(endpoint_score * 0.8 + straightness_score * 0.2, 0.0, 1.0)
+
+static func blend_solution(from_solution: Dictionary, to_solution: Dictionary, weight: float) -> Dictionary:
+	var amount := clampf(weight, 0.0, 1.0)
+	var result := to_solution.duplicate(true)
+	for key in ["shoulder", "elbow", "wrist"]:
+		if from_solution.has(key) and to_solution.has(key):
+			var from_point: Vector3 = from_solution[key]
+			var to_point: Vector3 = to_solution[key]
+			result[key] = from_point.lerp(to_point, amount)
+	result["valid"] = bool(from_solution.get("valid", true)) and bool(to_solution.get("valid", true))
+	result["target_clamped"] = bool(to_solution.get("target_clamped", false))
+	return result
