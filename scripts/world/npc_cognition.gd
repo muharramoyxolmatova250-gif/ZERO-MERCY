@@ -198,3 +198,12 @@ func choose_threat_response(distance: float, severity: float, courage: float, pr
 		return "seek_safety_and_observe"
 	return "continue_cautiously"
 
+
+
+func learn_from_outcome(action: String, satisfaction: float, learning_rate: float = 0.08) -> void:
+	if action.is_empty():
+		return
+	var old := float(learned_preferences.get(action,0.0))
+	var target := (clampf(satisfaction,0.0,1.0)-0.5)*2.0
+	learned_preferences[action] = clampf(lerpf(old,target,clampf(learning_rate,0.01,0.3)),-1.0,1.0)
+
