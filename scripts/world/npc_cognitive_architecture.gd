@@ -351,3 +351,8 @@ func update_goal_priority(goal_id: int, priority: float, reason: String = "") ->
 			goals[index]["last_priority_reason"] = reason
 			return true
 	return false
+
+
+func observe_world_fact(subject: String, claim: String, confidence: float, evidence: String, context: Dictionary = {}) -> void:
+	form_belief(subject, claim, confidence, evidence)
+	add_memory("observation:" + subject, context.merged({"claim":claim,"evidence":evidence}, true), confidence * 0.65, confidence)
