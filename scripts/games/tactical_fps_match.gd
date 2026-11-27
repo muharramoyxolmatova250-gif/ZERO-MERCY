@@ -118,11 +118,11 @@ func _build_arena() -> void:
 	floor.add_child(floor_shape)
 	floor.position.y = -0.5
 	add_child(floor)
-	for i in range(12):
+	for i in range(20):
 		var cover := StaticBody3D.new()
 		var mesh := MeshInstance3D.new()
 		var block := BoxMesh.new()
-		block.size = Vector3(2.8, 1.5, 1.2)
+		block.size = Vector3(3.2, 1.8, 1.4)
 		mesh.mesh = block
 		var mat := StandardMaterial3D.new()
 		mat.albedo_color = Color(0.12, 0.19, 0.23)
@@ -134,7 +134,7 @@ func _build_arena() -> void:
 		collision.size = block.size
 		shape.shape = collision
 		cover.add_child(shape)
-		cover.position = Vector3(-15.0 + float(i % 4) * 10.0, 0.75, -12.0 + float(i / 4) * 10.0)
+		cover.position = Vector3(-24.0 + float(i % 5) * 12.0, 0.9, -18.0 + float(i / 5) * 12.0)
 		cover_positions.append(cover.position)
 		add_child(cover)
 	var light := DirectionalLight3D.new()
