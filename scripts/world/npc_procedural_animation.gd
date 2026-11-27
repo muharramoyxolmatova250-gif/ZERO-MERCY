@@ -41,6 +41,9 @@ func setup(body_node: Node3D, head_node: Node3D, left_arm_node: Node3D, right_ar
 	if is_instance_valid(head):
 		head_rest = head.rotation
 
+func configure_profile(identity: String, traits: Dictionary) -> void:
+	director.configure(identity, traits)
+
 func trigger_reaction(kind: String, intensity: float = 0.7) -> void:
 	reaction_name = kind
 	reaction_intensity = clampf(intensity, 0.0, 1.0)
@@ -147,4 +150,4 @@ func update_pose(delta: float, speed: float, motion_state: String, activity: Str
 		phone.rotation.x = -0.08 if using_phone else 0.0
 
 func get_pose_snapshot() -> Dictionary:
-	return {"gait_phase":phase,"idle_phase":idle_phase,"gesture_phase":gesture_phase,"idle_gesture":idle_gesture,"reaction":reaction_name if reaction_remaining > 0.0 else "","reaction_remaining":reaction_remaining,"director":director.get_snapshot()}
+	return {"gait_phase":phase,"idle_phase":idle_phase,"gesture_phase":gesture_phase,"idle_gesture":idle_gesture,"reaction":reaction_name if reaction_remaining > 0.0 else "","reaction_remaining":reaction_remaining,"director":director.get_snapshot(),"style":director.profile.style}
