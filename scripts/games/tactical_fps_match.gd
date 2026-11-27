@@ -513,7 +513,7 @@ func _detonate_tactical_grenade(blast_position: Vector3) -> void:
 		var player_escape := player.global_position - blast_position
 		player_escape.y = 0.0
 		if player_escape.length() > 0.01:
-			player.velocity += player_escape.normalized() * (5.5 * (1.0 - player_distance / 5.0))
+			external_knockback += player_escape.normalized() * (5.5 * (1.0 - player_distance / 5.0))
 	for ally in allies:
 		if not is_instance_valid(ally) or bool(ally.get_meta("downed", false)):
 			continue
