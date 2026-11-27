@@ -1112,3 +1112,9 @@ func update_resident_belief(subject: String, claim: String, confidence: float, e
 
 func revise_resident_belief(subject: String, claim: String, evidence_quality: float) -> bool:
 	return _independent_mind.revise_belief(subject, claim, evidence_quality)
+
+func get_independent_mind_snapshot() -> Dictionary:
+	return _independent_mind.get_cognitive_snapshot()
+
+func reflect_on_recent_life(topic: String = "") -> Dictionary:
+	return _independent_mind.simulate_reflection({"topic":topic,"goal":current_goal,"stress":_stress})
