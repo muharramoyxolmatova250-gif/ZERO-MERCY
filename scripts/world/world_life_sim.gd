@@ -1655,6 +1655,19 @@ func get_phone_conversation(citizen_id: String, other_id: String, limit: int = 6
     return conversation.slice(maxi(0, conversation.size() - safe_limit))
 
 
+func get_phone_thread_summary(citizen_id: String, other_id: String) -> Dictionary:
+    var messages := get_phone_conversation(citizen_id, other_id, 200)
+    var unread := 0
+    var last_message: Dictionary = {}
+    for message in messages:
+        if str(message.get("from", "")) == other_id and not bool(message.get("read", false)):
+            unread += 1
+        last_message = message
+    return {"contact_id": other_id, "message_count": messages.size(), "unread": unread,
+        "last_text": str(last_message.get("text", "")), "last_day": int(last_message.get("day", 0)),
+        "last_timestamp": str(last_message.get("timestamp", ""))}
+
+
 func get_phone_contacts(citizen_id: String) -> Array:
     var profile := _ensure_phone_profile(citizen_id)
     if profile.is_empty():
