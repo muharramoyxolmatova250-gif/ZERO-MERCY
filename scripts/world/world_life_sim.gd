@@ -1623,7 +1623,10 @@ func get_phone_unread_count(citizen_id: String) -> int:
 
 
 func send_phone_message(sender_id: String, recipient_id: String, message_text: String, message_kind: String = "text") -> bool:
-    if sender_id == recipient_id or message_text.strip_edges().is_empty():
+    message_text = message_text.strip_edges()
+    if message_text.length() > 500:
+        return false
+    if sender_id == recipient_id or message_text.is_empty():
         return false
     if not resident_profiles.has(sender_id) or not resident_profiles.has(recipient_id):
         return false
