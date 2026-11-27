@@ -120,7 +120,8 @@ func release_responder(responder_id: String, incident_id: String) -> void:
 		assigned.erase(responder_id)
 		incident["assigned"] = assigned
 		if assigned.is_empty() and str(incident.get("status", "")) != "resolved":
-			incident["status"] = "awaiting_units"
+			incident["status"] = "on_scene"
+			incident["last_responder_released_msec"] = Time.get_ticks_msec()
 		_incidents[incident_id] = incident
 
 func resolve_incident(incident_id: String) -> bool:
@@ -185,3 +186,19 @@ func get_priority_queue() -> Array[Dictionary]:
 		return float(a.get("priority_score", 0.0)) > float(b.get("priority_score", 0.0))
 	)
 	return queue
+
+ 
+func get_incidents_near(position: Vector3, radius: float = 100.0) -> Array[Dictionary]:
+	var nearby: Array[Dictionary] = []
+	for incident in _incidents.values():
+		if str(incident.get("status", "")) == "resolved":
+			continue
+		var distance := position.distance_to(incident.get("position", Vector3.ZERO))
+		if distance <= radius:
+			var item: Dictionary = incident.duplicate(true)
+			item["distance"] = distance
+			nearby.append(item)
+	nearby.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("distance", INF)) < float(b.get("distance", INF))
+	)
+	return nearby
