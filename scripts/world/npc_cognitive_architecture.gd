@@ -276,3 +276,11 @@ func reconsider_goals(context: Dictionary = {}) -> Dictionary:
 		var revised := clampf(priority * 0.82 + drive * 0.18,0.0,1.0)
 		if absf(revised-priority) > 0.04: goals[i]["priority"] = revised; changed += 1
 	return {"revised_goals":changed,"conflicts":detect_goal_conflicts().size()}
+
+func build_autobiographical_summary(max_items: int = 12) -> Array[String]:
+	var summary: Array[String] = []
+	var start := maxi(0, memories.size()-maxi(1,max_items))
+	for i in range(start, memories.size()):
+		var event := str(memories[i].get("event", ""))
+		if not event.is_empty(): summary.append(event)
+	return summary
