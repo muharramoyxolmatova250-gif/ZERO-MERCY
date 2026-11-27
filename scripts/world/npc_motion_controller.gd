@@ -110,3 +110,5 @@ func reset_motion(position: Vector3) -> void:
 	last_position = position
 	stuck_time = 0.0
 	motion_state = "idle"
+func get_speed_ratio() -> float:
+	return clampf(velocity.length() / maxf(preferred_speed, 0.01), 0.0, 2.0)
