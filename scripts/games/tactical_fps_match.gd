@@ -519,7 +519,7 @@ func _detonate_tactical_grenade(blast_position: Vector3) -> void:
 			continue
 		var distance := ally.global_position.distance_to(blast_position)
 		if distance < 5.0:
-			var remaining := maxf(0.0, float(ally.get_meta("health", 100.0)) - 42.0 * (1.0 - distance / 6.5))
+			var remaining := maxf(0.0, float(ally.get_meta("health", 100.0)) - 42.0 * (1.0 - distance / 5.0))
 			ally.set_meta("health", remaining)
 			if remaining <= 0.0:
 				ally.set_meta("downed", true)
