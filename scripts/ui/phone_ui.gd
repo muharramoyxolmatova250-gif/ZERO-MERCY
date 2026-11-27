@@ -150,6 +150,8 @@ func _refresh_content() -> void:
             _build_news()
         "contacts":
             _build_contacts()
+        "sms":
+            _build_sms_inbox()
         "life":
             _build_life()
         "missions":
