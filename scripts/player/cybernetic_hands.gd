@@ -7,6 +7,7 @@ var _dark_metal := StandardMaterial3D.new()
 var _gold := StandardMaterial3D.new()
 var _arm_pivots: Array[Node3D] = []
 var _finger_hinges: Array[Node3D] = []
+var _thumb_hinges: Array[Node3D] = []
 var _right_arm: Node3D
 var _grip_anchor: Marker3D
 var _reach_rotation := Vector3.ZERO
@@ -50,7 +51,9 @@ func _process(delta: float) -> void:
 		if hinge_index >= 4:
 			curl = lerpf(curl, 0.88 if _is_gripping else 0.24, _reach_weight)
 		var hinge := _finger_hinges[hinge_index]
-		hinge.rotation.x = lerpf(hinge.rotation.x, curl, clampf(delta * 9.0, 0.0, 1.0))
+		hinge.rotation.x = lerpf(hinge.rotation.x, curl, clampf(delta * 12.0, 0.0, 1.0))
+	for thumb in _thumb_hinges:
+		thumb.rotation.z = lerpf(thumb.rotation.z, -0.62 if _is_gripping else -0.12, clampf(delta * 12.0, 0.0, 1.0))
 
 func _build_arm(side: float, right_hand: bool) -> void:
 	var arm := Node3D.new()
@@ -92,8 +95,13 @@ func _build_arm(side: float, right_hand: bool) -> void:
 		middle_hinge.add_child(tip_hinge)
 		_add_box(tip_hinge, "Finger_%d_Tip" % finger, Vector3(0.0, -0.0325, -0.003), Vector3(0.043, 0.065, 0.06), finger_material)
 
-	_add_box(arm, "Thumb_Base", Vector3(side * 0.55, -0.51, -0.015), Vector3(0.13, 0.075, 0.08), _metal)
-	_add_box(arm, "Thumb_Tip", Vector3(side * 0.50, -0.58, -0.025), Vector3(0.09, 0.065, 0.07), _metal)
+	var thumb_hinge := Node3D.new()
+	thumb_hinge.name = "Thumb_Hinge"
+	thumb_hinge.position = Vector3(side * 0.55, -0.51, -0.015)
+	arm.add_child(thumb_hinge)
+	_thumb_hinges.append(thumb_hinge)
+	_add_box(thumb_hinge, "Thumb_Base", Vector3(side * -0.025, -0.035, 0.0), Vector3(0.13, 0.075, 0.08), _metal)
+	_add_box(thumb_hinge, "Thumb_Tip", Vector3(side * -0.075, -0.075, -0.01), Vector3(0.09, 0.065, 0.07), _metal)
 	var status := StandardMaterial3D.new()
 	status.albedo_color = Color(0.0, 0.82, 1.0)
 	status.emission_enabled = true
