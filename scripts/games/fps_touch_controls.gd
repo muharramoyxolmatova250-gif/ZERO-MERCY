@@ -7,6 +7,8 @@ signal fire_held_changed(held: bool)
 signal sprint_held_changed(held: bool)
 signal reload_pressed
 signal jump_pressed
+signal crouch_pressed
+signal aim_toggle_pressed
 
 var _move_touch := -1
 var _aim_touch := -1
@@ -33,14 +35,20 @@ func _draw() -> void:
 	var reload := _reload_center()
 	var jump := _jump_center()
 	var sprint := _sprint_center()
+	var crouch := _crouch_center()
+	var ads := _ads_center()
 	draw_circle(fire, 48, Color(0.75, 0.12, 0.08, 0.7))
 	draw_circle(reload, 31, Color(0.15, 0.4, 0.55, 0.75))
 	draw_circle(jump, 31, Color(0.2, 0.55, 0.35, 0.75))
 	draw_circle(sprint, 32, Color(0.55, 0.48, 0.12, 0.78))
+	draw_circle(crouch, 31, Color(0.35, 0.35, 0.42, 0.78))
+	draw_circle(ads, 31, Color(0.22, 0.36, 0.58, 0.78))
 	draw_string(ThemeDB.fallback_font, fire + Vector2(-20, 6), "FIRE", HORIZONTAL_ALIGNMENT_LEFT, -1, 17, Color.WHITE)
 	draw_string(ThemeDB.fallback_font, reload + Vector2(-25, 5), "RELOAD", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
 	draw_string(ThemeDB.fallback_font, jump + Vector2(-17, 5), "JUMP", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color.WHITE)
 	draw_string(ThemeDB.fallback_font, sprint + Vector2(-24, 5), "SPRINT", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
+	draw_string(ThemeDB.fallback_font, crouch + Vector2(-26, 5), "CROUCH", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
+	draw_string(ThemeDB.fallback_font, ads + Vector2(-13, 5), "ADS", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color.WHITE)
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
@@ -68,6 +76,10 @@ func _gui_input(event: InputEvent) -> void:
 					reload_pressed.emit()
 				elif _is_near(event.position, _jump_center(), 38.0):
 					jump_pressed.emit()
+				elif _is_near(event.position, _crouch_center(), 38.0):
+					crouch_pressed.emit()
+				elif _is_near(event.position, _ads_center(), 38.0):
+					aim_toggle_pressed.emit()
 				accept_event()
 		else:
 			if event.index == _sprint_touch:
@@ -127,3 +139,9 @@ func _reset_touches() -> void:
 
 func _sprint_center() -> Vector2:
 	return Vector2(size.x - 92.0, 72.0)
+
+func _crouch_center() -> Vector2:
+	return Vector2(size.x - 190.0, size.y - 142.0)
+
+func _ads_center() -> Vector2:
+	return Vector2(size.x - 190.0, size.y - 292.0)
