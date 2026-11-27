@@ -35,6 +35,7 @@ func _ready() -> void:
 	_roads_and_blocks()
 	_spawn_street_furniture()
 	_build_pedestrian_route_network()
+	_build_road_traffic_manager()
 	_build_public_transit_network()
 	_build_taxi_dispatch()
 	_spawn_city_life()
@@ -554,6 +555,21 @@ func _build_pedestrian_route_network() -> void:
 	for destination in _building_destinations:
 		_pedestrian_route_network.call("register_destination", str(destination.get("category", "explore")), destination.get("position", Vector3.ZERO), destination.get("interior", Vector3.ZERO), float(destination.get("height", 3.2)))
 
+func _build_road_traffic_manager() -> void:
+	var manager_script := load("res://scripts/world/road_traffic_manager.gd")
+	if manager_script == null:
+		push_warning("Road traffic manager script is missing; vehicles use local speed control.")
+		return
+	var manager := Node.new()
+	manager.name = "RoadTrafficManager"
+	manager.set_script(manager_script)
+	manager.add_to_group("road_traffic_manager")
+	add_child(manager)
+	var city_prefix := _resolved_settlement_id()
+	manager.call("register_segment", city_prefix + "_city_loop", 13.9, 18)
+	manager.call("register_segment", city_prefix + "_city_transit", 10.0, 24)
+
+
 func _build_public_transit_network() -> void:
 	var transit_script := load("res://scripts/world/public_transit_network.gd")
 	var bus_script := load("res://scripts/world/city_transit_vehicle.gd")
@@ -596,6 +612,7 @@ func _build_public_transit_network() -> void:
 		var bus_stop_ids: Array[String] = []
 		for point_index in range(stop_ids.size()):
 			bus_stop_ids.append(stop_ids[(start_index + point_index) % stop_ids.size()])
+		bus.set("traffic_segment_id", _resolved_settlement_id() + "_city_transit")
 		bus.set("route", bus_route)
 		bus.set("route_id", _resolved_settlement_id() + "_bus_loop")
 		bus.set("stop_ids", bus_stop_ids)
@@ -668,6 +685,7 @@ func _spawn_city_life() -> void:
 			Vector3(half, 0, offset + 5.0),
 			Vector3(-half, 0, offset + 5.0)
 		])
+		car.set("traffic_segment_id", _resolved_settlement_id() + "_city_loop")
 		car.set("route", route)
 		car.set("speed", rng.randf_range(7.0, 12.0))
 		car.set("vehicle_color", [Color(0.02,0.12,0.2), Color(0.12,0.025,0.09), Color(0.08,0.1,0.14), Color(0.16,0.09,0.025)][i % 4])
