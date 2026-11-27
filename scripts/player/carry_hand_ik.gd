@@ -291,3 +291,9 @@ static func get_solution_quality(solution: Dictionary, desired_target: Vector3) 
 static func get_segment_transform(start: Vector3, finish: Vector3, up_hint: Vector3 = Vector3.UP) -> Transform3D:
 	var basis := get_chain_orientation(start, finish, up_hint)
 	return Transform3D(basis, get_segment_midpoint(start, finish))
+
+static func get_joint_transform(position: Vector3, forward: Vector3, up_hint: Vector3 = Vector3.UP) -> Transform3D:
+	var direction := safe_normalize(forward)
+	var right := safe_normalize(direction.cross(up_hint), Vector3.RIGHT)
+	var up := safe_normalize(right.cross(direction), Vector3.UP)
+	return Transform3D(Basis(right, up, -direction).orthonormalized(), position)
