@@ -173,3 +173,12 @@ func update_social_impression(other_id: String, interaction: String, outcome: fl
 func get_social_impression(other_id: String) -> Dictionary:
 	return social_model.get(other_id,{"trust":0.35,"familiarity":0.0}).duplicate(true)
 
+
+
+func score_social_approach(other_id: String, kindness: float, current_stress: float) -> float:
+	var impression := get_social_impression(other_id)
+	var trust := float(impression.get("trust",0.35))
+	var familiarity := float(impression.get("familiarity",0.0))
+	var fear := float(emotional_state.get("fear",0.0))
+	return clampf(0.28+trust*0.38+familiarity*0.2+kindness*0.14-current_stress*0.28-fear*0.2,0.0,1.0)
+
