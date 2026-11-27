@@ -551,3 +551,84 @@ undefined
 undefined
 
 undefined
+
+func resume_interrupted_goal(goal_id: String, context: Dictionary = {}) -> Dictionary:
+	for record in completed_goals:
+		if str(record.get("id",""))==goal_id and str(record.get("status",""))=="interrupted":
+			if is_goal_feasible(record,context):
+				active_personal_goal=record.duplicate(true)
+				active_personal_goal["status"]="resumed"
+				return active_personal_goal.duplicate(true)
+	return {}
+
+func learn_from_action_result(action: String, result: Dictionary) -> void:
+	var satisfaction := clampf(float(result.get("satisfaction",0.5)),0.0,1.0)
+	record_action_experience(action,str(result.get("target","")),satisfaction)
+	if not bool(result.get("success",true)):
+		record_failed_attempt(str(result.get("goal_id","")),str(result.get("reason","unknown")))
+
+func get_decision_explanation(candidate: Dictionary, context: Dictionary = {}) -> Dictionary:
+	return {"goal":str(candidate.get("id","")),"score":score_goal_candidate(candidate,context),"personality_drive":str(candidate.get("drive","")),"learned_preference":float(preferences.get(str(candidate.get("id","")),0.0)),"context_need":str(candidate.get("need","")),"self_selected":true}
+
+func prune_agency_history(max_records: int = 80) -> void:
+	while completed_goals.size()>max_records: completed_goals.pop_front()
+	while rejected_goals.size()>16: rejected_goals.pop_front()
+	var failures: Dictionary=preferences.get("failures",{})
+	for key in failures.keys():
+		if int(failures[key])<=0: failures.erase(key)
+	preferences["failures"]=failures
+
+func get_autonomous_decision_candidates(context: Dictionary = {}) -> Array[Dictionary]:
+	var candidates: Array[Dictionary]=[]
+	for goal in GOAL_CATALOG:
+		var copy: Dictionary=goal.duplicate(true)
+		copy["score"]=score_goal_candidate(copy,context)-goal_failure_penalty(str(copy.get("id","")))
+		if not goal_is_repetitive(str(copy.get("id",""))): candidates.append(copy)
+	for emergent in observe_environment(context.get("affordances",[])):
+		emergent["score"]=score_goal_candidate(emergent,context)
+		candidates.append(emergent)
+	return candidates
+
+func choose_goal_with_constraints(context: Dictionary = {}) -> Dictionary:
+	if not respects_goal_boundaries({"need":"discovery"},context):
+		context["unavailable"]=true
+	var candidates := get_autonomous_decision_candidates(context)
+	return choose_from_candidates(candidates,context)
+
+func register_personal_commitment(goal_id: String, reason: String, importance: float = 0.5) -> void:
+	if goal_id.is_empty(): return
+	var commitments: Dictionary=preferences.get("commitments",{})
+	commitments[goal_id]={"reason":reason,"importance":clampf(importance,0.0,1.0),"created_tick":Time.get_ticks_msec()}
+	preferences["commitments"]=commitments
+
+func get_personal_commitment(goal_id: String) -> Dictionary:
+	var commitments: Dictionary=preferences.get("commitments",{})
+	return commitments.get(goal_id,{}).duplicate(true)
+
+func update_personal_relationship_memory(person_id: String, trust_delta: float, warmth_delta: float) -> void:
+	if person_id.is_empty(): return
+	var relations: Dictionary=preferences.get("relationships",{})
+	var record: Dictionary=relations.get(person_id,{"trust":0.5,"warmth":0.5})
+	record["trust"]=clampf(float(record.get("trust",0.5))+trust_delta,0.0,1.0)
+	record["warmth"]=clampf(float(record.get("warmth",0.5))+warmth_delta,0.0,1.0)
+	relations[person_id]=record
+	preferences["relationships"]=relations
+
+func choose_personal_goal_for_relationship(person_id: String, context: Dictionary = {}) -> Dictionary:
+	var relations: Dictionary=preferences.get("relationships",{})
+	var relation: Dictionary=relations.get(person_id,{})
+	var warmth := float(relation.get("warmth",0.5))
+	var trust := float(relation.get("trust",0.5))
+	var goal := {"id":"relationship_"+person_id,"activity":"social","drive":"sociability","weight":warmth*0.65+trust*0.35,"need":"belonging","target":person_id,"self_chosen":true}
+	if not is_goal_feasible(goal,context): return {}
+	active_personal_goal=goal.duplicate(true)
+	return goal
+
+func update_goal_from_new_information(information: Dictionary, context: Dictionary = {}) -> Dictionary:
+	var goal_id := str(active_personal_goal.get("id",""))
+	if goal_id.is_empty(): return {}
+	var relevance := float(information.get("relevance",0.0))
+	if relevance>0.65 and bool(information.get("contradicts_plan",false)):
+		interrupt_goal("new_information",context)
+		return select_next_autonomous_intention(context)
+	return active_personal_goal.duplicate(true)
