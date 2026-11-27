@@ -277,3 +277,12 @@ func respond_to_disagreement(other_opinion: String, topic: String) -> String:
 		return "I disagree with that point. My reasons are different, and I'm happy to explain."
 	return "That's not quite how I see it. Maybe we can compare our reasons."
 
+
+
+func share_relevant_memory(topic: String) -> String:
+	var matches := recall_conversations(topic,2)
+	if matches.is_empty():
+		return ""
+	var memory: Dictionary = matches[0]
+	return "That reminds me of our earlier conversation about %s." % str(memory.get("topic",topic))
+
