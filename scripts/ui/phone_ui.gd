@@ -1110,3 +1110,142 @@ func _show_browser_bookmarks() -> void:
     _browser_query = ""
     _browser_view_mode = "bookmarks"
     _refresh_content()
+
+
+func _build_social_network() -> void:
+    _add_section_title("ZERO SOCIAL // GLOBAL NETWORK")
+    var owner_id := _get_phone_owner_id()
+    if owner_id.is_empty() or _life == null or not _life.has_method("get_phone_social_profile"):
+        _add_body("Social identity is unavailable. Connect the player profile first.")
+        return
+    var profile: Dictionary = _life.call("get_phone_social_profile", owner_id)
+    _add_body("IDENTITY VERIFIED  •  " + str(profile.get("name", "RESIDENT")).to_upper())
+    _add_stat("FOLLOWERS", str((profile.get("followers", []) as Array).size()))
+    _add_stat("FOLLOWING", str((profile.get("following", []) as Array).size()))
+    var modes := HBoxContainer.new()
+    for mode in ["all", "following", "discover", "profile"]:
+        var button := Button.new()
+        button.text = mode.to_upper()
+        button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        button.pressed.connect(func() -> void:
+            _social_feed_mode = mode
+            _refresh_content()
+        )
+        modes.add_child(button)
+    _content.add_child(modes)
+    if _social_feed_mode == "discover":
+        _build_social_discover(owner_id)
+        return
+    if _social_feed_mode == "profile":
+        _add_section_title("MY PROFILE")
+        _add_stat("RESIDENT ID", owner_id)
+        _add_stat("OCCUPATION", str(profile.get("occupation", "Resident")))
+        _add_stat("CITY", str(profile.get("city", "Unknown")))
+        var own_posts: Array = profile.get("posts", [])
+        own_posts.reverse()
+        for post in own_posts:
+            _render_social_post(post, owner_id, false)
+        if own_posts.is_empty():
+            _add_body("You have not published anything yet.")
+        return
+    _add_section_title("PUBLISH A POST")
+    var composer := TextEdit.new()
+    composer.placeholder_text = "What's happening in your world?"
+    composer.custom_minimum_size = Vector2(0, 76)
+    composer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    _content.add_child(composer)
+    var publish := Button.new()
+    publish.text = "PUBLISH TO ZERO SOCIAL"
+    publish.custom_minimum_size.y = 42
+    publish.pressed.connect(func() -> void:
+        var message := composer.text.strip_edges()
+        if not message.is_empty() and _life.has_method("publish_phone_post"):
+            if _life.call("publish_phone_post", owner_id, message, "resident"):
+                _refresh_content()
+    )
+    _content.add_child(publish)
+    _add_section_title("FOLLOWING FEED" if _social_feed_mode == "following" else "GLOBAL RESIDENT FEED")
+    var posts: Array = _life.call("get_phone_network_feed", owner_id, 35, _social_feed_mode == "following")
+    if posts.is_empty():
+        _add_body("No posts in this feed yet. Follow residents or publish the first update.")
+    for post in posts:
+        _render_social_post(post, owner_id, true)
+
+
+func _render_social_post(post: Dictionary, owner_id: String, allow_reactions: bool) -> void:
+    var card := PanelContainer.new()
+    var style := StyleBoxFlat.new()
+    style.bg_color = Color(0.018, 0.045, 0.075, 0.98)
+    style.border_color = Color(0.0, 0.72, 0.88, 0.62)
+    style.set_border_width_all(1)
+    style.set_corner_radius_all(9)
+    card.add_theme_stylebox_override("panel", style)
+    _content.add_child(card)
+    var body := VBoxContainer.new()
+    body.add_theme_constant_override("separation", 5)
+    card.add_child(body)
+    var author := Label.new()
+    author.text = str(post.get("author", post.get("author_name", post.get("author_id", "Resident")))) + "  •  DAY " + str(post.get("day", 1))
+    author.add_theme_color_override("font_color", Color(0.1, 0.9, 1.0))
+    body.add_child(author)
+    var message := Label.new()
+    message.text = str(post.get("text", post.get("caption", post.get("title", ""))))
+    message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    message.add_theme_color_override("font_color", Color(0.9, 0.94, 0.98))
+    body.add_child(message)
+    var stats := Label.new()
+    stats.text = "♥ " + str(post.get("likes", 0)) + "     COMMENTS " + str(post.get("comments", 0)) + "     " + str(post.get("mood", post.get("topic", "WORLD")))
+    stats.add_theme_color_override("font_color", Color(0.35, 0.72, 0.82))
+    stats.add_theme_font_size_override("font_size", 10)
+    body.add_child(stats)
+    if allow_reactions:
+        var actions := HBoxContainer.new()
+        var like := Button.new()
+        like.text = "♥ LIKE"
+        like.pressed.connect(func() -> void:
+            if _life.has_method("react_to_phone_post"):
+                _life.call("react_to_phone_post", owner_id, str(post.get("id", "")))
+                _refresh_content()
+        )
+        actions.add_child(like)
+        var comment_input := LineEdit.new()
+        comment_input.placeholder_text = "Write a comment..."
+        comment_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        actions.add_child(comment_input)
+        var send_comment := Button.new()
+        send_comment.text = "SEND"
+        send_comment.pressed.connect(func() -> void:
+            if _life.has_method("add_phone_social_comment") and _life.call("add_phone_social_comment", owner_id, str(post.get("id", "")), comment_input.text):
+                _refresh_content()
+        )
+        actions.add_child(send_comment)
+        body.add_child(actions)
+    var comments: Array = post.get("comment_list", [])
+    for comment in comments.slice(maxi(0, comments.size() - 3)):
+        var comment_label := Label.new()
+        comment_label.text = "↳ " + str(comment.get("author", comment.get("author_id", "Resident"))) + ": " + str(comment.get("text", ""))
+        comment_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        comment_label.add_theme_color_override("font_color", Color(0.58, 0.72, 0.8))
+        body.add_child(comment_label)
+
+
+func _build_social_discover(owner_id: String) -> void:
+    _add_section_title("DISCOVER RESIDENTS")
+    var suggestions: Array = _life.call("get_phone_suggested_residents", owner_id, 24)
+    if suggestions.is_empty():
+        _add_body("No new residents to recommend.")
+    for resident in suggestions:
+        var row := HBoxContainer.new()
+        var details := Label.new()
+        details.text = str(resident.get("name", "Resident")) + "\\n" + str(resident.get("occupation", "Resident")) + "  •  " + str(resident.get("followers", 0)) + " followers"
+        details.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        row.add_child(details)
+        var follow := Button.new()
+        follow.text = "FOLLOW"
+        follow.pressed.connect(func() -> void:
+            _life.call("follow_phone_resident", owner_id, str(resident.get("id", "")))
+            _refresh_content()
+        )
+        row.add_child(follow)
+        _content.add_child(row)
