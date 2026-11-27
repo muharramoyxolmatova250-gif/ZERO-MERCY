@@ -195,3 +195,7 @@ func wants_new_job(context: Dictionary = {}) -> bool:
 	var dissatisfaction := clampf(float(context.get("dissatisfaction", 0.0)), 0.0, 1.0)
 	var financial_pressure := clampf(float(context.get("financial_pressure", 0.0)), 0.0, 1.0)
 	return dissatisfaction * 0.55 + financial_pressure * 0.3 + _trait("ambition") * 0.15 > 0.62
+func wants_business(context: Dictionary = {}) -> bool:
+	var capital := clampf(float(context.get("capital_readiness", 0.0)), 0.0, 1.0)
+	var opportunity := clampf(float(context.get("market_opportunity", 0.0)), 0.0, 1.0)
+	return _trait("risk_tolerance") * 0.38 + _trait("ambition") * 0.28 + capital * 0.18 + opportunity * 0.16 > 0.68
