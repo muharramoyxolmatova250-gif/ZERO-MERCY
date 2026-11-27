@@ -24,6 +24,7 @@ var _browser_view_mode := "search"
 var _last_camera_message := "READY TO CAPTURE"
 var _last_call_message := ""
 var _social_feed_mode := "all"
+var _social_search_query := ""
 var _social_comment_post_id := ""
 
 func _ready() -> void:
@@ -1125,7 +1126,7 @@ func _build_social_network() -> void:
     _add_stat("POSTS", str(profile.get("post_count", 0)))
     _add_stat("SOCIAL INFLUENCE", str(profile.get("influence_score", 0)))
     var modes := HBoxContainer.new()
-    for mode in ["all", "following", "discover", "profile"]:
+    for mode in ["all", "following", "trending", "search", "discover", "profile"]:
         var button := Button.new()
         button.text = mode.to_upper()
         button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1135,6 +1136,36 @@ func _build_social_network() -> void:
         )
         modes.add_child(button)
     _content.add_child(modes)
+    if _social_feed_mode == "search":
+        var search_row := HBoxContainer.new()
+        var search_input := LineEdit.new()
+        search_input.placeholder_text = "Search residents, topics or posts..."
+        search_input.text = _social_search_query
+        search_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        search_row.add_child(search_input)
+        var search_button := Button.new()
+        search_button.text = "SEARCH"
+        search_button.pressed.connect(func() -> void:
+            _social_search_query = search_input.text.strip_edges()
+            _refresh_content()
+        )
+        search_row.add_child(search_button)
+        _content.add_child(search_row)
+        _add_section_title("SEARCH RESULTS")
+        var search_results: Array = _life.call("search_phone_social_posts", owner_id, _social_search_query, 30) if _life.has_method("search_phone_social_posts") else []
+        if search_results.is_empty():
+            _add_body("No matching resident posts. Try a name, topic or keyword.")
+        for result in search_results:
+            _render_social_post(result, owner_id, true)
+        return
+    if _social_feed_mode == "trending":
+        _add_section_title("TRENDING RESIDENT POSTS")
+        var trending_posts: Array = _life.call("get_phone_trending_feed", owner_id, 30) if _life.has_method("get_phone_trending_feed") else []
+        if trending_posts.is_empty():
+            _add_body("The network is quiet. Trending posts will appear as residents interact.")
+        for trending_post in trending_posts:
+            _render_social_post(trending_post, owner_id, true)
+        return
     if _social_feed_mode == "discover":
         _build_social_discover(owner_id)
         return
