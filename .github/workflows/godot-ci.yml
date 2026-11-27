@@ -46,5 +46,8 @@ jobs:
       - name: Run NPC family and household regression tests
         run: godot --headless --path . --script res://tests/test_world_family_system.gd
 
+      - name: Run campaign progression integration test
+        run: godot --headless --path . --script res://tests/test_mission_campaign.gd
+
       - name: Run core system integration smoke test
         run: godot --headless --path . --script res://tests/core_integration_smoke.gd
