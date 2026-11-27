@@ -3047,3 +3047,157 @@ undefined
 undefined
 
 undefined
+
+func resolve_resident_job_application(citizen_id: String) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {"resolved":false}
+	var p: Dictionary = resident_profiles[citizen_id]
+	var application: Dictionary = p.get("job_application",{})
+	if application.is_empty() or str(application.get("status","")) != "pending": return {"resolved":false,"reason":"no_pending_application"}
+	var job := str(application.get("job",""))
+	var offer := evaluate_job_offer(citizen_id,job)
+	var chance := clampf(float(application.get("qualification",0.0))*0.68 + float(p.get("academic_performance",0.5))*0.18,0.08,0.92)
+	var success := _rng.randf() <= chance and bool(offer.get("accepted",false))
+	application["status"] = "accepted" if success else "rejected"
+	application["resolved_day"] = simulation_day
+	p["job_application"] = application
+	p["job_search_status"] = "employed" if success else "application_rejected"
+	if success:
+		p["occupation"] = job
+		p["career_field"] = job
+		p["contract_salary"] = int(offer.get("salary",_monthly_salary_for_job(job,1)))
+		p["career_satisfaction"] = clampf(float(p.get("career_satisfaction",0.5))+0.08,0.0,1.0)
+		_append_event(p,"job_application_accepted:" + job)
+	else:
+		_append_event(p,"job_application_rejected:" + job)
+	resident_profiles[citizen_id] = p
+	_dirty = true
+	return {"resolved":true,"success":success,"application":application}
+
+func apply_resident_job_offer(citizen_id: String, job: String, salary: int = 0) -> Dictionary:
+	var offer := evaluate_job_offer(citizen_id,job,salary)
+	if not bool(offer.get("accepted",false)): return {"applied":false,"reason":"qualification_mismatch","offer":offer}
+	var p: Dictionary = resident_profiles[citizen_id]
+	p["occupation"] = job
+	p["career_field"] = job
+	p["contract_salary"] = int(offer.get("salary",0))
+	p["job_search_status"] = "employed"
+	p["job_application"] = {}
+	_append_event(p,"accepted_job_offer:" + job)
+	resident_profiles[citizen_id] = p
+	_dirty = true
+	return {"applied":true,"job":job,"salary":int(offer.get("salary",0))}
+
+func forecast_resident_business(citizen_id: String) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {}
+	var p: Dictionary = resident_profiles[citizen_id]
+	if str(p.get("business_id","")).is_empty(): return {"owns_business":false}
+	var capital := float(p.get("business_capital",0))
+	var profit := float(p.get("business_last_profit",0))
+	var health := float(p.get("business_health",0.5))
+	var competition := float(p.get("business_competition_pressure",0.0))
+	var risk := clampf(0.25 + competition*0.35 + (1.0-health)*0.4,0.0,1.0)
+	return {"owns_business":true,"estimated_next_month_profit":int(profit*(1.0-competition*0.15)),"closure_risk":risk,"capital_runway_months":int(capital/maxf(1.0,absf(minf(0.0,profit))+1500.0)),"recommended_action":"reduce_costs" if risk>0.65 else ("invest" if health>0.7 and profit>0 else "protect_cash")}
+
+func execute_business_strategy(citizen_id: String, strategy: String) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {"executed":false}
+	var p: Dictionary = resident_profiles[citizen_id]
+	if str(p.get("business_id","")).is_empty(): return {"executed":false,"reason":"no_business"}
+	match strategy:
+		"expand_inventory":
+			return invest_in_resident_business(citizen_id,mini(2500,int(p.get("money",0))),"inventory")
+		"expand_capacity":
+			return invest_in_resident_business(citizen_id,mini(5000,int(p.get("money",0))),"capacity")
+		"cut_costs":
+			p["business_restock_budget"] = maxi(300,int(p.get("business_restock_budget",1200))*3/4)
+			p["business_marketing_budget"] = 0
+			_append_event(p,"business_strategy_cut_costs")
+		"protect_cash":
+			p["business_restock_budget"] = mini(1800,int(p.get("business_restock_budget",1200)))
+			_append_event(p,"business_strategy_protect_cash")
+		_:
+			return {"executed":false,"reason":"unknown_strategy"}
+	resident_profiles[citizen_id] = p
+	_dirty = true
+	return {"executed":true,"strategy":strategy}
+
+func get_resident_economic_history(citizen_id: String, limit: int = 12) -> Array:
+	if not resident_profiles.has(citizen_id): return []
+	var events: Array = resident_profiles[citizen_id].get("life_events",[])
+	var filtered: Array = []
+	for item in events:
+		var event := str(item.get("event",""))
+		if event.contains("job_") or event.contains("business") or event.contains("career") or event.contains("skill") or event.contains("financial"):
+			filtered.append(item.duplicate(true))
+	var start := maxi(0,filtered.size()-clampi(limit,1,32))
+	return filtered.slice(start,filtered.size())
+
+func get_resident_economic_decision_snapshot(citizen_id: String, personality: Dictionary = {}) -> Dictionary:
+	var opportunities := get_resident_opportunity_snapshot(citizen_id)
+	var career := get_resident_career_snapshot(citizen_id)
+	var employment := get_resident_employment_snapshot(citizen_id)
+	var business := get_citizen_business_snapshot(citizen_id)
+	var business_forecast := forecast_resident_business(citizen_id)
+	return {"opportunities":opportunities,"career":career,"employment":employment,"business":business,"business_forecast":business_forecast,"financial_pressure":get_resident_financial_pressure(citizen_id),"decision":evaluate_resident_life_decision(citizen_id,"seek_job",personality)}
+
+func process_resident_autonomy_economy(citizen_id: String, personality: Dictionary = {}) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {}
+	var p: Dictionary = resident_profiles[citizen_id]
+	var result: Dictionary = {}
+	var application: Dictionary = p.get("job_application",{})
+	if str(application.get("status","")) == "pending" and simulation_day-int(application.get("submitted_day",simulation_day)) >= 7:
+		result["application"] = resolve_resident_job_application(citizen_id)
+	p = resident_profiles[citizen_id]
+	if not str(p.get("business_id","")).is_empty():
+		var choice := choose_business_strategy(citizen_id,personality)
+		if not choice.is_empty() and _rng.randf() < 0.12:
+			result["business_strategy"] = execute_business_strategy(citizen_id,str(choice.get("strategy","protect_cash")))
+	return result
+
+func record_resident_skill_mastery(citizen_id: String, skill: String, milestone: String = "practice") -> void:
+	if not resident_profiles.has(citizen_id): return
+	var p: Dictionary = resident_profiles[citizen_id]
+	var skills: Dictionary = p.get("skills",{})
+	var level := float(skills.get(skill,0.0))
+	if level >= 0.25 and not bool(p.get("skill_milestones",{}).get(skill+"_beginner",false)):
+		var milestones: Dictionary = p.get("skill_milestones",{})
+		milestones[skill+"_beginner"] = true
+		p["skill_milestones"] = milestones
+		_append_event(p,"skill_milestone:" + skill + ":beginner")
+	if level >= 0.75 and not bool(p.get("skill_milestones",{}).get(skill+"_advanced",false)):
+		var milestones: Dictionary = p.get("skill_milestones",{})
+		milestones[skill+"_advanced"] = true
+		p["skill_milestones"] = milestones
+		_append_event(p,"skill_milestone:" + skill + ":advanced")
+	resident_profiles[citizen_id] = p
+	_dirty = true
+
+func update_resident_goal_progress(citizen_id: String, goal_id: String, amount: float) -> float:
+	if not resident_profiles.has(citizen_id): return 0.0
+	var p: Dictionary = resident_profiles[citizen_id]
+	var progress: Dictionary = p.get("personal_goal_progress",{})
+	var value := clampf(float(progress.get(goal_id,0.0))+amount,0.0,1.0)
+	progress[goal_id] = value
+	p["personal_goal_progress"] = progress
+	if value >= 1.0:
+		_append_event(p,"personal_goal_completed:" + goal_id)
+		p["happiness"] = clampf(float(p.get("happiness",0.5))+0.035,0.0,1.0)
+	resident_profiles[citizen_id] = p
+	_dirty = true
+	return value
+
+func get_resident_autonomy_report(citizen_id: String) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {}
+	var p: Dictionary = resident_profiles[citizen_id]
+	return {"resident_id":citizen_id,"life_stage":str(p.get("life_stage","")),"occupation":str(p.get("occupation","")),"active_personal_goal":str(p.get("active_personal_goal","")),"financial_pressure":get_resident_financial_pressure(citizen_id),"career":get_resident_career_snapshot(citizen_id),"employment":get_resident_employment_snapshot(citizen_id),"business":get_citizen_business_snapshot(citizen_id),"economic_history":get_resident_economic_history(citizen_id,8)}
+
+func update_resident_autonomy_goal(citizen_id: String, goal_id: String, success: bool, personality: Dictionary = {}) -> Dictionary:
+	if not resident_profiles.has(citizen_id): return {}
+	var p: Dictionary = resident_profiles[citizen_id]
+	p["active_personal_goal"] = goal_id
+	p["last_personal_goal_success"] = success
+	p["last_personal_goal_day"] = simulation_day
+	if success: p["happiness"] = clampf(float(p.get("happiness",0.5))+0.015,0.0,1.0)
+	_append_event(p,"personal_goal_decision:" + goal_id + (":success" if success else ":deferred"))
+	resident_profiles[citizen_id] = p
+	_dirty = true
+	return {"goal":goal_id,"success":success,"happiness":float(p.get("happiness",0.5))}
