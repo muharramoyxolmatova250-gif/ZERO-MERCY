@@ -505,7 +505,12 @@ func _detonate_tactical_grenade(blast_position: Vector3) -> void:
 			flash.queue_free())
 	var player_distance := player.global_position.distance_to(blast_position)
 	if player_distance < 5.0:
-		health = maxf(0.0, health - 42.0 * (1.0 - player_distance / 6.5))
+		var player_damage := 42.0 * (1.0 - player_distance / 5.0)
+		health = maxf(0.0, health - player_damage)
+		var player_escape := player.global_position - blast_position
+		player_escape.y = 0.0
+		if player_escape.length() > 0.01:
+			player.velocity += player_escape.normalized() * (5.5 * (1.0 - player_distance / 5.0))
 	for ally in allies:
 		if not is_instance_valid(ally) or bool(ally.get_meta("downed", false)):
 			continue
