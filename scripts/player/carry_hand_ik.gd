@@ -53,3 +53,6 @@ static func make_debug_solution(shoulder: Vector3, target: Vector3, upper_length
 		"elbow_flex": get_elbow_flex(shoulder, elbow, wrist, upper_length, lower_length),
 		"target_clamped": not wrist.is_equal_approx(target)
 	}
+
+static func validate_segment_lengths(upper_length: float, lower_length: float) -> bool:
+	return upper_length > 0.001 and lower_length > 0.001
