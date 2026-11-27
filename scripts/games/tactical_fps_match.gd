@@ -600,12 +600,14 @@ func _update_allies(delta: float) -> void:
 		var status_label := ally.get_node_or_null("SquadStatus") as Label3D
 		if status_label != null:
 			var member_name := str(ally.get_meta("display_name", "SQUADMATE"))
+			var member_role := str(ally.get_meta("squad_role", "assault")).to_upper()
 			if downed:
 				status_label.modulate = Color(1.0, 0.35, 0.25)
-				status_label.text = member_name + "\nDOWN // REVIVE"
+				var helper := str(ally.get_meta("being_revived_by", ""))
+				status_label.text = member_name + "\nDOWN // " + (helper if not helper.is_empty() else "REVIVE")
 			else:
 				status_label.modulate = Color(0.55, 0.9, 1.0) if ally_health >= 55.0 else Color(1.0, 0.72, 0.25)
-				status_label.text = member_name + "\nHP %.0f" % ally_health
+				status_label.text = member_name + "  [" + member_role + "]\nHP %.0f" % ally_health
 		if downed:
 			ally.velocity = Vector3.ZERO
 			var revive_progress := float(ally.get_meta("revive_progress", 0.0))
