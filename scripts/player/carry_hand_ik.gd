@@ -297,3 +297,9 @@ static func get_joint_transform(position: Vector3, forward: Vector3, up_hint: Ve
 	var right := safe_normalize(direction.cross(up_hint), Vector3.RIGHT)
 	var up := safe_normalize(right.cross(direction), Vector3.UP)
 	return Transform3D(Basis(right, up, -direction).orthonormalized(), position)
+
+static func get_solution_transforms(solution: Dictionary) -> Dictionary:
+	var shoulder := get_solution_shoulder(solution)
+	var elbow := get_solution_elbow(solution)
+	var wrist := get_solution_endpoint(solution)
+	return {"upper": get_segment_transform(shoulder, elbow), "lower": get_segment_transform(elbow, wrist)}
