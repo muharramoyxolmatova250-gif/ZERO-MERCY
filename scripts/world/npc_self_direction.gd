@@ -303,3 +303,70 @@ func goal_matches_world_state(goal: Dictionary, world_state: Dictionary) -> bool
 	if not target.is_empty() and world_state.has("unavailable_targets") and (world_state.unavailable_targets as Array).has(target): return false
 	if bool(world_state.get("emergency",false)) and str(goal.get("need","")) not in ["security","calm","health"]: return false
 	return true
+
+
+func build_personal_plan(goal: Dictionary, context: Dictionary = {}) -> Array[Dictionary]:
+	var actions: Array[Dictionary] = []
+	if goal.is_empty(): return actions
+	var activity := str(goal.get("activity","explore"))
+	var target := str(goal.get("target",""))
+	var steps: Array[String] = []
+	match activity:
+		"work": steps = ["check_opportunity","prepare","travel","perform_task","review_result"]
+		"social": steps = ["choose_person","approach","start_conversation","listen","respond","reflect"]
+		"family": steps = ["check_family_needs","travel_home","offer_help","spend_time_together"]
+		"food": steps = ["check_hunger","find_food_source","obtain_food","eat"]
+		"rest": steps = ["find_safe_place","settle_down","rest","reassess_needs"]
+		"leisure": steps = ["choose_interest","find_activity","participate","reflect"]
+		_: steps = ["observe_environment","choose_target","approach_target","interact","reflect"]
+	for step in steps:
+		actions.append({"step":step,"target":target,"goal_id":str(goal.get("id","")),"status":"pending"})
+	return actions
+
+func evaluate_plan_step(step: Dictionary, context: Dictionary = {}) -> Dictionary:
+	var action := str(step.get("step",""))
+	var blocked := bool(context.get("blocked",false)) or bool(context.get("danger",false))
+	var utility := 0.5 + _trait("discipline")*0.12 + _trait("curiosity")*0.08
+	if blocked: utility -= 0.8
+	if float(context.get("energy",1.0)) < 0.15 and action not in ["rest","reassess_needs"]: utility -= 0.45
+	return {"step":action,"utility":clampf(utility,0.0,1.0),"feasible":utility>0.2,"reason":"context_and_personality_evaluation"}
+
+func choose_plan_alternative(step: Dictionary, alternatives: Array[String], context: Dictionary = {}) -> String:
+	var best := ""
+	var best_score := -INF
+	for option in alternatives:
+		var score := _trait("curiosity")*0.25 + _trait("discipline")*0.2 + float(preferences.get("action_"+option,0.0))
+		if option == str(context.get("last_action","")): score -= 0.3
+		score += _rng.randf_range(0.0,0.08)
+		if score > best_score: best_score=score; best=option
+	return best
+
+func interrupt_goal(reason: String, context: Dictionary = {}) -> Dictionary:
+	if active_personal_goal.is_empty(): return {}
+	var old := active_personal_goal.duplicate(true)
+	old["status"]="interrupted"
+	old["interrupt_reason"]=reason
+	old["progress_before_interrupt"]=float(context.get("progress",0.0))
+	completed_goals.append(old)
+	active_personal_goal.clear()
+	return old
+
+func resume_goal(goal_id: String, context: Dictionary = {}) -> Dictionary:
+	for record in completed_goals:
+		if str(record.get("id",""))==goal_id and str(record.get("status",""))=="interrupted" and is_goal_feasible(record,context):
+			active_personal_goal=record.duplicate(true)
+			active_personal_goal["status"]="resumed"
+			return active_personal_goal.duplicate(true)
+	return {}
+
+func record_action_experience(action: String, target: String, outcome: float) -> void:
+	if action.is_empty(): return
+	var key := "action_"+action
+	preferences[key]=clampf(float(preferences.get(key,0.0))*0.8+(clampf(outcome,0.0,1.0)-0.5)*0.35,-1.0,1.0)
+	if not target.is_empty(): remember_interest("target_"+target,(outcome-0.5)*0.08)
+
+func should_reconsider_goal(context: Dictionary = {}) -> bool:
+	if active_personal_goal.is_empty(): return true
+	if not goal_matches_world_state(active_personal_goal,context): return true
+	if bool(context.get("urgent_need",false)) or bool(context.get("major_event",false)): return true
+	return float(context.get("goal_satisfaction",0.5)) < 0.12
