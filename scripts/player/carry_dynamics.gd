@@ -292,3 +292,8 @@ func get_sway_offset() -> Vector3:
 
 func get_hand_tension() -> float:
 	return clampf(mass_kg / 24.0, 0.08, 1.0) if has_item() else 0.0
+
+func needs_second_hand() -> bool:
+	if not has_item():
+		return false
+	return mass_kg >= sprint_mass_limit and bool(held_item.get_meta("can_be_two_hand_carried", true))
