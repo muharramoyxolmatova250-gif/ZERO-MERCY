@@ -19,7 +19,8 @@ func _run() -> void:
 	if player == null:
 		_fail("Main scene did not create the Dara player.")
 		return
-	if GameSession.player != player:
+	var game_session := root.get_node_or_null("GameSession")
+	if game_session == null or game_session.get("player") != player:
 		_fail("GameSession did not register the active player.")
 		return
 
