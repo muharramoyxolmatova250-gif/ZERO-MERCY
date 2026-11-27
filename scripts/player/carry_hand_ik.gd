@@ -310,3 +310,7 @@ static func get_solution_center(solution: Dictionary) -> Vector3:
 static func get_solution_total_length(solution: Dictionary) -> float:
 	var lengths := get_solution_segment_lengths(solution)
 	return lengths.x + lengths.y
+
+static func get_solution_validity_report(solution: Dictionary) -> Dictionary:
+	var valid := get_solution_is_valid(solution)
+	return {"valid": valid, "has_shoulder": solution.has("shoulder"), "has_elbow": solution.has("elbow"), "has_wrist": solution.has("wrist")}
