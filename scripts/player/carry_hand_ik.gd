@@ -207,3 +207,9 @@ static func solve_with_constraints(shoulder: Vector3, target: Vector3, upper_len
 	var pole := get_bend_normal(wrist - shoulder, bend_normal)
 	var elbow := solve_elbow(shoulder, wrist, upper_length, lower_length, pole)
 	return {"shoulder": shoulder, "elbow": elbow, "wrist": wrist, "valid": true, "target_clamped": not wrist.is_equal_approx(target)}
+
+static func get_limb_directions(solution: Dictionary) -> Dictionary:
+	var shoulder: Vector3 = solution.get("shoulder", Vector3.ZERO)
+	var elbow: Vector3 = solution.get("elbow", Vector3.ZERO)
+	var wrist: Vector3 = solution.get("wrist", Vector3.ZERO)
+	return {"upper": safe_normalize(elbow - shoulder), "lower": safe_normalize(wrist - elbow)}
