@@ -199,3 +199,12 @@ func wants_business(context: Dictionary = {}) -> bool:
 	var capital := clampf(float(context.get("capital_readiness", 0.0)), 0.0, 1.0)
 	var opportunity := clampf(float(context.get("market_opportunity", 0.0)), 0.0, 1.0)
 	return _trait("risk_tolerance") * 0.38 + _trait("ambition") * 0.28 + capital * 0.18 + opportunity * 0.16 > 0.68
+func discover_hobby(context: Dictionary = {}) -> String:
+	var hobbies := ["music","photography","sports","cooking","reading","crafting","gaming","gardening"]
+	var best := hobbies[0]
+	var best_score := -INF
+	for hobby in hobbies:
+		var score := _trait("curiosity") * 0.4 + float(preferences.get("hobby_" + hobby, 0.0)) + _rng.randf_range(0.0, 0.3)
+		if hobby == str(context.get("current_hobby", "")): score -= 0.35
+		if score > best_score: best_score = score; best = hobby
+	return best
