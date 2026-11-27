@@ -120,7 +120,14 @@ func _build_phone() -> void:
     for tab in ["feed", "media", "games", "news", "contacts", "sms", "life", "missions", "map"]:
         var button := Button.new()
         button.text = tab.to_upper()
-        button.custom_minimum_size = Vector2(76, 34)
+        button.custom_minimum_size = Vector2(76, 36)
+        button.add_theme_font_size_override("font_size", 10)
+        button.add_theme_color_override("font_color", Color(0.48, 0.76, 0.84))
+        button.add_theme_color_override("font_hover_color", Color(0.08, 0.98, 1.0))
+        button.add_theme_stylebox_override("normal", _make_phone_button_style(Color(0.015, 0.04, 0.065, 0.98), Color(0.08, 0.35, 0.43, 0.8)))
+        button.add_theme_stylebox_override("hover", _make_phone_button_style(Color(0.02, 0.12, 0.16, 1.0), Color(0.0, 0.92, 1.0, 0.95)))
+        button.add_theme_stylebox_override("pressed", _make_phone_button_style(Color(0.0, 0.22, 0.27, 1.0), Color(0.0, 1.0, 1.0, 1.0)))
+        button.add_theme_stylebox_override("focus", _make_phone_button_style(Color(0.02, 0.12, 0.16, 1.0), Color(0.0, 0.92, 1.0, 0.95)))
         button.pressed.connect(_set_tab.bind(tab))
         tabs.add_child(button)
 
@@ -141,6 +148,19 @@ func _build_phone() -> void:
     footer.add_theme_color_override("font_color", Color(0.3, 0.56, 0.66))
     footer.add_theme_font_size_override("font_size", 9)
     outer.add_child(footer)
+
+func _make_phone_button_style(fill: Color, edge: Color) -> StyleBoxFlat:
+    var style := StyleBoxFlat.new()
+    style.bg_color = fill
+    style.border_color = edge
+    style.set_border_width_all(1)
+    style.set_corner_radius_all(7)
+    style.content_margin_left = 7
+    style.content_margin_right = 7
+    style.content_margin_top = 5
+    style.content_margin_bottom = 5
+    return style
+
 
 func _set_tab(tab: String) -> void:
     _active_tab = tab
