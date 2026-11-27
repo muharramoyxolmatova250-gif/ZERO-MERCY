@@ -133,3 +133,6 @@ static func project_point_on_segment(point: Vector3, start: Vector3, finish: Vec
 		return start
 	var weight := clampf((point - start).dot(segment) / length_sq, 0.0, 1.0)
 	return start + segment * weight
+
+static func get_point_segment_distance(point: Vector3, start: Vector3, finish: Vector3) -> float:
+	return point.distance_to(project_point_on_segment(point, start, finish))
