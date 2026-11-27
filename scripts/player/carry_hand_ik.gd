@@ -306,3 +306,7 @@ static func get_solution_transforms(solution: Dictionary) -> Dictionary:
 
 static func get_solution_center(solution: Dictionary) -> Vector3:
 	return get_chain_midpoint(get_solution_shoulder(solution), get_solution_elbow(solution), get_solution_endpoint(solution))
+
+static func get_solution_total_length(solution: Dictionary) -> float:
+	var lengths := get_solution_segment_lengths(solution)
+	return lengths.x + lengths.y
