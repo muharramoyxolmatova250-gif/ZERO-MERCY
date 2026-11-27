@@ -546,15 +546,15 @@ func _update_bots(delta: float) -> void:
 		bot.move_and_slide()
 		var wait := float(bot.get_meta("fire_wait", 1.0)) - delta
 		var enemy_target: Node3D = player
-		var target_distance := bot.global_position.distance_to(player.global_position)
+		var enemy_target_distance := bot.global_position.distance_to(player.global_position)
 		for ally_target in allies:
 			if not is_instance_valid(ally_target) or bool(ally_target.get_meta("downed", false)):
 				continue
 			var ally_distance := bot.global_position.distance_to(ally_target.global_position)
-			if ally_distance < target_distance and ally_distance < 24.0:
+			if ally_distance < enemy_target_distance and ally_distance < 24.0:
 				enemy_target = ally_target
-				target_distance = ally_distance
-		if wait <= 0.0 and target_distance < 24.0:
+				enemy_target_distance = ally_distance
+		if wait <= 0.0 and enemy_target_distance < 24.0:
 			var eye := bot.global_position + Vector3.UP * 0.55
 			var target := enemy_target.global_position + Vector3.UP * 0.55
 			var sight := PhysicsRayQueryParameters3D.create(eye, target)
@@ -660,7 +660,7 @@ func _update_allies(delta: float) -> void:
 			else:
 				ally.velocity.x = move_toward(ally.velocity.x, 0.0, 8.0 * delta)
 				ally.velocity.z = move_toward(ally.velocity.z, 0.0, 8.0 * delta)
-		if nearest != null:
+		if nearest != null and ally_health >= 55.0:
 			ally.velocity.x = move_toward(ally.velocity.x, 0.0, 8.0 * delta)
 			ally.velocity.z = move_toward(ally.velocity.z, 0.0, 8.0 * delta)
 		ally.velocity.y = 0.0
