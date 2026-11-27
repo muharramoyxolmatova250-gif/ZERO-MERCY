@@ -2,7 +2,7 @@ name: ZERO MERCY Godot CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, world-build]
   pull_request:
     branches: [main]
   workflow_dispatch:
