@@ -231,3 +231,15 @@ func learn_topic(topic: String, fact: String, confidence: float = 0.5) -> void:
 		entries.pop_front()
 	known_topics[topic] = entries
 
+
+
+func answer_from_knowledge(topic: String) -> String:
+	var entries: Array = known_topics.get(topic,[])
+	if entries.is_empty():
+		return ""
+	var best: Dictionary = entries[0]
+	for entry in entries:
+		if float(entry.get("confidence",0.0)) > float(best.get("confidence",0.0)):
+			best = entry
+	return str(best.get("fact",""))
+
