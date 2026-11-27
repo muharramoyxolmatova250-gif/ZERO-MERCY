@@ -5,13 +5,21 @@ class_name CyberpunkTrafficSignal
 @export_range(4.0, 40.0, 1.0) var cycle_seconds := 18.0
 @export_range(0.0, 1.0, 0.05) var phase_offset := 0.0
 @export_range(0.1, 0.45, 0.05) var green_fraction := 0.45
+var _emergency_axis := Vector3.ZERO
+var _emergency_until_msec := 0
 
 func _ready() -> void:
     add_to_group("traffic_signals")
     _build_signal_visual()
 
+func request_emergency_green(travel_direction: Vector3, hold_seconds: float = 8.0) -> void:
+    _emergency_axis = Vector3(travel_direction.x, 0.0, travel_direction.z).normalized()
+    _emergency_until_msec = Time.get_ticks_msec() + int(clampf(hold_seconds, 2.0, 20.0) * 1000.0)
+
 func is_green_for(travel_direction: Vector3) -> bool:
     var direction := travel_direction.normalized()
+    if Time.get_ticks_msec() < _emergency_until_msec and _emergency_axis.length_squared() > 0.01:
+        return absf(direction.dot(_emergency_axis)) > 0.65
     var axis := green_axis.normalized()
     var aligned := absf(direction.dot(axis)) > 0.65
     var phase := fposmod(Time.get_ticks_msec() / 1000.0 / cycle_seconds + phase_offset, 1.0)
