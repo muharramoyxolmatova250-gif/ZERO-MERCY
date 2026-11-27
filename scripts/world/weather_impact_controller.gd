@@ -63,10 +63,10 @@ func _apply_traffic_weather() -> void:
 		manager.call("set_weather_effect", weather, intensity)
 
 func get_driving_condition_snapshot() -> Dictionary:
-    var risk := 0.0
-    match weather:
-        "rain": risk = intensity * 0.25
-        "storm": risk = intensity * 0.55
-        "snow": risk = intensity * 0.7
+	var risk := 0.0
+	match weather:
+		"rain": risk = intensity * 0.25
+		"storm": risk = intensity * 0.55
+		"snow": risk = intensity * 0.7
         "fog": risk = intensity * 0.18
     return {"weather": weather, "intensity": intensity, "driving_risk": risk, "visibility": get_visibility_multiplier(), "traction": get_movement_multiplier()}
