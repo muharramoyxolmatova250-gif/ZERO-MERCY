@@ -626,10 +626,12 @@ func _attach_pickup_item(item: Node3D) -> void:
 		item.collision_layer = 0
 		item.collision_mask = 0
 	item.reparent(grip, true)
+	var grip_offset: Vector3 = item.get_meta("grip_offset", Vector3(0.0, -0.06, -0.13))
+	var grip_rotation: Vector3 = item.get_meta("grip_rotation", Vector3.ZERO)
 	var attach_tween := create_tween()
 	attach_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	attach_tween.tween_property(item, "position", Vector3(0.0, -0.06, -0.13), 0.18)
-	attach_tween.parallel().tween_property(item, "rotation", Vector3.ZERO, 0.18)
+	attach_tween.tween_property(item, "position", grip_offset, 0.18)
+	attach_tween.parallel().tween_property(item, "rotation", grip_rotation, 0.18)
 	attach_tween.tween_callback(Callable(self, "_finish_pickup"))
 
 func _finish_pickup() -> void:
