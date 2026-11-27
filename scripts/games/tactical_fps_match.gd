@@ -416,6 +416,9 @@ func _update_bots(delta: float) -> void:
 				cohesion = center_offset.normalized() * 0.35
 		var pursuit := (approach + side * 0.58 + separation * 0.9 + cohesion).normalized()
 		var bot_health := float(bot.get_meta("health", 100.0))
+		var suppressed_time := maxf(0.0, float(bot.get_meta("suppressed_time", 0.0)) - delta)
+		bot.set_meta("suppressed_time", suppressed_time)
+		var is_suppressed := suppressed_time > 0.0
 		if bot_health <= 65.0 and not cover_positions.is_empty():
 			var best_cover := cover_positions[0]
 			var best_distance := INF
@@ -429,6 +432,8 @@ func _update_bots(delta: float) -> void:
 			var cover_direction := cover_offset.normalized()
 			pursuit = side * 0.18 if cover_offset.length() < 1.8 else cover_direction
 		var move_speed := 2.5 if bot_health <= 65.0 else 2.15
+		if is_suppressed:
+			move_speed *= 0.72
 		bot.velocity.x = pursuit.x * move_speed
 		bot.velocity.z = pursuit.z * move_speed
 		bot.move_and_slide()
@@ -442,7 +447,7 @@ func _update_bots(delta: float) -> void:
 			if not obstruction.is_empty() and obstruction.get("collider") == player:
 				var skill := float(bot.get_meta("combat_skill", 0.8))
 				var damage := 2.5 + skill * 2.5
-				if randf() <= skill:
+				if randf() <= skill * (0.55 if is_suppressed else 1.0):
 					health = maxf(0.0, health - damage)
 				var role_delay := 0.18 if role == "support" else (-0.12 if role == "flanker" else 0.0)
 				wait = maxf(0.55, 1.15 + (1.0 - skill) * 0.9 + role_delay)
