@@ -149,3 +149,6 @@ static func get_chain_straightness(shoulder: Vector3, elbow: Vector3, wrist: Vec
 static func get_elbow_pole_weight(shoulder: Vector3, elbow: Vector3, wrist: Vector3, minimum: float = 0.03) -> float:
 	var offset := get_point_segment_distance(elbow, shoulder, wrist)
 	return clampf(offset / maxf(minimum, 0.001), 0.0, 1.0)
+
+static func get_chain_midpoint(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> Vector3:
+	return (shoulder + elbow * 2.0 + wrist) * 0.25
