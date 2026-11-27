@@ -1,4 +1,6 @@
 extends Node3D
+
+const CarryHandIK = preload("res://scripts/player/carry_hand_ik.gd")
 ## Procedural cybernetic arms with shoulder pivots and gait-synchronised motion.
 ## Dara's two gold fingers remain on her right hand.
 
@@ -20,6 +22,7 @@ var _carry_fragile := false
 var _secondary_grip_weight := 0.0
 var _carry_sway := 0.0
 var _clock := 0.0
+var _secondary_ik_solution: Dictionary = {}
 
 func _ready() -> void:
 	_metal.albedo_color = Color(0.28, 0.34, 0.42)
@@ -57,12 +60,16 @@ func _process(delta: float) -> void:
 				if _carry_mass_kg >= 8.0 and is_instance_valid(_carry_object):
 					var grip_offset: Vector3 = _carry_object.get_meta("secondary_grip_offset", Vector3(-0.24, -0.05, -0.10))
 					var grip_world: Vector3 = _carry_object.global_transform * grip_offset
-					var target_local := to_local(grip_world) - pivot.position
+					var target_local := to_local(grip_world)
+					var bend_normal := Vector3(0.0, 0.0, 1.0 if target_local.x < pivot.position.x else -1.0)
+					_secondary_ik_solution = CarryHandIK.make_debug_solution(pivot.position, target_local, 0.38, 0.43, bend_normal)
+					var solved_wrist: Vector3 = _secondary_ik_solution.get("wrist", target_local)
+					var reach_vector := solved_wrist - pivot.position
 					_secondary_grip_weight = move_toward(_secondary_grip_weight, 1.0, delta * 3.0)
-					var target_horizontal := Vector2(target_local.x, target_local.z).length()
-					target.x = clampf(atan2(target_local.y, maxf(0.001, target_horizontal)) + 0.45, -0.8, 0.55)
+					var target_horizontal := Vector2(reach_vector.x, reach_vector.z).length()
+					target.x = clampf(atan2(reach_vector.y, maxf(0.001, target_horizontal)) + 0.45, -0.8, 0.55)
 					target.x += sin(_clock * 1.8) * 0.018 * (1.0 - _secondary_grip_weight)
-					target.y = clampf(atan2(-target_local.z, target_local.x), -0.95, 0.95)
+					target.y = clampf(atan2(-reach_vector.z, reach_vector.x), -0.95, 0.95)
 					target.z = -0.04 if _carry_fragile else 0.0
 		else:
 			if side > 0.0:
@@ -173,6 +180,7 @@ func release_object() -> void:
 	_carry_fragile = false
 	_carry_object = null
 	_secondary_grip_weight = 0.0
+	_secondary_ik_solution.clear()
 	_carry_sway = 0.0
 	_reach_weight = 0.0
 	_reach_rotation = Vector3.ZERO
