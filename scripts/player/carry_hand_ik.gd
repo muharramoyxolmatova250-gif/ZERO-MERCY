@@ -239,3 +239,9 @@ static func get_solution_segment_lengths(solution: Dictionary) -> Vector2:
 
 static func get_solution_bend_direction(solution: Dictionary) -> Vector3:
 	return get_chain_bend_direction(get_solution_shoulder(solution), get_solution_elbow(solution), get_solution_endpoint(solution))
+
+static func get_upper_segment_basis(shoulder: Vector3, elbow: Vector3, up_hint: Vector3 = Vector3.UP) -> Basis:
+	var direction := safe_normalize(elbow - shoulder)
+	var right := safe_normalize(direction.cross(up_hint), Vector3.RIGHT)
+	var corrected_up := safe_normalize(right.cross(direction), Vector3.UP)
+	return Basis(right, corrected_up, -direction).orthonormalized()
