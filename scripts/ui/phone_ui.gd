@@ -383,9 +383,54 @@ func _open_media_player() -> void:
     set_phone_open(false)
 
 func _build_games_hub() -> void:
-    _add_section_title("ZERO PLAY // GAME CENTER")
-    _add_body("Connect with nearby residents and invite them into a phone party. NPCs decide whether to join based on their availability and phone battery.")
+    _add_section_title("ZERO PLAY // AAA GAME CENTER")
+    _add_body("Every title is planned as a complete, large-scale 3D game—not a short mini-game. Only titles marked PLAYABLE can currently launch; other projects remain in development.")
     var catalog: Array = _life.call("get_phone_games_catalog") if _life != null and _life.has_method("get_phone_games_catalog") else []
+    for game_data in catalog:
+        var card := PanelContainer.new()
+        var style := StyleBoxFlat.new()
+        style.bg_color = Color(0.018, 0.045, 0.075, 0.98)
+        style.border_color = Color(0.0, 0.72, 0.9, 0.62)
+        style.set_border_width_all(1)
+        style.set_corner_radius_all(10)
+        style.set_content_margin_all(10)
+        card.add_theme_stylebox_override("panel", style)
+        _content.add_child(card)
+        var body := VBoxContainer.new()
+        body.add_theme_constant_override("separation", 5)
+        card.add_child(body)
+        var heading := Label.new()
+        heading.text = str(game_data.get("title", "Game")) + "  //  " + str(game_data.get("production_tier", "AAA target"))
+        heading.add_theme_color_override("font_color", Color(0.22, 0.9, 1.0))
+        heading.add_theme_font_size_override("font_size", 15)
+        body.add_child(heading)
+        var description := Label.new()
+        description.text = str(game_data.get("description", ""))
+        description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        body.add_child(description)
+        var scope := Label.new()
+        scope.text = "SCALE: " + str(game_data.get("world_scale", "")) + "\nVISUAL TARGET: " + str(game_data.get("visual_target", ""))
+        scope.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        scope.add_theme_font_size_override("font_size", 10)
+        scope.add_theme_color_override("font_color", Color(0.55, 0.78, 0.86))
+        body.add_child(scope)
+        var systems := Label.new()
+        systems.text = "SYSTEMS: " + ", ".join(game_data.get("systems", []))
+        systems.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        systems.add_theme_font_size_override("font_size", 10)
+        body.add_child(systems)
+        var status := Label.new()
+        status.text = "● PLAYABLE PROTOTYPE" if bool(game_data.get("playable", false)) else "◌ IN DEVELOPMENT — FULL GAME NOT YET PLAYABLE"
+        status.add_theme_color_override("font_color", Color(0.25, 0.95, 0.55) if bool(game_data.get("playable", false)) else Color(1.0, 0.72, 0.25))
+        body.add_child(status)
+        if str(game_data.get("id", "")) == "tactical_breach":
+            var launch := Button.new()
+            launch.text = "LAUNCH TACTICAL BREACH PROTOTYPE"
+            launch.custom_minimum_size.y = 42
+            launch.pressed.connect(_launch_tactical_breach)
+            body.add_child(launch)
+    _add_section_title("NPC PHONE PARTY")
+    _add_body("NPC party invitations and match statistics are social simulation features; they are not a substitute for the full playable game modes.")
     var game_picker := OptionButton.new()
     game_picker.custom_minimum_size = Vector2(0, 40)
     for game_data in catalog:
@@ -425,18 +470,12 @@ func _build_games_hub() -> void:
     if shown == 0:
         _add_body("No nearby NPC phones detected. Move closer to residents to invite them.")
     var party := Button.new()
-    party.text = "START PARTY MATCH  (" + str(_party_invites.size()) + " INVITES)"
+    party.text = "START NPC SOCIAL MATCH  (" + str(_party_invites.size()) + " INVITES)"
     party.custom_minimum_size = Vector2(0, 48)
     party.pressed.connect(_start_phone_party_match)
     _content.add_child(party)
-    var solo := Button.new()
-    solo.text = "LAUNCH PLAYABLE TACTICAL BREACH"
-    solo.custom_minimum_size = Vector2(0, 44)
-    solo.pressed.connect(_launch_tactical_breach)
-    _content.add_child(solo)
-    _add_body("Invited residents join the playable Tactical Breach squad as AI teammates. Phone party results remain a separate simulated game mode.")
     if not _last_party_result.is_empty():
-        _add_section_title("LAST PARTY RESULT")
+        _add_section_title("LAST NPC PARTY RESULT")
         _add_stat("GAME", str(_last_party_result.get("game_title", "Game")))
         _add_stat("TEAM RESULT", "VICTORY" if bool(_last_party_result.get("won", false)) else "DEFEAT")
         _add_stat("NPCs JOINED", str(_last_party_result.get("accepted_count", 0)) + " / " + str(_last_party_result.get("invited_count", 0)))
