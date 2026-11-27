@@ -664,6 +664,7 @@ func get_ai_snapshot() -> Dictionary:
 
 func remember_event(event_name: String) -> void:
 	_memory.append(event_name)
+	_independent_mind.add_memory(event_name, {"goal":current_goal,"position":global_position}, 0.55, 0.9)
 	var normalized_event := event_name.to_lower()
 	if "crime" in normalized_event or "violence" in normalized_event or "attack" in normalized_event:
 		_stress = clampf(_stress + 0.12, 0.0, 1.0)
