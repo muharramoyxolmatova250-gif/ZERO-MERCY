@@ -227,3 +227,14 @@ func generate_goal_from_drive(context: Dictionary = {}) -> int:
 	var need := str(drive.get("need", ""))
 	var descriptions := {"hunger":"Find food and eat","energy":"Find a safe place to rest","social":"Seek meaningful company","safety":"Move toward a safer place","curiosity":"Explore something unfamiliar","comfort":"Improve personal comfort","purpose":"Pursue a meaningful challenge"}
 	return generate_goal(str(descriptions.get(need, "Improve my situation")), need, float(drive.get("urgency", 0.5)), context)
+
+func detect_goal_conflicts() -> Array[Dictionary]:
+	var conflicts: Array[Dictionary] = []
+	for i in range(goals.size()):
+		if goals[i].get("status") != "active": continue
+		for j in range(i+1, goals.size()):
+			if goals[j].get("status") != "active": continue
+			var a := str(goals[i].get("category", "")); var b := str(goals[j].get("category", ""))
+			if (a == "energy" and b == "purpose") or (b == "energy" and a == "purpose") or (a == "safety" and b == "exploration") or (b == "safety" and a == "exploration"):
+				conflicts.append({"first":goals[i].id,"second":goals[j].id,"reason":"limited_time_or_risk_tradeoff"})
+	return conflicts
