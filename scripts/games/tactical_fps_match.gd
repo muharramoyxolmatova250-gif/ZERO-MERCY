@@ -20,6 +20,7 @@ var party_roster: Array[Dictionary] = []
 var cover_positions: Array[Vector3] = []
 var mouse_captured := false
 var touch_move := Vector2.ZERO
+var external_knockback := Vector3.ZERO
 var touch_fire_held := false
 var touch_sprinting := false
 var touch_controls: Control
