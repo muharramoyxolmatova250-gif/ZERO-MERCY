@@ -219,3 +219,20 @@ func evaluate_option_utility(option: Dictionary, context: Dictionary) -> float:
 	var risk_tolerance := float(context.get("risk_tolerance",0.5))
 	return benefit*0.42+value_alignment*0.24+urgency*0.18-cost*0.28-risk*(1.0-risk_tolerance)*0.32-fear*risk*0.18
 
+
+
+func compare_decision_outcomes(options: Array[Dictionary], context: Dictionary) -> Dictionary:
+	var best: Dictionary = {}
+	var best_utility := -INF
+	var scored: Array[Dictionary] = []
+	for option in options:
+		var item := option.duplicate(true)
+		var utility := evaluate_option_utility(item,context)
+		item["expected_utility"] = utility
+		scored.append(item)
+		if utility > best_utility:
+			best_utility = utility
+			best = item
+	scored.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.get("expected_utility",0.0)) > float(b.get("expected_utility",0.0)))
+	return {"best":best,"ranked":scored,"confidence":decision_confidence(scored)}
+
