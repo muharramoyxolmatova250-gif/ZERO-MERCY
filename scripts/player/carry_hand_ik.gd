@@ -168,3 +168,6 @@ static func get_wrist_to_target_direction(wrist: Vector3, target: Vector3) -> Ve
 
 static func smooth_weight(current: float, target: float, delta: float, speed: float) -> float:
 	return move_toward(current, target, maxf(delta, 0.0) * maxf(speed, 0.0))
+
+static func smooth_vector(current: Vector3, target: Vector3, delta: float, speed: float) -> Vector3:
+	return current.lerp(target, clampf(maxf(delta, 0.0) * maxf(speed, 0.0), 0.0, 1.0))
