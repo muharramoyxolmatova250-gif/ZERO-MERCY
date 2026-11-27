@@ -1804,6 +1804,11 @@ func react_to_phone_post(citizen_id: String, post_id: String) -> bool:
         var post: Dictionary = _social_feed[index]
         if str(post.get("id", "")) != post_id or str(post.get("author_id", "")) == citizen_id:
             continue
+        var liked_by: Array = post.get("liked_by", [])
+        if liked_by.has(citizen_id):
+            return false
+        liked_by.append(citizen_id)
+        post["liked_by"] = liked_by
         post["likes"] = int(post.get("likes", 0)) + 1
         _social_feed[index] = post
         var author_id := str(post.get("author_id", ""))
