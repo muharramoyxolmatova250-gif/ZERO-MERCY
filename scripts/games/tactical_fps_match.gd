@@ -15,6 +15,8 @@ var time_left := ROUND_SECONDS
 var reloading := false
 var reload_left := 0.0
 var bots: Array[CharacterBody3D] = []
+var allies: Array[CharacterBody3D] = []
+var party_roster: Array[Dictionary] = []
 var cover_positions: Array[Vector3] = []
 var mouse_captured := false
 var touch_move := Vector2.ZERO
@@ -38,6 +40,7 @@ func _ready() -> void:
 	_build_arena()
 	_build_player()
 	_build_bots()
+	_build_allies()
 	_build_hud()
 	_build_touch_controls()
 	if not OS.has_feature("mobile"):
@@ -90,6 +93,12 @@ func _bind_key(action: String, key: Key) -> void:
 	var event := InputEventKey.new()
 	event.physical_keycode = key
 	InputMap.action_add_event(action, event)
+
+func set_party_roster(roster: Array) -> void:
+	party_roster.clear()
+	for member in roster:
+		if member is Dictionary:
+			party_roster.append(member.duplicate(true))
 
 func _build_arena() -> void:
 	var floor := StaticBody3D.new()
