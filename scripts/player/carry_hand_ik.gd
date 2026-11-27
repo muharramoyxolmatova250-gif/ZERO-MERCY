@@ -221,3 +221,6 @@ static func get_solution_is_valid(solution: Dictionary) -> bool:
 	if not solution.has("shoulder") or not solution.has("elbow") or not solution.has("wrist"):
 		return false
 	return (solution["shoulder"] as Vector3).is_finite() and (solution["elbow"] as Vector3).is_finite() and (solution["wrist"] as Vector3).is_finite()
+
+static func get_solution_endpoint(solution: Dictionary) -> Vector3:
+	return solution.get("wrist", Vector3.ZERO)
