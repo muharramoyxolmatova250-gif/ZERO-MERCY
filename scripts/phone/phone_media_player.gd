@@ -117,6 +117,10 @@ func _on_stop_pressed() -> void:
 	image.texture = null
 	image.hide()
 	video.hide()
+	_current_path = ""
+	_current_title = ""
+	for entry in _feed_buttons:
+		entry.modulate = Color.WHITE
 	status.text = "Playback stopped. Choose another feed item or open an asset."
 
 func _on_video_finished() -> void:
