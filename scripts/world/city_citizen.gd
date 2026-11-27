@@ -965,3 +965,6 @@ func evaluate_local_risk(threat_position: Vector3, threat_severity: float = 0.5)
 
 func get_autonomy_snapshot() -> Dictionary:
 	return _self_direction.get_snapshot()
+
+func _get_active_personal_goal_id() -> String:
+	return str(_self_direction.active_personal_goal.get("id", ""))
