@@ -1260,6 +1260,7 @@ func receive_simulation_rumor(payload: Dictionary, trust: float = 0.35) -> bool:
 	var accepted := _simulation_awareness.receive_rumor(payload, trust)
 	if accepted:
 		remember_event("heard_simulation_rumor:" + str(payload.get("id", "unknown")))
+		_independent_mind.observe_world_fact("rumor:" + str(payload.get("id", "unknown")), str(payload.get("detail", "Unverified rumor")), float(payload.get("strength", 0.3)), "resident_rumor", {"kind":str(payload.get("kind", "unknown"))})
 	return accepted
 
 func get_simulation_awareness_snapshot() -> Dictionary:
