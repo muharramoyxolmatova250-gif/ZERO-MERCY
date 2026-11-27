@@ -1676,7 +1676,8 @@ func send_phone_message(sender_id: String, recipient_id: String, message_text: S
     var message := {
         "id": "msg_" + str(Time.get_unix_time_from_system()) + "_" + str(_rng.randi()),
         "from": sender_id, "to": recipient_id, "text": message_text,
-        "kind": message_kind, "day": simulation_day, "read": false
+        "kind": message_kind, "day": simulation_day, "read": false,
+        "timestamp": Time.get_datetime_string_from_system()
     }
     var inbox: Array = recipient.get("phone_inbox", [])
     inbox.append(message.duplicate(true))
