@@ -1815,6 +1815,38 @@ func react_to_phone_post(citizen_id: String, post_id: String) -> bool:
     return false
 
 
+func get_resident_reputation(citizen_id: String) -> Dictionary:
+    if not resident_profiles.has(citizen_id):
+        return {}
+    var profile: Dictionary = resident_profiles[citizen_id]
+    var reputation := float(profile.get("public_reputation", 0.0))
+    var notoriety := float(profile.get("public_notoriety", 0.0))
+    var respect := float(profile.get("community_respect", 0.0))
+    var followers := (profile.get("phone_followers", []) as Array).size()
+    var influence := _get_phone_social_influence(_ensure_phone_profile(citizen_id))
+    return {
+        "reputation": reputation, "notoriety": notoriety, "respect": respect,
+        "followers": followers, "influence": influence,
+        "standing": "respected" if respect > 0.35 else ("controversial" if notoriety > 0.35 else ("popular" if reputation > 0.35 else ("disliked" if reputation < -0.35 else "ordinary")))
+    }
+
+
+func adjust_resident_reputation(citizen_id: String, reputation_delta: float = 0.0, notoriety_delta: float = 0.0, respect_delta: float = 0.0, reason: String = "community_event") -> void:
+    if not resident_profiles.has(citizen_id):
+        return
+    var profile: Dictionary = resident_profiles[citizen_id]
+    profile["public_reputation"] = clampf(float(profile.get("public_reputation", 0.0)) + reputation_delta, -1.0, 1.0)
+    profile["public_notoriety"] = clampf(float(profile.get("public_notoriety", 0.0)) + notoriety_delta, 0.0, 1.0)
+    profile["community_respect"] = clampf(float(profile.get("community_respect", 0.0)) + respect_delta, -1.0, 1.0)
+    var events: Array = profile.get("life_events", [])
+    events.append({"day": simulation_day, "event": "reputation:" + reason})
+    while events.size() > 32:
+        events.pop_front()
+    profile["life_events"] = events
+    resident_profiles[citizen_id] = profile
+    _dirty = true
+
+
 func get_phone_social_profile(citizen_id: String) -> Dictionary:
     var profile := _ensure_phone_profile(citizen_id)
     if profile.is_empty():
