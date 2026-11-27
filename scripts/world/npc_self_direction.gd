@@ -208,3 +208,9 @@ func discover_hobby(context: Dictionary = {}) -> String:
 		if hobby == str(context.get("current_hobby", "")): score -= 0.35
 		if score > best_score: best_score = score; best = hobby
 	return best
+func preferred_activity_window(activity: String) -> Dictionary:
+	var morning_bias := _trait("discipline") * 0.55 + _trait("ambition") * 0.25
+	var evening_bias := _trait("curiosity") * 0.35 + _trait("sociability") * 0.4
+	if activity in ["work","learn_skill"]: return {"start":7.0 + (1.0-morning_bias)*2.0,"end":16.0 + morning_bias*2.0}
+	if activity in ["social","practice_hobby"]: return {"start":16.0 + (1.0-evening_bias)*2.0,"end":22.0}
+	return {"start":0.0,"end":24.0}
