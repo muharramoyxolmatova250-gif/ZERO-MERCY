@@ -22,9 +22,19 @@ func unregister_responder(responder_id: String) -> void:
 func report_incident(kind: String, position: Vector3, severity: float = 0.5, reporter_id: String = "", details: Dictionary = {}) -> Dictionary:
 	if kind.is_empty():
 		return {}
+	for existing_id in _incidents:
+		var existing: Dictionary = _incidents[existing_id]
+		if str(existing.get("status", "")) != "resolved" and str(existing.get("kind", "")) == kind and existing.position.distance_to(position) < 35.0:
+			existing["severity"] = maxf(float(existing.get("severity", 0.0)), clampf(severity, 0.0, 1.0))
+			var witnesses: Array = existing.get("witnesses", [])
+			if not reporter_id.is_empty() and not witnesses.has(reporter_id):
+				witnesses.append(reporter_id)
+			existing["witnesses"] = witnesses
+			_incidents[existing_id] = existing
+			return existing.duplicate(true)
 	var incident_id := "city_incident_" + str(_next_incident)
 	_next_incident += 1
-	var incident := {"id": incident_id, "kind": kind, "position": position, "severity": clampf(severity, 0.0, 1.0), "reporter_id": reporter_id, "details": details.duplicate(true), "status": "reported", "created_msec": Time.get_ticks_msec(), "assigned": []}
+	var incident := {"id": incident_id, "kind": kind, "position": position, "severity": clampf(severity, 0.0, 1.0), "reporter_id": reporter_id, "details": details.duplicate(true), "status": "reported", "created_msec": Time.get_ticks_msec(), "assigned": [], "witnesses": [reporter_id] if not reporter_id.is_empty() else []}
 	_incidents[incident_id] = incident
 	incident_created.emit(incident_id, incident.duplicate(true))
 	_dispatch_for_incident(incident_id)
