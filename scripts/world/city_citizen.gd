@@ -2,6 +2,7 @@ extends Node3D
 const NPCCognition = preload("res://scripts/world/npc_cognition.gd")
 const NPCDialogueAI = preload("res://scripts/world/npc_dialogue_ai.gd")
 const NPCActionPlanner = preload("res://scripts/world/npc_action_planner.gd")
+const NPCMotionController = preload("res://scripts/world/npc_motion_controller.gd")
 ## Lightweight ambient pedestrian that loops a local sidewalk route.
 @export var route: PackedVector3Array = PackedVector3Array()
 @export_range(0.2, 5.0, 0.1) var walk_speed := 1.25
@@ -54,6 +55,7 @@ var _last_browser_topic := ""
 var _cognition = NPCCognition.new()
 var _dialogue = NPCDialogueAI.new()
 var _action_planner = NPCActionPlanner.new()
+var _motion_controller = NPCMotionController.new()
 var _planned_action: Dictionary = {}
 @export var citizen_id := ""
 @export var city_id := ""
@@ -143,12 +145,11 @@ func _physics_process(delta: float) -> void:
 		if spatial_index != null:
 			spatial_index.call("update_citizen", self)
 	if _taxi_riding:
+		_motion_controller.reset_motion(global_position)
 		return
 	if _crime_flee_timer > 0.0:
 		_crime_flee_timer = maxf(0.0, _crime_flee_timer - delta)
-		position += _crime_flee_direction * walk_speed * 2.1 * delta
-		if _crime_flee_direction.length_squared() > 0.001:
-			look_at(position + _crime_flee_direction, Vector3.UP)
+		_motion_controller.move_toward(self, global_position + _crime_flee_direction * 12.0, delta, 2.1, _get_crowd_separation(), true)
 		if _crime_flee_timer <= 0.0:
 			current_goal = "avoid_crowd"
 			_pause_remaining = 1.5
@@ -181,6 +182,7 @@ func _physics_process(delta: float) -> void:
 	if _building_visit_phase == "inside":
 		_update_indoor_activity(delta)
 	if _pause_remaining > 0.0:
+		_motion_controller.stop(self, delta)
 		_pause_remaining = maxf(0.0, _pause_remaining - delta)
 		if _pause_remaining == 0.0:
 			is_using_phone = false
@@ -235,11 +237,7 @@ func _physics_process(delta: float) -> void:
 		if _phone != null: _phone.visible = is_using_phone
 		return
 	var speed_factor := 1.3 if current_goal == "commute" else (0.65 if current_goal in ["rest", "leisure", "family"] else (1.12 if current_goal in ["food", "school", "play"] else 1.0))
-	var steering := direction.normalized() + _get_crowd_separation() * 1.25
-	if steering.length_squared() > 0.001:
-		steering = steering.normalized()
-		position += steering * walk_speed * speed_factor * delta
-		look_at(position + steering, Vector3.UP)
+	_motion_controller.move_toward(self, target, delta, speed_factor, _get_crowd_separation(), false)
 
 func _get_nearby_citizens(radius: float) -> Array:
 	var spatial_index := get_tree().get_first_node_in_group("citizen_spatial_index")
@@ -293,6 +291,7 @@ func _initialize_personality() -> void:
 	_cognition.initialize(citizen_id, _personality_traits)
 	_dialogue.initialize(citizen_id, _personality_traits, life_profile)
 	_action_planner.initialize(citizen_id, _personality_traits)
+	_motion_controller.initialize(citizen_id, _personality_traits, walk_speed)
 
 
 func _update_needs() -> void:
