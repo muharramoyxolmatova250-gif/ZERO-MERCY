@@ -278,3 +278,11 @@ static func get_bend_plane_distance(point: Vector3, plane: Plane) -> float:
 static func project_direction_on_plane(direction: Vector3, plane_normal: Vector3) -> Vector3:
 	var normal := safe_normalize(plane_normal, Vector3.UP)
 	return safe_normalize(direction - normal * direction.dot(normal), Vector3.FORWARD)
+
+static func get_solution_quality(solution: Dictionary, desired_target: Vector3) -> float:
+	if not get_solution_is_valid(solution):
+		return 0.0
+	var shoulder := get_solution_shoulder(solution)
+	var elbow := get_solution_elbow(solution)
+	var wrist := get_solution_endpoint(solution)
+	return get_pose_quality(shoulder, elbow, wrist, desired_target)
