@@ -227,3 +227,6 @@ static func get_solution_endpoint(solution: Dictionary) -> Vector3:
 
 static func get_solution_elbow(solution: Dictionary) -> Vector3:
 	return solution.get("elbow", Vector3.ZERO)
+
+static func get_solution_shoulder(solution: Dictionary) -> Vector3:
+	return solution.get("shoulder", Vector3.ZERO)
