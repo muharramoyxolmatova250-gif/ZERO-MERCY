@@ -157,3 +157,18 @@ func advance_time(delta: float) -> void:
   _cooldowns[key] = maxf(0.0,float(_cooldowns[key])-decay)
   if float(_cooldowns[key]) <= 0.0:
    _cooldowns.erase(key)
+
+
+func recover_from_failure(action: String, reason: String, context: Dictionary = {}) -> Dictionary:
+ learn_outcome(action,0.18)
+ var fallback := "reassess"
+ if reason in ["blocked","unsafe","unavailable"]:
+  fallback = "find_alternative"
+ elif reason == "social_rejection":
+  fallback = "respect_distance"
+ elif reason == "exhausted":
+  fallback = "rest"
+ active_plan = [{"goal":str(context.get("goal","recovery")),"action":fallback,"status":"recovery","reason":reason}]
+ plan_index = 0
+ plan_reason = "failure_recovery:" + reason
+ return active_plan[0].duplicate(true)
