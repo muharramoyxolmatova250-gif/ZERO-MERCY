@@ -206,3 +206,17 @@ func plan_social_intent(other: Dictionary, context: Dictionary = {}) -> Dictiona
  elif _trait("curiosity") > 0.72:
   intent = "ask_about_experience"
  return {"intent":intent,"target_id":str(other.get("id","")),"trust":trust,"familiarity":familiarity}
+
+
+func score_affordances(affordances: Array[Dictionary], context: Dictionary = {}) -> Array[Dictionary]:
+ var scored: Array[Dictionary] = []
+ for affordance in affordances:
+  var item := affordance.duplicate(true)
+  var comfort := float(item.get("comfort",0.5))
+  var utility := float(item.get("utility",0.5))
+  var accessibility := float(item.get("accessibility",0.5))
+  var danger := float(item.get("danger",0.0))
+  item["score"] = comfort*0.24 + utility*0.42 + accessibility*0.22 - danger*(1.0-_trait("courage"))*0.38
+  scored.append(item)
+ scored.sort_custom(func(a:Dictionary,b:Dictionary)->bool: return float(a.score)>float(b.score))
+ return scored
