@@ -344,3 +344,16 @@ func answer_uzbek(question: String, context: Dictionary = {}) -> String:
 		return _apology_answer()
 	return "Qiziq savol ekan. Buni birgalikda muhokama qilsak bo'ladi. Siz nima deb o'ylaysiz?"
 
+
+
+func get_conversation_summary(other_id: String) -> Dictionary:
+	var count := 0
+	var topics: Dictionary = {}
+	var last_topic := ""
+	for entry in conversation_memory:
+		if str(entry.get("other_id","")) == other_id:
+			count += 1
+			last_topic = str(entry.get("topic",""))
+			topics[last_topic] = int(topics.get(last_topic,0))+1
+	return {"other_id":other_id,"conversation_count":count,"topics":topics,"last_topic":last_topic}
+
