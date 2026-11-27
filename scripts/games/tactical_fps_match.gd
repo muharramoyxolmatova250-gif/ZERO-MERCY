@@ -599,6 +599,21 @@ func _update_allies(delta: float) -> void:
 				nearest = enemy
 				nearest_distance = enemy_distance
 		var wait := maxf(0.0, float(ally.get_meta("fire_wait", 0.5)) - delta)
+		if ally_health < 55.0 and not cover_positions.is_empty():
+			var safest := cover_positions[0]
+			var safest_score := INF
+			for cover_point in cover_positions:
+				var candidate := ally.global_position.distance_to(cover_point) + cover_point.distance_to(player.global_position) * 0.15
+				if candidate < safest_score:
+					safest_score = candidate
+					safest = cover_point
+			var retreat := safest - ally.global_position
+			retreat.y = 0.0
+			if retreat.length() > 1.2:
+				var retreat_dir := retreat.normalized()
+				ally.velocity.x = retreat_dir.x * 2.7
+				ally.velocity.z = retreat_dir.z * 2.7
+				ally.look_at(Vector3(safest.x, ally.global_position.y, safest.z), Vector3.UP)
 		if nearest != null:
 			var aim_point := nearest.global_position + Vector3.UP * 0.55
 			var aim_offset := aim_point - (ally.global_position + Vector3.UP * 0.6)
