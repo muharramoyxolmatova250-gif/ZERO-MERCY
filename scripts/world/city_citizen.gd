@@ -100,6 +100,7 @@ func _ready() -> void:
 	_target_index = 1
 	personality = _rng.randi_range(1, 5)
 	_initialize_personality()
+	_animation_controller.configure_profile(citizen_id, _personality_traits)
 	_simulation_awareness.setup(citizen_id, float(_personality_traits.get("curiosity", 0.5)))
 	_decide_goal()
 
@@ -758,7 +759,7 @@ func _update_procedural_animation(delta: float) -> void:
 	if _animation_controller == null:
 		return
 	var motion: Dictionary = _motion_controller.snapshot()
-	_animation_controller.update_pose(delta, float(motion.get("speed", 0.0)), str(motion.get("state", "idle")), _indoor_activity, is_using_phone, _stress, current_goal, _personality_traits)
+	_animation_controller.update_pose(delta, float(motion.get("speed", 0.0)), str(motion.get("state", "idle")), _indoor_activity, is_using_phone, _stress, current_goal, _personality_traits, _motion_controller.preferred_speed, _crime_flee_timer > 0.0)
 
 func _build_appearance() -> void:
 	var coat := StandardMaterial3D.new()
