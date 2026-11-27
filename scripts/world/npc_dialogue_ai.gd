@@ -403,3 +403,8 @@ func should_change_topic(turns_on_topic: int, emotional_tension: float) -> bool:
 		threshold += 2
 	return turns_on_topic >= threshold or emotional_tension > 0.82
 
+
+
+func get_dialogue_snapshot() -> Dictionary:
+	return {"resident_id":resident_id,"style":speaking_style,"voice":voice_profile.duplicate(true),"dialogue_count":dialogue_count,"known_topics":known_topics.keys(),"opinion_topics":opinions.keys(),"recent_conversations":recall_conversations("",5)}
+
