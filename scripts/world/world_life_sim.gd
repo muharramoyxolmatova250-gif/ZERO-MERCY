@@ -3032,21 +3032,13 @@ func record_autonomous_goal_result(citizen_id: String, goal_id: String, success:
     _dirty = true
 
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
 func resolve_resident_job_application(citizen_id: String) -> Dictionary:
     if not resident_profiles.has(citizen_id): return {"resolved":false}
@@ -3201,18 +3193,9 @@ func update_resident_autonomy_goal(citizen_id: String, goal_id: String, success:
     return {"goal":goal_id,"success":success,"happiness":float(p.get("happiness",0.5))}
 
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
 
-undefined
-
-undefined
