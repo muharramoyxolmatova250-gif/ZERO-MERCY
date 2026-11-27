@@ -100,3 +100,6 @@ static func get_pole_vector(shoulder: Vector3, wrist: Vector3, pole: Vector3) ->
 
 static func get_segment_midpoint(start: Vector3, finish: Vector3) -> Vector3:
 	return start.lerp(finish, 0.5)
+
+static func get_reach_margin(upper_length: float, lower_length: float, target: Vector3, shoulder: Vector3) -> float:
+	return maxf(0.0, upper_length + lower_length - shoulder.distance_to(target))
