@@ -104,3 +104,9 @@ func get_gait_sway() -> float:
 	return sin(gait_phase) * 0.035
 func set_personal_space(value: float) -> void:
 	personal_space = clampf(value, 0.55, 1.35)
+func reset_motion(position: Vector3) -> void:
+	velocity = Vector3.ZERO
+	acceleration = Vector3.ZERO
+	last_position = position
+	stuck_time = 0.0
+	motion_state = "idle"
