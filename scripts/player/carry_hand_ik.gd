@@ -103,3 +103,6 @@ static func get_segment_midpoint(start: Vector3, finish: Vector3) -> Vector3:
 
 static func get_reach_margin(upper_length: float, lower_length: float, target: Vector3, shoulder: Vector3) -> float:
 	return maxf(0.0, upper_length + lower_length - shoulder.distance_to(target))
+
+static func get_fold_margin(upper_length: float, lower_length: float, target: Vector3, shoulder: Vector3) -> float:
+	return maxf(0.0, absf(upper_length - lower_length) - shoulder.distance_to(target))
