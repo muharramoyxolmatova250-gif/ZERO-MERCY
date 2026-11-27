@@ -289,3 +289,6 @@ func reinforce_preference(key: String, outcome: float, learning_rate: float = 0.
 	if key.is_empty(): return
 	var old := float(preferences.get(key, 0.5))
 	preferences[key] = clampf(old + (clampf(outcome,0.0,1.0)-old)*clampf(learning_rate,0.0,0.5),0.0,1.0)
+
+func get_full_cognitive_snapshot() -> Dictionary:
+	return {"base":get_cognitive_snapshot(),"goals":goals.duplicate(true),"plans":plans.duplicate(true),"preferences":preferences.duplicate(true),"autobiography":build_autobiographical_summary(),"goal_conflicts":detect_goal_conflicts(),"reflection":simulate_reflection()}
