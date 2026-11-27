@@ -5,6 +5,7 @@ const NPCActionPlanner = preload("res://scripts/world/npc_action_planner.gd")
 const NPCMotionController = preload("res://scripts/world/npc_motion_controller.gd")
 const NPCSelfDirection = preload("res://scripts/world/npc_self_direction.gd")
 const NPCCognitiveArchitecture = preload("res://scripts/world/npc_cognitive_architecture.gd")
+const NPCSimulationAwareness = preload("res://scripts/world/npc_simulation_awareness.gd")
 ## Lightweight ambient pedestrian that loops a local sidewalk route.
 @export var route: PackedVector3Array = PackedVector3Array()
 @export_range(0.2, 5.0, 0.1) var walk_speed := 1.25
@@ -62,6 +63,8 @@ var _action_planner = NPCActionPlanner.new()
 var _motion_controller = NPCMotionController.new()
 var _self_direction = NPCSelfDirection.new()
 var _independent_mind = NPCCognitiveArchitecture.new()
+var _simulation_awareness = NPCSimulationAwareness.new()
+var _simulation_scan_timer := 0.0
 var _planned_action: Dictionary = {}
 var _last_economic_goal_id := ""
 var _cognitive_reflection_timer := 0.0
@@ -77,6 +80,7 @@ func _ready() -> void:
 	if citizen_id.is_empty():
 		citizen_id = "citizen_" + str(abs(hash(str(position) + ":" + city_id)))
 	_register_life_profile()
+	_simulation_awareness.setup(citizen_id, float(_personality_traits.get("curiosity", 0.5)))
 	var spatial_index := get_tree().get_first_node_in_group("citizen_spatial_index")
 	if spatial_index != null:
 		spatial_index.call("register_citizen", self)
@@ -156,6 +160,10 @@ func _on_crime_reported(crime_id: String, crime_position: Vector3, severity: int
 
 func _physics_process(delta: float) -> void:
 	_spatial_update_timer += delta
+	_simulation_scan_timer += delta
+	if _simulation_scan_timer >= 2.0:
+		_simulation_scan_timer = 0.0
+		_scan_simulation_anomalies()
 	if _spatial_update_timer >= 0.2:
 		_spatial_update_timer = 0.0
 		var spatial_index := get_tree().get_first_node_in_group("citizen_spatial_index")
@@ -1220,3 +1228,44 @@ func _record_cognitive_activity_outcome(activity: String, success: bool, satisfa
 			_cognitive_plan_id = -1
 		elif plan_status == "interrupted" or advanced.is_empty():
 			_cognitive_plan_id = -1
+
+ 
+## Residents only reason about anomalies they can physically perceive.
+func _scan_simulation_anomalies() -> void:
+	if _simulation_awareness == null:
+		return
+	var candidates := get_tree().get_nodes_in_group("simulation_anomaly")
+	var nearest: Node3D
+	var nearest_distance := 18.0
+	for candidate in candidates:
+		if not candidate is Node3D or not is_instance_valid(candidate):
+			continue
+		var distance := global_position.distance_to(candidate.global_position)
+		if distance < nearest_distance:
+			nearest = candidate as Node3D
+			nearest_distance = distance
+	if nearest == null:
+		return
+	var anomaly_id := str(nearest.get("anomaly_id"))
+	var kind := str(nearest.get("anomaly_kind"))
+	var detail := str(nearest.get("anomaly_detail"))
+	var strength := float(nearest.get("evidence_strength"))
+	if _simulation_awareness.observe_anomaly(anomaly_id, kind, detail, strength, "direct_observation"):
+		_independent_mind.observe_world_fact("simulation_anomaly:" + anomaly_id, detail, strength, "direct_observation", {"distance":nearest_distance,"kind":kind})
+		remember_event("noticed_simulation_anomaly:" + anomaly_id)
+		_decision_reason = "noticed_unusual_world_pattern"
+
+func receive_simulation_rumor(payload: Dictionary, trust: float = 0.35) -> bool:
+	var accepted := _simulation_awareness.receive_rumor(payload, trust)
+	if accepted:
+		remember_event("heard_simulation_rumor:" + str(payload.get("id", "unknown")))
+	return accepted
+
+func get_simulation_awareness_snapshot() -> Dictionary:
+	return _simulation_awareness.get_snapshot()
+
+func test_simulation_hypothesis(question: String, expected: String, risk: float = 0.1) -> int:
+	return _simulation_awareness.create_experiment(question, expected, risk)
+
+func resolve_simulation_test(index: int, result: String, supports_theory: bool) -> bool:
+	return _simulation_awareness.resolve_experiment(index, result, supports_theory)
