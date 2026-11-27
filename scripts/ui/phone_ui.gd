@@ -963,3 +963,140 @@ func _launch_tactical_breach() -> void:
         )
     get_parent().add_child(game)
     set_phone_open(false)
+
+
+func _build_browser() -> void:
+    _add_section_title("ZERO SEARCH // WORLD WEB")
+    _add_body("OFFLINE WORLD DATABASE  •  " + str(_phone_browser.get_page_count()) + " VERIFIED GAME PAGES")
+    _add_body("This prototype searches the simulated ZERO MERCY network. It does not access the real internet.")
+    var search_row := HBoxContainer.new()
+    var query_input := LineEdit.new()
+    query_input.placeholder_text = "Search jobs, cars, news, health..."
+    query_input.text = _browser_query
+    query_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    query_input.custom_minimum_size.y = 42
+    query_input.text_submitted.connect(_submit_browser_search)
+    search_row.add_child(query_input)
+    var search_button := Button.new()
+    search_button.text = "GO"
+    search_button.custom_minimum_size = Vector2(54, 42)
+    search_button.pressed.connect(_submit_browser_search.bind(query_input.text))
+    search_row.add_child(search_button)
+    _content.add_child(search_row)
+    var quick_row := HBoxContainer.new()
+    var home_button := Button.new()
+    home_button.text = "HOME"
+    home_button.pressed.connect(func() -> void:
+        _browser_page_id = ""
+        _browser_query = ""
+        _refresh_content()
+    )
+    quick_row.add_child(home_button)
+    var history_button := Button.new()
+    history_button.text = "HISTORY"
+    history_button.pressed.connect(_show_browser_history)
+    quick_row.add_child(history_button)
+    var saved_button := Button.new()
+    saved_button.text = "BOOKMARKS"
+    saved_button.pressed.connect(_show_browser_bookmarks)
+    quick_row.add_child(saved_button)
+    _content.add_child(quick_row)
+    if not _browser_page_id.is_empty():
+        _render_browser_page(_browser_page_id)
+        return
+    if not _browser_query.is_empty():
+        _add_section_title("SEARCH RESULTS // " + _browser_query.to_upper())
+        var results: Array = _phone_browser.search(_browser_query, 12)
+        if results.is_empty():
+            _add_body("No matching pages found. Try a shorter keyword.")
+        for result in results:
+            _add_browser_result(result)
+    else:
+        _add_section_title("TRENDING NETWORK DESTINATIONS")
+        for result in _phone_browser.search("", 8):
+            _add_browser_result(result)
+    _add_stat("NETWORK", "LOCAL SIMULATION")
+    _add_stat("PRIVACY", "NO EXTERNAL REQUESTS")
+
+
+func _submit_browser_search(query: String) -> void:
+    _browser_query = query.strip_edges()
+    _browser_page_id = ""
+    _browser_status = "SEARCH COMPLETE"
+    _refresh_content()
+
+
+func _add_browser_result(page: Dictionary) -> void:
+    var result_button := Button.new()
+    result_button.text = str(page.get("title", "PAGE")) + "\\n" + str(page.get("domain", "world.zero")) + "  •  " + str(page.get("snippet", ""))
+    result_button.custom_minimum_size = Vector2(0, 72)
+    result_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    result_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+    result_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    result_button.pressed.connect(_open_browser_page.bind(str(page.get("id", ""))))
+    _content.add_child(result_button)
+
+
+func _open_browser_page(page_id: String) -> void:
+    var page: Dictionary = _phone_browser.visit(page_id)
+    if page.is_empty():
+        return
+    _browser_page_id = page_id
+    _refresh_content()
+
+
+func _render_browser_page(page_id: String) -> void:
+    var page: Dictionary = _phone_browser.get_page(page_id)
+    if page.is_empty():
+        _browser_page_id = ""
+        _add_body("This page is no longer available.")
+        return
+    _add_section_title(str(page.get("title", "WORLD PAGE")))
+    _add_stat("ADDRESS", str(page.get("domain", "world.zero")))
+    _add_stat("CATEGORY", str(page.get("category", "general")).to_upper())
+    _add_body(str(page.get("body", "")))
+    var saved := false
+    for item in _phone_browser.get_bookmarks():
+        if str(item.get("id", "")) == page_id:
+            saved = true
+            break
+    var bookmark_button := Button.new()
+    bookmark_button.text = "REMOVE BOOKMARK" if saved else "SAVE BOOKMARK"
+    bookmark_button.pressed.connect(func() -> void:
+        _phone_browser.toggle_bookmark(page_id)
+        _refresh_content()
+    )
+    _content.add_child(bookmark_button)
+    var back := Button.new()
+    back.text = "BACK TO SEARCH"
+    back.pressed.connect(func() -> void:
+        _browser_page_id = ""
+        _refresh_content()
+    )
+    _content.add_child(back)
+
+
+func _show_browser_history() -> void:
+    _browser_page_id = ""
+    _browser_query = ""
+    _refresh_content()
+    _add_section_title("RECENTLY VISITED")
+    var history: Array = _phone_browser.get_history()
+    if history.is_empty():
+        _add_body("No browsing history yet.")
+        return
+    for item in history:
+        _add_browser_result(_phone_browser.get_page(str(item.get("id", ""))))
+
+
+func _show_browser_bookmarks() -> void:
+    _browser_page_id = ""
+    _browser_query = ""
+    _refresh_content()
+    _add_section_title("SAVED PAGES")
+    var saved: Array = _phone_browser.get_bookmarks()
+    if saved.is_empty():
+        _add_body("No saved pages yet.")
+        return
+    for item in saved:
+        _add_browser_result(item)
