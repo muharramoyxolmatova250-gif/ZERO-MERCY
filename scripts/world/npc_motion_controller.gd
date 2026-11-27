@@ -102,3 +102,5 @@ func get_motion_state() -> String:
 	return motion_state
 func get_gait_sway() -> float:
 	return sin(gait_phase) * 0.035
+func set_personal_space(value: float) -> void:
+	personal_space = clampf(value, 0.55, 1.35)
