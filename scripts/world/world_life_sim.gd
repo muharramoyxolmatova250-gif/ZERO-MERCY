@@ -1578,8 +1578,6 @@ func _ensure_phone_profile(citizen_id: String) -> Dictionary:
         "phone_blocked_contacts":[], "phone_muted_contacts":[], "phone_contact_aliases":{}
     }
     for key in defaults:
-    }
-    for key in defaults:
         if not profile.has(key):
             profile[key] = defaults[key]
             changed = true
