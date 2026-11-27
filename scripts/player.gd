@@ -46,6 +46,7 @@ var _hand_anchor: Marker3D
 var _cybernetic_hands: Node3D
 var _pickup_tween: Tween
 var _pickup_in_progress := false
+var _weapon_visual: Node3D
 var _muzzle_flash: MeshInstance3D
 var _muzzle_light: OmniLight3D
 var _muzzle_flash_timer := 0.0
@@ -206,6 +207,7 @@ func _add_dara_box(part_name: String, part_position: Vector3, part_size: Vector3
 
 func _build_weapon_visual() -> void:
 	var weapon := Node3D.new()
+	_weapon_visual = weapon
 	weapon.name = "SovereignSidearm"
 	_hand_anchor.add_child(weapon)
 	var armor := StandardMaterial3D.new()
@@ -687,6 +689,8 @@ func _finish_pickup() -> void:
 		_cybernetic_hands.call("close_grip")
 	if is_instance_valid(_held_item) and _held_item.has_method("set_being_held"):
 		_held_item.call("set_being_held", true)
+	if is_instance_valid(_weapon_visual):
+		_weapon_visual.visible = false
 	_pickup_in_progress = false
 
 func _restore_pickup_collision(item: Node3D) -> void:
@@ -702,6 +706,8 @@ func _drop_held_item() -> void:
 		return
 	var item := _held_item
 	_held_item = null
+	if is_instance_valid(_weapon_visual):
+		_weapon_visual.visible = true
 	_pickup_in_progress = false
 	if is_instance_valid(_cybernetic_hands) and _cybernetic_hands.has_method("release_object"):
 		_cybernetic_hands.call("release_object")
