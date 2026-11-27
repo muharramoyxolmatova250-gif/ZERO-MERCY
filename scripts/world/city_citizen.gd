@@ -708,6 +708,36 @@ func _consider_autonomous_phone_use() -> void:
 			_phone_battery_visual = maxf(0.15, _phone_battery_visual - 0.025)
 			_set_phone_visible(true)
 			return
+	if free_time and _social_need > 0.5 and life_sim.has_method("get_phone_network_feed") and _rng.randf() < 0.32:
+		var network_posts: Array = life_sim.call("get_phone_network_feed", citizen_id, 18, false)
+		var interesting_posts: Array[Dictionary] = []
+		for network_post_value in network_posts:
+			var network_post: Dictionary = network_post_value
+			if str(network_post.get("author_id", "")) != citizen_id:
+				interesting_posts.append(network_post)
+		if not interesting_posts.is_empty():
+			var selected_post: Dictionary = interesting_posts[_rng.randi_range(0, interesting_posts.size() - 1)]
+			var selected_post_id := str(selected_post.get("id", ""))
+			var selected_author := str(selected_post.get("author_id", ""))
+			if not selected_post_id.is_empty() and life_sim.has_method("react_to_phone_post"):
+				life_sim.call("react_to_phone_post", citizen_id, selected_post_id)
+				remember_event("liked_social_post:" + selected_author)
+				if _curiosity > 0.82 and life_sim.has_method("add_phone_social_comment") and _rng.randf() < 0.18:
+					var short_replies := ["Zo'r fikr!", "Men ham shuni ko'rdim.", "Bu haqda ko'proq bilmoqchiman.", "Ajoyib yangilik!"]
+					life_sim.call("add_phone_social_comment", citizen_id, selected_post_id, short_replies[_rng.randi_range(0, short_replies.size() - 1)])
+				_phone_action_cooldown = _rng.randf_range(35.0, 90.0)
+				_set_phone_visible(true)
+				return
+	if free_time and _social_need > 0.68 and life_sim.has_method("get_phone_suggested_residents") and _rng.randf() < 0.16:
+		var suggested_people: Array = life_sim.call("get_phone_suggested_residents", citizen_id, 8)
+		if not suggested_people.is_empty():
+			var suggested_person: Dictionary = suggested_people[_rng.randi_range(0, suggested_people.size() - 1)]
+			var followed_id := str(suggested_person.get("id", ""))
+			if not followed_id.is_empty() and life_sim.call("follow_phone_resident", citizen_id, followed_id):
+				remember_event("followed_resident:" + followed_id)
+				_phone_action_cooldown = _rng.randf_range(65.0, 140.0)
+				_set_phone_visible(true)
+				return
 	if _curiosity > 0.66 and life_sim.has_method("publish_phone_post") and _rng.randf() < 0.2:
 		var posts := ["Bugun shahar juda gavjum.", "Yangi kun, yangi rejalar.", "Bugun yaxshi voqea yuz berdi.", "Kelajak tez o'zgaryapti."]
 		life_sim.call("publish_phone_post", citizen_id, posts[_rng.randi_range(0, posts.size() - 1)], "curious")
