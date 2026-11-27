@@ -3033,3 +3033,5 @@ func record_autonomous_goal_result(citizen_id: String, goal_id: String, success:
 
 
 undefined
+
+undefined
