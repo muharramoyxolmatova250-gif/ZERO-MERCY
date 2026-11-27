@@ -1277,3 +1277,10 @@ func test_simulation_hypothesis(question: String, expected: String, risk: float 
 
 func resolve_simulation_test(index: int, result: String, supports_theory: bool) -> bool:
 	return _simulation_awareness.resolve_experiment(index, result, supports_theory)
+
+ 
+func get_simulation_investigation_readiness() -> float:
+	return _simulation_awareness.get_investigation_readiness()
+
+func get_most_likely_simulation_theory() -> Dictionary:
+	return _simulation_awareness.get_most_supported_hypothesis()
