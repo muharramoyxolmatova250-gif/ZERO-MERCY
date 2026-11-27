@@ -204,3 +204,15 @@ func get_grip_anchor() -> Marker3D:
 
 func get_support_grip_anchor() -> Marker3D:
 	return _support_grip_anchor
+
+func get_secondary_grip_weight() -> float:
+	return _secondary_grip_weight
+
+func get_secondary_ik_solution() -> Dictionary:
+	return _secondary_ik_solution.duplicate(true)
+
+func is_support_hand_engaged() -> bool:
+	return _secondary_grip_weight > 0.05 and not _secondary_ik_solution.is_empty()
+
+func get_support_grip_anchor() -> Marker3D:
+	return _support_grip_anchor
