@@ -46,8 +46,14 @@ func _dispatch_for_incident(incident_id: String) -> void:
 		return
 	var incident: Dictionary = _incidents[incident_id]
 	var requested_types: Array[String] = _required_services(str(incident.get("kind", "")), float(incident.get("severity", 0.5)))
-	var assigned: Array = []
+	var assigned: Array = incident.get("assigned", [])
+	var assigned_types: Array[String] = []
+	for existing_responder_id in assigned:
+		if _responders.has(str(existing_responder_id)):
+			assigned_types.append(str(_responders[str(existing_responder_id)].get("type", "")))
 	for service_type in requested_types:
+		if assigned_types.has(service_type):
+			continue
 		var responder_id := _find_best_responder(service_type, incident.position)
 		if responder_id.is_empty():
 			continue
@@ -56,6 +62,7 @@ func _dispatch_for_incident(incident_id: String) -> void:
 		responder["calls"] = int(responder.get("calls", 0)) + 1
 		_responders[responder_id] = responder
 		assigned.append(responder_id)
+		assigned_types.append(service_type)
 		var node: Node3D = responder.get("node")
 		if is_instance_valid(node) and node.has_method("respond_to_incident"):
 			node.call("respond_to_incident", incident_id, incident.position, float(incident.get("severity", 0.5)))
