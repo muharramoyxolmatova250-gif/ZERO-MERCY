@@ -3001,11 +3001,11 @@ func execute_autonomous_resident_goal(citizen_id: String, goal_id: String, perso
 			var options := get_job_market_options(str(p.get("city","")),citizen_id)
 			for option in options:
 				if str(option.job) != str(p.get("occupation","")) and float(option.qualification) >= 0.5:
-					var result := submit_job_application(citizen_id,str(option.job))
-					return {"executed":bool(result.get("submitted",false)),"action":"job_application","result":result}
+					var application_result := submit_job_application(citizen_id,str(option.job))
+					return {"executed":bool(application_result.get("submitted",false)),"action":"job_application","result":application_result}
 		"advance_career":
-			var result := process_autonomous_career_choice(citizen_id,{"choice":"seek_promotion"})
-			return {"executed":bool(result.get("changed",false)),"action":"promotion_effort","result":result}
+			var promotion_result := process_autonomous_career_choice(citizen_id,{"choice":"seek_promotion"})
+			return {"executed":bool(promotion_result.get("changed",false)),"action":"promotion_effort","result":promotion_result}
 		"learn_skill":
 			var skill := str(p.get("career_field",p.get("occupation","general")))
 			return {"executed":not train_resident_skill(citizen_id,skill,0.08).is_empty(),"action":"skill_training"}
@@ -3014,8 +3014,8 @@ func execute_autonomous_resident_goal(citizen_id: String, goal_id: String, perso
 			if not choices.is_empty() and int(p.get("savings",0))+int(p.get("bank_balance",0)) >= 30000:
 				var sector := str(choices[0].sector)
 				var type_map := {"food":"food_store","medicine":"pharmacy","electronics":"electronics_shop","clothing":"clothing_store","fuel":"fuel_station"}
-				var result := start_resident_business(citizen_id,str(type_map.get(sector,"food_store")),30000)
-				return {"executed":bool(result.get("started",false)),"action":"business_startup","result":result}
+				var startup_result := start_resident_business(citizen_id,str(type_map.get(sector,"food_store")),30000)
+				return {"executed":bool(startup_result.get("started",false)),"action":"business_startup","result":startup_result}
 		"save_money":
 			set_resident_financial_goal(citizen_id,"build_savings")
 			return {"executed":true,"action":"savings_plan"}
@@ -3158,16 +3158,14 @@ func record_resident_skill_mastery(citizen_id: String, skill: String, milestone:
 	var p: Dictionary = resident_profiles[citizen_id]
 	var skills: Dictionary = p.get("skills",{})
 	var level := float(skills.get(skill,0.0))
-	if level >= 0.25 and not bool(p.get("skill_milestones",{}).get(skill+"_beginner",false)):
-		var milestones: Dictionary = p.get("skill_milestones",{})
+	var milestones: Dictionary = p.get("skill_milestones",{})
+	if level >= 0.25 and not bool(milestones.get(skill+"_beginner",false)):
 		milestones[skill+"_beginner"] = true
-		p["skill_milestones"] = milestones
 		_append_event(p,"skill_milestone:" + skill + ":beginner")
-	if level >= 0.75 and not bool(p.get("skill_milestones",{}).get(skill+"_advanced",false)):
-		var milestones: Dictionary = p.get("skill_milestones",{})
+	if level >= 0.75 and not bool(milestones.get(skill+"_advanced",false)):
 		milestones[skill+"_advanced"] = true
-		p["skill_milestones"] = milestones
 		_append_event(p,"skill_milestone:" + skill + ":advanced")
+	p["skill_milestones"] = milestones
 	resident_profiles[citizen_id] = p
 	_dirty = true
 
