@@ -1234,6 +1234,7 @@ func _record_cognitive_activity_outcome(activity: String, success: bool, satisfa
 func _scan_simulation_anomalies() -> void:
 	if _simulation_awareness == null:
 		return
+	_simulation_awareness.update_personal_traits(float(_personality_traits.get("curiosity", 0.5)), 1.0 - float(_personality_traits.get("courage", 0.5)))
 	var candidates := get_tree().get_nodes_in_group("simulation_anomaly")
 	var nearest: Node3D
 	var nearest_distance := 18.0
