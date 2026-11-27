@@ -17,6 +17,11 @@ func _initialize() -> void:
 	_test_max_min_reach()
 	_test_joint_balance()
 	_test_wrist_direction()
+	_test_solution_points()
+	_test_invalid_solver_lengths()
+	_test_solution_lengths()
+	_test_solution_directions()
+	_test_constrained_solver()
 	quit()
 
 func _test_reach_clamping() -> void:
@@ -75,3 +80,27 @@ func _test_joint_balance() -> void:
 func _test_wrist_direction() -> void:
 	var direction := CarryHandIK.get_wrist_to_target_direction(Vector3.ZERO, Vector3.RIGHT)
 	assert(direction.is_equal_approx(Vector3.RIGHT))
+
+func _test_constrained_solver() -> void:
+	var result: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	assert(bool(result.get("valid", false)))
+	assert(CarryHandIK.get_solution_is_valid(result))
+
+func _test_solution_directions() -> void:
+	var result: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	var directions: Dictionary = CarryHandIK.get_limb_directions(result)
+	assert((directions["upper"] as Vector3).length() > 0.99)
+
+func _test_solution_lengths() -> void:
+	var result: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	var lengths: Vector2 = CarryHandIK.get_solution_segment_lengths(result)
+	assert(absf(lengths.x - 0.4) < 0.001)
+	assert(absf(lengths.y - 0.4) < 0.001)
+
+func _test_invalid_solver_lengths() -> void:
+	var result: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3.RIGHT, 0.0, 0.4, Vector3.UP)
+	assert(not bool(result.get("valid", true)))
+
+func _test_solution_points() -> void:
+	var result: Dictionary = CarryHandIK.solve_with_constraints(Vector3.ZERO, Vector3(0.5, 0.0, 0.0), 0.4, 0.4, Vector3.UP)
+	assert(CarryHandIK.get_joint_positions(result).size() == 3)
