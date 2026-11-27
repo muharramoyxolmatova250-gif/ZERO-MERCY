@@ -193,3 +193,6 @@ static func get_target_direction(shoulder: Vector3, target: Vector3, fallback: V
 static func get_elbow_plane(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> Plane:
 	var normal := get_elbow_plane_normal(shoulder, elbow, wrist)
 	return Plane(normal, elbow)
+
+static func get_wrist_error_vector(actual: Vector3, desired: Vector3) -> Vector3:
+	return desired - actual
