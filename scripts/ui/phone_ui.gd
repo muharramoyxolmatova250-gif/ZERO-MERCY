@@ -438,6 +438,13 @@ func _build_contacts() -> void:
         var person: Dictionary = citizen.call("get_ai_snapshot")
         _add_stat(str(person.get("name", person.get("id", "Resident"))),
             str(person.get("age_years", 0)) + " yrs  •  " + str(person.get("life_stage", "adult")) + "  •  " + str(person.get("occupation", "resident")))
+        var contact_id := str(person.get("id", ""))
+        if not contact_id.is_empty():
+            var call_button := Button.new()
+            call_button.text = "☎  CALL " + str(person.get("name", "RESIDENT")).to_upper()
+            call_button.custom_minimum_size.y = 38
+            call_button.pressed.connect(_place_phone_call.bind(contact_id, str(person.get("name", "Resident"))))
+            _content.add_child(call_button)
 
 func _build_life() -> void:
     _add_section_title("GLOBAL LIFE SIMULATION")
