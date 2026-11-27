@@ -627,7 +627,8 @@ func _update_allies(delta: float) -> void:
 				best_target_score = target_score
 				nearest = enemy
 		var wait := maxf(0.0, float(ally.get_meta("fire_wait", 0.5)) - delta)
-		if ally_health < 55.0 and not cover_positions.is_empty():
+		var retreating_to_cover := ally_health < 55.0 and not cover_positions.is_empty()
+		if retreating_to_cover:
 			var safest := cover_positions[0]
 			var safest_score := INF
 			for cover_point in cover_positions:
@@ -642,6 +643,12 @@ func _update_allies(delta: float) -> void:
 				ally.velocity.x = retreat_dir.x * 2.7
 				ally.velocity.z = retreat_dir.z * 2.7
 				ally.look_at(Vector3(safest.x, ally.global_position.y, safest.z), Vector3.UP)
+			else:
+				ally.velocity.x = move_toward(ally.velocity.x, 0.0, 9.0 * delta)
+				ally.velocity.z = move_toward(ally.velocity.z, 0.0, 9.0 * delta)
+			ally.set_meta("morale", maxf(0.2, float(ally.get_meta("morale", 1.0)) - delta * 0.025))
+		else:
+			ally.set_meta("morale", minf(1.0, float(ally.get_meta("morale", 1.0)) + delta * 0.018))
 		if nearest != null:
 			var aim_point := nearest.global_position + Vector3.UP * 0.55
 			var aim_offset := aim_point - (ally.global_position + Vector3.UP * 0.6)
@@ -678,7 +685,7 @@ func _update_allies(delta: float) -> void:
 			else:
 				ally.velocity.x = move_toward(ally.velocity.x, 0.0, 8.0 * delta)
 				ally.velocity.z = move_toward(ally.velocity.z, 0.0, 8.0 * delta)
-		if nearest != null and ally_health >= 55.0:
+		if nearest != null and ally_health >= 55.0 and not retreating_to_cover:
 			ally.velocity.x = move_toward(ally.velocity.x, 0.0, 8.0 * delta)
 			ally.velocity.z = move_toward(ally.velocity.z, 0.0, 8.0 * delta)
 		ally.velocity.y = 0.0
