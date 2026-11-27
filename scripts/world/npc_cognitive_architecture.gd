@@ -356,3 +356,7 @@ func update_goal_priority(goal_id: int, priority: float, reason: String = "") ->
 func observe_world_fact(subject: String, claim: String, confidence: float, evidence: String, context: Dictionary = {}) -> void:
 	form_belief(subject, claim, confidence, evidence)
 	add_memory("observation:" + subject, context.merged({"claim":claim,"evidence":evidence}, true), confidence * 0.65, confidence)
+
+
+func build_decision_context(topic: String = "") -> Dictionary:
+	return {"resident_id":resident_id,"needs":needs.duplicate(true),"top_goals":get_active_goals(5),"recalled_memories":recall_memories(topic, 5),"belief_uncertainty":float(beliefs.get("uncertainty", 0.5)),"preferences":preferences.duplicate(true),"decision_count":decision_count}
