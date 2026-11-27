@@ -1045,3 +1045,11 @@ func _advance_indoor_life_action() -> void:
 	var threshold := _get_personal_activity_duration(goal_id)
 	if _indoor_activity_time >= threshold:
 		_complete_indoor_personal_action()
+
+func _apply_indoor_need_outcomes(goal_id: String) -> void:
+	match goal_id:
+		"exercise_for_health": _stress = maxf(0.0, _stress - 0.08); _energy = maxf(0.0, _energy - 0.06)
+		"spend_time_with_family", "make_friend", "repair_relationship", "help_neighbor": _social_need = maxf(0.0, _social_need - 0.16)
+		"learn_skill", "advance_career": _stress = minf(1.0, _stress + 0.025)
+		"find_quiet_place": _stress = maxf(0.0, _stress - 0.14)
+		"practice_hobby", "create_something": _curiosity = maxf(0.0, _curiosity - 0.12)
