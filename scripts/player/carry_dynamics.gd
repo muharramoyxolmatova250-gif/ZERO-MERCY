@@ -225,3 +225,11 @@ func can_release_safely() -> bool:
 	if not has_item():
 		return true
 	return stability >= 0.12 and actor != null and actor.is_inside_tree()
+
+
+func validate_profile(item: Node3D, mass: float) -> bool:
+	if not is_instance_valid(item) or not item.is_inside_tree():
+		return false
+	if mass <= 0.0 or mass > max_mass_kg:
+		return false
+	return item.is_in_group("world_pickup")
