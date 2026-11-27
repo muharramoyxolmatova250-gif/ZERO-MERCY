@@ -773,6 +773,7 @@ func _update_allies(delta: float) -> void:
 			ally.velocity.x = escape_direction.x * 5.8
 			ally.velocity.z = escape_direction.z * 5.8
 			ally.look_at(ally.global_position + escape_direction, Vector3.UP)
+			_apply_ally_blast_impulse(ally, delta)
 			ally.move_and_slide()
 			ally.set_meta("fire_wait", 0.25)
 			continue
