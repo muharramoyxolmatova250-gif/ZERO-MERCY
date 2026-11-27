@@ -1624,6 +1624,17 @@ func get_phone_inbox(citizen_id: String, unread_only: bool = false, limit: int =
     return result.slice(0, mini(result.size(), maxi(1, limit)))
 
 
+func get_phone_unread_by_contact(citizen_id: String) -> Dictionary:
+    var profile := _ensure_phone_profile(citizen_id)
+    var counts: Dictionary = {}
+    for message_value in profile.get("phone_inbox", []):
+        var message: Dictionary = message_value
+        if not bool(message.get("read", false)):
+            var sender_id := str(message.get("from", ""))
+            counts[sender_id] = int(counts.get(sender_id, 0)) + 1
+    return counts
+
+
 func get_phone_conversation(citizen_id: String, other_id: String, limit: int = 60) -> Array:
     if not resident_profiles.has(citizen_id) or not resident_profiles.has(other_id) or citizen_id == other_id:
         return []
