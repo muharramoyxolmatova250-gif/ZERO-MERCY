@@ -1065,3 +1065,9 @@ func _record_autonomous_family_time(goal_id: String) -> void:
 	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
 	if life_sim != null and life_sim.has_method("record_family_interaction"):
 		life_sim.call("record_family_interaction", citizen_id, "autonomous_family_time")
+
+func _record_autonomous_social_progress(goal_id: String) -> void:
+	if goal_id not in ["make_friend", "help_neighbor", "volunteer", "repair_relationship"]: return
+	var life_sim := get_tree().get_first_node_in_group("world_life_sim")
+	if life_sim != null and life_sim.has_method("record_event"):
+		life_sim.call("record_event", citizen_id, "self_directed_social_effort:" + goal_id)
