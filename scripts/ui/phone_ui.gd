@@ -362,6 +362,24 @@ func _get_phone_owner_id() -> String:
     return ""
 
 
+func _build_notifications_center() -> void:
+    _add_section_title("SYSTEM // NOTIFICATION CENTER")
+    var owner_id := _get_phone_owner_id()
+    if owner_id.is_empty() or _life == null or not _life.has_method("get_phone_snapshot"):
+        _add_body("Notification link unavailable.")
+        return
+    var snapshot: Dictionary = _life.call("get_phone_snapshot", owner_id)
+    var notifications: Array = snapshot.get("notifications", [])
+    _add_stat("TOTAL ALERTS", str(notifications.size()))
+    if notifications.is_empty():
+        _add_body("No new system alerts.")
+        return
+    for alert in notifications:
+        var title := str(alert.get("title", alert.get("kind", "WORLD ALERT")))
+        var detail := str(alert.get("text", alert.get("message", "")))
+        _add_stat(title, detail)
+
+
 func _build_sms_inbox() -> void:
     _add_section_title("MESSAGES / INBOX")
     var owner_id := _get_phone_owner_id()
