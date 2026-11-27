@@ -447,8 +447,11 @@ func _physics_process(delta: float) -> void:
 	var performance := _get_gameplay_performance()
 	var carry_speed_factor := float(_carry_dynamics.call("get_speed_factor"))
 	var speed := (sprint_speed if sprinting else walk_speed) * performance * carry_speed_factor
-	var direction := (transform.basis * Vector3(input_vector.x, 0.0, input_vector.y)).normalized()
+	var turn_factor := float(_carry_dynamics.call("get_turn_sensitivity"))
+	var adjusted_input := Vector2(input_vector.x * turn_factor, input_vector.y)
+	var direction := (transform.basis * Vector3(adjusted_input.x, 0.0, adjusted_input.y)).normalized()
 	var movement_response := float(_carry_dynamics.call("get_movement_response"))
+	movement_response *= float(_carry_dynamics.call("get_acceleration_response"))
 	_carry_dynamics.call("update_dynamics", delta)
 	var target_x := direction.x * speed if direction.length_squared() > 0.0 else 0.0
 	var target_z := direction.z * speed if direction.length_squared() > 0.0 else 0.0
