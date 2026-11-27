@@ -329,3 +329,6 @@ func get_secondary_grip_local() -> Vector3:
 
 func estimate_item_stress() -> float:
 	return clampf((impact_load * 0.55 + turn_load * 0.25) * get_handling_factor(), 0.0, 1.0)
+
+func get_carry_quality() -> float:
+	return clampf(stability - estimate_item_stress() * (0.5 if fragile else 0.2), 0.0, 1.0)
