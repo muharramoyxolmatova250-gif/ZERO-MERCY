@@ -1619,6 +1619,26 @@ func get_phone_inbox(citizen_id: String, unread_only: bool = false, limit: int =
     return result.slice(0, mini(result.size(), maxi(1, limit)))
 
 
+func get_phone_conversation(citizen_id: String, other_id: String, limit: int = 60) -> Array:
+    if not resident_profiles.has(citizen_id) or not resident_profiles.has(other_id) or citizen_id == other_id:
+        return []
+    var profile := _ensure_phone_profile(citizen_id)
+    var conversation: Array[Dictionary] = []
+    for message_value in profile.get("phone_inbox", []):
+        var message: Dictionary = message_value
+        if str(message.get("from", "")) == other_id and str(message.get("to", "")) == citizen_id:
+            conversation.append(message.duplicate(true))
+    for message_value in profile.get("phone_outbox", []):
+        var message: Dictionary = message_value
+        if str(message.get("from", "")) == citizen_id and str(message.get("to", "")) == other_id:
+            conversation.append(message.duplicate(true))
+    conversation.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+        return int(a.get("day", 0)) < int(b.get("day", 0))
+    )
+    var safe_limit := maxi(1, limit)
+    return conversation.slice(maxi(0, conversation.size() - safe_limit))
+
+
 func get_phone_contacts(citizen_id: String) -> Array:
     var profile := _ensure_phone_profile(citizen_id)
     if profile.is_empty():
