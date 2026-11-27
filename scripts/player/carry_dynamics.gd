@@ -189,3 +189,7 @@ func get_footstep_intensity() -> float:
 func get_camera_motion_factor() -> float:
 	var weight := clampf(mass_kg / 28.0, 0.0, 1.0)
 	return clampf(1.0 - weight * 0.32 - (0.16 if fragile else 0.0), 0.48, 1.0)
+
+
+func get_setdown_clearance() -> float:
+	return 0.34 + clampf(mass_kg * 0.004, 0.0, 0.24)
