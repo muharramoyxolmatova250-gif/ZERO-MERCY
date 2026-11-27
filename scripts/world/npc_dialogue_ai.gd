@@ -255,3 +255,16 @@ func suggest_topic(context: Dictionary = {}) -> String:
 		options.append_array(["career goals","new opportunities","projects"])
 	return options[_rng.randi_range(0,options.size()-1)]
 
+
+
+func continue_conversation(topic: String, previous_line: String, context: Dictionary = {}) -> String:
+	if previous_line.strip_edges().is_empty():
+		return generate_follow_up(topic)
+	if _contains_any(previous_line.to_lower(),["sad","hard","difficult","worried"]):
+		return "I hear you. What do you think would make the situation a little better?"
+	if speaking_style == "curious":
+		return "There's another side to %s too. Have you considered it?" % topic
+	if speaking_style == "warm":
+		return "Thanks for sharing that with me. Is there anything else on your mind?"
+	return generate_follow_up(topic,previous_line)
+
