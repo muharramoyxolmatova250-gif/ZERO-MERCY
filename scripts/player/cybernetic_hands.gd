@@ -63,17 +63,17 @@ func _process(delta: float) -> void:
 					var grip_world: Vector3 = _carry_object.global_transform * grip_offset
 					var target_local := to_local(grip_world)
 					var bend_normal := Vector3(0.0, 0.0, 1.0 if target_local.x < pivot.position.x else -1.0)
-					_secondary_ik_solution = CarryHandIK.make_debug_solution(pivot.position, target_local, 0.38, 0.43, bend_normal)
+					_secondary_ik_solution = CarryHandIK.solve_with_constraints(pivot.position, target_local, 0.38, 0.43, bend_normal)
 					var solved_wrist: Vector3 = _secondary_ik_solution.get("wrist", target_local)
 					var reach_vector := solved_wrist - pivot.position
-					_secondary_grip_weight = move_toward(_secondary_grip_weight, 1.0, delta * 3.0)
+					_secondary_grip_weight = CarryHandIK.smooth_weight(_secondary_grip_weight, 1.0, delta, 3.0)
 					var target_horizontal := Vector2(reach_vector.x, reach_vector.z).length()
 					target.x = clampf(atan2(reach_vector.y, maxf(0.001, target_horizontal)) + 0.45, -0.8, 0.55)
 					target.x += sin(_clock * 1.8) * 0.018 * (1.0 - _secondary_grip_weight)
 					target.y = clampf(atan2(-reach_vector.z, reach_vector.x), -0.95, 0.95)
 					target.z = -0.04 if _carry_fragile else 0.0
 				else:
-					_secondary_grip_weight = move_toward(_secondary_grip_weight, 0.0, delta * 4.0)
+					_secondary_grip_weight = CarryHandIK.smooth_weight(_secondary_grip_weight, 0.0, delta, 4.0)
 		else:
 			if side > 0.0:
 				target += _reach_rotation * _reach_weight
