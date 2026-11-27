@@ -59,3 +59,6 @@ static func validate_segment_lengths(upper_length: float, lower_length: float) -
 
 static func get_max_reach(upper_length: float, lower_length: float, margin: float = 0.025) -> float:
 	return maxf(0.0, upper_length + lower_length - margin)
+
+static func get_min_reach(upper_length: float, lower_length: float, margin: float = 0.025) -> float:
+	return absf(upper_length - lower_length) + margin
