@@ -376,3 +376,12 @@ func answer_private_question(question: String, trust: float) -> String:
 		return "I'd rather keep that part of my life private, if that's okay."
 	return "That's personal, but I can share a little if we trust each other."
 
+
+
+func discuss_rumor(topic: String, source_reliability: float) -> String:
+	if source_reliability < 0.25:
+		return "I've heard something about %s, but I don't trust the source. I wouldn't repeat it as fact." % topic
+	if source_reliability < 0.6:
+		return "There are stories about %s, but I haven't confirmed them." % topic
+	return "I heard a credible report about %s, though I'd still like to verify the details." % topic
+
