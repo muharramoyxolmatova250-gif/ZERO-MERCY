@@ -243,3 +243,15 @@ func answer_from_knowledge(topic: String) -> String:
 			best = entry
 	return str(best.get("fact",""))
 
+
+
+func suggest_topic(context: Dictionary = {}) -> String:
+	var options: Array[String] = ["work","family","the city","music","food","future plans","technology","weekend","memories","local news"]
+	if speaking_style == "curious":
+		options.append_array(["new discoveries","science","travel","how things work"])
+	elif speaking_style == "warm":
+		options.append_array(["friends","how everyone is doing","helping the community"])
+	elif speaking_style == "driven":
+		options.append_array(["career goals","new opportunities","projects"])
+	return options[_rng.randi_range(0,options.size()-1)]
+
