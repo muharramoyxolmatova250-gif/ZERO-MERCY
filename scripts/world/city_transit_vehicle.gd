@@ -136,9 +136,9 @@ func _safe_follow_speed() -> float:
 
 func set_passenger_count(value: int) -> void:
     passenger_count = clampi(value, 0, passenger_capacity)
-	passenger_destinations.clear()
-	for index in range(passenger_count):
-		passenger_destinations.append("")
+    passenger_destinations.clear()
+    for index in range(passenger_count):
+        passenger_destinations.append("")
 
 func get_vehicle_snapshot() -> Dictionary:
     return {"passengers": passenger_count, "capacity": passenger_capacity, "alighted_total": total_alighted, "onboard_destinations": passenger_destinations.duplicate(), "completed_stops": completed_stops, "speed": _current_speed, "dwelling": _dwell_remaining > 0.0, "doors_open": _door_open, "route_id": route_id}
