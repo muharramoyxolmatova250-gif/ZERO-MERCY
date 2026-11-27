@@ -123,3 +123,6 @@ func update_stuck_detection(position: Vector3, delta: float) -> bool:
 		stuck_time = maxf(0.0, stuck_time - dt * 2.0)
 	last_position = position
 	return stuck_time > 1.1
+func get_recovery_direction(forward: Vector3) -> Vector3:
+	var side := Vector3(-forward.z, 0.0, forward.x) * sidestep_sign
+	return (side + forward * 0.25).normalized()
