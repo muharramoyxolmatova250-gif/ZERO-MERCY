@@ -191,3 +191,7 @@ func _catalog_activity(goal_id: String) -> String:
 	for entry in GOAL_CATALOG:
 		if str(entry.id) == goal_id: return str(entry.activity)
 	return "leisure"
+func wants_new_job(context: Dictionary = {}) -> bool:
+	var dissatisfaction := clampf(float(context.get("dissatisfaction", 0.0)), 0.0, 1.0)
+	var financial_pressure := clampf(float(context.get("financial_pressure", 0.0)), 0.0, 1.0)
+	return dissatisfaction * 0.55 + financial_pressure * 0.3 + _trait("ambition") * 0.15 > 0.62
