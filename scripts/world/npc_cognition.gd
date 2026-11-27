@@ -300,3 +300,16 @@ func assess_crowd_context(observations: Array[Dictionary]) -> Dictionary:
 	var divisor := maxf(1.0,float(count))
 	return {"crowd_size":count,"danger_level":clampf(danger/divisor,0.0,1.0),"social_support":clampf(support/divisor,0.0,1.0),"should_leave":count > 0 and danger/divisor > 0.58}
 
+
+
+func adapt_routine(activity: String, disruption: float, importance: float) -> Dictionary:
+	var severity := clampf(disruption*importance,0.0,1.0)
+	var response := "continue"
+	if severity > 0.78:
+		response = "cancel_and_replan"
+	elif severity > 0.48:
+		response = "delay_and_reassess"
+	elif severity > 0.22:
+		response = "shorten_activity"
+	return {"activity":activity,"response":response,"disruption":severity,"priority":clampf(importance,0.0,1.0)}
+
