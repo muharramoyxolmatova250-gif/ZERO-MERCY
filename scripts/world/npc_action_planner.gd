@@ -120,3 +120,20 @@ func expand_action_variants(action: String, context: Dictionary) -> Array[String
  if action in ["investigate","observe"] and float(context.get("risk",0.0)) > 0.6:
   variants.append("observe_from_cover")
  return variants
+
+
+func choose_target(candidates: Array[Dictionary], context: Dictionary = {}) -> Dictionary:
+ var best: Dictionary = {}
+ var best_score := -INF
+ for candidate in candidates:
+  var distance := float(candidate.get("distance",50.0))
+  var affinity := float(candidate.get("affinity",0.0))
+  var relevance := float(candidate.get("relevance",0.0))
+  var risk := float(candidate.get("risk",0.0))
+  var score := relevance*0.42 + affinity*0.28 - distance/100.0 - risk*(1.0-_trait("courage"))*0.3
+  score += _rng.randf_range(-0.025,0.025)
+  if score > best_score:
+   best_score = score
+   best = candidate.duplicate(true)
+ best["selection_score"] = best_score
+ return best
