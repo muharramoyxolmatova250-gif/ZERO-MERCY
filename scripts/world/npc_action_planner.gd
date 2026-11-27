@@ -294,3 +294,12 @@ func filter_risky_actions(actions: Array[String], context: Dictionary = {}) -> A
    continue
   result.append(action)
  return result
+
+
+func learn_routine_preference(activity: String, satisfaction: float, repetition: float = 1.0) -> void:
+ if activity.is_empty():
+  return
+ var old := float(habits.get(activity,0.0))
+ var rate := clampf(0.06*maxf(0.25,repetition),0.02,0.22)
+ habits[activity] = clampf(lerpf(old,clampf(satisfaction,0.0,1.0),rate),0.0,1.0)
+ learned[activity] = clampf(float(learned.get(activity,0.0))+(habits[activity]-0.5)*0.08,-1.0,1.0)
