@@ -34,6 +34,8 @@ func _ready() -> void:
 func load_feed(items: Array) -> void:
 	_feed_items.clear()
 	_current_index = -1
+	_feed_buttons.clear()
+	var playable_count := 0
 	for child in feed_list.get_children():
 		child.queue_free()
 	for item in items:
@@ -46,13 +48,18 @@ func load_feed(items: Array) -> void:
 		var entry := Button.new()
 		entry.text = title + ("  •  " + path.get_file() if not path.is_empty() else "  •  Media file unavailable")
 		entry.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var available := not path.is_empty() and ResourceLoader.exists(path)
+		entry.disabled = not available
+		if available:
+			playable_count += 1
 		var item_index := _feed_items.size() - 1
 		entry.pressed.connect(func() -> void: _play_feed_item(item_index))
+		_feed_buttons.append(entry)
 		feed_list.add_child(entry)
 	if _feed_items.is_empty():
 		status.text = "No media items in this feed yet."
 	else:
-		status.text = str(_feed_items.size()) + " feed items loaded. Select an installed asset to play."
+		status.text = str(_feed_items.size()) + " feed entries • " + str(playable_count) + " playable installed assets."
 
 func _play_feed_item(index: int) -> void:
 	if index < 0 or index >= _feed_items.size():
