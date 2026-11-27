@@ -8,6 +8,8 @@ var beliefs: Dictionary = {}
 var active_intentions: Array[Dictionary] = []
 var decision_history: Array[Dictionary] = []
 var social_model: Dictionary = {}
+var personal_promises: Dictionary = {}
+var _promise_counter := 0
 var last_decision := {}
 
 func initialize(identity: String, seed_traits: Dictionary = {}) -> void:
@@ -63,7 +65,7 @@ func record_decision(goal: String, reason: String, score: float, context: Dictio
 		decision_history.pop_front()
 
 func get_cognition_snapshot() -> Dictionary:
-	return {"citizen_id":citizen_id,"emotions":emotional_state.duplicate(true),"preferences":learned_preferences.duplicate(true),"beliefs":beliefs.duplicate(true),"intentions":active_intentions.duplicate(true),"last_decision":last_decision.duplicate(true),"memory_count":episodic_memory.size()}
+	return {"citizen_id":citizen_id,"emotions":emotional_state.duplicate(true),"preferences":learned_preferences.duplicate(true),"beliefs":beliefs.duplicate(true),"intentions":active_intentions.duplicate(true),"last_decision":last_decision.duplicate(true),"memory_count":episodic_memory.size(),"pending_promises":get_pending_promises(),"promise_count":personal_promises.size()}
 
 
 func appraise_event(event_kind: String, intensity: float, personal_relevance: float = 0.5) -> Dictionary:
@@ -157,6 +159,49 @@ func get_active_intention() -> Dictionary:
 			active_intentions.remove_at(index)
 	return active_intentions[0].duplicate(true) if not active_intentions.is_empty() else {}
 
+
+
+func make_personal_promise(other_id: String, promise_text: String, due_day: int, importance: float = 0.5) -> Dictionary:
+	if other_id.is_empty() or promise_text.strip_edges().is_empty():
+		return {}
+	_promise_counter += 1
+	var promise_id := citizen_id + "_promise_" + str(_promise_counter)
+	var record := {"id":promise_id,"other_id":other_id,"promise":promise_text,"due_day":due_day,"importance":clampf(importance,0.0,1.0),"status":"pending"}
+	personal_promises[promise_id] = record
+	return record.duplicate(true)
+
+
+func resolve_personal_promise(promise_id: String, fulfilled: bool, resolution_day: int = -1) -> Dictionary:
+	if not personal_promises.has(promise_id):
+		return {}
+	var record: Dictionary = personal_promises[promise_id].duplicate(true)
+	if str(record.get("status","")) != "pending":
+		return record
+	record["status"] = "fulfilled" if fulfilled else "broken"
+	record["resolved_day"] = resolution_day
+	personal_promises[promise_id] = record
+	var other_id := str(record.get("other_id",""))
+	var importance := float(record.get("importance",0.5))
+	var impact := clampf(0.55 + importance * 0.45,0.0,1.0)
+	update_social_impression(other_id, "keep_promise" if fulfilled else "break_promise", 1.0 if fulfilled else 0.0)
+	var impression: Dictionary = social_model.get(other_id,{})
+	impression["last_promise"] = record.duplicate(true)
+	social_model[other_id] = impression
+	return record.duplicate(true)
+
+
+func get_pending_promises(other_id: String = "") -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for promise in personal_promises.values():
+		if str(promise.get("status","")) != "pending":
+			continue
+		if not other_id.is_empty() and str(promise.get("other_id","")) != other_id:
+			continue
+		result.append(promise.duplicate(true))
+	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a.get("due_day",0)) < int(b.get("due_day",0))
+	)
+	return result
 
 
 func update_social_impression(other_id: String, interaction: String, outcome: float) -> void:
