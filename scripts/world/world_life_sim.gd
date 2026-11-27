@@ -1603,6 +1603,14 @@ func get_phone_inbox(citizen_id: String, unread_only: bool = false, limit: int =
     return result.slice(0, mini(result.size(), maxi(1, limit)))
 
 
+func get_phone_contacts(citizen_id: String) -> Array:
+    var profile := _ensure_phone_profile(citizen_id)
+    if profile.is_empty():
+        return []
+    var contacts: Array = profile.get("phone_contacts", [])
+    return contacts.duplicate(true)
+
+
 func send_phone_message(sender_id: String, recipient_id: String, message_text: String, message_kind: String = "text") -> bool:
     if sender_id == recipient_id or message_text.strip_edges().is_empty():
         return false
