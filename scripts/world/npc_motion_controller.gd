@@ -90,3 +90,7 @@ func set_speed_profile(walk: float, run: float, cautious: float) -> void:
 	braking_rate = clampf(4.2 + cautious * 1.8, 4.2, 6.2)
 func get_personal_speed_factor() -> float:
 	return _speed_bias
+func arrival_speed(distance: float, radius: float, maximum: float) -> float:
+	if radius <= 0.0:
+		return maximum
+	return maximum * smoothstep(0.0, radius, maxf(0.0, distance))
