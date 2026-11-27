@@ -152,3 +152,6 @@ static func get_elbow_pole_weight(shoulder: Vector3, elbow: Vector3, wrist: Vect
 
 static func get_chain_midpoint(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -> Vector3:
 	return (shoulder + elbow * 2.0 + wrist) * 0.25
+
+static func get_target_clamp_amount(shoulder: Vector3, desired: Vector3, solved: Vector3) -> float:
+	return desired.distance_to(solved)
