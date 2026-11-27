@@ -398,8 +398,9 @@ func _physics_process(delta: float) -> void:
 	var wish := (player.transform.basis * Vector3(input.x, 0, input.y)).normalized()
 	sprinting = (Input.is_key_pressed(KEY_SHIFT) or touch_sprinting) and input.length() > 0.1 and not crouched
 	var move_speed := 7.2 if sprinting else (2.8 if crouched else 5.2)
-	player.velocity.x = wish.x * move_speed
-	player.velocity.z = wish.z * move_speed
+	external_knockback = external_knockback.move_toward(Vector3.ZERO, 10.0 * delta)
+	player.velocity.x = wish.x * move_speed + external_knockback.x
+	player.velocity.z = wish.z * move_speed + external_knockback.z
 	if player.is_on_floor():
 		player.velocity.y = 0.0
 		if Input.is_action_just_pressed("fps_jump"):
