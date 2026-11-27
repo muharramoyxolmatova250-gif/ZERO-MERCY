@@ -287,3 +287,16 @@ func infer_observed_intent(action: String, target_id: String, context: Dictionar
 		confidence = minf(0.96,confidence+0.12)
 	return {"target_id":target_id,"intent":inferred,"confidence":confidence,"evidence":action}
 
+
+
+func assess_crowd_context(observations: Array[Dictionary]) -> Dictionary:
+	var danger := 0.0
+	var support := 0.0
+	var count := 0
+	for observation in observations:
+		count += 1
+		danger += clampf(float(observation.get("danger",0.0)),0.0,1.0)
+		support += clampf(float(observation.get("helpfulness",0.0)),0.0,1.0)
+	var divisor := maxf(1.0,float(count))
+	return {"crowd_size":count,"danger_level":clampf(danger/divisor,0.0,1.0),"social_support":clampf(support/divisor,0.0,1.0),"should_leave":count > 0 and danger/divisor > 0.58}
+
