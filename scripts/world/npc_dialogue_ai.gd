@@ -395,3 +395,11 @@ func ask_follow_up(topic: String) -> String:
 		questions.append_array(["Would you like some advice?","Do you have someone supporting you?"])
 	return questions[_rng.randi_range(0,questions.size()-1)]
 
+
+
+func should_change_topic(turns_on_topic: int, emotional_tension: float) -> bool:
+	var threshold := 4 if speaking_style == "reserved" else 7
+	if float(traits.get("curiosity",0.5)) > 0.75:
+		threshold += 2
+	return turns_on_topic >= threshold or emotional_tension > 0.82
+
