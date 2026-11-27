@@ -323,3 +323,12 @@ func complete_goal(goal_id: int, outcome: String = "achieved") -> bool:
 		add_memory("goal_completed:" + str(goals[index].get("category", "")), {"goal_id":goal_id,"outcome":outcome}, 0.72, 0.95)
 		return true
 	return false
+
+
+func select_goal_for_activity(activity: String) -> Dictionary:
+	var mapping := {"food":["hunger"],"rest":["energy","comfort"],"social":["social"],"avoid_crowd":["safety"],"explore":["curiosity","exploration"],"work":["purpose"]}
+	for category in mapping.get(activity, []):
+		for goal in get_active_goals(MAX_GOALS):
+			if str(goal.get("category", "")) == str(category):
+				return goal
+	return {}
