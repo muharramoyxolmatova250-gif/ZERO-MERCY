@@ -88,3 +88,6 @@ static func get_elbow_angle(shoulder: Vector3, elbow: Vector3, wrist: Vector3) -
 
 static func get_wrist_distance(shoulder: Vector3, wrist: Vector3) -> float:
 	return shoulder.distance_to(wrist)
+
+static func get_stretch_warning(shoulder: Vector3, target: Vector3, upper_length: float, lower_length: float, threshold: float = 0.92) -> bool:
+	return get_reach_ratio(shoulder, target, upper_length, lower_length) >= threshold
