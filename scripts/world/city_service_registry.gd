@@ -8,7 +8,7 @@ func register_service(service_type: String, world_position: Vector3, capacity: i
 		return ""
 	var service_id := "service_" + str(_next_service_id)
 	_next_service_id += 1
-	_services[service_id] = {"id": service_id, "type": service_type, "position": world_position, "capacity": maxi(1, capacity), "load": 0, "active": true, "metadata": metadata.duplicate(true), "completed_visits": 0}}
+	_services[service_id] = {"id": service_id, "type": service_type, "position": world_position, "capacity": maxi(1, capacity), "load": 0, "active": true, "metadata": metadata.duplicate(true), "completed_visits": 0}
 	return service_id
 
 func unregister_service(service_id: String) -> void:
