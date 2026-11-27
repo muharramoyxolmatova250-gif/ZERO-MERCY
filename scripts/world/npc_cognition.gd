@@ -157,3 +157,19 @@ func get_active_intention() -> Dictionary:
 			active_intentions.remove_at(index)
 	return active_intentions[0].duplicate(true) if not active_intentions.is_empty() else {}
 
+
+
+func update_social_impression(other_id: String, interaction: String, outcome: float) -> void:
+	if other_id.is_empty():
+		return
+	var impression: Dictionary = social_model.get(other_id,{"trust":0.35,"familiarity":0.0,"kindness":0.5,"interactions":0})
+	var result := clampf(outcome,0.0,1.0)
+	impression["trust"] = lerpf(float(impression.get("trust",0.35)),result,0.18)
+	impression["familiarity"] = clampf(float(impression.get("familiarity",0.0))+0.08,0.0,1.0)
+	impression["interactions"] = int(impression.get("interactions",0))+1
+	impression["last_interaction"] = interaction
+	social_model[other_id] = impression
+
+func get_social_impression(other_id: String) -> Dictionary:
+	return social_model.get(other_id,{"trust":0.35,"familiarity":0.0}).duplicate(true)
+
