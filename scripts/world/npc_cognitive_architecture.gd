@@ -219,3 +219,11 @@ func simulate_reflection(context: Dictionary = {}) -> Dictionary:
 
 func get_cognitive_snapshot() -> Dictionary:
 	return {"resident_id":resident_id,"needs":needs.duplicate(true),"beliefs":beliefs.duplicate(true),"memory_count":memories.size(),"goal_count":goals.size(),"plan_count":plans.size(),"decision_count":decision_count,"last_decision":last_decision.duplicate(true),"active_drives":evaluate_need_drives()}
+
+func generate_goal_from_drive(context: Dictionary = {}) -> int:
+	var drives := evaluate_need_drives()
+	if drives.is_empty(): return -1
+	var drive: Dictionary = drives[0]
+	var need := str(drive.get("need", ""))
+	var descriptions := {"hunger":"Find food and eat","energy":"Find a safe place to rest","social":"Seek meaningful company","safety":"Move toward a safer place","curiosity":"Explore something unfamiliar","comfort":"Improve personal comfort","purpose":"Pursue a meaningful challenge"}
+	return generate_goal(str(descriptions.get(need, "Improve my situation")), need, float(drive.get("urgency", 0.5)), context)
