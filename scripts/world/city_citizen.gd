@@ -407,6 +407,9 @@ func _decide_goal() -> void:
 			for affordance in nearby_affordances:
 				discoveries.append({"name":str(affordance.get("name", affordance.get("kind", "nearby opportunity"))),"novelty":float(affordance.get("novelty", affordance.get("relevance", 0.55))),"risk":float(affordance.get("danger", affordance.get("risk", 0.25))),"position":affordance.get("position", global_position)})
 			_independent_mind.consider_curiosity_goal(discoveries)
+			var conflicts: Array[Dictionary] = _independent_mind.detect_goal_conflicts()
+			if not conflicts.is_empty():
+				_decision_reason = "curiosity_balanced_against_conflicting_personal_goals"
 		var previous_personal_goal := str(_self_direction.active_personal_goal.get("id", ""))
 		var chosen_personal_goal: Dictionary = _self_direction.choose_personal_goal(agency_context)
 		var chosen_goal_id := str(chosen_personal_goal.get("id", ""))
