@@ -1237,7 +1237,7 @@ func _scan_simulation_anomalies() -> void:
 	_simulation_awareness.update_personal_traits(float(_personality_traits.get("curiosity", 0.5)), 1.0 - float(_personality_traits.get("courage", 0.5)))
 	var candidates := get_tree().get_nodes_in_group("simulation_anomaly")
 	var nearest: Node3D
-	var nearest_distance := 18.0
+	var nearest_distance := 10.0 + float(_personality_traits.get("curiosity", 0.5)) * 12.0
 	for candidate in candidates:
 		if not candidate is Node3D or not is_instance_valid(candidate):
 			continue
