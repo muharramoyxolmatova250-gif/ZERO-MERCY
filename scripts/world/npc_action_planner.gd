@@ -321,3 +321,12 @@ func personalize_action(action: String, context: Dictionary = {}) -> String:
  if action in ["help","share_food"] and _trait("kindness") < 0.25:
   return "consider_" + action
  return action
+
+
+func plan_complexity(context: Dictionary = {}) -> int:
+ var skill := float(context.get("experience",0.0))
+ var urgency := float(context.get("urgency",0.0))
+ var base := 2 + int(_trait("discipline")*3.0) + int(skill*2.0)
+ if urgency > 0.8:
+  base = mini(base,3)
+ return clampi(base,2,7)
