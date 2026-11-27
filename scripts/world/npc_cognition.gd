@@ -64,3 +64,20 @@ func record_decision(goal: String, reason: String, score: float, context: Dictio
 
 func get_cognition_snapshot() -> Dictionary:
 	return {"citizen_id":citizen_id,"emotions":emotional_state.duplicate(true),"preferences":learned_preferences.duplicate(true),"beliefs":beliefs.duplicate(true),"intentions":active_intentions.duplicate(true),"last_decision":last_decision.duplicate(true),"memory_count":episodic_memory.size()}
+
+
+func appraise_event(event_kind: String, intensity: float, personal_relevance: float = 0.5) -> Dictionary:
+	var impact := clampf(intensity * personal_relevance, 0.0, 1.0)
+	match event_kind:
+		"threat", "violence", "accident":
+			emotional_state["fear"] = clampf(float(emotional_state.get("fear",0.0)) + impact * 0.42, 0.0, 1.0)
+		"insult", "betrayal":
+			emotional_state["anger"] = clampf(float(emotional_state.get("anger",0.0)) + impact * 0.35, 0.0, 1.0)
+			emotional_state["trust"] = clampf(float(emotional_state.get("trust",0.35)) - impact * 0.28, 0.0, 1.0)
+		"kindness", "help":
+			emotional_state["joy"] = clampf(float(emotional_state.get("joy",0.5)) + impact * 0.22, 0.0, 1.0)
+			emotional_state["trust"] = clampf(float(emotional_state.get("trust",0.35)) + impact * 0.18, 0.0, 1.0)
+		"discovery", "novelty":
+			emotional_state["curiosity"] = clampf(float(emotional_state.get("curiosity",0.5)) + impact * 0.3, 0.0, 1.0)
+	return emotional_state.duplicate(true)
+
