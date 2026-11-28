@@ -1,52 +1,41 @@
 extends SceneTree
-## Exercises the real autoloaded campaign manager from mission start through reward persistence.
+## Runs the real campaign manager in isolation, without reading or changing player save data.
+
+const MissionManagerScript = preload("res://scripts/story/mission_manager.gd")
 
 func _initialize() -> void:
-	call_deferred("_run")
-
-func _run() -> void:
-	var manager := root.get_node_or_null("MissionManager")
-	if manager == null:
-		_fail("MissionManager autoload is missing.")
+	var manager = MissionManagerScript.new()
+	manager.load_definitions("res://data/story/missions.json")
+	manager.load_campaign("res://data/story/campaign_structure.json")
+	if manager.definitions.is_empty() or manager.campaign_order.is_empty():
+		_fail("Campaign data failed to load.")
 		return
-
-	var definitions: Dictionary = manager.get("definitions")
-	var main_order: Array = manager.get("campaign_order")
-	var side_ids: Array = manager.get("side_mission_ids")
-	if definitions.is_empty():
-		_fail("Campaign mission definitions did not load.")
+	if manager.campaign_order.size() != 38 or manager.side_mission_ids.size() != 25:
+		_fail("Expected 38 main missions and 25 side missions; got %d and %d." % [manager.campaign_order.size(), manager.side_mission_ids.size()])
 		return
-	if main_order.size() != 38 or side_ids.size() != 25:
-		_fail("Expected 38 main missions and 25 side missions; got %d and %d." % [main_order.size(), side_ids.size()])
-		return
-
-	for mission_id in main_order + side_ids:
-		if not definitions.has(str(mission_id)):
-			_fail("Campaign references a missing mission definition: " + str(mission_id))
+	for mission_id in manager.campaign_order + manager.side_mission_ids:
+		if not manager.definitions.has(mission_id):
+			_fail("Campaign references missing mission: " + mission_id)
 			return
-
-	var initial_credits := int(manager.get("credits"))
-	if not manager.call("start_mission", "prologue_signal"):
+	var initial_credits := manager.credits
+	if not manager.start_mission("prologue_signal"):
 		_fail("The first campaign mission could not be started.")
 		return
-	var expected_events := ["enter_old_market", "interact_beacon", "escort_family_safe"]
-	for event_id in expected_events:
-		manager.call("report_event", event_id)
-	if str(manager.get("active_mission_id")) != "":
-		_fail("The first mission did not complete after all three objective events.")
+	for event_id in ["enter_old_market", "interact_beacon", "escort_family_safe"]:
+		manager.report_event(event_id)
+	if manager.active_mission_id != "":
+		_fail("The first mission did not complete after its three objective events.")
 		return
-	var completed: Array = manager.get("completed_missions")
-	if not completed.has("prologue_signal"):
-		_fail("The completed first mission was not recorded.")
+	if not manager.completed_missions.has("prologue_signal"):
+		_fail("Completed mission was not recorded.")
 		return
-	if not bool(manager.call("get_story_flag", "family_saved", false)):
-		_fail("The first mission reward story flag was not applied.")
+	if not bool(manager.get_story_flag("family_saved", false)):
+		_fail("Mission reward story flag was not applied.")
 		return
-	if int(manager.get("credits")) != initial_credits + 250:
-		_fail("The first mission credit reward was not applied.")
+	if manager.credits != initial_credits + 250:
+		_fail("The 250-credit mission reward was not applied.")
 		return
-
-	print("PASS campaign integration: 38 main + 25 side definitions, first mission objectives, completion, story flag and 250-credit reward.")
+	print("PASS campaign integration: 38 main + 25 side definitions, mission objectives, completion, story flag and reward.")
 	quit(0)
 
 func _fail(message: String) -> void:
