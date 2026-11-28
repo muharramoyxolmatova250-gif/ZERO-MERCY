@@ -9,6 +9,8 @@ extends StaticBody3D
 @export_multiline var anomaly_detail := ""
 @export_range(0.0, 1.0, 0.01) var evidence_strength := 0.65
 var _cooldown := 0.0
+## Optional explicit reference for isolated tests; gameplay resolves the autoload.
+var mission_manager: Node
 var _label: Label3D
 var _progress_label: Label3D
 
@@ -102,9 +104,11 @@ func interact() -> void:
     _cooldown = 0.8
     if event_id in ["collect_repeating_faces", "decode_boundary_recording"]:
         evidence_strength = clampf(evidence_strength + 0.08, 0.0, 1.0)
-    var mission_manager = get_tree().root.get_node_or_null("MissionManager")
-    if mission_manager != null:
-        mission_manager.call("report_event", event_id, 1)
+    var manager := mission_manager
+    if manager == null and is_inside_tree():
+        manager = get_node_or_null("/root/MissionManager")
+    if manager != null and is_instance_valid(manager):
+        manager.call("report_event", event_id, 1)
 
 func set_progress(value: int, total: int) -> void:
     current = value
