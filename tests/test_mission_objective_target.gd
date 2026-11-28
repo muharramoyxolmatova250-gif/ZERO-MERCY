@@ -24,10 +24,11 @@ func _initialize() -> void:
 		return
 
 	var first_marker = _make_marker("enter_old_market")
-	var routed_manager = first_marker.get_node_or_null("/root/MissionManager")
-	print("DEBUG marker event=", first_marker.event_id, " manager_match=", routed_manager == manager, " active_before=", manager.active_mission_id, " objective_before=", manager.get_current_objective())
+	var routed_manager = first_marker.get_tree().root.get_node_or_null("MissionManager")
+	if routed_manager != manager:
+		_fail("Objective marker resolved a different mission manager instance.")
+		return
 	first_marker.interact()
-	print("DEBUG active_after=", manager.active_mission_id, " objective_after=", manager.get_current_objective())
 	if str(manager.get_current_objective().get("event", "")) != "interact_beacon":
 		_fail("First physical marker did not advance to the beacon objective.")
 		return
