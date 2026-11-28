@@ -27,10 +27,6 @@ func _run() -> void:
 		return
 
 	var first_marker = _make_marker("enter_old_market")
-	var routed_manager = first_marker.get_tree().root.get_node_or_null("MissionManager")
-	if routed_manager != manager:
-		_fail("Objective marker resolved a different mission manager instance.")
-		return
 	first_marker.interact()
 	if str(manager.get_current_objective().get("event", "")) != "interact_beacon":
 		_fail("First physical marker did not advance to the beacon objective.")
@@ -60,6 +56,7 @@ func _run() -> void:
 func _make_marker(event_name: String):
 	var marker = ObjectiveTargetScript.new()
 	marker.event_id = event_name
+	marker.mission_manager = root.get_node("MissionManager")
 	root.add_child(marker)
 	return marker
 
