@@ -40,6 +40,8 @@ var last_director_pose: Dictionary = {}
 var attention_target: Node3D
 var lod_accumulator := 0.0
 var animation_events = NPCAnimationEventQueue.new()
+var queued_gesture := ""
+var queued_gesture_remaining := 0.0
 var animation_state = NPCAnimationStateMachine.new()
 var animation_diagnostics = NPCAnimationDiagnostics.new()
 var resident_variation: Dictionary = {}
@@ -76,6 +78,12 @@ func update_pose(delta: float, speed: float, motion_state: String, activity: Str
 	last_director_pose = director.update(dt, speed, motion_state, activity, using_phone, stress, goal, traits, preferred_speed, urgent)
 	idle_gesture = str(last_director_pose.get("gesture", ""))
 	idle_gesture_remaining = float(last_director_pose.get("gesture_state", {}).get("remaining", 0.0))
+	if queued_gesture_remaining > 0.0:
+		queued_gesture_remaining = maxf(0.0, queued_gesture_remaining - dt)
+		if queued_gesture_remaining > 0.0:
+			idle_gesture = queued_gesture
+		else:
+			queued_gesture = ""
 	phase = float(last_director_pose.get("gait", {}).get("phase", phase))
 	idle_phase = fposmod(idle_phase + dt * (0.8 + variation_seed * 0.08), TAU)
 	gesture_phase = fposmod(gesture_phase + dt * 1.7, TAU)
@@ -283,11 +291,11 @@ func get_hand_pose(name: String) -> Dictionary:
 
 
 func _dispatch_animation_events(delta: float) -> void:
-	for event in animation_events.consume_ready(delta):
+	for event in animation_events.update(delta):
 		var kind := str(event.get("kind", ""))
 		var payload: Dictionary = event.get("payload", {})
 		if kind == "reaction":
 			trigger_reaction(str(payload.get("reaction", "alert")), float(payload.get("intensity", 0.65)))
 		elif kind == "gesture":
-			idle_gesture = str(payload.get("gesture", "talk"))
-			idle_gesture_remaining = maxf(idle_gesture_remaining, float(payload.get("duration", 0.8)))
+			queued_gesture = str(payload.get("gesture", "talk"))
+			queued_gesture_remaining = maxf(0.05, float(payload.get("duration", 0.8)))
