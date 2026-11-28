@@ -388,3 +388,40 @@ func _dominant_emotion() -> String:
 			selected = str(emotion)
 	return selected
 
+
+func get_social_impression(other_id: String) -> Dictionary:
+	if other_id.is_empty():
+		return {}
+	return (social_model.get(other_id, {
+		"trust": 0.35,
+		"familiarity": 0.0,
+		"warmth": 0.5,
+		"respect": 0.5,
+		"conflict": 0.0,
+		"interactions": 0,
+		"history": [],
+		"relationship": "stranger"
+	}) as Dictionary).duplicate(true)
+
+
+func get_relationship_snapshot(other_id: String) -> Dictionary:
+	return get_social_impression(other_id)
+
+
+func _relationship_label(impression: Dictionary) -> String:
+	var trust := clampf(float(impression.get("trust", 0.35)), 0.0, 1.0)
+	var conflict := clampf(float(impression.get("conflict", 0.0)), 0.0, 1.0)
+	var familiarity := clampf(float(impression.get("familiarity", 0.0)), 0.0, 1.0)
+	if conflict >= 0.55 and trust < 0.35:
+		return "hostile"
+	if trust >= 0.78 and familiarity >= 0.45:
+		return "close_friend"
+	if trust >= 0.62 and familiarity >= 0.2:
+		return "trusted"
+	if trust < 0.2 and familiarity >= 0.06:
+		return "distrustful"
+	if familiarity >= 0.06:
+		return "acquaintance"
+	return "stranger"
+
+
