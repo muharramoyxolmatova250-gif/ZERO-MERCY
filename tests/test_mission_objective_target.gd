@@ -4,6 +4,9 @@ const MissionManagerScript = preload("res://scripts/story/mission_manager.gd")
 const ObjectiveTargetScript = preload("res://scripts/story/mission_objective_target.gd")
 
 func _initialize() -> void:
+	call_deferred("_run")
+
+func _run() -> void:
 	var manager = root.get_node_or_null("MissionManager")
 	if manager == null:
 		manager = MissionManagerScript.new()
