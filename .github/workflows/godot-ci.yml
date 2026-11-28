@@ -35,19 +35,19 @@ jobs:
         run: godot --headless --path . --quit-after 5
 
       - name: Run carry hand IK geometry tests
-        run: godot --headless --path . --script res://tests/test_carry_hand_ik.gd
+        run: bash tests/run_godot_test.sh res://tests/test_carry_hand_ik.gd
 
       - name: Run NPC self-direction regression tests
-        run: godot --headless --path . --script res://tests/test_npc_self_direction.gd
+        run: bash tests/run_godot_test.sh res://tests/test_npc_self_direction.gd
 
       - name: Run NPC social memory regression tests
-        run: godot --headless --path . --script res://tests/test_npc_social_memory.gd
+        run: bash tests/run_godot_test.sh res://tests/test_npc_social_memory.gd
 
       - name: Run NPC family and household regression tests
-        run: godot --headless --path . --script res://tests/test_world_family_system.gd
+        run: bash tests/run_godot_test.sh res://tests/test_world_family_system.gd
 
       - name: Run campaign progression integration test
-        run: godot --headless --path . --script res://tests/test_mission_campaign.gd
+        run: bash tests/run_godot_test.sh res://tests/test_mission_campaign.gd
 
       - name: Run core system integration smoke test
-        run: godot --headless --path . --script res://tests/core_integration_smoke.gd
+        run: bash tests/run_godot_test.sh res://tests/core_integration_smoke.gd
