@@ -17,9 +17,11 @@ func _initialize() -> void:
 		if not manager.definitions.has(mission_id):
 			_fail("Campaign references missing mission: " + mission_id)
 			return
-	var initial_credits := manager.credits
+	var initial_credits: int = int(manager.credits)
 	if not manager.start_mission("prologue_signal"):
-		_fail("The first campaign mission could not be started.")
+		var first_definition: Dictionary = manager.definitions.get("prologue_signal", {})
+		var prerequisites_ok: bool = bool(manager.call("_prerequisites_met", first_definition))
+		_fail("The first campaign mission could not be started (definition=%s, active=%s, prerequisites=%s)." % [str(not first_definition.is_empty()), str(manager.active_mission_id), str(prerequisites_ok)])
 		return
 	for event_id in ["enter_old_market", "interact_beacon", "escort_family_safe"]:
 		manager.report_event(event_id)
