@@ -35,8 +35,9 @@ var _last_routine_hour := -1
 func _ready() -> void:
     add_to_group("world_life_sim")
     _rng.randomize()
-    if has_node("/root/GameSession"):
-        GameSession.session_clock_changed.connect(_on_session_clock_changed)
+    var game_session = get_node_or_null("/root/GameSession")
+    if game_session != null and game_session.has_signal("session_clock_changed"):
+        game_session.connect("session_clock_changed", Callable(self, "_on_session_clock_changed"))
     _load_state()
     _build_phone_media_catalog()
     _rebuild_claim_cache()
@@ -647,8 +648,9 @@ func _advance_education(profile: Dictionary) -> void:
 
 
 func publish_event_if_available(event_id: String, payload: Dictionary) -> void:
-    if has_node("/root/GameSession"):
-        GameSession.publish_world_event(event_id, payload)
+    var game_session = get_node_or_null("/root/GameSession")
+    if game_session != null and game_session.has_method("publish_world_event"):
+        game_session.call("publish_world_event", event_id, payload)
 
 func advance_month() -> void:
     simulation_day += 30
