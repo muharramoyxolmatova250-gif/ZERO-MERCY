@@ -5,6 +5,7 @@ const ObjectiveTargetScript = preload("res://scripts/story/mission_objective_tar
 
 func _initialize() -> void:
 	var manager = MissionManagerScript.new()
+	manager.name = "MissionManager"
 	manager.load_definitions("res://data/story/missions.json")
 	manager.load_campaign("res://data/story/campaign_structure.json")
 	root.add_child(manager)
