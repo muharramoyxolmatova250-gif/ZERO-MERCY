@@ -37,7 +37,24 @@ func _initialize() -> void:
 	if manager.credits != initial_credits + 250:
 		_fail("The 250-credit mission reward was not applied.")
 		return
-	print("PASS campaign integration: 38 main + 25 side definitions, mission objectives, completion, story flag and reward.")
+	var snapshot: Dictionary = manager.get_campaign_snapshot()
+	if int(snapshot.get("main_completed", 0)) != 1 or int(snapshot.get("main_total", 0)) != 38:
+		_fail("Campaign snapshot did not record first-mission progress.")
+		return
+	if not manager.has_next_campaign_mission() or not manager.start_next_campaign_mission():
+		_fail("The campaign did not advance to its next available main mission.")
+		return
+	if manager.active_mission_id != "prologue_aftershock":
+		_fail("Campaign order advanced to the wrong mission: " + manager.active_mission_id)
+		return
+	if str(manager.get_current_objective().get("event", "")) != "reach_safehouse":
+		_fail("The second mission did not expose its first objective.")
+		return
+	manager.report_event("disable_pursuit_drone")
+	if str(manager.get_current_objective().get("event", "")) != "reach_safehouse":
+		_fail("An out-of-order event incorrectly advanced the mission.")
+		return
+	print("PASS campaign integration: mission catalog, objective order, rewards, snapshot progress and next-mission unlock.")
 	quit(0)
 
 func _fail(message: String) -> void:
