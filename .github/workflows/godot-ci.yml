@@ -55,5 +55,8 @@ jobs:
       - name: Run physical mission objective marker integration test
         run: bash tests/run_godot_test.sh res://tests/test_mission_objective_target.gd
 
+      - name: Run mission save/load regression test
+        run: bash tests/run_godot_test.sh res://tests/test_mission_save_roundtrip.gd
+
       - name: Run core system integration smoke test
         run: bash tests/run_godot_test.sh res://tests/core_integration_smoke.gd
