@@ -96,7 +96,7 @@ func interact() -> void:
     _cooldown = 0.8
     if event_id in ["collect_repeating_faces", "decode_boundary_recording"]:
         evidence_strength = clampf(evidence_strength + 0.08, 0.0, 1.0)
-    var mission_manager = get_node_or_null("/root/MissionManager")
+    var mission_manager = get_tree().root.get_node_or_null("MissionManager")
     if mission_manager != null:
         mission_manager.call("report_event", event_id, 1)
 
