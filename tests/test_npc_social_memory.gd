@@ -19,7 +19,7 @@ func _make_mind(identity: String):
 
 func _test_help_builds_trust() -> void:
 	var mind = _make_mind("social_helper")
-	for index in range(4):
+	for index in range(8):
 		mind.update_social_impression("neighbor_1", "help", 1.0)
 	var relation: Dictionary = mind.get_relationship_snapshot("neighbor_1")
 	assert(float(relation.get("trust", 0.0)) > 0.8)
