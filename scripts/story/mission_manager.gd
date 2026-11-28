@@ -309,9 +309,10 @@ func _complete_active_mission() -> void:
     _save_progress()
 
 func _restore_progress() -> void:
-    if not has_node("/root/SaveManager"):
+    var save_manager = get_node_or_null("/root/SaveManager")
+    if save_manager == null:
         return
-    var payload: Dictionary = SaveManager.load_game()
+    var payload: Dictionary = save_manager.call("load_game")
     completed_missions.clear()
     for mission_id in payload.get("completed_missions", []):
         completed_missions.append(str(mission_id))
@@ -327,9 +328,10 @@ func _restore_progress() -> void:
         active_objective_index = clampi(active_objective_index, 0, maxi(0, objectives.size() - 1))
 
 func _save_progress() -> void:
-    if not has_node("/root/SaveManager"):
+    var save_manager = get_node_or_null("/root/SaveManager")
+    if save_manager == null:
         return
-    var payload: Dictionary = SaveManager.load_game()
+    var payload: Dictionary = save_manager.call("load_game")
     payload["completed_missions"] = completed_missions
     payload["story_flags"] = story_flags
     payload["story_choices"] = story_choices
@@ -337,4 +339,4 @@ func _save_progress() -> void:
     payload["active_mission_id"] = active_mission_id
     payload["active_objective_index"] = active_objective_index
     payload["objective_progress"] = objective_progress
-    SaveManager.save_game(payload)
+    save_manager.call("save_game", payload)
