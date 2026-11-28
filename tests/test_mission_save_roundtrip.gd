@@ -44,9 +44,26 @@ func _run() -> void:
 	if str(restored.get_current_objective().get("event", "")) != "escort_family_safe":
 		_fail("Restored campaign could not continue from its saved objective.")
 		return
+	restored.report_event("escort_family_safe")
+	if not restored.completed_missions.has("prologue_signal"):
+		_fail("Completed mission was not recorded before saving.")
+		return
+	if restored.credits != 250 or not bool(restored.get_story_flag("family_saved", false)):
+		_fail("Mission reward credits or story flag were not applied.")
+		return
+
+	var final_restore = MissionManagerScript.new()
+	final_restore.name = "MissionSaveRoundTripFinalRestore"
+	root.add_child(final_restore)
+	if not final_restore.completed_missions.has("prologue_signal"):
+		_fail("Completed mission state was not restored from the save file.")
+		return
+	if final_restore.credits != 250 or not bool(final_restore.get_story_flag("family_saved", false)):
+		_fail("Completed mission rewards were not restored from the save file.")
+		return
 
 	save_manager.call("delete_save")
-	print("PASS mission save round trip: active mission, objective index, completed objective progress and continued progression.")
+	print("PASS mission save round trip: active objective progress, continued play, completion, rewards and story flags persist.")
 	quit(0)
 
 func _fail(message: String) -> void:
