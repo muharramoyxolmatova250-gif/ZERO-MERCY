@@ -885,7 +885,7 @@ func _consider_vehicle_purchase(profile: Dictionary) -> void:
         return
     var vehicle_types := ["compact_car", "sedan", "motorcycle", "electric_car"]
     var vehicle_prices := {"compact_car": 18000, "sedan": 26000, "motorcycle": 8500, "electric_car": 34000}
-    var vehicle_type := vehicle_types[_rng.randi_range(0, vehicle_types.size() - 1)]
+    var vehicle_type: String = vehicle_types[_rng.randi_range(0, vehicle_types.size() - 1)]
     var price := int(vehicle_prices[vehicle_type])
     if total_funds < price:
         vehicle_type = "motorcycle"
