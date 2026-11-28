@@ -4,11 +4,21 @@ const MissionManagerScript = preload("res://scripts/story/mission_manager.gd")
 const ObjectiveTargetScript = preload("res://scripts/story/mission_objective_target.gd")
 
 func _initialize() -> void:
-	var manager = MissionManagerScript.new()
-	manager.name = "MissionManager"
+	var manager = root.get_node_or_null("MissionManager")
+	if manager == null:
+		manager = MissionManagerScript.new()
+		manager.name = "MissionManager"
+		root.add_child(manager)
 	manager.load_definitions("res://data/story/missions.json")
 	manager.load_campaign("res://data/story/campaign_structure.json")
-	root.add_child(manager)
+	manager.active_mission_id = ""
+	manager.completed_missions.clear()
+	manager.story_flags.clear()
+	manager.story_choices.clear()
+	manager.credits = 0
+	if root.get_node_or_null("MissionManager") != manager:
+		_fail("Test mission manager is not the root manager used by objective markers.")
+		return
 	if not manager.start_mission("prologue_signal"):
 		_fail("Could not start the first mission.")
 		return
