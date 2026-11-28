@@ -29,6 +29,12 @@ func _ready() -> void:
     shape_node.shape = sphere
     add_child(shape_node)
 
+    # Headless integration tests exercise the real interaction/collision node,
+    # but do not need Label3D or render meshes. Avoid render resources with the
+    # dummy headless renderer; normal gameplay keeps the complete visual marker.
+    if DisplayServer.get_name() == "headless":
+        return
+
     var color := Color(0.05, 0.9, 1.0)
     if event_id == "collect_repeating_faces": color = Color(0.72, 0.28, 1.0)
     elif event_id == "decode_boundary_recording": color = Color(1.0, 0.55, 0.12)
